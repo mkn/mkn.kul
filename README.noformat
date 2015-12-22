@@ -1,0 +1,52 @@
+kul
+===
+
+C++ Kommon usage library
+
+Convenience library providing cross platform threading/process management/io/logging
+
+How to use:
+view inc/kul.test.hpp
+
+License: BSD
+
+Switches
+ 
+Key             __KUL_LOG_FRMT__ 
+Type            string
+Default         "[%M] : %T - %D : %F : %L - %S"
+OS              all
+Description
+Logging format in format view:
+	%M = Mode - DEBUG/INFO/ERROR
+	%T = Thread ID
+	%D = DateTime - uses __KUL_LOG_DATE_FRMT__
+	%F = File
+	%L = Line
+	%S = String
+
+Key             __KUL_LOG_DATE_FRMT__ 
+Type            string
+Default         "%Y-%m-%d-%H:%M:%S:%i"
+OS              all
+Description
+Logging DateTime format, reference: http://en.cppreference.com/w/cpp/chrono/c/strftime
+"%i" is custom for milliseconds, method strftime is used for all other
+
+Key             __KUL_THREAD_SPAWN_WAIT__
+Type             number
+Default
+    nix/bsd     5000000
+    win         0
+OS              all
+Description
+Used in thread pools. The amount of time in nanoseconds waited after launching a thread. Threads launched too quickly can cause issues on nix platforms, bsd assumed similar.
+
+Key             __KUL_PROC_BLOCK_ERR__ 
+Type            flag
+Default         disabled
+OS              nix/bsd
+Description
+Turns on error checking for creating new processes when running - 
+    fcntl(fd, F_SETFL, O_NONBLOCK);
+Can be an issue being on when running many processes rapidly.
