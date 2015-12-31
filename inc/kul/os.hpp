@@ -39,6 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "kul/string.hpp"
 
 #include <fstream>
+#include <iostream>
 
 namespace kul{
 
@@ -81,7 +82,28 @@ inline const std::string CWD(){
 }
 bool CWD(const std::string& c);
 bool CWD(const Dir& d);
+#ifdef _WIN32
+inline const char* GET(const char* c){
+	return getenv(c);
 }
+inline void SET(const char* var, const char* val){
+	putenv(std::string(std::string(var) + "=" + std::string(val)).c_str());
+}
+inline const char SEP(){
+	return ';';
+}
+#else
+inline const char* GET(const char* c){
+	return getenv(c);
+}
+inline void SET(const char* var, const char* val){
+	setenv(var, val, 1);
+}
+inline const char SEP(){
+	return ':';
+}
+#endif
+} // END NAMESPACE env
 
 class Dir{
 	private:
@@ -112,6 +134,9 @@ class Dir{
 	public:
 		Dir(){}
 		Dir(const std::string& p, bool m = false) throw(fs::Exception) : p(Dir::LOCL(p)) {
+#ifndef _WIN32
+			if(p.size() && p[0] == '~') this->p = (env::GET("HOME") + p.substr(1));
+#endif
 			if(m && !is() && !mk()) KEXCEPT(fs::Exception, "Invalid directory path provided");
 		}
 		Dir(const Dir& d) : p(d.p){}
@@ -365,27 +390,6 @@ inline std::ostream& operator<<(std::ostream &s, const File& d){
 }
 
 namespace env{
-#ifdef _WIN32
-inline const char* GET(const char* c){
-	return getenv(c);
-}
-inline void SET(const char* var, const char* val){
-	putenv(std::string(std::string(var) + "=" + std::string(val)).c_str());
-}
-inline const char SEP(){
-	return ';';
-}
-#else
-inline const char* GET(const char* c){
-	return getenv(c);
-}
-inline void SET(const char* var, const char* val){
-	setenv(var, val, 1);
-}
-inline const char SEP(){
-	return ':';
-}
-#endif
 inline bool WHICH(const char* c){
 	for(const auto& s : kul::String::split(std::string(env::GET("PATH")), kul::env::SEP()))
 		for(const auto& f : kul::Dir(s).files())

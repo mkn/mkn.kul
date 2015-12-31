@@ -78,7 +78,6 @@ class GCCompiler : public CCompiler{
 			}
 			kul::Process p(cmd);
 			for(unsigned int i = 1; i < bits.size(); i++) p.arg(bits[i]);
-			CompilerProcessCapture pc(p);
 			for(const std::string& path : libPaths)	p.arg("-L" + path);
 			if(mode == Mode::STAT) p.arg("-static");
 			p.arg("-o").arg(out);
@@ -86,6 +85,7 @@ class GCCompiler : public CCompiler{
 			for(const std::string& lib : libs)	p.arg("-l" + lib);
 			for(const std::string& s: kul::String::split(linkerEnd, ' ')) p.arg(s);
 			
+			CompilerProcessCapture pc(p);
 			try{
 				p.start();
 			}catch(const kul::proc::Exception& e){
@@ -113,12 +113,12 @@ class GCCompiler : public CCompiler{
 				cmd = bits[0];
 			}
 			kul::Process p(cmd);
-			CompilerProcessCapture pc(p);
 			for(unsigned int i = 1; i < bits.size(); i++) p.arg(bits[i]);
 			if(mode == Mode::SHAR)		p.arg("-shared");
 			p.arg("-o").arg(lib);
 			for(const std::string& o : objects)	p.arg(o);
 			for(const std::string& s: kul::String::split(linkerEnd, ' ')) p.arg(s);
+			CompilerProcessCapture pc(p);
 			try{
 				p.start();
 			}catch(const kul::proc::Exception& e){
@@ -144,16 +144,16 @@ class GCCompiler : public CCompiler{
 			}
 			kul::Process p(cmd);
 			for(unsigned int i = 1; i < bits.size(); i++) p.arg(bits[i]);
-			CompilerProcessCapture pc(p);
-			
 			for(const std::string& s : incs) p.arg("-I"+s);
 			for(const std::string& s : args) p.arg(s);
 			p.arg("-o").arg(out).arg("-c").arg(in);
+			CompilerProcessCapture pc(p);
 			try{
 				p.start();
 			}catch(const kul::proc::Exception& e){
 				pc.exception(std::current_exception());
 			}
+			pc.tmp(out);
 			pc.cmd(p.toString());
 			return pc;
 		}
@@ -251,14 +251,14 @@ class WINCompiler : public CCompiler{
 				cmd = bits[0];
 			}
 			kul::Process p(cmd);
-			CompilerProcessCapture pc(p);
-			p.arg("/OUT:\"" + exe + "\"").arg("/nologo");	
 			for(unsigned int i = 1; i < bits.size(); i++) p.arg(bits[i]);
-			for(const std::string& path : libPaths)	p.arg("/LIBPATH:\"" + path + "\"");
+			p.arg("-OUT:\"" + exe + "\"").arg("-nologo");
+			for(const std::string& path : libPaths)	p.arg("-LIBPATH:\"" + path + "\"");
 			for(const std::string& o : objects)	p.arg(o);
 			for(const std::string& lib : libs) p.arg(staticLib(lib));
 			for(const std::string& s: kul::String::split(linkerEnd, ' ')) p.arg(s);
 
+			CompilerProcessCapture pc;
 			try{
 				p.start();
 			}catch(const kul::proc::Exception& e){
@@ -286,17 +286,17 @@ class WINCompiler : public CCompiler{
 				cmd = bits[0];
 			}
 			kul::Process p(cmd);
-			p.arg("/OUT:\"" + lib + "\"").arg("/nologo");
-			if(mode == Mode::STAT) p.arg("/LTCG");
+			for(unsigned int i = 1; i < bits.size(); i++) p.arg(bits[i]);
+			p.arg("-OUT:\"" + lib + "\"").arg("-nologo");
+			if(mode == Mode::STAT) p.arg("-LTCG");
 			else {
-				p.arg("/DLL");
-				for(const std::string& path : libPaths)	p.arg("/LIBPATH:\"" + path + "\"");
+				p.arg("-DLL");
+				for(const std::string& path : libPaths)	p.arg("-LIBPATH:\"" + path + "\"");
 				for(const std::string& lib : libs) p.arg(staticLib(lib));
 			}
-			CompilerProcessCapture pc(p);
-			for(unsigned int i = 1; i < bits.size(); i++) p.arg(bits[i]);
 			for(const std::string& o : objects)	p.arg(o);
 			for(const std::string& s: kul::String::split(linkerEnd, ' ')) p.arg(s);
+			CompilerProcessCapture pc;
 			try{
 				p.start();
 			}catch(const kul::proc::Exception& e){
@@ -322,16 +322,18 @@ class WINCompiler : public CCompiler{
 			}
 			kul::Process p(cmd);
 			for(unsigned int i = 1; i < bits.size(); i++) p.arg(bits[i]);
-			p.arg("/nologo");
-			CompilerProcessCapture pc(p);
-			for(const std::string& s : incs)	p.arg("/I\"" + s + "\"");
+			p.arg("-nologo");
+			for(const std::string& s : incs)	p.arg("-I\"" + s + "\"");
 			for(const std::string& s : args)	p.arg(s);
-			p.arg("/c").arg("/Fo\"" + out + "\"").arg("\"" + in + "\"");
+			p.arg("-c").arg("-Fo\"" + out + "\"").arg("\"" + in + "\"");
+			CompilerProcessCapture pc;
+			if(!kul::LogMan::INSTANCE().inf()) pc.setProcess(p);
 			try{
 				p.start();
 			}catch(const kul::Exception& e){
 				pc.exception(std::current_exception());
 			}
+			pc.tmp(out);
 			pc.cmd(p.toString());
 			return pc;
 		}

@@ -246,10 +246,7 @@ class Process : public kul::AProcess{
 				DWORD ec = 0;
 				if (FALSE == GetExitCodeProcess(piProcInfo.hProcess, &ec))
 					KEXCEPT(kul::proc::Exception, "GetExitCodeProcess failure");
-				if(ec != 0)
-					kul::LogMan::INSTANCE().err()
-					? throw proc::ExitException(__FILE__, __LINE__, ec, "Process exit code: " + std::to_string(ec) + kul::os::EOL() + toString())
-					: throw proc::ExitException(__FILE__, __LINE__, ec, "Process exit code: " + std::to_string(ec));
+				exitCode(ec);
 				finish();
 				setFinished();
 			}

@@ -58,15 +58,16 @@ class ExitException : public kul::proc::Exception{
 		const short ec;
 	public:
 		ExitException(const char*f, const int l, const short ec, const std::string& s) : Exception(f, l, s), ec(ec){}
-		const short& code(){ return ec; }
+		const short& code() const { return ec; }
 };
 }
 
 class AProcess{
 	private:
-		bool f, s;
-		const bool wfe;
-		unsigned int pi;
+		bool f = 0, s = 0;
+		const bool wfe = 1;
+		uint pi = 0;
+		int pec = 0;
 		const std::string d;
 		std::function<void(std::string)> e;
 		std::function<void(std::string)> o;
@@ -74,8 +75,8 @@ class AProcess{
 		kul::hash::map::S2S evs;
 		friend std::ostream& operator<<(std::ostream&, const AProcess&);
 	protected:
-		AProcess(const std::string& cmd, const bool& wfe) : f(0), s(0), wfe(wfe), pi(0) { argv.push_back(cmd); }
-		AProcess(const std::string& cmd, const std::string& d, const bool& wfe) : f(0), s(0), wfe(wfe), d(d){ argv.push_back(cmd); }
+		AProcess(const std::string& cmd, const bool& wfe) : wfe(wfe){ argv.push_back(cmd); }
+		AProcess(const std::string& cmd, const std::string& d, const bool& wfe) : wfe(wfe), d(d){ argv.push_back(cmd); }
 		virtual ~AProcess(){}
 
 		const std::string&	directory()const { return d; }
@@ -102,6 +103,7 @@ class AProcess{
 			tearDown();
 			throw Exception("kul/proc.hpp", line, s);
 		}
+		void exitCode(const int& e){ pec = e; }
 	public:
 		template <class T> AProcess& arg(const T& a) { 
 			std::stringstream ss;
@@ -114,7 +116,15 @@ class AProcess{
 		virtual void start() throw(kul::Exception){
 			if(this->s) KEXCEPT(kul::proc::Exception, "Process is already started");
 			this->s = true;
-			this->run();
+			if(this->o || this->e) {
+				// std::cout << "\nCAPTURED\n" << std::endl;
+				this->run();
+			}
+			else pec = kul::os::exec(toString());
+			if(pec != 0)
+				kul::LogMan::INSTANCE().err()
+					? throw proc::ExitException(__FILE__, __LINE__, pec, "Process exit code: " + std::to_string(pec) + kul::os::EOL() + toString())
+					: throw proc::ExitException(__FILE__, __LINE__, pec, "Process exit code: " + std::to_string(pec));
 		}
 		const unsigned int& pid() 	const { return pi; }
 		bool started()		const { return pi > 0; }
@@ -127,6 +137,7 @@ class AProcess{
 		}
 		void setOut(std::function<void(std::string)> o) { this->o = o; }
 		void setErr(std::function<void(std::string)> e) { this->e = e; }
+		const int& exitCode(){ return pec; }
 };
 
 inline std::ostream& operator<<(std::ostream &s, const AProcess &p){
@@ -148,12 +159,15 @@ class ProcessCapture{
 		}
 	public:
 		ProcessCapture(AProcess& p){
-			p.setOut(std::bind(&ProcessCapture::out, std::ref(*this), std::placeholders::_1));
-			p.setErr(std::bind(&ProcessCapture::err, std::ref(*this), std::placeholders::_1));
+			setProcess(p);
 		}
 		virtual ~ProcessCapture(){}
 		const std::string outs() const { return so.str(); }
 		const std::string errs() const { return se.str(); }
+		void setProcess(AProcess& p){
+			p.setOut(std::bind(&ProcessCapture::out, std::ref(*this), std::placeholders::_1));
+			p.setErr(std::bind(&ProcessCapture::err, std::ref(*this), std::placeholders::_1));
+		}
 };
 
 }

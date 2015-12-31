@@ -43,6 +43,8 @@ namespace kul{ namespace code{
 
 enum Mode { NONE = 0, STAT, SHAR};
 
+
+class Compiler;
 class CompilerProcessCapture : public kul::ProcessCapture{
 	private:
 		std::exception_ptr ep;

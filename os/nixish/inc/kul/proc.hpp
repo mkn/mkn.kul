@@ -66,7 +66,6 @@ class Process : public kul::AProcess{
 		int errFd[2];
 		int popPip[3];
 		int cStat; //child status
-		int cec; //child exit code
 
 		inline int recall(const int& s){
 			int ret; 
@@ -103,11 +102,7 @@ class Process : public kul::AProcess{
 		}
 		void waitExit() throw (kul::proc::ExitException){
 			tearDown();
-			cec = WEXITSTATUS(cStat);
-			if(cec != 0)
-				kul::LogMan::INSTANCE().err()
-					? throw proc::ExitException(__FILE__, __LINE__, cec, "Process exit code: " + std::to_string(cec) + kul::os::EOL() + toString())
-					: throw proc::ExitException(__FILE__, __LINE__, cec, "Process exit code: " + std::to_string(cec));
+			exitCode(WEXITSTATUS(cStat));
 			finish();
 			setFinished();
 		}

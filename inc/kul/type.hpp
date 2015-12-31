@@ -63,17 +63,21 @@ class Bool{
 		}
 };
 
-template <class T>
 class Type{
-	private:
-		static int GET(const std::string& s) throw(TypeException){
+	public:
+		static uint GET_UINT(const std::string& s) throw(TypeException){
+			try{
+				unsigned long lresult = stoul(s, 0, 10);
+			    unsigned int result = lresult;
+			    if (result != lresult) KEXCEPT(TypeException, "GET<uint> failed");
+			    return result;
+			}catch(const std::invalid_argument& e){ KEXCEPT(TypeException, "GET<uint> failed"); }
+		    return 0;
+		}
+		static int GET_INT(const std::string& s) throw(TypeException){
 			try{
 				return std::stoi(s); 
 			}catch(const std::invalid_argument& e){ KEXCEPT(TypeException, "stoi failed"); }
-		}
-	public:
-		static T FROM(const std::string& s){
-			return GET(s);
 		}
 };
 
