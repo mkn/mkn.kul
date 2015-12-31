@@ -272,7 +272,7 @@ inline std::ostream& operator<<(std::ostream &s, const Dir& d){
 	return s << d.path();
 }
 
-class KUL_PUBLISH File{
+class File{
 	private:
 		std::string n;
 		Dir d;

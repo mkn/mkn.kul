@@ -50,8 +50,8 @@ inline const std::string receive(const std::string& t = ""){
 	return s;
 }
 
-KUL_PUBLISH const std::string hidden(const std::string& t = "");
-KUL_PUBLISH void show();
+const std::string hidden(const std::string& t = "");
+void show();
 
 class Exception : public kul::Exception{
 	public:

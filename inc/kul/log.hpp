@@ -58,9 +58,9 @@ class Exception : public kul::Exception{
 	public:
 		Exception(const char*f, const int l, const std::string& s) : kul::Exception(f, l, s){}
 };
+} // END NAMESPACE log
 
-}
-class KUL_PUBLISH Logger{
+class Logger{
 	public:
 		void out(const std::string& s, const log::mode& m) const{
 			if(m != log::ERR) 
@@ -145,7 +145,7 @@ class Message{
 			return *this;
 		}
 };
-class KUL_PUBLISH LogMessage : public Message{
+class LogMessage : public Message{
 	private:
 		const char* f;
 		const int& l;
@@ -155,14 +155,14 @@ class KUL_PUBLISH LogMessage : public Message{
 		}
 		LogMessage(const char* f, const int& l, const log::mode& m) : Message(m), f(f), l(l){}
 };
-class KUL_PUBLISH OutMessage : public Message{
+class OutMessage : public Message{
 	public:
 		~OutMessage(){
 			LogMan::INSTANCE().out(m, ss.str());
 		}
 		OutMessage(const log::mode& m = kul::log::mode::NON) : Message(m){}
 };
-class KUL_PUBLISH ErrMessage : public Message{
+class ErrMessage : public Message{
 	public:
 		~ErrMessage(){
 			LogMan::INSTANCE().err(m, ss.str());

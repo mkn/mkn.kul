@@ -49,7 +49,7 @@ class NotFoundException : public kul::Exception{
 };
 }
 
-class KUL_PUBLISH SCM{
+class SCM{
 	protected:
 		SCM(){}
 	public:
@@ -69,7 +69,7 @@ class KUL_PUBLISH SCM{
 };
 
 namespace scm{
-class KUL_PUBLISH Git : public SCM{
+class Git : public SCM{
 	public:
 		const std::string co(const std::string& d, const std::string& r, const std::string& v) const throw(Exception){
 			Dir dr(d, true);
@@ -176,7 +176,7 @@ class KUL_PUBLISH Git : public SCM{
 };
 
 // SVN URL CHANGE: svn switch –relocate  <from URL> <to URL>
-class KUL_PUBLISH Svn : public SCM{
+class Svn : public SCM{
 	public:
 		const std::string co(const std::string& d, const std::string& r, const std::string& v) const throw(Exception){
 			Dir dr(d, true);
