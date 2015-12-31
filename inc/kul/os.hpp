@@ -391,9 +391,12 @@ inline std::ostream& operator<<(std::ostream &s, const File& d){
 
 namespace env{
 inline bool WHICH(const char* c){
-	for(const auto& s : kul::String::split(std::string(env::GET("PATH")), kul::env::SEP()))
-		for(const auto& f : kul::Dir(s).files())
-			if(f.name().compare(c) == 0) return 1;
+	for(const auto& s : kul::String::split(std::string(env::GET("PATH")), kul::env::SEP())){
+		const kul::Dir d(s);
+		if(d)
+			for(const auto& f : d.files())
+				if(f.name().compare(c) == 0) return 1;
+	}
 	return false;
 }
 } // END NAMESPACE env
