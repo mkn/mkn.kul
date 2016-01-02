@@ -63,6 +63,13 @@ class TimeStamps{
 		friend class kul::Dir;
 		friend class kul::File;
 };
+
+class Item{
+	public:
+		virtual const fs::TimeStamps timeStamps() const = 0;
+		virtual const std::string  real() const = 0;
+		virtual const std::string  mini() const = 0;
+};
 } // END NAMESPACE fs
 
 namespace env{
@@ -105,7 +112,7 @@ inline const char SEP(){
 #endif
 } // END NAMESPACE env
 
-class Dir{
+class Dir : public fs::Item {
 	private:
 		std::string p;
 
@@ -272,7 +279,7 @@ inline std::ostream& operator<<(std::ostream &s, const Dir& d){
 	return s << d.path();
 }
 
-class File{
+class File : public fs::Item {
 	private:
 		std::string n;
 		Dir d;

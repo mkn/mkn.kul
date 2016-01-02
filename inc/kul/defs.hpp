@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif /*  ulong */
 #ifndef ulonglong
 	typedef unsigned long long ulonglong;
-#endif /*  UINTMAX_MAX */
+#endif /*  ulonglong */
 
 
 #define KSTRINGIFY(x) #x

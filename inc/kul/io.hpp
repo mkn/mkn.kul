@@ -113,6 +113,8 @@ class AWriter{
 			else	f << c;
 		}
 };
+
+
 class Writer: public AWriter{
 	private:
 		std::ofstream f;

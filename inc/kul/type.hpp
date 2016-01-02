@@ -69,15 +69,27 @@ class Type{
 			try{
 				unsigned long lresult = stoul(s, 0, 10);
 			    unsigned int result = lresult;
-			    if (result != lresult) KEXCEPT(TypeException, "GET<uint> failed");
+			    if (result != lresult) KEXCEPT(TypeException, "GET_UINT failed");
 			    return result;
-			}catch(const std::invalid_argument& e){ KEXCEPT(TypeException, "GET<uint> failed"); }
+			}catch(const std::invalid_argument& e){ KEXCEPT(TypeException, "GET_UINT failed"); }
 		    return 0;
 		}
 		static int GET_INT(const std::string& s) throw(TypeException){
 			try{
 				return std::stoi(s); 
 			}catch(const std::invalid_argument& e){ KEXCEPT(TypeException, "stoi failed"); }
+		}
+		static ulong GET_ULONG(const std::string& s) throw(TypeException){
+			try{
+				return std::stoul(s);
+			}catch(const std::invalid_argument& e){ KEXCEPT(TypeException, "GET_ULONG failed"); }
+		    return 0;
+		}
+		static ulonglong GET_ULONGLONG(const std::string& s) throw(TypeException){
+			try{
+				return std::stoull(s);
+			}catch(const std::invalid_argument& e){ KEXCEPT(TypeException, "GET_ULONGLONG failed"); }
+		    return 0;
 		}
 };
 
