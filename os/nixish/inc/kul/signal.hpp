@@ -46,6 +46,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define REG_EIP REG_RIP
 #endif /* __x86_64__ */
 #if defined(__NetBSD__)
+#if defined(REG_EIP)
+#undef REG_EIP
+#endif /* REG_EIP */
 #define REG_EIP _REG_RIP
 #endif /* __NetBSD__ */
 #endif /* REG_EIP */
