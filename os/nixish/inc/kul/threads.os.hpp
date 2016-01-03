@@ -51,9 +51,9 @@ inline const std::string id(){
 inline bool main(){
 #if defined(__FreeBSD__)
 	return 0;
-#elif define(__NetBSD__)
+#elif defined(__NetBSD__)
 	return _lwp_self();
-#elif define(__OpenBSD__)
+#elif defined(__OpenBSD__)
 	return 0;
 #else
 	return getpid() == syscall(SYS_gettid);
