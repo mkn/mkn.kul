@@ -39,6 +39,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <pthread.h>
 #include <sys/syscall.h>
 
+#if defined(__NetBSD__)
+#include <lwp.h>
+#endif
+
 namespace kul{ 
 namespace this_thread{
 inline const std::string id(){
