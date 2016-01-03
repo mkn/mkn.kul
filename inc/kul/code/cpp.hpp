@@ -115,7 +115,7 @@ class GCCompiler : public CCompiler{
 			kul::Process p(cmd);
 			for(unsigned int i = 1; i < bits.size(); i++) p.arg(bits[i]);
 			if(mode == Mode::SHAR)		p.arg("-shared");
-			p.arg("-o").arg(lib);
+			p.arg(lib);
 			for(const std::string& o : objects)	p.arg(o);
 			for(const std::string& s: kul::String::split(linkerEnd, ' ')) p.arg(s);
 			CompilerProcessCapture pc(p);
