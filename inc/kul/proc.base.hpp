@@ -60,6 +60,41 @@ class ExitException : public kul::proc::Exception{
 		ExitException(const char*f, const int l, const short ec, const std::string& s) : Exception(f, l, s), ec(ec){}
 		const short& code() const { return ec; }
 };
+
+
+class Call{
+	private:
+		std::string cwd;
+		const std::string d;
+		const std::string& s;
+        kul::hash::map::S2S oldEvs;
+		void setCWD(){
+			if(d.size()){
+				cwd = kul::env::CWD();
+				if(kul::env::CWD(d) < 0) KEXCEPTION("FAILED TO SET DIRECTORY: "+ d);
+			}
+		}
+	public:
+		~Call(){
+			if(d.size()) kul::env::CWD(cwd);
+            for(const std::pair<std::string, std::string>& oldEv : oldEvs)
+                kul::env::SET(oldEv.first.c_str(), oldEv.second.c_str());
+		}
+		Call(const std::string& s, const std::string& d= "") : d(d), s(s){
+			setCWD();
+		}
+		Call(const std::string& s, const kul::hash::map::S2S& evs, const std::string& d= "") : d(d), s(s){
+			setCWD();
+            for(const auto& ev : evs){
+                const char* v = kul::env::GET(ev.first.c_str());
+                if(v) oldEvs.insert(ev.first, v);
+                kul::env::SET(ev.first.c_str(), ev.second.c_str());
+            }
+		}
+		const int run(){
+			return s.size() ? kul::os::exec(s) : 1;
+		}
+};
 }
 
 class AProcess{
@@ -117,7 +152,7 @@ class AProcess{
 			if(this->s) KEXCEPT(kul::proc::Exception, "Process is already started");
 			this->s = true;
 			if(this->o || this->e) this->run();
-			else pec = kul::os::exec(toString());
+			else pec = proc::Call(toString(), evs, d).run();
 			if(pec != 0)
 				kul::LogMan::INSTANCE().err()
 					? throw proc::ExitException(__FILE__, __LINE__, pec, "Process exit code: " + std::to_string(pec) + kul::os::EOL() + toString())
