@@ -116,10 +116,7 @@ class AProcess{
 		virtual void start() throw(kul::Exception){
 			if(this->s) KEXCEPT(kul::proc::Exception, "Process is already started");
 			this->s = true;
-			if(this->o || this->e) {
-				// std::cout << "\nCAPTURED\n" << std::endl;
-				this->run();
-			}
+			if(this->o || this->e) this->run();
 			else pec = kul::os::exec(toString());
 			if(pec != 0)
 				kul::LogMan::INSTANCE().err()
