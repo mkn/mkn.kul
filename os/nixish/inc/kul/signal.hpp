@@ -98,7 +98,7 @@ void kul_sig_handler(int s, siginfo_t* info, void* v) {
 			trace_size = backtrace(trace, 16);
 #if defined(__arm__)
 			trace[1] = (void *) uc->uc_mcontext.arm_r0;
-#elif __APPLE__
+#elif defined(__APPLE__)
 			trace[1] = (void *) uc->uc_mcontext->__ss.__rip;
 #else
 			trace[1] = (void *) uc->uc_mcontext.gregs[REG_EIP];

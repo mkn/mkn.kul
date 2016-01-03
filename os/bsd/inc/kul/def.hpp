@@ -44,5 +44,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef KNOEXCEPT
 	#define KNOEXCEPT noexcept
 #endif /*  KNOEXCEPT */
-#define _XOPEN_SOURCE 600
+
+#if defined(__APPLE__)
+	#define _XOPEN_SOURCE 600
+#endif /* __APPLE__ */
+
 #endif /* _KUL_DEF_HPP_ */

@@ -40,12 +40,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <unistd.h>
 #include <algorithm>
 #include <sys/stat.h>
+#include <sys/param.h>
 #include <sys/types.h>
-
-#ifdef __APPLE__
-    #include <sys/param.h>
-    #include <sys/sysctl.h>
-#endif
+#include <sys/sysctl.h>
 
 namespace kul{
 namespace cpu{
