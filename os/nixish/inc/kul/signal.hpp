@@ -38,18 +38,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <execinfo.h>
 #ifndef __USE_GNU
 #define __USE_GNU
-#endif
+#endif /* __USE_GNU */
 #include <ucontext.h>
 
 #ifndef REG_EIP
 #ifdef __x86_64__
 #define REG_EIP REG_RIP
-#endif
-if defined(__NetBSD__)
+#endif /* __x86_64__ */
+#if defined(__NetBSD__)
 #define REG_EIP _REG_RIP
-#endif
-
-#endif
+#endif /* __NetBSD__ */
+#endif /* REG_EIP */
 
 static void kul_sig_handler(int s, siginfo_t* info, void* v);
 
