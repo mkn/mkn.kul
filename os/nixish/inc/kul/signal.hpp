@@ -45,6 +45,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef __x86_64__
 #define REG_EIP REG_RIP
 #endif
+if defined(__NetBSD__)
+#define REG_EIP _REG_RIP
+#endif
+
 #endif
 
 static void kul_sig_handler(int s, siginfo_t* info, void* v);
@@ -100,6 +104,8 @@ void kul_sig_handler(int s, siginfo_t* info, void* v) {
 			trace[1] = (void *) uc->uc_mcontext.arm_r0;
 #elif defined(__APPLE__)
 			trace[1] = (void *) uc->uc_mcontext->__ss.__rip;
+#elif defined(__NetBSD__)
+			trace[1] = (void *) uc->uc_mcontext.__gregs[REG_EIP];
 #else
 			trace[1] = (void *) uc->uc_mcontext.gregs[REG_EIP];
 #endif
