@@ -52,8 +52,11 @@ inline unsigned int cores() {
 	size_t len = sizeof(numCPU);
 
 	mib[0] = CTL_HW;
-	mib[1] = HW_AVAILCPU;   // alternatively, try HW_NCPU;
-
+#if defined(__APPLE__)
+	mib[1] = HW_AVAILCPU;
+#else
+	mib[1] = HW_NCPU;
+#endif
 	sysctl(mib, 2, &numCPU, &len, NULL, 0);
 
 	if(numCPU < 1){

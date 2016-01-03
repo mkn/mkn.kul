@@ -49,7 +49,15 @@ inline const std::string id(){
 
 //http://stackoverflow.com/questions/4867839/how-can-i-tell-if-pthread-self-is-the-main-first-thread-in-the-process
 inline bool main(){
+#if defined(__FreeBSD__)
+	return 0;
+#elif define(__NetBSD__)
+	return _lwp_self();
+#elif define(__OpenBSD__)
+	return 0;
+#else
 	return getpid() == syscall(SYS_gettid);
+#endif
 }
 inline void kill(){
 	pthread_exit(0);
