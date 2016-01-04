@@ -1,7 +1,7 @@
 
 
 name: mkn.kul
-version: master
+version: 0.6.6
 inc: ./inc ./os/${OS}/inc
 dep:
   - name: google.sparsehash
@@ -16,6 +16,6 @@ profile:
   - name: test 
     dep:
       - name: mkn.kul
-        version: master
+        version: 0.6.6
         local: .
     main: test.cpp

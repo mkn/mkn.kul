@@ -10,7 +10,7 @@ CALL :get
 GOTO eof
 
 :get
-SET KUL_VER=master
+SET KUL_VER=0.6.6
 SET HASH_VER=2.0.3
 IF NOT EXIST %PWD%\ext\sparsehash\%HASH_VER% (
 	git clone http://github.com/mkn/google.sparsehash.git --branch %HASH_VER% %PWD%/ext/sparsehash/%HASH_VER%
