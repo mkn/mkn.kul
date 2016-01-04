@@ -8,7 +8,6 @@ Minimal cross platform C++ wrapper for threading/process management/io/logging/s
 Supports: Window/OSX/NetBSD/Debian/RHEL (FreeBSD untest but most expected to work)
 
 Requires:
-	
 	Windows: Visual Studio 2013+
 	Unix   : gcc 4.9 (or equivalent)
 
