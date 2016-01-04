@@ -48,8 +48,8 @@ inline void uSleep(const unsigned long& micros){ std::this_thread::sleep_for(std
 inline void nSleep(const unsigned long& nanos) { std::this_thread::sleep_for(std::chrono::nanoseconds(nanos));}
 }// END NAMESPACE this_thread
 
-class ThreadPool;
-template<class P> class PredicatedThreadPool;
+// class ThreadQueue;
+// template<class P> class PredicatedThreadQueue;
 
 namespace threading{
 class Exception : public kul::Exception{

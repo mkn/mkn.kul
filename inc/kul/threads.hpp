@@ -47,11 +47,11 @@ class ScopeLock{
 		}
 };
 
-class ThreadPool{
+class ThreadQueue{
 	protected:
-		bool d, s;
-		unsigned int m;	
-		kul::Ref<ThreadPool> re;
+		bool d = 0, s = 0;
+		unsigned int m = 1;	
+		kul::Ref<ThreadQueue> re;
 		kul::Thread th;
 		std::shared_ptr<kul::threading::ThreadObject> to;
 		std::vector<std::shared_ptr<kul::Thread> > ts;
@@ -59,7 +59,7 @@ class ThreadPool{
 		void setStarted()	{ s = true; }
 		bool started()		{ return s; }
 		virtual void start() throw (std::exception) {
-			if(started()) KEXCEPT(Exception, "ThreadPool is already started");
+			if(started()) KEXCEPT(Exception, "ThreadQueue is already started");
 			setStarted();
 			for(unsigned int i = 0 ; i < m; i++){
 				std::shared_ptr<kul::Thread> at = std::make_shared<kul::Thread>(to);
@@ -69,8 +69,8 @@ class ThreadPool{
 			}
 		}
 	public:
-		template <class T> ThreadPool(const T& t) 			: d(0), s(0), m(1), re(*this), th(re), to(std::make_shared<kul::ThreadCopy<T> >(t)){}
-		template <class T> ThreadPool(const Ref<T>& ref) 	: d(0), s(0), m(1), re(*this), th(re), to(std::make_shared<kul::ThreadRef<T> >(ref)){}
+		template <class T> ThreadQueue(const T& t) 			: re(*this), th(re), to(std::make_shared<kul::ThreadCopy<T> >(t)){}
+		template <class T> ThreadQueue(const Ref<T>& ref) 	: re(*this), th(re), to(std::make_shared<kul::ThreadRef<T> >(ref)){}
 		void setMax(const int& max) { m = max;}
 		void run(){
 			th.run();
@@ -107,13 +107,13 @@ class ThreadPool{
 };
 
 template<class P>
-class PredicatedThreadPool : public ThreadPool{
+class PredicatedThreadQueue : public ThreadQueue{
 	private:
 		P& p;
 		unsigned int ps;
 	protected:
 		void start() throw (std::exception) {
-			if(started()) KEXCEPT(Exception, "ThreadPool is already started");
+			if(started()) KEXCEPT(Exception, "ThreadQueue is already started");
 			setStarted();
 			unsigned int c = 0;
 			while(c < ps){
@@ -140,8 +140,8 @@ class PredicatedThreadPool : public ThreadPool{
 			}
 		}
 	public:
-		template <class T> PredicatedThreadPool(const T& t, P& pr) 			: ThreadPool(t) 	, p(pr), ps(p.size()){}
-		template <class T> PredicatedThreadPool(const Ref<T>& ref, P& pr) 	: ThreadPool(ref)	, p(pr), ps(p.size()){}
+		template <class T> PredicatedThreadQueue(const T& t, P& pr) 			: ThreadQueue(t) 	, p(pr), ps(p.size()){}
+		template <class T> PredicatedThreadQueue(const Ref<T>& ref, P& pr) 	: ThreadQueue(ref)	, p(pr), ps(p.size()){}
 };
 }// END NAMESPACE kul
 

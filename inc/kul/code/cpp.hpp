@@ -85,7 +85,7 @@ class GCCompiler : public CCompiler{
 			for(const std::string& lib : libs)	p.arg("-l" + lib);
 			for(const std::string& s: kul::String::split(linkerEnd, ' ')) p.arg(s);
 			
-			CompilerProcessCapture pc(p);
+			CompilerProcessCapture pc;
 			try{
 				p.start();
 			}catch(const kul::proc::Exception& e){
@@ -118,7 +118,7 @@ class GCCompiler : public CCompiler{
 			p.arg(lib);
 			for(const std::string& o : objects)	p.arg(o);
 			for(const std::string& s: kul::String::split(linkerEnd, ' ')) p.arg(s);
-			CompilerProcessCapture pc(p);
+			CompilerProcessCapture pc;
 			try{
 				p.start();
 			}catch(const kul::proc::Exception& e){
@@ -147,7 +147,8 @@ class GCCompiler : public CCompiler{
 			for(const std::string& s : incs) p.arg("-I"+s);
 			for(const std::string& s : args) p.arg(s);
 			p.arg("-o").arg(out).arg("-c").arg(in);
-			CompilerProcessCapture pc(p);
+			CompilerProcessCapture pc;
+			if(!kul::LogMan::INSTANCE().inf()) pc.setProcess(p);
 			try{
 				p.start();
 			}catch(const kul::proc::Exception& e){

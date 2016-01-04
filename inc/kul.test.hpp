@@ -67,12 +67,12 @@ class TestThreadObject{
 		}
 };
 
-class TestThreadPoolObject{
+class TestThreadQueueObject{
 	protected:
 		int i;
 		Mutex& mutex;
 	public:
-		TestThreadPoolObject(Mutex& mutex) : i(0), mutex(mutex){}
+		TestThreadQueueObject(Mutex& mutex) : i(0), mutex(mutex){}
 		void operator()(){
 			kul::ScopeLock lock(mutex);
 			KLOG(INF) << "THREAD RUNNING";
@@ -82,11 +82,11 @@ class TestThreadPoolObject{
 		void print(){ KLOG(INF) << "i = " << i;}
 };
 
-class TestThreadPoolQObject : public TestThreadPoolObject{
+class TestThreadQueueQObject : public TestThreadQueueObject{
 	private:
 		std::queue<int>& q;
 	public:
-		TestThreadPoolQObject(Mutex& mutex, std::queue<int>& q) : TestThreadPoolObject(mutex), q(q){}
+		TestThreadQueueQObject(Mutex& mutex, std::queue<int>& q) : TestThreadQueueObject(mutex), q(q){}
 		void operator()(){
 		   	kul::ScopeLock lock(mutex);
 		   	KLOG(INF) << "THREAD RUNNING";
@@ -210,9 +210,9 @@ class Test{
 			}
 
 			KOUT(NON) << "LAUNCHING THREAD POOL";
-			TestThreadPoolObject ttpo1(mutex);
-			kul::Ref<TestThreadPoolObject> ref2(ttpo1);
-			kul::ThreadPool tp1(ref2);
+			TestThreadQueueObject ttpo1(mutex);
+			kul::Ref<TestThreadQueueObject> ref2(ttpo1);
+			kul::ThreadQueue tp1(ref2);
 			tp1.setMax(4);
 			tp1.detach();
 			tp1.join();
@@ -221,9 +221,9 @@ class Test{
 			std::queue<int> q;
 			for(int i = 0; i < 10; i++) q.push(i);
 			KOUT(NON) << "LAUNCHING PREDICATED THREAD POOL";
-			TestThreadPoolQObject ttpo2(mutex, q);
-			kul::Ref<TestThreadPoolQObject> ref3(ttpo2);
-			kul::PredicatedThreadPool<std::queue<int> > tp2(ref3, q);
+			TestThreadQueueQObject ttpo2(mutex, q);
+			kul::Ref<TestThreadQueueQObject> ref3(ttpo2);
+			kul::PredicatedThreadQueue<std::queue<int> > tp2(ref3, q);
 			tp2.setMax(kul::cpu::threads());
 			tp2.detach();
 			tp2.join();
