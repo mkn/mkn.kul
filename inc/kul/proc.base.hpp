@@ -72,7 +72,7 @@ class Call{
 		void setCWD(){
 			if(d.size()){
 				cwd = kul::env::CWD();
-				if(kul::env::CWD(d) < 0) KEXCEPTION("FAILED TO SET DIRECTORY: "+ d);
+				if(!kul::env::CWD(d)) KEXCEPTION("FAILED TO SET DIRECTORY: "+ d);
 			}
 		}
 	public:

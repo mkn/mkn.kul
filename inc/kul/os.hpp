@@ -473,10 +473,10 @@ inline const std::string EOL(){
 #ifdef _WIN32
 
 inline bool kul::env::CWD(const std::string& c){
-	return _chdir(c.c_str());
+	return _chdir(c.c_str()) != -1;
 }
 inline bool kul::env::CWD(const kul::Dir& d){
-	return _chdir(d.path().c_str());
+	return _chdir(d.path().c_str()) != -1;
 }
 inline void kul::Dir::rm() const{
 	if(is()){
@@ -516,10 +516,10 @@ inline const std::vector<kul::File> kul::Dir::files(bool recursive) const throw(
 }
 #else
 inline bool kul::env::CWD(const std::string& c){
-	return chdir(c.c_str());
+	return chdir(c.c_str()) != -1;
 }
 inline bool kul::env::CWD(const kul::Dir& d){
-	return chdir(d.path().c_str());
+	return chdir(d.path().c_str()) != -1;
 }
 inline void kul::Dir::rm() const{
 	if(is()){
