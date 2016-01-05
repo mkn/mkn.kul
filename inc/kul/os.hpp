@@ -67,6 +67,7 @@ class TimeStamps{
 class Item{
 	public:
 		virtual const fs::TimeStamps timeStamps() const = 0;
+		virtual const std::string  esc() const = 0;
 		virtual const std::string  real() const = 0;
 		virtual const std::string  mini() const = 0;
 };
@@ -115,7 +116,6 @@ inline const char SEP(){
 class Dir : public fs::Item {
 	private:
 		std::string p;
-
 		static const fs::TimeStamps TIMESTAMPS(const std::string& s){ 
 			uint a = 0, c = 0, m = 0;
 			fs::KulTimeStampsResolver::GET(s.c_str(), a, c, m);
@@ -126,6 +126,18 @@ class Dir : public fs::Item {
 			kul::String::replaceAll(s, "/", "\\");
 #else
 			kul::String::replaceAll(s, "\\", "/");
+#endif
+			return s;
+		}
+
+		static const std::string ESC(std::string s){
+#ifdef _WIN32
+#else
+			size_t p = s.find(" ");
+			while(p != std::string::npos){
+				s.replace(s.find(" ", p), 1, "\\ ");
+				p = s.find(" ", p + 2) ;
+			}
 #endif
 			return s;
 		}
@@ -191,6 +203,8 @@ class Dir : public fs::Item {
 		const std::string name() const{
 			return root() ? path() : path().substr(path().rfind(SEP()) + 1);
 		}
+		const std::string  esc()  const { return is() ? ESC(real()) : ESC(path()); }
+		const std::string  escm() const { return ESC(mini()); }
 		const std::string  locl() const { return LOCL(path()); }
 		const std::string& path() const { return p;}
 		const std::string  real() const { return REAL(path()); }
@@ -351,9 +365,12 @@ class File : public fs::Item {
 
 		const std::string& name() const { return n; }
 
+		const std::string esc()  const { return Dir::JOIN(d.esc(), Dir::ESC(n)); }
+		const std::string escm() const { return Dir::ESC(mini()); }
 		const std::string full() const { return Dir::JOIN(d.path(), n); }
 		const std::string real() const { return Dir::JOIN(d.real(), n); }
 		const std::string mini() const { return Dir::MINI(real()); }
+
 		const ulonglong   size() const{
 			ulonglong r = 0;
 #ifdef _WIN32
@@ -416,9 +433,6 @@ inline int exec(const std::string& cmd, bool q = false){
 		return system(std::string(cmd + " > nul").c_str());
 	}else return system(cmd.c_str());
 }
-inline int exec(const std::string& cmd, char*const args[]){
-	return execvp(cmd.c_str(), args);
-}
 inline const kul::Dir userDir(){
 	const char* h = env::GET("HOME");
 	if(h) return kul::Dir(h);
@@ -442,9 +456,6 @@ inline int exec(const std::string& cmd, bool q = false){
 		return system(std::string(cmd + " > /dev/null").c_str());
 	}else return system(cmd.c_str());
 	return system(cmd.c_str());
-}
-inline int exec(const std::string& cmd, char*const args[]){
-	return execvp(cmd.c_str(), args);
 }
 inline const kul::Dir userDir(){
 	return Dir(env::GET("HOME"));

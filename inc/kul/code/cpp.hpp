@@ -106,6 +106,7 @@ class GCCompiler : public CCompiler{
 
 			std::string lib = out.dir().join(sharedLib(out.name()));
 			if(mode == Mode::STAT) lib = out.dir().join(staticLib(out.name()));
+			lib = kul::File(lib).escm();
 			std::string cmd = linker;
 			std::vector<std::string> bits;
 			if(linker.find(" ") != std::string::npos){

@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 #include <functional>
 
+#include "kul/cli.hpp"
 #include "kul/hash.hpp"
 #include "kul/except.hpp"
 
@@ -66,7 +67,7 @@ class Call{
 	private:
 		std::string cwd;
 		const std::string d;
-		const std::string& s;
+		std::string s;
         kul::hash::map::S2S oldEvs;
 		void setCWD(){
 			if(d.size()){
@@ -92,6 +93,11 @@ class Call{
             }
 		}
 		const int run(){
+			size_t p = s.find("\"");
+			while(p != std::string::npos){
+				s.replace(s.find("\"", p), 1, "\\\"");
+				p = s.find("\"", p + 2) ;
+			}
 			return s.size() ? kul::os::exec(s) : 1;
 		}
 };
