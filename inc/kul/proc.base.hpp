@@ -67,7 +67,7 @@ class Call{
 	private:
 		std::string cwd;
 		const std::string d;
-		std::string s;
+		const std::string& s;
         kul::hash::map::S2S oldEvs;
 		void setCWD(){
 			if(d.size()){
@@ -93,13 +93,6 @@ class Call{
             }
 		}
 		const int run(){
-#ifndef _WIN32
-			size_t p = s.find("\"");
-			while(p != std::string::npos){
-				s.replace(s.find("\"", p), 1, "\\\"");
-				p = s.find("\"", p + 2) ;
-			}
-#endif
 			return s.size() ? kul::os::exec(s) : 1;
 		}
 };
