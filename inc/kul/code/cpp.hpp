@@ -73,7 +73,7 @@ class GCCompiler : public CCompiler{
 			std::string cmd = linker;
 			std::vector<std::string> bits;
 			if(linker.find(" ") != std::string::npos){
-				bits = kul::String::split(linker, ' ');
+				bits = kul::cli::asArgs(linker);
 				cmd = bits[0];
 			}
 			kul::Process p(cmd);
@@ -83,7 +83,7 @@ class GCCompiler : public CCompiler{
 			p.arg("-o").arg(out);
 			for(const std::string& o : objects)	p.arg(o);
 			for(const std::string& lib : libs)	p.arg("-l" + lib);
-			for(const std::string& s: kul::String::split(linkerEnd, ' ')) p.arg(s);
+			for(const std::string& s: kul::cli::asArgs(linkerEnd)) p.arg(s);
 			
 			CompilerProcessCapture pc;
 			try{
@@ -110,7 +110,7 @@ class GCCompiler : public CCompiler{
 			std::string cmd = linker;
 			std::vector<std::string> bits;
 			if(linker.find(" ") != std::string::npos){
-				bits = kul::String::split(linker, ' ');
+				bits = kul::cli::asArgs(linker);
 				cmd = bits[0];
 			}
 			kul::Process p(cmd);
@@ -118,7 +118,7 @@ class GCCompiler : public CCompiler{
 			if(mode == Mode::SHAR)		p.arg("-shared").arg("-o");
 			p.arg(lib);
 			for(const std::string& o : objects)	p.arg(o);
-			for(const std::string& s: kul::String::split(linkerEnd, ' ')) p.arg(s);
+			for(const std::string& s: kul::cli::asArgs(linkerEnd)) p.arg(s);
 			CompilerProcessCapture pc;
 			try{
 				p.start();
@@ -140,7 +140,7 @@ class GCCompiler : public CCompiler{
 			std::string cmd = compiler;
 			std::vector<std::string> bits;
 			if(compiler.find(" ") != std::string::npos){
-				bits = kul::String::split(compiler, ' ');
+				bits = kul::cli::asArgs(compiler);
 				cmd = bits[0];
 			}
 			kul::Process p(cmd);
@@ -249,7 +249,7 @@ class WINCompiler : public CCompiler{
 			std::string cmd = linker;
 			std::vector<std::string> bits;
 			if(linker.find(" ") != std::string::npos){
-				bits = kul::String::split(linker, ' ');
+				bits = kul::cli::asArgs(linker);
 				cmd = bits[0];
 			}
 			kul::Process p(cmd);
@@ -258,7 +258,7 @@ class WINCompiler : public CCompiler{
 			for(const std::string& path : libPaths)	p.arg("-LIBPATH:\"" + path + "\"");
 			for(const std::string& o : objects)	p.arg(o);
 			for(const std::string& lib : libs) p.arg(staticLib(lib));
-			for(const std::string& s: kul::String::split(linkerEnd, ' ')) p.arg(s);
+			for(const std::string& s: kul::cli::asArgs(linkerEnd)) p.arg(s);
 
 			CompilerProcessCapture pc;
 			try{
@@ -284,7 +284,7 @@ class WINCompiler : public CCompiler{
 			std::string cmd = linker;
 			std::vector<std::string> bits;
 			if(linker.find(" ") != std::string::npos){
-				bits = kul::String::split(linker, ' ');
+				bits = kul::cli::asArgs(linker);
 				cmd = bits[0];
 			}
 			kul::Process p(cmd);
@@ -297,7 +297,7 @@ class WINCompiler : public CCompiler{
 				for(const std::string& lib : libs) p.arg(staticLib(lib));
 			}
 			for(const std::string& o : objects)	p.arg(o);
-			for(const std::string& s: kul::String::split(linkerEnd, ' ')) p.arg(s);
+			for(const std::string& s: kul::cli::asArgs(linkerEnd)) p.arg(s);
 			CompilerProcessCapture pc;
 			try{
 				p.start();
@@ -319,7 +319,7 @@ class WINCompiler : public CCompiler{
 			std::string cmd = compiler;
 			std::vector<std::string> bits;
 			if(compiler.find(" ") != std::string::npos){
-				bits = kul::String::split(compiler, ' ');
+				bits = kul::cli::asArgs(compiler);
 				cmd = bits[0];
 			}
 			kul::Process p(cmd);
