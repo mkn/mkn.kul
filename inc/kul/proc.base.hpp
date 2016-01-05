@@ -93,11 +93,13 @@ class Call{
             }
 		}
 		const int run(){
+#ifndef _WIN32
 			size_t p = s.find("\"");
 			while(p != std::string::npos){
 				s.replace(s.find("\"", p), 1, "\\\"");
 				p = s.find("\"", p + 2) ;
 			}
+#endif
 			return s.size() ? kul::os::exec(s) : 1;
 		}
 };
