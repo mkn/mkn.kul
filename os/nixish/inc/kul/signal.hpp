@@ -119,8 +119,12 @@ void kul_sig_handler(int s, siginfo_t* info, void* v) {
 				while(messages[i][p] != '(' && messages[i][p] != ' '&& messages[i][p] != 0) ++p;
 				std::string s(messages[i]);
 				s = s.substr(0, p);
-				if(kul::SignalStatic::INSTANCE().addr)
-					kul::Process("addr2line").arg(trace[i]).arg("-e").arg(s).start();
+				if(kul::SignalStatic::INSTANCE().addr){
+					kul::Process p("addr2line");
+					kul::ProcessCapture pc(p);
+					p.arg(trace[i]).arg("-e").arg(s).start();
+					printf("%s", pc.outs().c_str());
+				}
 			}
 		}
 		exit(s);
