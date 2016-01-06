@@ -3,19 +3,20 @@
 name: mkn.kul
 version: master
 inc: ./inc ./os/${OS}/inc
-dep:
-  - name: google.sparsehash
-    version: 2.0.3
-    scm: http://www.github.com/mkn/google.sparsehash
-if_inc:
-    bsd: ./os/nixish/inc
-    nix: ./os/nixish/inc
-    win: ./os/win/msinttypes-r26
+
+parent: cmn
 
 profile:
-  - name: test 
+  - name: cmn
     dep:
-      - name: mkn.kul
-        version: master
-        local: .
+    - name: google.sparsehash
+      version: 2.0.3
+      scm: http://www.github.com/mkn/google.sparsehash
+    if_inc:
+      bsd: ./os/nixish/inc
+      nix: ./os/nixish/inc
+      win: ./os/win/msinttypes-r26
+
+  - name: test 
+    parent: cmn
     main: test.cpp
