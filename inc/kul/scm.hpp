@@ -89,7 +89,8 @@ class Git : public SCM{
 			else{
 				kul::Process p("git", d);
 				p.arg("pull");
-				if(!v.empty()) p.arg(r).arg(v);
+				if(!r.empty()) p.arg(r);
+				if(!r.empty() && !v.empty()) p.arg(v);
 				try{
 					p.start();
 				}catch(const kul::proc::ExitException& e){
@@ -113,7 +114,7 @@ class Git : public SCM{
 			kul::Process p("git", d);
 			kul::ProcessCapture pc(p);
 			try{
-				p.arg("rev-parse").arg(b).start();
+				p.arg("rev-parse").arg(b.empty() ? "HEAD" : b).start();
 			}catch(const kul::proc::ExitException& e){
 				KERR << pc.errs();
 				KEXCEPT(Exception, "SCM ERROR " + std::string(e.what()));
@@ -175,7 +176,6 @@ class Git : public SCM{
 		// }
 };
 
-// SVN URL CHANGE: svn switch –relocate  <from URL> <to URL>
 class Svn : public SCM{
 	public:
 		const std::string co(const std::string& d, const std::string& r, const std::string& v) const throw(Exception){
@@ -191,11 +191,12 @@ class Svn : public SCM{
 				KEXCEPT(Exception, "SCM ERROR - Check remote dependency location / version");
 			}
 			return p.toString();
-		};
+		}
 		void up(const std::string& d, const std::string& r, const std::string& v) const throw(Exception){
 			if(!Dir(d).is()) co(d, r, v);
 			else KEXCEPT(Exception, "SCM ERROR - SVN NOT IMPLEMENTED");
-		};
+		}
+		// svn info . | lines | split | ifeq "Repository Root" go | http://svnbook.red-bean.com/en/1.6/svn.ref.svn.c.info.html
 		const std::string origin(const std::string& d) const{
 			KEXCEPT(Exception, "SCM ERROR - SVN NOT IMPLEMENTED");
 		}
