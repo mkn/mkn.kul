@@ -102,7 +102,7 @@ class AProcess{
     private:
         bool f = 0, s = 0;
         const bool wfe = 1;
-        uint32_t pec = 0, pi = 0;
+        int32_t pec = 0, pi = 0;
         const std::string d;
         std::function<void(std::string)> e;
         std::function<void(std::string)> o;
@@ -122,7 +122,7 @@ class AProcess{
         virtual void tearDown() {}
         virtual void run() throw (kul::Exception) = 0;
         bool waitForExit()  const { return wfe; }
-        void pid(const uint32_t& pi )  { this->pi = pi; }
+        void pid(const int32_t& pi )  { this->pi = pi; }
 
         const std::vector<std::string>&     args()  const { return argv; };
         const kul::hash::map::S2S&          vars()  const { return evs; }
@@ -158,9 +158,9 @@ class AProcess{
                     ? throw proc::ExitException(__FILE__, __LINE__, pec, "Process exit code: " + std::to_string(pec) + kul::os::EOL() + toString())
                     : throw proc::ExitException(__FILE__, __LINE__, pec, "Process exit code: " + std::to_string(pec));
         }
-        const uint32_t& pid()   const { return pi; }
-        bool started()          const { return pi > 0; }
-        bool finished()         const { return f; }
+        const int32_t& pid() const { return pi; }
+        bool started()       const { return pi > 0; }
+        bool finished()      const { return f; }
         virtual const std::string toString() const{
             std::string s;
             for(const std::string& a : args()) s += a + " ";

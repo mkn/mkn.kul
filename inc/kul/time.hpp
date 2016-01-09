@@ -66,7 +66,7 @@ class DateTime{
 #ifdef _WIN32
 			localtime_s(&ti, &t);
 #else
-			localtime_r(&ti, &t);
+			localtime_r(&t, &ti);
 #endif
 			std::strftime(buffer, 80, f.c_str(), &ti);
 			return std::string(buffer);
