@@ -113,7 +113,8 @@ inline const char SEP(){
 }
 #else
 inline const std::string GET(const char* c){
-	return std::string(getenv(c));
+	const char* r = getenv(c);
+	return std::string(r ? r : "");
 }
 inline void SET(const char* var, const char* val){
 	setenv(var, val, 1);
