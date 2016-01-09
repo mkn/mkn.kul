@@ -97,7 +97,6 @@ class LogMan{
 		LogMan() : m(kul::log::mode::NON), logger(){
 			std::string s(kul::env::GET("KLOG"));
 			if(s.size()){
-				bool e = 0;
 				kul::String::trim(s);
 				if     (s == "0" || s == "NON") m = log::mode::NON;
 				else if(s == "1" || s == "INF") m = log::mode::INF;
