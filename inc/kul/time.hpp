@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _KUL_TIME_HPP_
 
 #include <ctime>
+#include <time.h>
 #include <chrono>
 #include <sstream>
 
