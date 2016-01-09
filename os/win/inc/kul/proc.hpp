@@ -50,10 +50,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace kul{ 
 
 namespace this_proc{
-inline int id(){
+inline int16_t id(){
 	return GetCurrentProcessId();
 }
-inline void kill(const int& e){
+inline void kill(const int16_t& e){
 	TerminateProcess(OpenProcess(PROCESS_TERMINATE, 0, kul::this_proc::id()), 128+e);
 }
 }
@@ -75,7 +75,7 @@ class Process : public kul::AProcess{
 		Process(const std::string& cmd, const bool& wfe = true)                         : kul::AProcess(cmd, wfe)      {}
 		Process(const std::string& cmd, const std::string& path, const bool& wfe = true): kul::AProcess(cmd, path, wfe){}
 		~Process(){ tearDown(); }
-		bool kill(int k = 6){
+		bool kill(int16_t k = 6){
 			if(!started()) return 0;
 			DWORD dwDesiredAccess = PROCESS_TERMINATE;
 			bool  bInheritHandle  = 0;

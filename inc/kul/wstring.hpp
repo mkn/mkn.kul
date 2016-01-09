@@ -71,7 +71,7 @@ class WString{
 		static std::vector<std::wstring> split(const std::wstring& s, const wchar_t& d){
 			std::vector<std::wstring> ss;
 			std::wstring l = s;
-			unsigned int pos = 0;
+			uint16_t pos = 0;
 			while((pos = s.find(d, pos + 1)) < l.size()){
 				ss.push_back(l.substr(0, pos));
 				l = l.substr(pos + 1);
@@ -82,7 +82,7 @@ class WString{
 		static std::vector<std::wstring> split(const std::wstring& s, const std::wstring& d){
 			std::vector<std::wstring> ss;
 			std::wstring l = s;			
-			unsigned int pos = 0;
+			uint16_t pos = 0;
 			while((pos = s.find(d, pos + 1)) < l.size()){
 				ss.push_back(l.substr(0, pos));
 				l = l.substr(pos + 1);

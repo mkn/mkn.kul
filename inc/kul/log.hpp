@@ -56,7 +56,7 @@ enum mode { NON = 0, INF, ERR, DBG};
 
 class Exception : public kul::Exception{
 	public:
-		Exception(const char*f, const int l, const std::string& s) : kul::Exception(f, l, s){}
+		Exception(const char*f, const uint16_t& l, const std::string& s) : kul::Exception(f, l, s){}
 };
 } // END NAMESPACE log
 
@@ -68,7 +68,7 @@ class Logger{
 			else
 				fprintf(stderr, "%s", s.c_str());
 		}
-		void log(const char* f, const int& l, const std::string& s, const log::mode& m) const{
+		void log(const char* f, const uint16_t& l, const std::string& s, const log::mode& m) const{
 			std::string mode(modeTxt(m));
 			std::string tr(kul::this_thread::id());
 			std::string str(__KUL_LOG_FRMT__);
@@ -122,7 +122,7 @@ class LogMan{
 		bool inf(){ return m >= log::INF;}
 		bool err(){ return m >= log::ERR;}
 		bool dbg(){ return m >= log::DBG;}
-		void log(const char* f, const int& l, const log::mode& m, const std::string& s){
+		void log(const char* f, const uint16_t& l, const log::mode& m, const std::string& s){
 			if(this->m >= m) logger.log(f, l, s, m);
 		}
 		void out(const log::mode& m, const std::string& s){
@@ -148,12 +148,12 @@ class Message{
 class LogMessage : public Message{
 	private:
 		const char* f;
-		const int& l;
+		const uint16_t& l;
 	public:		
 		~LogMessage(){
 			LogMan::INSTANCE().log(f, l, m, ss.str());
 		}
-		LogMessage(const char* f, const int& l, const log::mode& m) : Message(m), f(f), l(l){}
+		LogMessage(const char* f, const uint16_t& l, const log::mode& m) : Message(m), f(f), l(l){}
 };
 class OutMessage : public Message{
 	public:

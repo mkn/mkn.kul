@@ -51,10 +51,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace kul {
 
 namespace this_proc{
-inline int id(){
+inline int16_t id(){
 	return getpid();
 }
-inline void kill(const int& e){
+inline void kill(const int16_t& e){
 	::kill(kul::this_proc::id(), e);
 }
 }
@@ -67,16 +67,16 @@ class Process : public kul::AProcess{
 		int popPip[3];
 		int cStat; //child status
 
-		inline int recall(const int& s){
+		inline int16_t recall(const uint16_t& s){
 			int ret; 
 			while((ret = (s)) < 0x0 && (errno == EINTR)){}
 			return ret;
 		}
 	protected:
-		int	child(){
+		int16_t	child(){
 			std::string s(args()[0]);
 			char** as = new char*[args().size() + 1]; // doesnt' need deleting - process exists after method
-			int i = 0;
+			int16_t i = 0;
 			for(const std::string& c : args()){ as[i] = const_cast<char*>(c.c_str()); i++; }
 			as[i] = NULL;
 			return execvp(s.c_str(), as);
@@ -86,7 +86,7 @@ class Process : public kul::AProcess{
 	public:
 		Process(const std::string& cmd, const bool& wfe = true)							: kul::AProcess(cmd, wfe){}
 		Process(const std::string& cmd, const std::string& path, const bool& wfe = true): kul::AProcess(cmd, path, wfe){}
-		bool kill(int k = 6){
+		bool kill(int16_t k = 6){
 			if(started()){
 				bool b = ::kill(pid(), k) == 0;
 				if(::kill(pid(), 0) == 0) setFinished();
@@ -96,7 +96,7 @@ class Process : public kul::AProcess{
 		}
 	protected:
 		void waitForStatus(){
-			int ret = 0;
+			int16_t ret = 0;
 			ret = recall(waitpid(pid(), &cStat, 0));
 			assert(ret);
 		}
@@ -118,7 +118,7 @@ class Process : public kul::AProcess{
 			recall(close(inFd[0]));
 		}
 		void run() throw (kul::proc::Exception){
-			int ret = 0;
+			int16_t ret = 0;
 
 			if((ret = pipe(inFd)) < 0) 	error(__LINE__, "Failed to pipe in");
 			if((ret = pipe(outFd)) < 0)	error(__LINE__, "Failed to pipe out");
@@ -152,7 +152,7 @@ class Process : public kul::AProcess{
 							bool b = 0;
 							do {
 								char cOut[1024] = {'\0'};
-								int ret = recall(read(popPip[1], cOut, sizeof(cOut)));
+								int16_t ret = recall(read(popPip[1], cOut, sizeof(cOut)));
 								cOut[ret > 0 ? ret : 0] = 0;
 								if (ret < 0){
 									if(b && ((errno != EAGAIN) || (errno != EWOULDBLOCK)))
@@ -167,7 +167,7 @@ class Process : public kul::AProcess{
 							bool b = 0;
 							do {
 								char cErr[1024] = {'\0'};
-								int ret = recall(read(popPip[2], cErr, sizeof(cErr)));
+								int16_t ret = recall(read(popPip[2], cErr, sizeof(cErr)));
 								cErr[ret > 0 ? ret : 0] = 0;
 								if (ret < 0){
 									if(b && ((errno != EAGAIN) || (errno != EWOULDBLOCK)))
@@ -188,7 +188,7 @@ class Process : public kul::AProcess{
 				close(outFd[0]);
 				close(errFd[0]);
 
-				int ret = 0; //check rets
+				int16_t ret = 0; //check rets
 				close(0);
 				if((ret = dup(inFd[0])) < 0) 	error(__LINE__, "dup in call failed");
 				close(1);

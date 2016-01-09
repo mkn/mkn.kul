@@ -44,10 +44,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace kul{
 namespace cpu{
-inline unsigned int cores() {
+inline uint16_t cores() {
 	return sysconf(_SC_NPROCESSORS_ONLN);
 }
-inline unsigned int threads() {
+inline uint16_t threads() {
 	return std::thread::hardware_concurrency();
 }
 } // END NAMESPACE cpu

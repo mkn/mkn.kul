@@ -49,7 +49,7 @@ namespace fs {
 
 class KulTimeStampsResolver{
 	private:
-		static void GET(const char*const p, uint& a, uint& c, uint& m){
+		static void GET(const char*const p, uint16_t& a, uint16_t& c, uint16_t& m){
 			struct stat att;
 			if(stat(p, &att) != -1){
 				a = att.st_atime;

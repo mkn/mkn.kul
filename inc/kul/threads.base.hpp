@@ -54,11 +54,11 @@ inline void nSleep(const unsigned long& nanos) { std::this_thread::sleep_for(std
 namespace threading{
 class Exception : public kul::Exception{
 	public:
-		Exception(const char*f, const int l, const std::string& s) : kul::Exception(f, l, s){}
+		Exception(const char*f, const uint16_t& l, const std::string& s) : kul::Exception(f, l, s){}
 };
 class InterruptionException : public Exception{
 	public:
-		InterruptionException(const char*f, const int l, const std::string& s) : Exception(f, l, s){}
+		InterruptionException(const char*f, const uint16_t& l, const std::string& s) : Exception(f, l, s){}
 };
 
 class AThread;

@@ -100,7 +100,7 @@ void kul_sig_handler(int s, siginfo_t* info, void* v) {
 			ucontext_t *uc = (ucontext_t *) v;
 			void *trace[16];
 			char **messages = (char **)NULL;
-			int i, trace_size = 0;
+			int16_t i, trace_size = 0;
 			trace_size = backtrace(trace, 16);
 #if defined(__arm__)
 			trace[1] = (void *) uc->uc_mcontext.arm_r0;
@@ -117,12 +117,12 @@ void kul_sig_handler(int s, siginfo_t* info, void* v) {
 				printf("[bt] %s : ", messages[i]);
 				size_t p = 0;
 				while(messages[i][p] != '(' && messages[i][p] != ' '&& messages[i][p] != 0) ++p;
-				std::string s(messages[i]);
-				s = s.substr(0, p);
+				std::string str(messages[i]);
+				str = str.substr(0, p);
 				if(kul::SignalStatic::INSTANCE().addr){
 					kul::Process p("addr2line");
 					kul::ProcessCapture pc(p);
-					p.arg(trace[i]).arg("-e").arg(s).start();
+					p.arg(trace[i]).arg("-e").arg(str).start();
 					printf("%s", pc.outs().c_str());
 				}
 			}

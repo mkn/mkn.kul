@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _KUL_SCM_HPP_
  
 #include "kul/os.hpp"
-#include "kul/hash.hpp"
+#include "kul/map.hpp"
 #include "kul/proc.hpp"
 #include "kul/string.hpp"
 
@@ -40,12 +40,12 @@ namespace kul{ namespace scm{
 
 class Exception : public kul::Exception{
 	public:
-		Exception(const char*f, const int l, const std::string& s) : kul::Exception(f, l, s){}
+		Exception(const char*f, const uint16_t& l, const std::string& s) : kul::Exception(f, l, s){}
 };
 
 class NotFoundException : public kul::Exception{
 	public:
-		NotFoundException(const char*f, const int l, const std::string& s) : kul::Exception(f, l, s){}
+		NotFoundException(const char*f, const uint16_t& l, const std::string& s) : kul::Exception(f, l, s){}
 };
 }
 

@@ -44,7 +44,7 @@ namespace kul{  namespace io {
 
 class Exception : public kul::Exception{
 	public:
-		Exception(const char*f, const int l, const std::string& s) : kul::Exception(f, l, s){}
+		Exception(const char*f, const uint16_t& l, const std::string& s) : kul::Exception(f, l, s){}
 };
 
 class AReader{
@@ -60,7 +60,7 @@ class AReader{
 			}
 			return str.get();
 		}
-		const std::string* read(std::ifstream& f, const uint& s){
+		const std::string* read(std::ifstream& f, const uint16_t& s){
 			str.reset();
 			if(f.good()){
 				std::vector<char> v;
@@ -84,7 +84,7 @@ class Reader : public AReader{
 		const std::string* readLine(){
 			return AReader::readLine(f);
 		}
-		const std::string* read(const uint& s){
+		const std::string* read(const uint16_t& s){
 			return AReader::read(f, s);
 		}
 };
@@ -100,7 +100,7 @@ class BinaryReader : public AReader{
 		const std::string* readLine(){
 			return AReader::readLine(f);
 		}
-		const std::string* read(const uint& s){
+		const std::string* read(const uint16_t& s){
 			return AReader::read(f, s);
 		}
 };

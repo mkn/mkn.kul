@@ -50,7 +50,7 @@ class ScopeLock{
 class ThreadQueue{
 	protected:
 		bool d = 0, s = 0;
-		unsigned int m = 1;	
+		uint16_t m = 1;	
 		kul::Ref<ThreadQueue> re;
 		kul::Thread th;
 		std::shared_ptr<kul::threading::ThreadObject> to;
@@ -61,7 +61,7 @@ class ThreadQueue{
 		virtual void start() throw (std::exception) {
 			if(started()) KEXCEPT(Exception, "ThreadQueue is already started");
 			setStarted();
-			for(unsigned int i = 0 ; i < m; i++){
+			for(uint16_t i = 0 ; i < m; i++){
 				std::shared_ptr<kul::Thread> at = std::make_shared<kul::Thread>(to);
 				at->run();
 				ts.push_back(at);
@@ -71,7 +71,7 @@ class ThreadQueue{
 	public:
 		template <class T> ThreadQueue(const T& t) 			: re(*this), th(re), to(std::make_shared<kul::ThreadCopy<T> >(t)){}
 		template <class T> ThreadQueue(const Ref<T>& ref) 	: re(*this), th(re), to(std::make_shared<kul::ThreadRef<T> >(ref)){}
-		void setMax(const int& max) { m = max;}
+		void setMax(const int16_t&& max) { m = max;}
 		void run(){
 			th.run();
 		}
@@ -110,14 +110,14 @@ template<class P>
 class PredicatedThreadQueue : public ThreadQueue{
 	private:
 		P& p;
-		unsigned int ps;
+		uint16_t ps;
 	protected:
 		void start() throw (std::exception) {
 			if(started()) KEXCEPT(Exception, "ThreadQueue is already started");
 			setStarted();
-			unsigned int c = 0;
+			uint16_t c = 0;
 			while(c < ps){
-				for(unsigned int i = ts.size(); i < m && c < ps; i++){
+				for(size_t i = ts.size(); i < m && c < ps; i++){
 					c++;
 					std::shared_ptr<kul::Thread> at = std::make_shared<kul::Thread>(to);
 					at->run();

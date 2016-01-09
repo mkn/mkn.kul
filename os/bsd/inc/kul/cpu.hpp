@@ -46,9 +46,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace kul{
 namespace cpu{
-inline unsigned int cores() {
-	unsigned int numCPU = sysconf( _SC_NPROCESSORS_ONLN );
-	int mib[4];
+inline uint16_t cores() {
+	uint16_t numCPU = sysconf( _SC_NPROCESSORS_ONLN );
+	int16_t mib[4];
 	size_t len = sizeof(numCPU);
 
 	mib[0] = CTL_HW;
@@ -66,7 +66,7 @@ inline unsigned int cores() {
 	}
 	return numCPU;
 }
-inline unsigned int threads() {
+inline uint16_t threads() {
 	return std::thread::hardware_concurrency();
 }
 } // END NAMESPACE cpu

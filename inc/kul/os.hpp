@@ -49,17 +49,17 @@ class File;
 namespace fs {
 class Exception : public kul::Exception{
 	public:
-		Exception(const char*f, const int l, const std::string& s) : kul::Exception(f, l, s){}
+		Exception(const char*f, const uint16_t& l, const std::string& s) : kul::Exception(f, l, s){}
 };
 
 class TimeStamps{
 	private:
-		const uint a, c, m;
-		TimeStamps(const uint& a, const uint& c, const uint& m) : a(a), c(c), m(m){}
+		const uint16_t a, c, m;
+		TimeStamps(const uint16_t& a, const uint16_t& c, const uint16_t& m) : a(a), c(c), m(m){}
 	public:
-		const uint& accessed() const { return a; }
-		const uint& created () const { return c; }
-		const uint& modified() const { return m; }
+		const uint16_t& accessed() const { return a; }
+		const uint16_t& created () const { return c; }
+		const uint16_t& modified() const { return m; }
 		friend class kul::Dir;
 		friend class kul::File;
 };
@@ -117,7 +117,7 @@ class Dir : public fs::Item {
 	private:
 		std::string p;
 		static const fs::TimeStamps TIMESTAMPS(const std::string& s){ 
-			uint a = 0, c = 0, m = 0;
+			uint16_t a = 0, c = 0, m = 0;
 			fs::KulTimeStampsResolver::GET(s.c_str(), a, c, m);
 			return fs::TimeStamps(a, c, m);
 		}
@@ -152,6 +152,7 @@ class Dir : public fs::Item {
 		}
 	public:
 		Dir(){}
+		Dir(const char* p, bool m = false) throw(fs::Exception) : Dir(std::string(p), m) {}
 		Dir(const std::string& p, bool m = false) throw(fs::Exception) : p(Dir::LOCL(p)) {
 #ifndef _WIN32
 			if(p.size() && p[0] == '~') this->p = (env::GET("HOME") + p.substr(1));
@@ -299,19 +300,16 @@ class File : public fs::Item {
 		Dir d;
 	public:
 		File(){}
-		File(const std::string& n, bool m = false) : n(Dir::LOCL(n)){
+		File(const std::string& n, bool m = false) : n(Dir::LOCL(n)), d(env::CWD()){
 			if(n.find(Dir::SEP()) != std::string::npos){
 				this->d = Dir(n.substr(0, n.rfind(Dir::SEP())));
 				this->n = this->n.substr(n.rfind(Dir::SEP()) + 1);
 			}else
 				try{
 					d = Dir(Dir::PRNT(Dir::REAL(this->n)), m);
-				}catch(const kul::fs::Exception& e){
-					this->d = Dir(env::CWD());
-				}
-			if(this->n.find(d.path()) != std::string::npos)
-				this->n = this->n.substr(d.path().size() + 1);
+				}catch(const kul::fs::Exception& e){}
 		}
+		File(const char* n, bool m = false) : File(std::string(n), m){}
 		File(const std::string& n, const Dir& d) : n(n), d(d){}
 		File(const std::string& n, const char* c) : n(n), d(c){}
 		File(const std::string& n, const std::string& d1) : n(n), d(d1){}
@@ -428,7 +426,7 @@ inline bool WHICH(const char* c){
 
 #ifdef _WIN32
 namespace os{
-inline int exec(const std::string& cmd, bool q = false){
+inline uint16_t exec(const std::string& cmd, bool q = false){
 	if(q){
 		return system(std::string(cmd + " > nul").c_str());
 	}else return system(cmd.c_str());

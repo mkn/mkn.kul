@@ -36,8 +36,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *       V VECTOR 
 **/
 
-#ifndef _KUL_HASH_HPP_
-#define _KUL_HASH_HPP_
+#ifndef _KUL_MAP_HPP_
+#define _KUL_MAP_HPP_
 
 #include "sparsehash/sparse_hash_map"
 #include "sparsehash/sparse_hash_set"
@@ -329,4 +329,4 @@ class S2S2T : google::dense_hash_map<std::string, S2T<T>, HashFcn, EqualKey>{
 }
 
 }
-#endif /* _KUL_HASH_HPP_ */
+#endif /* _KUL_MAP_HPP_ */

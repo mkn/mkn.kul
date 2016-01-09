@@ -11,7 +11,6 @@ profile:
     dep:
     - name: google.sparsehash
       version: 2.0.3
-      scm: http://www.github.com/mkn/google.sparsehash
     if_inc:
       bsd: ./os/nixish/inc
       nix: ./os/nixish/inc

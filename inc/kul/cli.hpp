@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 
 #include "kul/os.hpp"
-#include "kul/hash.hpp"
+#include "kul/map.hpp"
 #include "kul/cli.os.hpp"
 #include "kul/except.hpp"
 #include "kul/string.hpp"
@@ -55,12 +55,12 @@ void show();
 
 class Exception : public kul::Exception{
 	public:
-		Exception(const char*f, const int l, const std::string& s) : kul::Exception(f, l, s){}
+		Exception(const char*f, const uint16_t& l, const std::string& s) : kul::Exception(f, l, s){}
 };
 
 class ArgNotFoundException : public Exception{
 	public:
-		ArgNotFoundException(const char*f, const int l, const std::string& s) : Exception(f, l, s){}
+		ArgNotFoundException(const char*f, const uint16_t& l, const std::string& s) : Exception(f, l, s){}
 };
 
 
@@ -149,7 +149,7 @@ class Args{
 		bool has(const std::string& s) const {
 			return vals.count(s);
 		}
-		void process(int argc, char* argv[], int first = 1) throw(ArgNotFoundException){
+		void process(const uint16_t& argc, char* argv[], uint16_t first = 1) throw(ArgNotFoundException){
 			for(const Arg& a1 : arguments())
 				for(const Arg& a2 : arguments()){
 					if(&a1 == &a2) continue;
@@ -165,11 +165,11 @@ class Args{
 				}
 
 			Arg* arg = 0;
-			int valExpected = 0;
+			uint16_t valExpected = 0;
 			std::string valExpectedFor, c, t;
 
-			for(int i = first; i < argc; i++){
-				c = argv[i];
+			for(size_t j = first; j < argc; j++){
+				c = argv[j];
 				t = c;
 
 				if(c.compare("---") == 0)	KEXCEPT(Exception, "Illegal argument ---");
@@ -210,7 +210,7 @@ class Args{
 						valExpected = 0;
 					}else if(c.length() > 1){
 						std::string a = c;
-						for(unsigned int i = 0; i < c.length(); i++){
+						for(size_t i = 0; i < c.length(); i++){
 							arg = const_cast<Arg*>(&dashes(a.at(0)));
 							if(i + 1 == c.length())
 								valExpected = arg->type();

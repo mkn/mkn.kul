@@ -49,12 +49,12 @@ namespace kul{ namespace ipc{
 
 class Exception : public kul::Exception{
 	public:
-		Exception(const char*f, const int l, const std::string& s) : kul::Exception(f, l, s){}
+		Exception(const char*f, const uint16_t& l, const std::string& s) : kul::Exception(f, l, s){}
 };
 
 class Server{
 	private:
-		int lp;
+		int16_t lp;
 		const std::string uuid;
 		HANDLE hPipe;
 		TCHAR *pchRequest = 0;
@@ -107,8 +107,8 @@ class Server{
 			}
 			CloseHandle(hPipe); 
 		}
-		Server(const int& lp = -1) throw(Exception) : lp(lp), uuid(_KUL_IPC_UUID_PREFIX_ + std::string("pid\\") + std::to_string(kul::this_proc::id())){ start();}
-		Server(const std::string& ui, const int& lp = -1) throw(Exception) : uuid(_KUL_IPC_UUID_PREFIX_ + ui), lp(lp){ start();}
+		Server(const int16_t& lp = -1) throw(Exception) : lp(lp), uuid(_KUL_IPC_UUID_PREFIX_ + std::string("pid\\") + std::to_string(kul::this_proc::id())){ start();}
+		Server(const std::string& ui, const int16_t& lp = -1) throw(Exception) : uuid(_KUL_IPC_UUID_PREFIX_ + ui), lp(lp){ start();}
 };
 
 class Client{
@@ -151,7 +151,7 @@ class Client{
 			stop();
 		}
 		Client(const std::string& ui) throw(Exception) : uuid(_KUL_IPC_UUID_PREFIX_ + ui) { start(); }
-		Client(const int& pid) throw(Exception) : uuid(_KUL_IPC_UUID_PREFIX_ + std::string("pid\\") + std::to_string(pid)) { start(); }
+		Client(const int16_t& pid) throw(Exception) : uuid(_KUL_IPC_UUID_PREFIX_ + std::string("pid\\") + std::to_string(pid)) { start(); }
 		virtual void send(const std::string& m) const throw(Exception){
 			DWORD  cbToWrite, cbWritten;
 			LPTSTR lpvMessage = _strdup(m.c_str()); 

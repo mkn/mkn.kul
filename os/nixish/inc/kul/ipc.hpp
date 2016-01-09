@@ -51,13 +51,13 @@ namespace kul{ namespace ipc{
 
 class Exception : public kul::Exception{
 	public:
-		Exception(const char*f, const int l, const std::string& s) : kul::Exception(f, l, s){}
+		Exception(const char*f, const uint16_t& l, const std::string& s) : kul::Exception(f, l, s){}
 };
 
 class IPCCall{
 
 	protected:
-		int fd;
+		int16_t fd;
 		void writePID() const{
 			std::string s = std::to_string(this_proc::id());
 			while(s.size() < 9) s = "0" + s;
@@ -71,7 +71,7 @@ class IPCCall{
 };
 class Server : public IPCCall{
 	private:
-		int lp;
+		int16_t lp;
 		const kul::File uuid;
 
 		void start() throw(Exception){
@@ -91,7 +91,7 @@ class Server : public IPCCall{
 				memset(buff, 0, BUFSIZE);
 				fd = open(uuid.full().c_str(), O_RDONLY);
 				if (fd == -1) KEXCEPT(kul::ipc::Exception, "Cannot open FIFO for read");
-				int l;
+				int16_t l;
 				read(fd, buff, 3);
 				std::istringstream ssl(buff);
 				ssl >> l;
@@ -102,8 +102,8 @@ class Server : public IPCCall{
 				if(lp != -1) lp--;
 			}
 		}
-		Server(const int& lp = -1) throw(Exception) : lp(lp), uuid(std::to_string(kul::this_proc::id()), Dir(_KUL_IPC_UUID_PREFIX_ + std::string("/pid/"))){ start();}
-		Server(const std::string& ui, const int& lp = -1) throw(Exception) : lp(lp), uuid(ui, Dir(_KUL_IPC_UUID_PREFIX_)){ start();}
+		Server(const int16_t& lp = -1) throw(Exception) : lp(lp), uuid(std::to_string(kul::this_proc::id()), Dir(_KUL_IPC_UUID_PREFIX_ + std::string("/pid/"))){ start();}
+		Server(const std::string& ui, const int16_t& lp = -1) throw(Exception) : lp(lp), uuid(ui, Dir(_KUL_IPC_UUID_PREFIX_)){ start();}
 };
 
 class Client : public IPCCall{
@@ -123,7 +123,7 @@ class Client : public IPCCall{
 			stop();
 		}
 		Client(const std::string& ui) throw(Exception) : m(1), uuid(ui, Dir(_KUL_IPC_UUID_PREFIX_)) { start(); }
-		Client(const int& pid) throw(Exception) : m(1), uuid(std::to_string(pid), Dir(_KUL_IPC_UUID_PREFIX_ + std::string("/pid/"))) { start(); }
+		Client(const int16_t& pid) throw(Exception) : m(1), uuid(std::to_string(pid), Dir(_KUL_IPC_UUID_PREFIX_ + std::string("/pid/"))) { start(); }
 		virtual void send(const std::string& m) const throw(Exception){
 			writeLength(m);
 			write(fd, m.c_str(), m.size());

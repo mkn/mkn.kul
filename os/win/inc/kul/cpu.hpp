@@ -36,12 +36,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <thread>
 
 namespace kul{ namespace cpu{
-inline unsigned int cores() {
+inline uint16_t cores() {
 	SYSTEM_INFO sysinfo;
 	GetSystemInfo( &sysinfo );
 	return sysinfo.dwNumberOfProcessors;
 }
-inline unsigned int threads() {
+inline uint16_t threads() {
 	return std::thread::hardware_concurrency();
 }
 } // END NAMESPACE cpu

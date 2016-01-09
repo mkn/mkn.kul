@@ -62,7 +62,7 @@ class String{
 			while(s.rfind(' ') == s.size() - 1 || s.rfind('\t') == s.size() - 1)
 				s.pop_back();
 		}
-		static void pad(std::string& s, const unsigned int& p){
+		static void pad(std::string& s, const uint16_t& p){
 			while(s.size() < p) s += " ";
 		}
 		static std::vector<std::string> split(const std::string& s, const char& d){
@@ -85,7 +85,7 @@ class String{
 		}
 		static void split(const std::string& s, const std::string& d, std::vector<std::string>& v){
 			std::string l = s;
-			unsigned int pos = 0;
+			uint16_t pos = 0;
 			while((pos = s.find(d, pos + 1)) < l.size()){
 				v.push_back(l.substr(0, pos));
 				l = l.substr(pos + 1);

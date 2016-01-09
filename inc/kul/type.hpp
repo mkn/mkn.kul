@@ -47,7 +47,7 @@ class Ref{
 	
 class TypeException : public kul::Exception{
 	public:
-		TypeException(const char*f, const int l, const std::string& s) : kul::Exception(f, l, s){}
+		TypeException(const char*f, const uint16_t& l, const std::string& s) : kul::Exception(f, l, s){}
 };
 
 class Bool{
@@ -65,7 +65,7 @@ class Bool{
 
 class Type{
 	public:
-		static uint GET_UINT(const std::string& s) throw(TypeException){
+		static uint16_t GET_UINT(const std::string& s) throw(TypeException){
 			try{
 				unsigned long lresult = stoul(s, 0, 10);
 			    unsigned int result = lresult;
@@ -74,18 +74,18 @@ class Type{
 			}catch(const std::invalid_argument& e){ KEXCEPT(TypeException, "GET_UINT failed"); }
 		    return 0;
 		}
-		static int GET_INT(const std::string& s) throw(TypeException){
+		static int16_t GET_INT(const std::string& s) throw(TypeException){
 			try{
 				return std::stoi(s); 
 			}catch(const std::invalid_argument& e){ KEXCEPT(TypeException, "stoi failed"); }
 		}
-		static ulong GET_ULONG(const std::string& s) throw(TypeException){
+		static uint32_t GET_ULONG(const std::string& s) throw(TypeException){
 			try{
 				return std::stoul(s);
 			}catch(const std::invalid_argument& e){ KEXCEPT(TypeException, "GET_ULONG failed"); }
 		    return 0;
 		}
-		static ulonglong GET_ULONGLONG(const std::string& s) throw(TypeException){
+		static uint64_t GET_ULONGLONG(const std::string& s) throw(TypeException){
 			try{
 				return std::stoull(s);
 			}catch(const std::invalid_argument& e){ KEXCEPT(TypeException, "GET_ULONGLONG failed"); }
