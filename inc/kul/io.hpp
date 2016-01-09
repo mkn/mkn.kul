@@ -66,7 +66,7 @@ class AReader{
 				std::vector<char> v;
 				v.resize(s);
 				f.read(&v[0], s);
-				v.resize(f.gcount());
+				v.resize((uint16_t)f.gcount());
 				str = std::make_unique<std::string>(std::string(v.begin(), v.end()));
 			}
 			return str.get();

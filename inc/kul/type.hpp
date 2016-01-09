@@ -67,8 +67,8 @@ class Type{
 	public:
 		static uint16_t GET_UINT(const std::string& s) throw(TypeException){
 			try{
-				unsigned long lresult = stoul(s, 0, 10);
-			    unsigned int result = lresult;
+				uint32_t lresult = stoul(s, 0, 10);
+				uint16_t result = lresult;
 			    if (result != lresult) KEXCEPT(TypeException, "GET_UINT failed");
 			    return result;
 			}catch(const std::invalid_argument& e){ KEXCEPT(TypeException, "GET_UINT failed"); }

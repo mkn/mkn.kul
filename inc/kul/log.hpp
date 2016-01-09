@@ -95,20 +95,15 @@ class LogMan{
 		log::mode m;
 		const Logger logger;
 		LogMan() : m(kul::log::mode::NON), logger(){
-			const char* klog = kul::env::GET("KLOG");
-			if(klog){
+			std::string s(kul::env::GET("KLOG"));
+			if(s.size()){
 				bool e = 0;
-				std::string s(klog);
-				if(s.empty()) e = 1;
-				else{
-					kul::String::trim(s);
-					if(s.compare("0") == 0 || s.compare("NON") == 0)      m = log::mode::NON;
-					else if(s.compare("1") == 0 || s.compare("INF") == 0) m = log::mode::INF;
-					else if(s.compare("2") == 0 || s.compare("ERR") == 0) m = log::mode::ERR;
-					else if(s.compare("3") == 0 || s.compare("DBG") == 0) m = log::mode::DBG;
-					else e = 1;
-				} 
-				if(e){
+				kul::String::trim(s);
+				if     (s == "0" || s == "NON") m = log::mode::NON;
+				else if(s == "1" || s == "INF") m = log::mode::INF;
+				else if(s == "2" || s == "ERR") m = log::mode::ERR;
+				else if(s == "3" || s == "DBG") m = log::mode::DBG;
+				else {
 					m = log::mode::ERR;
 					out(m, "ERROR DISCERNING LOG LEVEL, ERROR LEVEL IN USE");
 				}

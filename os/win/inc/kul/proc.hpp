@@ -50,10 +50,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace kul{ 
 
 namespace this_proc{
-inline int16_t id(){
+inline int32_t id(){
 	return GetCurrentProcessId();
 }
-inline void kill(const int16_t& e){
+inline void kill(const int32_t& e){
 	TerminateProcess(OpenProcess(PROCESS_TERMINATE, 0, kul::this_proc::id()), 128+e);
 }
 }

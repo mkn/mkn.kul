@@ -85,7 +85,7 @@ class String{
 		}
 		static void split(const std::string& s, const std::string& d, std::vector<std::string>& v){
 			std::string l = s;
-			uint16_t pos = 0;
+			size_t pos = 0;
 			while((pos = s.find(d, pos + 1)) < l.size()){
 				v.push_back(l.substr(0, pos));
 				l = l.substr(pos + 1);

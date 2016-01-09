@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <thread>
 
 namespace kul{ namespace cpu{
-inline uint16_t cores() {
+inline uint32_t cores() {
 	SYSTEM_INFO sysinfo;
 	GetSystemInfo( &sysinfo );
 	return sysinfo.dwNumberOfProcessors;

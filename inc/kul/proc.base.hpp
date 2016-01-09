@@ -43,8 +43,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace kul { 
 
 namespace this_proc{
-    int16_t id();
-    void kill(const int16_t& e);
+    int32_t id();
+    void kill(const uint32_t& e);
 }
 
 namespace proc{
@@ -87,8 +87,8 @@ class Call{
         Call(const std::string& s, const kul::hash::map::S2S& evs, const std::string& d= "") : d(d), s(s){
             setCWD();
             for(const auto& ev : evs){
-                const char* v = kul::env::GET(ev.first.c_str());
-                if(v) oldEvs.insert(ev.first, v);
+                const std::string& v = kul::env::GET(ev.first.c_str());
+                if(v.size()) oldEvs.insert(ev.first, v);
                 kul::env::SET(ev.first.c_str(), ev.second.c_str());
             }
         }
@@ -102,8 +102,7 @@ class AProcess{
     private:
         bool f = 0, s = 0;
         const bool wfe = 1;
-        uint16_t pi = 0;
-        int16_t pec = 0;
+        uint32_t pec = 0, pi = 0;
         const std::string d;
         std::function<void(std::string)> e;
         std::function<void(std::string)> o;
@@ -123,7 +122,7 @@ class AProcess{
         virtual void tearDown() {}
         virtual void run() throw (kul::Exception) = 0;
         bool waitForExit()  const { return wfe; }
-        void pid(const uint16_t& pi )  { this->pi = pi; }
+        void pid(const uint32_t& pi )  { this->pi = pi; }
 
         const std::vector<std::string>&     args()  const { return argv; };
         const kul::hash::map::S2S&          vars()  const { return evs; }
@@ -139,7 +138,7 @@ class AProcess{
             tearDown();
             throw Exception("kul/proc.hpp", line, s);
         }
-        void exitCode(const int16_t& e){ pec = e; }
+        void exitCode(const int32_t& e){ pec = e; }
     public:
         template <class T> AProcess& arg(const T& a) { 
             std::stringstream ss;
@@ -159,7 +158,7 @@ class AProcess{
                     ? throw proc::ExitException(__FILE__, __LINE__, pec, "Process exit code: " + std::to_string(pec) + kul::os::EOL() + toString())
                     : throw proc::ExitException(__FILE__, __LINE__, pec, "Process exit code: " + std::to_string(pec));
         }
-        const uint16_t& pid()   const { return pi; }
+        const uint32_t& pid()   const { return pi; }
         bool started()          const { return pi > 0; }
         bool finished()         const { return f; }
         virtual const std::string toString() const{
@@ -170,7 +169,7 @@ class AProcess{
         }
         void setOut(std::function<void(std::string)> o) { this->o = o; }
         void setErr(std::function<void(std::string)> e) { this->e = e; }
-        const int16_t& exitCode(){ return pec; }
+        const int32_t& exitCode(){ return pec; }
 };
 
 inline std::ostream& operator<<(std::ostream &s, const AProcess &p){

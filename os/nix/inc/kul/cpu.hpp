@@ -44,7 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace kul{
 namespace cpu{
-inline uint16_t cores() {
+inline uint32_t cores() {
 	return sysconf(_SC_NPROCESSORS_ONLN);
 }
 inline uint16_t threads() {

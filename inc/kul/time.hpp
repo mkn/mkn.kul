@@ -62,7 +62,9 @@ class DateTime{
 		static const std::string AS(const std::time_t t, std::string f = "%Y-%m-%d-%H:%M:%S"){
 			kul::String::replace(f, "%i", MILLIS());
 			char buffer [80];
-			std::strftime(buffer, 80, f.c_str(), std::localtime(&t));
+			struct tm ti;
+			localtime_s(&ti, &t);
+			std::strftime(buffer, 80, f.c_str(), &ti);
 			return std::string(buffer);
 		}
 		static const std::string AS(const std::string& epoch, const std::string& f = "%Y-%m-%d-%H:%M:%S"){

@@ -57,7 +57,7 @@ class KulTimeStampsResolver{
 			date.LowPart = ft.dwLowDateTime;
 			adjust.QuadPart = 11644473600000 * 10000;
 			date.QuadPart -= adjust.QuadPart;
-			return date.QuadPart / 10000000;
+			return (uint16_t) date.QuadPart / 10000000;
 		}
 		static void GET(const char*const p, uint16_t& a, uint16_t& c, uint16_t& m){
 			WIN32_FIND_DATA ffd;

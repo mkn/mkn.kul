@@ -41,6 +41,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  	#define __KUL_THREAD_SPAWN_WAIT__ 0
 #endif /*  __KUL_THREAD_SPAWN_WAIT__ */
 
+#ifndef __KUL_ENV_BUFFER__
+	#define __KUL_ENV_BUFFER__ 1024
+#endif /*  __KUL_ENV_BUFFER__ */
+
 #ifndef __KUL_PROCESS_BUFFER__
 	#define __KUL_PROCESS_BUFFER__ 1024
 #endif /*  __KUL_PROCESS_BUFFER__ */
@@ -50,6 +54,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif /*  __KUL_PROCESS_ENV_BUFFER__ */
 
 #pragma warning(disable : 4005)
+#pragma warning(disable : 4101)
+#pragma warning(disable : 4290)
 #pragma warning(disable : 4503)
 #pragma warning(disable : 4800)
 

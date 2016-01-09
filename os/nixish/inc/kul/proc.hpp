@@ -51,10 +51,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace kul {
 
 namespace this_proc{
-inline int16_t id(){
+inline int32_t id(){
 	return getpid();
 }
-inline void kill(const int16_t& e){
+inline void kill(const int32_t& e){
 	::kill(kul::this_proc::id(), e);
 }
 }

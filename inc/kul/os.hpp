@@ -77,7 +77,7 @@ namespace env{
 inline const std::string CWD(){
 #ifdef _WIN32
 	char c[_MAX_PATH];
-	getcwd(c, _MAX_PATH);
+	_getcwd(c, _MAX_PATH);
 #else
 #ifndef PATH_MAX
 #define PATH_MAX 1024
@@ -91,18 +91,29 @@ inline const std::string CWD(){
 bool CWD(const std::string& c);
 bool CWD(const Dir& d);
 #ifdef _WIN32
-inline const char* GET(const char* c){
-	return getenv(c);
+// inline const char* GET(const char* c){
+// 	return getenv(c);
+// }
+inline const std::string GET(const char* c){
+	char* r;
+	size_t len;
+	_dupenv_s(&r, &len, c);
+	if(len){
+		std::string s(r);
+		free(r);
+		return s;
+	}
+	return "";
 }
 inline void SET(const char* var, const char* val){
-	putenv(std::string(std::string(var) + "=" + std::string(val)).c_str());
+	_putenv(std::string(std::string(var) + "=" + std::string(val)).c_str());
 }
 inline const char SEP(){
 	return ';';
 }
 #else
-inline const char* GET(const char* c){
-	return getenv(c);
+inline const std::string GET(const char* c){
+	return std::string(getenv(c));
 }
 inline void SET(const char* var, const char* val){
 	setenv(var, val, 1);
@@ -221,12 +232,12 @@ class Dir : public fs::Item {
 			WIN32_FIND_DATA fdFile;
 			HANDLE hFind = NULL;
 			char sPath[2048];
-			sprintf(sPath, "%s\\*.*", path().c_str());
+			sprintf_s(sPath, "%s\\*.*", path().c_str());
 			if((hFind = FindFirstFile(sPath, &fdFile)) == INVALID_HANDLE_VALUE)
 				KEXCEPT(fs::Exception, "Directory : \"" + path() + "\" does not exist");
 			do{
 				if(strcmp(fdFile.cFileName, ".") != 0 && strcmp(fdFile.cFileName, "..") != 0){
-					sprintf(sPath, "%s\\%s", path().c_str(), fdFile.cFileName);
+					sprintf_s(sPath, "%s\\%s", path().c_str(), fdFile.cFileName);
 					if(fdFile.dwFileAttributes &FILE_ATTRIBUTE_DIRECTORY){
 						if(!incHidden && std::string(sPath).substr(std::string(sPath).rfind(kul::Dir::SEP()) + 1).substr(0, 1).compare(".") == 0) continue; 
 						dirs.push_back(Dir(sPath));
@@ -330,7 +341,7 @@ class File : public fs::Item {
 		}
 		bool rm() const{
 			if(is()){
-				unlink(d.join(n).c_str());
+				_unlink(d.join(n).c_str());
 				return true;
 			}
 			return false;
@@ -351,7 +362,11 @@ class File : public fs::Item {
 #endif
 		bool mk() const{
 			FILE* pFile;
+#ifdef _WIN32
+			fopen_s(&pFile, full().c_str(),"w");
+#else
 			pFile = fopen(full().c_str(),"w");
+#endif
 			if(pFile != NULL){
 				fclose(pFile);
 			}
@@ -432,8 +447,8 @@ inline uint16_t exec(const std::string& cmd, bool q = false){
 	}else return system(cmd.c_str());
 }
 inline const kul::Dir userDir(){
-	const char* h = env::GET("HOME");
-	if(h) return kul::Dir(h);
+	const std::string h(env::GET("HOME"));
+	if(h.size()) return kul::Dir(h);
 	return kul::Dir(std::string(env::GET("HOMEDRIVE")) + std::string(env::GET("HOMEPATH")));
 }
 inline const kul::Dir userAppDir(const std::string& app){
@@ -490,13 +505,13 @@ inline const std::vector<kul::File> kul::Dir::files(bool recursive) const throw(
 	WIN32_FIND_DATA fdFile;
 	HANDLE hFind = NULL;
 	char sPath[2048];
-	sprintf(sPath, "%s\\*.*", path().c_str());
+	sprintf_s(sPath, "%s\\*.*", path().c_str());
 	if((hFind = FindFirstFile(sPath, &fdFile)) == INVALID_HANDLE_VALUE) 
 		KEXCEPT(fs::Exception, "Directory : \"" + path() + "\" does not exist");
 
 	do{
 		if(strcmp(fdFile.cFileName, ".") != 0 && strcmp(fdFile.cFileName, "..") != 0){
-			sprintf(sPath, "%s\\%s", path().c_str(), fdFile.cFileName);
+			sprintf_s(sPath, "%s\\%s", path().c_str(), fdFile.cFileName);
 			if(!(fdFile.dwFileAttributes &FILE_ATTRIBUTE_DIRECTORY)){
 				std::string f(sPath);
 				fs.push_back(File(f.substr(f.rfind(kul::Dir::SEP()) + 1), *this));
