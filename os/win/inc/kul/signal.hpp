@@ -48,6 +48,22 @@ void kul_se_translator_function(unsigned int sig, EXCEPTION_POINTERS* pException
 	kul_real_se_handler(pExceptionInfo);
 }
 
+void kul_sig_function_handler(const uint16_t& s);
+
+BOOL WINAPI kul_sigint_function(DWORD d){
+	switch(d) {
+	    case CTRL_C_EVENT:
+	        kul_sig_function_handler(2);
+	        break;
+	    // case CTRL_BREAK_EVENT:
+	    //     printf("break\n");
+	    //     break;
+	    default:
+	        break;
+    }
+    return TRUE;
+}
+
 namespace kul{
 class Signal;
 
@@ -57,9 +73,16 @@ class SignalStatic{
 		std::vector<std::function<void(int)>> ab, in, se;
 		friend class Signal;
 		friend void ::kul_real_se_handler(EXCEPTION_POINTERS* pExceptionInfo);
+		friend void ::kul_sig_function_handler(const uint16_t& s);
 		static SignalStatic& INSTANCE(){
 			static SignalStatic ss;
 			return ss;
+		}
+		void intr(const std::function<void(int)>& f){
+			if(in.size() == 0)
+				if(!SetConsoleCtrlHandler((PHANDLER_ROUTINE)kul_sigint_function,TRUE))
+					KEXCEPTION("Unable to install handler!");
+			in.push_back(f); 
 		}
 };
 
@@ -68,24 +91,29 @@ class Signal{
 		bool q = 0;
 		std::vector<std::function<void(int)>> ab, in, se;
 		friend class Signal;
-		friend void ::kul_real_se_handler(EXCEPTION_POINTERS* pExceptionInfo);
 	public:
 		Signal(){
 			_set_se_translator( kul_se_translator_function );
 			SetUnhandledExceptionFilter(kul_top_level_exception_handler);
 		}
+		Signal& abrt(const std::function<void(int16_t)>& f){ kul::SignalStatic::INSTANCE().ab.push_back(f); return *this;}
+		Signal& intr(const std::function<void(int16_t)>& f){ kul::SignalStatic::INSTANCE().intr(f);         return *this;}
+		Signal& segv(const std::function<void(int16_t)>& f){ kul::SignalStatic::INSTANCE().se.push_back(f); return *this;}
+
 		void quiet() { kul::SignalStatic::INSTANCE().q = 1; }
-		void abrt(const std::function<void(int)>& f){ kul::SignalStatic::INSTANCE().ab.push_back(f); }
-		void intr(const std::function<void(int)>& f){ kul::SignalStatic::INSTANCE().in.push_back(f); }
-		void segv(const std::function<void(int)>& f){ kul::SignalStatic::INSTANCE().se.push_back(f); }
 };
+}
+
+void kul_sig_function_handler(const uint16_t& s){
+	if(s ==  2) for(auto& f : kul::SignalStatic::INSTANCE().in) f(s);
+	if(s == 11) for(auto& f : kul::SignalStatic::INSTANCE().se) f(s);
 }
 
 void kul_real_se_handler(EXCEPTION_POINTERS* pExceptionInfo){
 	const std::string& tid(kul::this_thread::id());
-	uint sig = pExceptionInfo->ExceptionRecord->ExceptionCode;
+	uint16_t sig = pExceptionInfo->ExceptionRecord->ExceptionCode;
 	if(pExceptionInfo->ExceptionRecord->ExceptionCode == EXCEPTION_ACCESS_VIOLATION)
-    	for(auto& f : kul::SignalStatic::INSTANCE().se) f(sig = 11);
+    	kul_sig_function_handler(sig = 11);
 
     if(!kul::SignalStatic::INSTANCE().q){
 	    HANDLE process = GetCurrentProcess();

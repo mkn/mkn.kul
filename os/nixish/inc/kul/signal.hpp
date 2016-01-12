@@ -63,6 +63,7 @@ class SignalStatic{
 		bool addr = 0, q = 0;
 		struct sigaction sigHandler;
 		std::vector<std::function<void(int)>> ab, in, se;
+		std::vector<void(*)(const uint16_t&)> lab, lin, lse;
 		SignalStatic(){
 			addr = kul::env::WHICH("addr2line");
 			sigemptyset(&sigHandler.sa_mask);
@@ -73,6 +74,10 @@ class SignalStatic{
 		static SignalStatic& INSTANCE(){
 			static SignalStatic ss;
 			return ss;
+		}
+		void intr(const std::function<void(int)>& f){
+			if(in.size() == 0) sigaction(SIGINT, &sigHandler, NULL);
+			in.push_back(f); 
 		}
 	public:
 		void quiet(){ q = 1; }
@@ -85,18 +90,21 @@ class Signal{
 		Signal(){
 			kul::SignalStatic::INSTANCE();
 		}
-		void abrt(const std::function<void(int)>& f){ kul::SignalStatic::INSTANCE().ab.push_back(f); }
-		void intr(const std::function<void(int)>& f){ kul::SignalStatic::INSTANCE().in.push_back(f); }
-		void segv(const std::function<void(int)>& f){ kul::SignalStatic::INSTANCE().se.push_back(f); }
+		Signal& abrt(const std::function<void(int16_t)>& f){ kul::SignalStatic::INSTANCE().ab.push_back(f); return *this;}
+		Signal& intr(const std::function<void(int16_t)>& f){ kul::SignalStatic::INSTANCE().intr(f);         return *this;}
+		Signal& segv(const std::function<void(int16_t)>& f){ kul::SignalStatic::INSTANCE().se.push_back(f); return *this;}
+
 		void quiet(){ kul::SignalStatic::INSTANCE().q = 1; }
 };
 }
 
 void kul_sig_handler(int s, siginfo_t* info, void* v) {
 	if(info->si_pid == 0 || info->si_pid == kul::this_proc::id()){
-		if(s == SIGSEGV) for(auto& f : kul::SignalStatic::INSTANCE().se) f(s);
+		// if(s == SIGABRT) for(auto& f : kul::SignalStatic::INSTANCE().ab ) f(s);
+		if(s == SIGINT ) for(auto& f : kul::SignalStatic::INSTANCE().in ) f(s);
+		if(s == SIGSEGV) for(auto& f : kul::SignalStatic::INSTANCE().se ) f(s);
 
-		if(!kul::SignalStatic::INSTANCE().q){
+		if(s == SIGSEGV && !kul::SignalStatic::INSTANCE().q){
 			ucontext_t *uc = (ucontext_t *) v;
 			void *trace[16];
 			char **messages = (char **)NULL;
