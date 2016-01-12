@@ -174,19 +174,21 @@ class Process : public kul::AProcess{
 			const char* dir = directory().empty() ? 0 : directory().c_str();
 			LPSTR szCmdline = _strdup(toString().c_str());
 			if(vars().size()){
-				TCHAR chNewEnv[__KUL_PROCESS_ENV_BUFFER__];
-				LPTSTR lpszCurrentVariable;
-				lpszCurrentVariable = (LPTSTR) chNewEnv;
+				WCHAR chNewEnv[__KUL_PROCESS_ENV_BUFFER__];
+				LPWSTR lpszCurrentVariable;
+				lpszCurrentVariable = (LPWSTR) chNewEnv;
 				for(auto& evs : vars()){
-					if(FAILED(StringCchCopy(lpszCurrentVariable, __KUL_PROCESS_ENV_BUFFER__, TEXT(std::string(evs.first + "=" + evs.second).c_str())))) 
+					std::string var(evs.first + "=" + evs.second);
+					if(FAILED(StringCchCopyW(lpszCurrentVariable, __KUL_PROCESS_ENV_BUFFER__, (std::wstring(var.begin(), var.end()).c_str())))) 
 						error(__LINE__, "String copy failed");
-					lpszCurrentVariable += lstrlen(lpszCurrentVariable) + 1;
+					lpszCurrentVariable += wcslen(lpszCurrentVariable) + 1;
 				}
 				for(auto& evs : env){
 					if(vars().count(evs.first)) continue;
-					if(FAILED(StringCchCopy(lpszCurrentVariable, __KUL_PROCESS_ENV_BUFFER__, TEXT(std::string(evs.first + "=" + evs.second).c_str())))) 
+					std::string var(evs.first + "=" + evs.second);
+					if(FAILED(StringCchCopyW(lpszCurrentVariable, __KUL_PROCESS_ENV_BUFFER__, (std::wstring(var.begin(), var.end()).c_str())))) 
 						error(__LINE__, "String copy failed");
-					lpszCurrentVariable += lstrlen(lpszCurrentVariable) + 1;
+					lpszCurrentVariable += wcslen(lpszCurrentVariable) + 1;
 				}
 				*lpszCurrentVariable = (TCHAR)0;
 				bSuccess = CreateProcess(NULL, szCmdline, NULL, NULL, TRUE, flags, chNewEnv, dir, &siStartInfo, &piProcInfo);
