@@ -81,7 +81,7 @@ class SignalStatic{
 		void intr(const std::function<void(int)>& f){
 			if(in.size() == 0)
 				if(!SetConsoleCtrlHandler((PHANDLER_ROUTINE)kul_sigint_function,TRUE))
-					KEXCEPTION("Unable to install handler!");
+					KEXCEPTION("Unable to install signal handler!");
 			in.push_back(f); 
 		}
 };
