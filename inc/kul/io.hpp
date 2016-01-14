@@ -71,6 +71,10 @@ class AReader{
 			}
 			return str.get();
 		}
+	public:
+		virtual ~AReader(){}
+		virtual const std::string* readLine() = 0;
+		virtual const std::string* read(const uint16_t& s) = 0;
 };
 class Reader : public AReader{
 	private:
@@ -112,8 +116,9 @@ class AWriter{
 			if(nl) 	f << c << kul::os::EOL();
 			else	f << c;
 		}
+	public:
+		virtual AWriter& write(const char*c, bool nl = false) = 0;
 };
-
 
 class Writer: public AWriter{
 	private:
@@ -126,12 +131,21 @@ class Writer: public AWriter{
 		}
 		Writer(const File& c, bool a = 0) : Writer(c.full().c_str(), a){}
 		~Writer() { f.close();}
-		void write(const char*c, bool nl = false){
-			return AWriter::write(f, c, nl);
+		AWriter& write(const char*c, bool nl = false){
+			AWriter::write(f, c, nl);
+			return *this;
 		}
 		template<class T> Writer& operator<<(const T& s){
 			f << s;
 			return *this;
+		}
+		AWriter& operator<< (std::ostream& (*os)(std::ostream&)) {
+		    f << std::flush;
+		    return *this;
+		}
+		AWriter& flush(){
+		    f << std::flush;
+		    return *this;
 		}
 };
 class BinaryWriter : public AWriter{
@@ -144,12 +158,21 @@ class BinaryWriter : public AWriter{
 		}
 		BinaryWriter(const File& c) : BinaryWriter(c.full().c_str()){}
 		~BinaryWriter() { f.close();}
-		void write(const char*c, bool nl = false){
-			return AWriter::write(f, c, nl);
+		AWriter& write(const char*c, bool nl = false){
+			AWriter::write(f, c, nl);
+			return *this;
 		}
 		template<class T> BinaryWriter& operator<<(const T& s){
 			f << s;
 			return *this;
+		}
+		BinaryWriter& operator<< (std::ostream& (*os)(std::ostream&)) {
+		    f << std::flush;
+		    return *this;
+		}
+		BinaryWriter& flush(){
+		    f << std::flush;
+		    return *this;
 		}
 };
 
