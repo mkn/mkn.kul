@@ -51,211 +51,211 @@ namespace kul{
 
 namespace this_proc{
 inline int32_t id(){
-	return GetCurrentProcessId();
+    return GetCurrentProcessId();
 }
 inline void kill(const int32_t& e){
-	TerminateProcess(OpenProcess(PROCESS_TERMINATE, 0, kul::this_proc::id()), 128+e);
+    TerminateProcess(OpenProcess(PROCESS_TERMINATE, 0, kul::this_proc::id()), 128+e);
 }
 }
 
 class Process : public kul::AProcess{
-	private:
-		static ULONG PIPE_ID(){
-			static ULONG p = 999;
-			p++;
-			return p;
-		}
-		HANDLE g_hChildStd_OUT_Rd = NULL;
-		HANDLE g_hChildStd_OUT_Wr = NULL;
-		HANDLE g_hChildStd_ERR_Rd = NULL;
-		HANDLE g_hChildStd_ERR_Wr = NULL;
+    private:
+        static ULONG PIPE_ID(){
+            static ULONG p = 999;
+            p++;
+            return p;
+        }
+        HANDLE g_hChildStd_OUT_Rd = NULL;
+        HANDLE g_hChildStd_OUT_Wr = NULL;
+        HANDLE g_hChildStd_ERR_Rd = NULL;
+        HANDLE g_hChildStd_ERR_Wr = NULL;
 
-		HANDLE revent = CreateEvent(0, 1, 0, 0);
-	public:
-		Process(const std::string& cmd, const bool& wfe = true)                         : kul::AProcess(cmd, wfe)      {}
-		Process(const std::string& cmd, const std::string& path, const bool& wfe = true): kul::AProcess(cmd, path, wfe){}
-		~Process(){ tearDown(); }
-		bool kill(int16_t k = 6){
-			if(!started()) return 0;
-			DWORD dwDesiredAccess = PROCESS_TERMINATE;
-			bool  bInheritHandle  = 0;
-			HANDLE hProcess = OpenProcess(dwDesiredAccess, bInheritHandle, pid());
-			if (hProcess == NULL) return 0;
-			bool r = TerminateProcess(hProcess, 128+k);
-			CloseHandle(hProcess);
-			setFinished();
-			return r;
-		}
-	protected:
-		void tearDown(){
-			CloseHandle(g_hChildStd_OUT_Rd);
-			CloseHandle(g_hChildStd_ERR_Rd);
-		}
-		void run() throw (kul::Exception){
-			SECURITY_ATTRIBUTES sa;
-			ZeroMemory(&sa, sizeof(SECURITY_ATTRIBUTES));
-			// Set the bInheritHandle flag so pipe handles are inherited. 
-			sa.nLength = sizeof(SECURITY_ATTRIBUTES); 
-			sa.bInheritHandle = TRUE; 
-			sa.lpSecurityDescriptor = NULL;
+        HANDLE revent = CreateEvent(0, 1, 0, 0);
+    public:
+        Process(const std::string& cmd, const bool& wfe = true)                         : kul::AProcess(cmd, wfe)      {}
+        Process(const std::string& cmd, const std::string& path, const bool& wfe = true): kul::AProcess(cmd, path, wfe){}
+        ~Process(){ tearDown(); }
+        bool kill(int16_t k = 6){
+            if(!started()) return 0;
+            DWORD dwDesiredAccess = PROCESS_TERMINATE;
+            bool  bInheritHandle  = 0;
+            HANDLE hProcess = OpenProcess(dwDesiredAccess, bInheritHandle, pid());
+            if (hProcess == NULL) return 0;
+            bool r = TerminateProcess(hProcess, 128+k);
+            CloseHandle(hProcess);
+            setFinished();
+            return r;
+        }
+    protected:
+        void tearDown(){
+            CloseHandle(g_hChildStd_OUT_Rd);
+            CloseHandle(g_hChildStd_ERR_Rd);
+        }
+        void run() throw (kul::Exception){
+            SECURITY_ATTRIBUTES sa;
+            ZeroMemory(&sa, sizeof(SECURITY_ATTRIBUTES));
+            // Set the bInheritHandle flag so pipe handles are inherited. 
+            sa.nLength = sizeof(SECURITY_ATTRIBUTES); 
+            sa.bInheritHandle = TRUE; 
+            sa.lpSecurityDescriptor = NULL;
 
-			std::stringstream ss;
-			ss << this;
+            std::stringstream ss;
+            ss << this;
 
-			const ULONG& pipeID = PIPE_ID();
-			std::string pipeOut = "\\\\.\\Pipe\\kul_proc_out."+std::to_string(this_proc::id())+"."+ss.str()+"."+std::to_string(pipeID);
-			std::string pipeErr = "\\\\.\\Pipe\\kul_proc_err."+std::to_string(this_proc::id())+"."+ss.str()+"."+std::to_string(pipeID);
-			std::string pipeIn  = "\\\\.\\Pipe\\kul_proc_in." +std::to_string(this_proc::id())+"."+ss.str()+"."+std::to_string(pipeID);
+            const ULONG& pipeID = PIPE_ID();
+            std::string pipeOut = "\\\\.\\Pipe\\kul_proc_out."+std::to_string(this_proc::id())+"."+ss.str()+"."+std::to_string(pipeID);
+            std::string pipeErr = "\\\\.\\Pipe\\kul_proc_err."+std::to_string(this_proc::id())+"."+ss.str()+"."+std::to_string(pipeID);
+            std::string pipeIn  = "\\\\.\\Pipe\\kul_proc_in." +std::to_string(this_proc::id())+"."+ss.str()+"."+std::to_string(pipeID);
 
-			LPSTR lPipeOut = _strdup(pipeOut.c_str());
-			g_hChildStd_OUT_Wr = ::CreateNamedPipeA(lPipeOut, PIPE_ACCESS_OUTBOUND | FILE_FLAG_OVERLAPPED,
-				 PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE | PIPE_WAIT, 1, __KUL_PROCESS_BUFFER__,
-				 __KUL_PROCESS_BUFFER__, 0, &sa);
-			if(!g_hChildStd_OUT_Wr) error(__LINE__, "CreatePipe failed");
-			g_hChildStd_OUT_Rd = ::CreateFileA(lPipeOut, GENERIC_READ, 0, &sa, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED, 0);
-			if(!g_hChildStd_OUT_Rd) error(__LINE__, "CreatePipe failed");
-			if (!SetHandleInformation(g_hChildStd_OUT_Rd, HANDLE_FLAG_INHERIT, 0)) 	error(__LINE__, "SetHandleInformation failed");
+            LPSTR lPipeOut = _strdup(pipeOut.c_str());
+            g_hChildStd_OUT_Wr = ::CreateNamedPipeA(lPipeOut, PIPE_ACCESS_OUTBOUND | FILE_FLAG_OVERLAPPED,
+                 PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE | PIPE_WAIT, 1, __KUL_PROCESS_BUFFER__,
+                 __KUL_PROCESS_BUFFER__, 0, &sa);
+            if(!g_hChildStd_OUT_Wr) error(__LINE__, "CreatePipe failed");
+            g_hChildStd_OUT_Rd = ::CreateFileA(lPipeOut, GENERIC_READ, 0, &sa, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED, 0);
+            if(!g_hChildStd_OUT_Rd) error(__LINE__, "CreatePipe failed");
+            if (!SetHandleInformation(g_hChildStd_OUT_Rd, HANDLE_FLAG_INHERIT, 0))  error(__LINE__, "SetHandleInformation failed");
 
-			LPSTR lPipeErr = _strdup(pipeErr.c_str());
-			g_hChildStd_ERR_Wr = ::CreateNamedPipeA(lPipeErr, PIPE_ACCESS_OUTBOUND | FILE_FLAG_OVERLAPPED,
-				 PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE | PIPE_WAIT, 1, __KUL_PROCESS_BUFFER__, 
-				 __KUL_PROCESS_BUFFER__, 0, &sa);
-			if(!g_hChildStd_ERR_Wr) error(__LINE__, "CreatePipe failed");
-			g_hChildStd_ERR_Rd = ::CreateFileA(lPipeErr, GENERIC_READ, 0, &sa, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED, 0);
-			if(!g_hChildStd_ERR_Rd) error(__LINE__, "CreatePipe failed");
-			if (!SetHandleInformation(g_hChildStd_ERR_Rd, HANDLE_FLAG_INHERIT, 0)) 	error(__LINE__, "SetHandleInformation failed");
+            LPSTR lPipeErr = _strdup(pipeErr.c_str());
+            g_hChildStd_ERR_Wr = ::CreateNamedPipeA(lPipeErr, PIPE_ACCESS_OUTBOUND | FILE_FLAG_OVERLAPPED,
+                 PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE | PIPE_WAIT, 1, __KUL_PROCESS_BUFFER__, 
+                 __KUL_PROCESS_BUFFER__, 0, &sa);
+            if(!g_hChildStd_ERR_Wr) error(__LINE__, "CreatePipe failed");
+            g_hChildStd_ERR_Rd = ::CreateFileA(lPipeErr, GENERIC_READ, 0, &sa, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED, 0);
+            if(!g_hChildStd_ERR_Rd) error(__LINE__, "CreatePipe failed");
+            if (!SetHandleInformation(g_hChildStd_ERR_Rd, HANDLE_FLAG_INHERIT, 0))  error(__LINE__, "SetHandleInformation failed");
 
-			bool bSuccess = FALSE; 
+            bool bSuccess = FALSE; 
 
-			PROCESS_INFORMATION piProcInfo; 
-			STARTUPINFO siStartInfo;
+            PROCESS_INFORMATION piProcInfo; 
+            STARTUPINFO siStartInfo;
 
-			ZeroMemory(&piProcInfo,  sizeof(PROCESS_INFORMATION));
-			ZeroMemory(&siStartInfo, sizeof(STARTUPINFO));
+            ZeroMemory(&piProcInfo,  sizeof(PROCESS_INFORMATION));
+            ZeroMemory(&siStartInfo, sizeof(STARTUPINFO));
 
-			siStartInfo.cb = sizeof(STARTUPINFO); 
-			siStartInfo.dwFlags = STARTF_USESTDHANDLES;
-			siStartInfo.hStdError = g_hChildStd_ERR_Wr;
-			siStartInfo.hStdOutput = g_hChildStd_OUT_Wr;
-			siStartInfo.wShowWindow = SW_HIDE;
-			siStartInfo.lpDesktop = NULL;
-			siStartInfo.lpReserved = NULL;
-			siStartInfo.lpTitle = NULL;
-			siStartInfo.cbReserved2 = 0;
-			siStartInfo.lpReserved2 = NULL;
+            siStartInfo.cb = sizeof(STARTUPINFO); 
+            siStartInfo.dwFlags = STARTF_USESTDHANDLES;
+            siStartInfo.hStdError = g_hChildStd_ERR_Wr;
+            siStartInfo.hStdOutput = g_hChildStd_OUT_Wr;
+            siStartInfo.wShowWindow = SW_HIDE;
+            siStartInfo.lpDesktop = NULL;
+            siStartInfo.lpReserved = NULL;
+            siStartInfo.lpTitle = NULL;
+            siStartInfo.cbReserved2 = 0;
+            siStartInfo.lpReserved2 = NULL;
 
-			unsigned flags = CREATE_UNICODE_ENVIRONMENT;
-			HANDLE cons = CreateFile("CONOUT$", GENERIC_WRITE,
-					FILE_SHARE_WRITE, NULL, OPEN_EXISTING,
-					FILE_ATTRIBUTE_NORMAL, NULL);
-			if (cons == INVALID_HANDLE_VALUE) {
-				flags |= DETACHED_PROCESS;
-			} else {
-				CloseHandle(cons);
-			}
+            unsigned flags = CREATE_UNICODE_ENVIRONMENT;
+            HANDLE cons = CreateFile("CONOUT$", GENERIC_WRITE,
+                    FILE_SHARE_WRITE, NULL, OPEN_EXISTING,
+                    FILE_ATTRIBUTE_NORMAL, NULL);
+            if (cons == INVALID_HANDLE_VALUE) {
+                flags |= DETACHED_PROCESS;
+            } else {
+                CloseHandle(cons);
+            }
 
-			preStart();
+            preStart();
 
-			LPTSTR lpszVariable;
-			LPCH lpvEnv;
-			lpvEnv = GetEnvironmentStrings();
-			if (lpvEnv == NULL) error(__LINE__, "GetEnvironmentStrings() failed.");
-			kul::hash::map::S2S env;
-			for (lpszVariable = (LPTSTR) lpvEnv; *lpszVariable; lpszVariable++){
-				std::stringstream ss;
-				while (*lpszVariable) ss << *lpszVariable++;
-				std::string var = ss.str();
-				if(var.find(":") != std::string::npos)
-					env.insert(var.substr(0, var.find(":")), var.substr(var.find(":") + 1));
-				else env.insert(var, "");
-			}
-			if(FreeEnvironmentStrings(lpvEnv) == 0) error(__LINE__, "FreeEnvironmentStrings() failed");
+            LPTSTR lpszVariable;
+            LPCH lpvEnv;
+            lpvEnv = GetEnvironmentStrings();
+            if (lpvEnv == NULL) error(__LINE__, "GetEnvironmentStrings() failed.");
+            kul::hash::map::S2S env;
+            for (lpszVariable = (LPTSTR) lpvEnv; *lpszVariable; lpszVariable++){
+                std::stringstream ss;
+                while (*lpszVariable) ss << *lpszVariable++;
+                std::string var = ss.str();
+                if(var.find(":") != std::string::npos)
+                    env.insert(var.substr(0, var.find(":")), var.substr(var.find(":") + 1));
+                else env.insert(var, "");
+            }
+            if(FreeEnvironmentStrings(lpvEnv) == 0) error(__LINE__, "FreeEnvironmentStrings() failed");
 
-			const char* dir = directory().empty() ? 0 : directory().c_str();
-			LPSTR szCmdline = _strdup(toString().c_str());
-			if(vars().size()){
-				WCHAR chNewEnv[__KUL_PROCESS_ENV_BUFFER__];
-				LPWSTR lpszCurrentVariable;
-				lpszCurrentVariable = (LPWSTR) chNewEnv;
-				for(auto& evs : vars()){
-					std::string var(evs.first + "=" + evs.second);
-					if(FAILED(StringCchCopyW(lpszCurrentVariable, __KUL_PROCESS_ENV_BUFFER__, (std::wstring(var.begin(), var.end()).c_str())))) 
-						error(__LINE__, "String copy failed");
-					lpszCurrentVariable += wcslen(lpszCurrentVariable) + 1;
-				}
-				for(auto& evs : env){
-					if(vars().count(evs.first)) continue;
-					std::string var(evs.first + "=" + evs.second);
-					if(FAILED(StringCchCopyW(lpszCurrentVariable, __KUL_PROCESS_ENV_BUFFER__, (std::wstring(var.begin(), var.end()).c_str())))) 
-						error(__LINE__, "String copy failed");
-					lpszCurrentVariable += wcslen(lpszCurrentVariable) + 1;
-				}
-				*lpszCurrentVariable = (TCHAR)0;
-				bSuccess = CreateProcess(NULL, szCmdline, NULL, NULL, TRUE, flags, chNewEnv, dir, &siStartInfo, &piProcInfo);
-			}else
-				bSuccess = CreateProcess(NULL, szCmdline, NULL, NULL, TRUE, flags, NULL,     dir, &siStartInfo, &piProcInfo);
+            const char* dir = directory().empty() ? 0 : directory().c_str();
+            LPSTR szCmdline = _strdup(toString().c_str());
+            if(vars().size()){
+                WCHAR chNewEnv[__KUL_PROCESS_ENV_BUFFER__];
+                LPWSTR lpszCurrentVariable;
+                lpszCurrentVariable = (LPWSTR) chNewEnv;
+                for(auto& evs : vars()){
+                    std::string var(evs.first + "=" + evs.second);
+                    if(FAILED(StringCchCopyW(lpszCurrentVariable, __KUL_PROCESS_ENV_BUFFER__, (std::wstring(var.begin(), var.end()).c_str())))) 
+                        error(__LINE__, "String copy failed");
+                    lpszCurrentVariable += wcslen(lpszCurrentVariable) + 1;
+                }
+                for(auto& evs : env){
+                    if(vars().count(evs.first)) continue;
+                    std::string var(evs.first + "=" + evs.second);
+                    if(FAILED(StringCchCopyW(lpszCurrentVariable, __KUL_PROCESS_ENV_BUFFER__, (std::wstring(var.begin(), var.end()).c_str())))) 
+                        error(__LINE__, "String copy failed");
+                    lpszCurrentVariable += wcslen(lpszCurrentVariable) + 1;
+                }
+                *lpszCurrentVariable = (TCHAR)0;
+                bSuccess = CreateProcess(NULL, szCmdline, NULL, NULL, TRUE, flags, chNewEnv, dir, &siStartInfo, &piProcInfo);
+            }else
+                bSuccess = CreateProcess(NULL, szCmdline, NULL, NULL, TRUE, flags, NULL,     dir, &siStartInfo, &piProcInfo);
 
-			if(!bSuccess) error(__LINE__, "CreateProcess failed with last error: " + GetLastError());
+            if(!bSuccess) error(__LINE__, "CreateProcess failed with last error: " + GetLastError());
 
-			pid(piProcInfo.dwProcessId);
+            pid(piProcInfo.dwProcessId);
 
-			CloseHandle(g_hChildStd_OUT_Wr);
-			CloseHandle(g_hChildStd_ERR_Wr);
+            CloseHandle(g_hChildStd_OUT_Wr);
+            CloseHandle(g_hChildStd_ERR_Wr);
 
-			if(this->waitForExit()){
-				OVERLAPPED il = { 0 };
-				memset(&il, 0, sizeof(il));
-				il.hEvent = revent;
-				OVERLAPPED ol = { 0 };
-				memset(&ol, 0, sizeof(ol));
-				ol.hEvent = revent;
-				OVERLAPPED el = { 0 };
-				memset(&el, 0, sizeof(el));
-				el.hEvent = revent;
+            if(this->waitForExit()){
+                OVERLAPPED il = { 0 };
+                memset(&il, 0, sizeof(il));
+                il.hEvent = revent;
+                OVERLAPPED ol = { 0 };
+                memset(&ol, 0, sizeof(ol));
+                ol.hEvent = revent;
+                OVERLAPPED el = { 0 };
+                memset(&el, 0, sizeof(el));
+                el.hEvent = revent;
 
-				DWORD dwRead; 
-				CHAR chBuf[__KUL_PROCESS_BUFFER__ + 1];
-				bSuccess = FALSE;
-				bool alive = true;
-				do{
-					alive = WaitForSingleObject(piProcInfo.hProcess, 11) == WAIT_TIMEOUT;
-					for (;;) { 
-						dwRead = 0;
-						bSuccess = ::ReadFile( g_hChildStd_OUT_Rd, chBuf, __KUL_PROCESS_BUFFER__, &dwRead, &ol);
-						while(!bSuccess && (GetLastError() == ERROR_IO_PENDING || GetLastError() == ERROR_IO_INCOMPLETE)){
-							WaitForSingleObject(ol.hEvent, 11);
-							bSuccess = GetOverlappedResult(g_hChildStd_OUT_Rd, &ol, &dwRead, 0);
-						}
-						if(!bSuccess || dwRead == 0) break; 
-						chBuf[dwRead] = '\0';
-						out(std::string(chBuf, dwRead));
-					} 
-					for (;;) { 
-						dwRead = 0;
-						bSuccess = ::ReadFile( g_hChildStd_ERR_Rd, chBuf, __KUL_PROCESS_BUFFER__, &dwRead, &el);
-						if (GetLastError() == ERROR_IO_PENDING) {
-							WaitForSingleObject(el.hEvent, 11);
-							bSuccess = GetOverlappedResult(g_hChildStd_OUT_Rd, &el, &dwRead, 0);
-						}
-						if(!bSuccess || dwRead == 0) break; 
-						chBuf[dwRead] = '\0';
-						err(std::string(chBuf, dwRead));
-					} 
-				}while(alive);
-			}
-			tearDown();
-			if(this->waitForExit()){
-				DWORD ec = 0;
-				if (FALSE == GetExitCodeProcess(piProcInfo.hProcess, &ec))
-					KEXCEPT(kul::proc::Exception, "GetExitCodeProcess failure");
-				exitCode(ec);
-				finish();
-				setFinished();
-			}
-			CloseHandle(piProcInfo.hThread);
-			CloseHandle(piProcInfo.hProcess);
-		}
-	};
+                DWORD dwRead; 
+                CHAR chBuf[__KUL_PROCESS_BUFFER__ + 1];
+                bSuccess = FALSE;
+                bool alive = true;
+                do{
+                    alive = WaitForSingleObject(piProcInfo.hProcess, 11) == WAIT_TIMEOUT;
+                    for (;;) { 
+                        dwRead = 0;
+                        bSuccess = ::ReadFile( g_hChildStd_OUT_Rd, chBuf, __KUL_PROCESS_BUFFER__, &dwRead, &ol);
+                        while(!bSuccess && (GetLastError() == ERROR_IO_PENDING || GetLastError() == ERROR_IO_INCOMPLETE)){
+                            WaitForSingleObject(ol.hEvent, 11);
+                            bSuccess = GetOverlappedResult(g_hChildStd_OUT_Rd, &ol, &dwRead, 0);
+                        }
+                        if(!bSuccess || dwRead == 0) break; 
+                        chBuf[dwRead] = '\0';
+                        out(std::string(chBuf, dwRead));
+                    } 
+                    for (;;) { 
+                        dwRead = 0;
+                        bSuccess = ::ReadFile( g_hChildStd_ERR_Rd, chBuf, __KUL_PROCESS_BUFFER__, &dwRead, &el);
+                        if (GetLastError() == ERROR_IO_PENDING) {
+                            WaitForSingleObject(el.hEvent, 11);
+                            bSuccess = GetOverlappedResult(g_hChildStd_OUT_Rd, &el, &dwRead, 0);
+                        }
+                        if(!bSuccess || dwRead == 0) break; 
+                        chBuf[dwRead] = '\0';
+                        err(std::string(chBuf, dwRead));
+                    } 
+                }while(alive);
+            }
+            tearDown();
+            if(this->waitForExit()){
+                DWORD ec = 0;
+                if (FALSE == GetExitCodeProcess(piProcInfo.hProcess, &ec))
+                    KEXCEPT(kul::proc::Exception, "GetExitCodeProcess failure");
+                exitCode(ec);
+                finish();
+                setFinished();
+            }
+            CloseHandle(piProcInfo.hThread);
+            CloseHandle(piProcInfo.hProcess);
+        }
+    };
 }
 
 #endif /* _KUL_PROC_HPP_ */

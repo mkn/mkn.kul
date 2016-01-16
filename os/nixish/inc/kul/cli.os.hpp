@@ -36,20 +36,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace kul{ namespace cli{
 inline const std::string hidden(const std::string& t){
-	if(!t.empty()) std::cout << t << std::endl;
-	termios oldt;
+    if(!t.empty()) std::cout << t << std::endl;
+    termios oldt;
     tcgetattr(STDIN_FILENO, &oldt);
     termios newt = oldt;
     newt.c_lflag &= ~ECHO;
     tcsetattr(STDIN_FILENO, TCSANOW, &newt);
-	std::string s;
-	std::getline(std::cin, s);
-	tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
-	return s;
+    std::string s;
+    std::getline(std::cin, s);
+    tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
+    return s;
 }
 
 inline void show(){
-	termios tty;
+    termios tty;
     tcgetattr(STDIN_FILENO, &tty);
     tty.c_lflag |= ECHO;
     tcsetattr(STDIN_FILENO, TCSANOW, &tty);

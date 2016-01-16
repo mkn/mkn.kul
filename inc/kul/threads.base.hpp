@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "kul/except.hpp"
 
 namespace kul{ 
-namespace this_thread{	
+namespace this_thread{  
 inline void sleep(const unsigned long& millis) { std::this_thread::sleep_for(std::chrono::milliseconds(millis));}
 inline void uSleep(const unsigned long& micros){ std::this_thread::sleep_for(std::chrono::microseconds(micros));}
 inline void nSleep(const unsigned long& nanos) { std::this_thread::sleep_for(std::chrono::nanoseconds(nanos));}
@@ -53,65 +53,65 @@ inline void nSleep(const unsigned long& nanos) { std::this_thread::sleep_for(std
 
 namespace threading{
 class Exception : public kul::Exception{
-	public:
-		Exception(const char*f, const uint16_t& l, const std::string& s) : kul::Exception(f, l, s){}
+    public:
+        Exception(const char*f, const uint16_t& l, const std::string& s) : kul::Exception(f, l, s){}
 };
 class InterruptionException : public Exception{
-	public:
-		InterruptionException(const char*f, const uint16_t& l, const std::string& s) : Exception(f, l, s){}
+    public:
+        InterruptionException(const char*f, const uint16_t& l, const std::string& s) : Exception(f, l, s){}
 };
 
 class AThread;
 class ThreadObject{
-	private:		
-		virtual void act() = 0;
-		friend class AThread;
-	public:
-		virtual ~ThreadObject(){}
+    private:
+        virtual void act() = 0;
+        friend class AThread;
+    public:
+        virtual ~ThreadObject(){}
 };
 }
 template <class T>
 class ThreadCopy : public threading::ThreadObject{
-	private:
-		T t;
-		void act(){ t(); } 
-	public:
-		ThreadCopy(T t) : t(t){}
+    private:
+        T t;
+        void act(){ t(); } 
+    public:
+        ThreadCopy(T t) : t(t){}
 };
 template <class T>
 class ThreadRef : public threading::ThreadObject{
-	private:
-		const Ref<T>& t;
-		void act(){ t.get()(); } 
-	public:
-		ThreadRef(const Ref<T>& t) : t(t){}
+    private:
+        const Ref<T>& t;
+        void act(){ t.get()(); } 
+    public:
+        ThreadRef(const Ref<T>& t) : t(t){}
 };
 namespace threading{
 class AThread{
-	protected:
-		std::atomic<bool> f, s;
-		std::exception_ptr ep;
-		std::shared_ptr<threading::ThreadObject> to;
+    protected:
+        std::atomic<bool> f, s;
+        std::exception_ptr ep;
+        std::shared_ptr<threading::ThreadObject> to;
 
-		AThread(const std::shared_ptr<ThreadObject>& t) : f(1), s(0), to(t){}
-		template <class T> AThread(const T& t) : f(1), s(0), to(std::make_shared<ThreadCopy<T>>(t)){}
-		template <class T> AThread(const Ref<T>& t) : f(1), s(0), to(std::make_shared<ThreadRef<T>>(t)){}
-		void act(){
-			try{
-				to->act(); 
-			}catch(const std::exception& e){ 
-				ep = std::current_exception();
-			}
-			f = 1;
-		}
-		virtual void run() throw(kul::threading::Exception) = 0;
-	public:
-		virtual ~AThread(){}
-		virtual void join() = 0;
-		bool started() { return s; }
-		bool finished(){ return f; }
-		const std::exception_ptr& exception(){ return ep;}
-		void rethrow(){ if(ep) std::rethrow_exception(ep);}
+        AThread(const std::shared_ptr<ThreadObject>& t) : f(1), s(0), to(t){}
+        template <class T> AThread(const T& t) : f(1), s(0), to(std::make_shared<ThreadCopy<T>>(t)){}
+        template <class T> AThread(const Ref<T>& t) : f(1), s(0), to(std::make_shared<ThreadRef<T>>(t)){}
+        void act(){
+            try{
+                to->act(); 
+            }catch(const std::exception& e){ 
+                ep = std::current_exception();
+            }
+            f = 1;
+        }
+        virtual void run() throw(kul::threading::Exception) = 0;
+    public:
+        virtual ~AThread(){}
+        virtual void join() = 0;
+        bool started() { return s; }
+        bool finished(){ return f; }
+        const std::exception_ptr& exception(){ return ep;}
+        void rethrow(){ if(ep) std::rethrow_exception(ep);}
 };
 
 } // END NAMESPACE threading

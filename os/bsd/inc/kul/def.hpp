@@ -34,19 +34,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "kul/defs.hpp"
 
 #ifndef __KUL_OS__
- 	#define __KUL_OS__ bsd
+    #define __KUL_OS__ bsd
 #endif /*  __KUL_OS__ */
 
 #ifndef __KUL_THREAD_SPAWN_WAIT__
- 	#define __KUL_THREAD_SPAWN_WAIT__ 5000000
+    #define __KUL_THREAD_SPAWN_WAIT__ 5000000
 #endif /*  __KUL_THREAD_SPAWN_WAIT__ */
 
 #ifndef KNOEXCEPT
-	#define KNOEXCEPT noexcept
+    #define KNOEXCEPT noexcept
 #endif /*  KNOEXCEPT */
 
 #if defined(__APPLE__)
-	#define _XOPEN_SOURCE 600
+    #define _XOPEN_SOURCE 600
 #endif /* __APPLE__ */
 
 #endif /* _KUL_DEF_HPP_ */

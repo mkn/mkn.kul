@@ -40,26 +40,26 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 void kul_real_se_handler(EXCEPTION_POINTERS* pExceptionInfo );
 
 LONG WINAPI kul_top_level_exception_handler(PEXCEPTION_POINTERS pExceptionInfo){
-	kul_real_se_handler(pExceptionInfo);
-	return (LONG) 0L;
+    kul_real_se_handler(pExceptionInfo);
+    return (LONG) 0L;
 }
 
 void kul_se_translator_function(unsigned int sig, EXCEPTION_POINTERS* pExceptionInfo ){
-	kul_real_se_handler(pExceptionInfo);
+    kul_real_se_handler(pExceptionInfo);
 }
 
 void kul_sig_function_handler(const uint16_t& s);
 
 BOOL WINAPI kul_sigint_function(DWORD d){
-	switch(d) {
-	    case CTRL_C_EVENT:
-	        kul_sig_function_handler(2);
-	        break;
-	    // case CTRL_BREAK_EVENT:
-	    //     printf("break\n");
-	    //     break;
-	    default:
-	        break;
+    switch(d) {
+        case CTRL_C_EVENT:
+            kul_sig_function_handler(2);
+            break;
+        // case CTRL_BREAK_EVENT:
+        //     printf("break\n");
+        //     break;
+        default:
+            break;
     }
     return TRUE;
 }
@@ -68,114 +68,114 @@ namespace kul{
 class Signal;
 
 class SignalStatic{
-	private:
-		bool q = 0;
-		std::vector<std::function<void(int)>> ab, in, se;
-		friend class Signal;
-		friend void ::kul_real_se_handler(EXCEPTION_POINTERS* pExceptionInfo);
-		friend void ::kul_sig_function_handler(const uint16_t& s);
-		static SignalStatic& INSTANCE(){
-			static SignalStatic ss;
-			return ss;
-		}
-		void intr(const std::function<void(int)>& f){
-			if(in.size() == 0)
-				if(!SetConsoleCtrlHandler((PHANDLER_ROUTINE)kul_sigint_function,TRUE))
-					KEXCEPTION("Unable to install signal handler!");
-			in.push_back(f); 
-		}
+    private:
+        bool q = 0;
+        std::vector<std::function<void(int)>> ab, in, se;
+        friend class Signal;
+        friend void ::kul_real_se_handler(EXCEPTION_POINTERS* pExceptionInfo);
+        friend void ::kul_sig_function_handler(const uint16_t& s);
+        static SignalStatic& INSTANCE(){
+            static SignalStatic ss;
+            return ss;
+        }
+        void intr(const std::function<void(int)>& f){
+            if(in.size() == 0)
+                if(!SetConsoleCtrlHandler((PHANDLER_ROUTINE)kul_sigint_function,TRUE))
+                    KEXCEPTION("Unable to install signal handler!");
+            in.push_back(f); 
+        }
 };
 
 class Signal{
-	private:
-		bool q = 0;
-		std::vector<std::function<void(int)>> ab, in, se;
-		friend class Signal;
-	public:
-		Signal(){
-			_set_se_translator( kul_se_translator_function );
-			SetUnhandledExceptionFilter(kul_top_level_exception_handler);
-		}
-		Signal& abrt(const std::function<void(int16_t)>& f){ kul::SignalStatic::INSTANCE().ab.push_back(f); return *this;}
-		Signal& intr(const std::function<void(int16_t)>& f){ kul::SignalStatic::INSTANCE().intr(f);         return *this;}
-		Signal& segv(const std::function<void(int16_t)>& f){ kul::SignalStatic::INSTANCE().se.push_back(f); return *this;}
+    private:
+        bool q = 0;
+        std::vector<std::function<void(int)>> ab, in, se;
+        friend class Signal;
+    public:
+        Signal(){
+            _set_se_translator( kul_se_translator_function );
+            SetUnhandledExceptionFilter(kul_top_level_exception_handler);
+        }
+        Signal& abrt(const std::function<void(int16_t)>& f){ kul::SignalStatic::INSTANCE().ab.push_back(f); return *this;}
+        Signal& intr(const std::function<void(int16_t)>& f){ kul::SignalStatic::INSTANCE().intr(f);         return *this;}
+        Signal& segv(const std::function<void(int16_t)>& f){ kul::SignalStatic::INSTANCE().se.push_back(f); return *this;}
 
-		void quiet() { kul::SignalStatic::INSTANCE().q = 1; }
+        void quiet() { kul::SignalStatic::INSTANCE().q = 1; }
 };
 }
 
 void kul_sig_function_handler(const uint16_t& s){
-	if(s ==  2) for(auto& f : kul::SignalStatic::INSTANCE().in) f(s);
-	if(s == 11) for(auto& f : kul::SignalStatic::INSTANCE().se) f(s);
+    if(s ==  2) for(auto& f : kul::SignalStatic::INSTANCE().in) f(s);
+    if(s == 11) for(auto& f : kul::SignalStatic::INSTANCE().se) f(s);
 }
 
 void kul_real_se_handler(EXCEPTION_POINTERS* pExceptionInfo){
-	const std::string& tid(kul::this_thread::id());
-	uint16_t sig = pExceptionInfo->ExceptionRecord->ExceptionCode;
-	if(pExceptionInfo->ExceptionRecord->ExceptionCode == EXCEPTION_ACCESS_VIOLATION)
-    	kul_sig_function_handler(sig = 11);
+    const std::string& tid(kul::this_thread::id());
+    uint16_t sig = pExceptionInfo->ExceptionRecord->ExceptionCode;
+    if(pExceptionInfo->ExceptionRecord->ExceptionCode == EXCEPTION_ACCESS_VIOLATION)
+        kul_sig_function_handler(sig = 11);
 
     if(!kul::SignalStatic::INSTANCE().q){
-	    HANDLE process = GetCurrentProcess();
-	    SymInitialize(process, NULL, TRUE);
+        HANDLE process = GetCurrentProcess();
+        SymInitialize(process, NULL, TRUE);
 
-	    CONTEXT context_record = *pExceptionInfo->ContextRecord;
+        CONTEXT context_record = *pExceptionInfo->ContextRecord;
 
-	    STACKFRAME64 stack_frame;
-	    memset(&stack_frame, 0, sizeof(stack_frame));
-	    #if defined(_WIN64)
-	    int machine_type = IMAGE_FILE_MACHINE_AMD64;
-	    stack_frame.AddrPC.Offset = context_record.Rip;
-	    stack_frame.AddrFrame.Offset = context_record.Rbp;
-	    stack_frame.AddrStack.Offset = context_record.Rsp;
-	    #else
-	    int machine_type = IMAGE_FILE_MACHINE_I386;
-	    stack_frame.AddrPC.Offset = context_record.Eip;
-	    stack_frame.AddrFrame.Offset = context_record.Ebp;
-	    stack_frame.AddrStack.Offset = context_record.Esp;
-	    #endif
-	    stack_frame.AddrPC.Mode = AddrModeFlat;
-	    stack_frame.AddrFrame.Mode = AddrModeFlat;
-	    stack_frame.AddrStack.Mode = AddrModeFlat;
+        STACKFRAME64 stack_frame;
+        memset(&stack_frame, 0, sizeof(stack_frame));
+        #if defined(_WIN64)
+        int machine_type = IMAGE_FILE_MACHINE_AMD64;
+        stack_frame.AddrPC.Offset = context_record.Rip;
+        stack_frame.AddrFrame.Offset = context_record.Rbp;
+        stack_frame.AddrStack.Offset = context_record.Rsp;
+        #else
+        int machine_type = IMAGE_FILE_MACHINE_I386;
+        stack_frame.AddrPC.Offset = context_record.Eip;
+        stack_frame.AddrFrame.Offset = context_record.Ebp;
+        stack_frame.AddrStack.Offset = context_record.Esp;
+        #endif
+        stack_frame.AddrPC.Mode = AddrModeFlat;
+        stack_frame.AddrFrame.Mode = AddrModeFlat;
+        stack_frame.AddrStack.Mode = AddrModeFlat;
 
-	    SYMBOL_INFO* symbol;
-	    symbol               = ( SYMBOL_INFO * )calloc( sizeof( SYMBOL_INFO ) + 256 * sizeof( char ), 1 );
-	    symbol->MaxNameLen   = 255;
-	    symbol->SizeOfStruct = sizeof(SYMBOL_INFO);
-	    std::cout << "[bt] Stacktrace:" << std::endl;
-	    while (StackWalk64(machine_type,
-	        GetCurrentProcess(),
-	        GetCurrentThread(),
-	        &stack_frame,
-	        &context_record,
-	        NULL,
-	        &SymFunctionTableAccess64,
-	        &SymGetModuleBase64,
-	        NULL)) {
+        SYMBOL_INFO* symbol;
+        symbol               = ( SYMBOL_INFO * )calloc( sizeof( SYMBOL_INFO ) + 256 * sizeof( char ), 1 );
+        symbol->MaxNameLen   = 255;
+        symbol->SizeOfStruct = sizeof(SYMBOL_INFO);
+        std::cout << "[bt] Stacktrace:" << std::endl;
+        while (StackWalk64(machine_type,
+            GetCurrentProcess(),
+            GetCurrentThread(),
+            &stack_frame,
+            &context_record,
+            NULL,
+            &SymFunctionTableAccess64,
+            &SymGetModuleBase64,
+            NULL)) {
 
-	        DWORD64 displacement = 0;
-	        if (SymFromAddr(process, (DWORD64)stack_frame.AddrPC.Offset, &displacement, symbol)){
-	        	DWORD  dwDisplacement;
-				IMAGEHLP_LINE64 line;
-				IMAGEHLP_MODULE64 moduleInfo;
-	            ZeroMemory(&moduleInfo, sizeof(IMAGEHLP_MODULE64));
-	            moduleInfo.SizeOfStruct = sizeof(moduleInfo);
+            DWORD64 displacement = 0;
+            if (SymFromAddr(process, (DWORD64)stack_frame.AddrPC.Offset, &displacement, symbol)){
+                DWORD  dwDisplacement;
+                IMAGEHLP_LINE64 line;
+                IMAGEHLP_MODULE64 moduleInfo;
+                ZeroMemory(&moduleInfo, sizeof(IMAGEHLP_MODULE64));
+                moduleInfo.SizeOfStruct = sizeof(moduleInfo);
 
-	            std::cout << "[bt] ";
-	            if (::SymGetModuleInfo64(process, symbol->ModBase, &moduleInfo))
-	            	std::cout << moduleInfo.ModuleName << " ";
+                std::cout << "[bt] ";
+                if (::SymGetModuleInfo64(process, symbol->ModBase, &moduleInfo))
+                    std::cout << moduleInfo.ModuleName << " ";
 
-	            std::cout << symbol->Name << " + [0x" << std::hex << displacement << "]"; 
+                std::cout << symbol->Name << " + [0x" << std::hex << displacement << "]"; 
 
-				if (SymGetLineFromAddr64(process, (DWORD64)stack_frame.AddrPC.Offset, &dwDisplacement, &line))
-					std::cout << " - " << line.FileName << ": " << std::to_string(line.LineNumber);
-				else
-					std::cout << " - ??:";
-				std::cout << std::endl;
-	        }
-	    }
+                if (SymGetLineFromAddr64(process, (DWORD64)stack_frame.AddrPC.Offset, &dwDisplacement, &line))
+                    std::cout << " - " << line.FileName << ": " << std::to_string(line.LineNumber);
+                else
+                    std::cout << " - ??:";
+                std::cout << std::endl;
+            }
+        }
     }
-	exit(sig);
+    exit(sig);
 }
 
 #endif /* _KUL_SIGNAL_HPP_ */

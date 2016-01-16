@@ -92,7 +92,7 @@ class Call{
                 kul::env::SET(ev.first.c_str(), ev.second.c_str());
             }
         }
-        const int run(){
+        int run(){
             return s.size() ? kul::os::exec(s) : 1;
         }
 };

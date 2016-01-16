@@ -45,10 +45,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace kul{
 namespace cpu{
 inline uint32_t cores() {
-	return sysconf(_SC_NPROCESSORS_ONLN);
+    return sysconf(_SC_NPROCESSORS_ONLN);
 }
 inline uint16_t threads() {
-	return std::thread::hardware_concurrency();
+    return std::thread::hardware_concurrency();
 }
 } // END NAMESPACE cpu
 } // END NAMESPACE kul

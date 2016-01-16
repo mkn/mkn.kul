@@ -34,23 +34,23 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "kul/defs.hpp"
 
 #ifndef __KUL_OS__
- 	#define __KUL_OS__ win
+    #define __KUL_OS__ win
 #endif /*  __KUL_OS__ */
 
 #ifndef __KUL_THREAD_SPAWN_WAIT__
- 	#define __KUL_THREAD_SPAWN_WAIT__ 0
+    #define __KUL_THREAD_SPAWN_WAIT__ 0
 #endif /*  __KUL_THREAD_SPAWN_WAIT__ */
 
 #ifndef __KUL_ENV_BUFFER__
-	#define __KUL_ENV_BUFFER__ 1024
+    #define __KUL_ENV_BUFFER__ 1024
 #endif /*  __KUL_ENV_BUFFER__ */
 
 #ifndef __KUL_PROCESS_BUFFER__
-	#define __KUL_PROCESS_BUFFER__ 1024
+    #define __KUL_PROCESS_BUFFER__ 1024
 #endif /*  __KUL_PROCESS_BUFFER__ */
 
 #ifndef __KUL_PROCESS_ENV_BUFFER__
-	#define __KUL_PROCESS_ENV_BUFFER__ 4096
+    #define __KUL_PROCESS_ENV_BUFFER__ 4096
 #endif /*  __KUL_PROCESS_ENV_BUFFER__ */
 
 #pragma warning(disable : 4005)
@@ -60,22 +60,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #pragma warning(disable : 4800)
 
 #ifndef KNOEXCEPT
-	#if (_MSC_VER >= 1900 )
-		#define KNOEXCEPT noexcept
-	#else
-		#define KNOEXCEPT
-	#endif
+    #if (_MSC_VER >= 1900 )
+        #define KNOEXCEPT noexcept
+    #else
+        #define KNOEXCEPT
+    #endif
 #endif /*  KNOEXCEPT */
 
 #ifndef INTMAX_MAX
-	#define INTMAX_MAX _I64_MAX
+    #define INTMAX_MAX _I64_MAX
 #endif /*  INTMAX_MAX */
 #ifndef UINTMAX_MAX
-	#define UINTMAX_MAX _UI64_MAX
+    #define UINTMAX_MAX _UI64_MAX
 #endif /*  UINTMAX_MAX */
 
 #ifndef WIN32_LEAN_AND_MEAN
-	#define WIN32_LEAN_AND_MEAN
+    #define WIN32_LEAN_AND_MEAN
 #endif
 
 #endif /* _KUL_DEF_HPP_ */

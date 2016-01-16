@@ -48,15 +48,15 @@ class Dir;
 namespace fs {
 
 class KulTimeStampsResolver{
-	private:
-		static void GET(const char*const p, uint16_t& a, uint16_t& c, uint16_t& m){
-			struct stat att;
-			if(stat(p, &att) != -1){
-				a = att.st_atime;
-				m = att.st_mtime;
-			}
-		}
-		friend class kul::Dir;
+    private:
+        static void GET(const char*const p, uint16_t& a, uint16_t& c, uint16_t& m){
+            struct stat att;
+            if(stat(p, &att) != -1){
+                a = att.st_atime;
+                m = att.st_mtime;
+            }
+        }
+        friend class kul::Dir;
 };
 
 } // END NAMESPACE fs

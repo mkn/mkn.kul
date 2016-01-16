@@ -47,27 +47,27 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace kul{
 namespace cpu{
 inline uint32_t cores() {
-	uint16_t numCPU = sysconf( _SC_NPROCESSORS_ONLN );
-	int16_t mib[4];
-	size_t len = sizeof(numCPU);
+    uint16_t numCPU = sysconf( _SC_NPROCESSORS_ONLN );
+    int16_t mib[4];
+    size_t len = sizeof(numCPU);
 
-	mib[0] = CTL_HW;
+    mib[0] = CTL_HW;
 #if defined(__APPLE__)
-	mib[1] = HW_AVAILCPU;
+    mib[1] = HW_AVAILCPU;
 #else
-	mib[1] = HW_NCPU;
+    mib[1] = HW_NCPU;
 #endif
-	sysctl(mib, 2, &numCPU, &len, NULL, 0);
+    sysctl(mib, 2, &numCPU, &len, NULL, 0);
 
-	if(numCPU < 1){
-		mib[1] = HW_NCPU;
-		sysctl( mib, 2, &numCPU, &len, NULL, 0 );
-		if(numCPU < 1) numCPU = 1;
-	}
-	return numCPU;
+    if(numCPU < 1){
+        mib[1] = HW_NCPU;
+        sysctl( mib, 2, &numCPU, &len, NULL, 0 );
+        if(numCPU < 1) numCPU = 1;
+    }
+    return numCPU;
 }
 inline uint16_t threads() {
-	return std::thread::hardware_concurrency();
+    return std::thread::hardware_concurrency();
 }
 } // END NAMESPACE cpu
 } // END NAMESPACE kul

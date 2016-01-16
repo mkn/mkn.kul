@@ -43,137 +43,137 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace kul{  namespace io {
 
 class Exception : public kul::Exception{
-	public:
-		Exception(const char*f, const uint16_t& l, const std::string& s) : kul::Exception(f, l, s){}
+    public:
+        Exception(const char*f, const uint16_t& l, const std::string& s) : kul::Exception(f, l, s){}
 };
 
 class AReader{
-	private:
-		std::unique_ptr<std::string> str;
-	protected:
-		const std::string* readLine(std::ifstream& f){
-			str.reset();
-			if(f.good()){
-				std::string s;
-				std::getline(f, s);
-				str = std::make_unique<std::string>(s);
-			}
-			return str.get();
-		}
-		const std::string* read(std::ifstream& f, const uint16_t& s){
-			str.reset();
-			if(f.good()){
-				std::vector<char> v;
-				v.resize(s);
-				f.read(&v[0], s);
-				v.resize((uint16_t)f.gcount());
-				str = std::make_unique<std::string>(std::string(v.begin(), v.end()));
-			}
-			return str.get();
-		}
-	public:
-		virtual ~AReader(){}
-		virtual const std::string* readLine() = 0;
-		virtual const std::string* read(const uint16_t& s) = 0;
+    private:
+        std::unique_ptr<std::string> str;
+    protected:
+        const std::string* readLine(std::ifstream& f){
+            str.reset();
+            if(f.good()){
+                std::string s;
+                std::getline(f, s);
+                str = std::make_unique<std::string>(s);
+            }
+            return str.get();
+        }
+        const std::string* read(std::ifstream& f, const uint16_t& s){
+            str.reset();
+            if(f.good()){
+                std::vector<char> v;
+                v.resize(s);
+                f.read(&v[0], s);
+                v.resize((uint16_t)f.gcount());
+                str = std::make_unique<std::string>(std::string(v.begin(), v.end()));
+            }
+            return str.get();
+        }
+    public:
+        virtual ~AReader(){}
+        virtual const std::string* readLine() = 0;
+        virtual const std::string* read(const uint16_t& s) = 0;
 };
 class Reader : public AReader{
-	private:
-		std::ifstream f;
-	public:
-		Reader(const char* c) : f(c, std::ios::in) { 
-			if(!f) KEXCEPT(Exception, "FileException : file \"" + std::string(c) + "\" not found");
-		}
-		Reader(const File& c) : Reader(c.full().c_str()){}
-		~Reader() { f.close();}
-		const std::string* readLine(){
-			return AReader::readLine(f);
-		}
-		const std::string* read(const uint16_t& s){
-			return AReader::read(f, s);
-		}
+    private:
+        std::ifstream f;
+    public:
+        Reader(const char* c) : f(c, std::ios::in) { 
+            if(!f) KEXCEPT(Exception, "FileException : file \"" + std::string(c) + "\" not found");
+        }
+        Reader(const File& c) : Reader(c.full().c_str()){}
+        ~Reader() { f.close();}
+        const std::string* readLine(){
+            return AReader::readLine(f);
+        }
+        const std::string* read(const uint16_t& s){
+            return AReader::read(f, s);
+        }
 };
 class BinaryReader : public AReader{
-	private:
-		std::ifstream f;
-	public:
-		BinaryReader(const char* c) : f(c, std::ios::in |std::ios::binary){
-			if(!f) KEXCEPT(Exception, "FileException : file \"" + std::string(c) + "\" not found");
-		}
-		BinaryReader(const File& c) : BinaryReader(c.full().c_str()){}
-		~BinaryReader() { f.close();}
-		const std::string* readLine(){
-			return AReader::readLine(f);
-		}
-		const std::string* read(const uint16_t& s){
-			return AReader::read(f, s);
-		}
+    private:
+        std::ifstream f;
+    public:
+        BinaryReader(const char* c) : f(c, std::ios::in |std::ios::binary){
+            if(!f) KEXCEPT(Exception, "FileException : file \"" + std::string(c) + "\" not found");
+        }
+        BinaryReader(const File& c) : BinaryReader(c.full().c_str()){}
+        ~BinaryReader() { f.close();}
+        const std::string* readLine(){
+            return AReader::readLine(f);
+        }
+        const std::string* read(const uint16_t& s){
+            return AReader::read(f, s);
+        }
 };
 
 
 class AWriter{
-	protected:
-		void write(std::ofstream& f, const char*c, bool nl){ 
-			if(nl) 	f << c << kul::os::EOL();
-			else	f << c;
-		}
-	public:
-		virtual AWriter& write(const char*c, bool nl = false) = 0;
+    protected:
+        void write(std::ofstream& f, const char*c, bool nl){ 
+            if(nl)  f << c << kul::os::EOL();
+            else    f << c;
+        }
+    public:
+        virtual AWriter& write(const char*c, bool nl = false) = 0;
 };
 
 class Writer: public AWriter{
-	private:
-		std::ofstream f;
-	public:
-		Writer(const char*c, bool a = 0){ 
-			if(a) f.open(c, std::ios::out | std::ios::app);
-			else  f.open(c, std::ios::out);
-			if(!f) KEXCEPT(Exception, "FileException : file \"" + std::string(c) + "\" not found");
-		}
-		Writer(const File& c, bool a = 0) : Writer(c.full().c_str(), a){}
-		~Writer() { f.close();}
-		AWriter& write(const char*c, bool nl = false){
-			AWriter::write(f, c, nl);
-			return *this;
-		}
-		template<class T> Writer& operator<<(const T& s){
-			f << s;
-			return *this;
-		}
-		AWriter& operator<< (std::ostream& (*os)(std::ostream&)) {
-		    f << std::flush;
-		    return *this;
-		}
-		AWriter& flush(){
-		    f << std::flush;
-		    return *this;
-		}
+    private:
+        std::ofstream f;
+    public:
+        Writer(const char*c, bool a = 0){ 
+            if(a) f.open(c, std::ios::out | std::ios::app);
+            else  f.open(c, std::ios::out);
+            if(!f) KEXCEPT(Exception, "FileException : file \"" + std::string(c) + "\" not found");
+        }
+        Writer(const File& c, bool a = 0) : Writer(c.full().c_str(), a){}
+        ~Writer() { f.close();}
+        AWriter& write(const char*c, bool nl = false){
+            AWriter::write(f, c, nl);
+            return *this;
+        }
+        template<class T> Writer& operator<<(const T& s){
+            f << s;
+            return *this;
+        }
+        AWriter& operator<< (std::ostream& (*os)(std::ostream&)) {
+            f << std::flush;
+            return *this;
+        }
+        AWriter& flush(){
+            f << std::flush;
+            return *this;
+        }
 };
 class BinaryWriter : public AWriter{
-	private:
-		std::ofstream f;
-	public:
-		BinaryWriter(const char* c) : f(c, std::ios::out |std::ios::binary){ 
-			if(!f) KEXCEPT(Exception, "FileException : file \"" + std::string(c) + "\" not found");
-			f.unsetf(std::ios_base::skipws);
-		}
-		BinaryWriter(const File& c) : BinaryWriter(c.full().c_str()){}
-		~BinaryWriter() { f.close();}
-		AWriter& write(const char*c, bool nl = false){
-			AWriter::write(f, c, nl);
-			return *this;
-		}
-		template<class T> BinaryWriter& operator<<(const T& s){
-			f << s;
-			return *this;
-		}
-		BinaryWriter& operator<< (std::ostream& (*os)(std::ostream&)) {
-		    f << std::flush;
-		    return *this;
-		}
-		BinaryWriter& flush(){
-		    f << std::flush;
-		    return *this;
-		}
+    private:
+        std::ofstream f;
+    public:
+        BinaryWriter(const char* c) : f(c, std::ios::out |std::ios::binary){ 
+            if(!f) KEXCEPT(Exception, "FileException : file \"" + std::string(c) + "\" not found");
+            f.unsetf(std::ios_base::skipws);
+        }
+        BinaryWriter(const File& c) : BinaryWriter(c.full().c_str()){}
+        ~BinaryWriter() { f.close();}
+        AWriter& write(const char*c, bool nl = false){
+            AWriter::write(f, c, nl);
+            return *this;
+        }
+        template<class T> BinaryWriter& operator<<(const T& s){
+            f << s;
+            return *this;
+        }
+        BinaryWriter& operator<< (std::ostream& (*os)(std::ostream&)) {
+            f << std::flush;
+            return *this;
+        }
+        BinaryWriter& flush(){
+            f << std::flush;
+            return *this;
+        }
 };
 
 }}

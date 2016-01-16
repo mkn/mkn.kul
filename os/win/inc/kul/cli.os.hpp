@@ -35,19 +35,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace kul{ namespace cli{
 inline const std::string hidden(const std::string& t){
-	if(!t.empty()) std::cout << t << std::endl;
-	HANDLE hStdin = GetStdHandle(STD_INPUT_HANDLE); 
+    if(!t.empty()) std::cout << t << std::endl;
+    HANDLE hStdin = GetStdHandle(STD_INPUT_HANDLE); 
     DWORD mode = 0;
     GetConsoleMode(hStdin, &mode);
     SetConsoleMode(hStdin, mode & (~ENABLE_ECHO_INPUT));
     std::string s;
-	std::getline(std::cin, s);
-	SetConsoleMode(hStdin, mode);
-	return s;
+    std::getline(std::cin, s);
+    SetConsoleMode(hStdin, mode);
+    return s;
 }
 
 inline void show(){
-	HANDLE hStdin = GetStdHandle(STD_INPUT_HANDLE); 
+    HANDLE hStdin = GetStdHandle(STD_INPUT_HANDLE); 
     DWORD mode = 0;
     GetConsoleMode(hStdin, &mode);
     SetConsoleMode(hStdin, mode | (ENABLE_ECHO_INPUT));

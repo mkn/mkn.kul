@@ -46,80 +46,80 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace kul{ 
 namespace this_thread{
 inline const std::string id(){
-	std::ostringstream os;
-	os << std::hex << pthread_self();
-	return os.str();
+    std::ostringstream os;
+    os << std::hex << pthread_self();
+    return os.str();
 }
 
 //http://stackoverflow.com/questions/4867839/how-can-i-tell-if-pthread-self-is-the-main-first-thread-in-the-process
 inline bool main(){
 #if defined(__FreeBSD__)
-	return 0;
+    return 0;
 #elif defined(__NetBSD__)
-	return _lwp_self();
+    return _lwp_self();
 #elif defined(__OpenBSD__)
-	return 0;
+    return 0;
 #else
-	return getpid() == syscall(SYS_gettid);
+    return getpid() == syscall(SYS_gettid);
 #endif
 }
 inline void kill(){
-	pthread_exit(0);
+    pthread_exit(0);
 }
 } // END NAMESPACE this_thread
 
 class Mutex{
-	private:
-		pthread_mutex_t mute;
-	public:
-		Mutex(){
-			pthread_mutexattr_t att;
-			pthread_mutexattr_init(&att);
-			pthread_mutexattr_settype(&att, PTHREAD_MUTEX_RECURSIVE);
-			pthread_mutex_init(&mute, &att);
-			pthread_mutexattr_destroy(&att);
-		}
-		~Mutex() {
-			pthread_mutex_destroy(&mute);
-		}
-		void lock() {
-			pthread_mutex_lock(&mute); 
-		}
-		void unlock() {
-			pthread_mutex_unlock(&mute);
-		}
+    private:
+        pthread_mutex_t mute;
+    public:
+        Mutex(){
+            pthread_mutexattr_t att;
+            pthread_mutexattr_init(&att);
+            pthread_mutexattr_settype(&att, PTHREAD_MUTEX_RECURSIVE);
+            pthread_mutex_init(&mute, &att);
+            pthread_mutexattr_destroy(&att);
+        }
+        ~Mutex() {
+            pthread_mutex_destroy(&mute);
+        }
+        void lock() {
+            pthread_mutex_lock(&mute); 
+        }
+        void unlock() {
+            pthread_mutex_unlock(&mute);
+        }
 };
 
 class Thread : public threading::AThread{
-	private:
-		pthread_t thr;
-		static void* threadFunction(void* th){
-			((Thread*)th)->act();
-			return 0;
-		}
-	public:
-		Thread(const std::shared_ptr<threading::ThreadObject>& t) : AThread(t){}
-		template <class T> Thread(const T& t) : AThread(t){}
-		template <class T> Thread(const Ref<T>& t) : AThread(t){}
-		virtual ~Thread(){}
-		bool detach(){
-			return pthread_detach(thr);
-		}
-		void interrupt() throw(kul::threading::InterruptionException){
-			pthread_cancel(thr);
-			f = 1;
-		}
-		void join(){
-			if(!s) run();
-			pthread_join(thr, 0);
-			s = 0;
-		}
-		void run() throw(kul::threading::Exception){
-			if(s) KEXCEPTION("Thread running");
-			f = 0;
-			s = 1;
-			pthread_create(&thr, NULL, Thread::threadFunction, this);
-		}
+    private:
+        pthread_t thr;
+        static void* threadFunction(void* th){
+            ((Thread*)th)->act();
+            return 0;
+        }
+    public:
+        Thread(const std::shared_ptr<threading::ThreadObject>& t) : AThread(t){}
+        template <class T> Thread(const T& t) : AThread(t){}
+        template <class T> Thread(const Ref<T>& t) : AThread(t){}
+        virtual ~Thread(){}
+        bool detach(){
+            return pthread_detach(thr);
+        }
+        void interrupt() throw(kul::threading::InterruptionException){
+            pthread_cancel(thr);
+            f = 1;
+        }
+        void join(){
+            if(!s) run();
+            pthread_join(thr, 0);
+            s = 0;
+        }
+        void run() throw(kul::threading::Exception){
+            if(s) KEXCEPTION("Thread running");
+            f = 0;
+            s = 1;
+            pthread_create(&thr, NULL, Thread::threadFunction, this);
+        }
 };
 
 }// END NAMESPACE kul

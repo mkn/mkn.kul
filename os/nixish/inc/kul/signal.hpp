@@ -59,84 +59,84 @@ namespace kul{
 
 class Signal;
 class SignalStatic{
-	private:
-		bool addr = 0, q = 0;
-		struct sigaction sigHandler;
-		std::vector<std::function<void(int)>> ab, in, se;
-		std::vector<void(*)(const uint16_t&)> lab, lin, lse;
-		SignalStatic(){
-			addr = kul::env::WHICH("addr2line");
-			sigemptyset(&sigHandler.sa_mask);
-			sigHandler.sa_flags = SA_SIGINFO;
-			sigHandler.sa_sigaction = kul_sig_handler;
-			sigaction(SIGSEGV, &sigHandler, NULL);
-		}
-		static SignalStatic& INSTANCE(){
-			static SignalStatic ss;
-			return ss;
-		}
-		void intr(const std::function<void(int)>& f){
-			if(in.size() == 0) sigaction(SIGINT, &sigHandler, NULL);
-			in.push_back(f); 
-		}
-	public:
-		void quiet(){ q = 1; }
-		friend class Signal;
-		friend void ::kul_sig_handler(int s, siginfo_t* i, void* v);
+    private:
+        bool addr = 0, q = 0;
+        struct sigaction sigHandler;
+        std::vector<std::function<void(int)>> ab, in, se;
+        std::vector<void(*)(const uint16_t&)> lab, lin, lse;
+        SignalStatic(){
+            addr = kul::env::WHICH("addr2line");
+            sigemptyset(&sigHandler.sa_mask);
+            sigHandler.sa_flags = SA_SIGINFO;
+            sigHandler.sa_sigaction = kul_sig_handler;
+            sigaction(SIGSEGV, &sigHandler, NULL);
+        }
+        static SignalStatic& INSTANCE(){
+            static SignalStatic ss;
+            return ss;
+        }
+        void intr(const std::function<void(int)>& f){
+            if(in.size() == 0) sigaction(SIGINT, &sigHandler, NULL);
+            in.push_back(f); 
+        }
+    public:
+        void quiet(){ q = 1; }
+        friend class Signal;
+        friend void ::kul_sig_handler(int s, siginfo_t* i, void* v);
 };
 
 class Signal{
-	public:
-		Signal(){
-			kul::SignalStatic::INSTANCE();
-		}
-		Signal& abrt(const std::function<void(int16_t)>& f){ kul::SignalStatic::INSTANCE().ab.push_back(f); return *this;}
-		Signal& intr(const std::function<void(int16_t)>& f){ kul::SignalStatic::INSTANCE().intr(f);         return *this;}
-		Signal& segv(const std::function<void(int16_t)>& f){ kul::SignalStatic::INSTANCE().se.push_back(f); return *this;}
+    public:
+        Signal(){
+            kul::SignalStatic::INSTANCE();
+        }
+        Signal& abrt(const std::function<void(int16_t)>& f){ kul::SignalStatic::INSTANCE().ab.push_back(f); return *this;}
+        Signal& intr(const std::function<void(int16_t)>& f){ kul::SignalStatic::INSTANCE().intr(f);         return *this;}
+        Signal& segv(const std::function<void(int16_t)>& f){ kul::SignalStatic::INSTANCE().se.push_back(f); return *this;}
 
-		void quiet(){ kul::SignalStatic::INSTANCE().q = 1; }
+        void quiet(){ kul::SignalStatic::INSTANCE().q = 1; }
 };
 }
 
 void kul_sig_handler(int s, siginfo_t* info, void* v) {
-	if(info->si_pid == 0 || info->si_pid == kul::this_proc::id()){
-		// if(s == SIGABRT) for(auto& f : kul::SignalStatic::INSTANCE().ab ) f(s);
-		if(s == SIGINT ) for(auto& f : kul::SignalStatic::INSTANCE().in ) f(s);
-		if(s == SIGSEGV) for(auto& f : kul::SignalStatic::INSTANCE().se ) f(s);
+    if(info->si_pid == 0 || info->si_pid == kul::this_proc::id()){
+        // if(s == SIGABRT) for(auto& f : kul::SignalStatic::INSTANCE().ab ) f(s);
+        if(s == SIGINT ) for(auto& f : kul::SignalStatic::INSTANCE().in ) f(s);
+        if(s == SIGSEGV) for(auto& f : kul::SignalStatic::INSTANCE().se ) f(s);
 
-		if(s == SIGSEGV && !kul::SignalStatic::INSTANCE().q){
-			ucontext_t *uc = (ucontext_t *) v;
-			void *trace[16];
-			char **messages = (char **)NULL;
-			int16_t i, trace_size = 0;
-			trace_size = backtrace(trace, 16);
+        if(s == SIGSEGV && !kul::SignalStatic::INSTANCE().q){
+            ucontext_t *uc = (ucontext_t *) v;
+            void *trace[16];
+            char **messages = (char **)NULL;
+            int16_t i, trace_size = 0;
+            trace_size = backtrace(trace, 16);
 #if defined(__arm__)
-			trace[1] = (void *) uc->uc_mcontext.arm_r0;
+            trace[1] = (void *) uc->uc_mcontext.arm_r0;
 #elif defined(__APPLE__)
-			trace[1] = (void *) uc->uc_mcontext->__ss.__rip;
+            trace[1] = (void *) uc->uc_mcontext->__ss.__rip;
 #elif defined(__NetBSD__)
-			trace[1] = (void *) uc->uc_mcontext.__gregs[REG_EIP];
+            trace[1] = (void *) uc->uc_mcontext.__gregs[REG_EIP];
 #else
-			trace[1] = (void *) uc->uc_mcontext.gregs[REG_EIP];
+            trace[1] = (void *) uc->uc_mcontext.gregs[REG_EIP];
 #endif
-			messages = backtrace_symbols(trace, trace_size);
-			printf("[bt] Stacktrace:\n");
-			for (i=2; i<trace_size; ++i){
-				printf("[bt] %s : ", messages[i]);
-				size_t p = 0;
-				while(messages[i][p] != '(' && messages[i][p] != ' '&& messages[i][p] != 0) ++p;
-				std::string str(messages[i]);
-				str = str.substr(0, p);
-				if(kul::SignalStatic::INSTANCE().addr){
-					kul::Process p("addr2line");
-					kul::ProcessCapture pc(p);
-					p.arg(trace[i]).arg("-e").arg(str).start();
-					printf("%s", pc.outs().c_str());
-				}
-			}
-		}
-		exit(s);
-	}
+            messages = backtrace_symbols(trace, trace_size);
+            printf("[bt] Stacktrace:\n");
+            for (i=2; i<trace_size; ++i){
+                printf("[bt] %s : ", messages[i]);
+                size_t p = 0;
+                while(messages[i][p] != '(' && messages[i][p] != ' '&& messages[i][p] != 0) ++p;
+                std::string str(messages[i]);
+                str = str.substr(0, p);
+                if(kul::SignalStatic::INSTANCE().addr){
+                    kul::Process p("addr2line");
+                    kul::ProcessCapture pc(p);
+                    p.arg(trace[i]).arg("-e").arg(str).start();
+                    printf("%s", pc.outs().c_str());
+                }
+            }
+        }
+        exit(s);
+    }
 }
 
 namespace kul{ 

@@ -40,39 +40,39 @@ namespace kul{
 
 
 class Exception : public std::runtime_error{
-	protected:
-		const char* f;
-		const uint16_t l;
-		const std::exception_ptr ep;
-	public:
-		~Exception() KNOEXCEPT{}
-		Exception(const char*f, const uint16_t& l, const std::string& s) : std::runtime_error(s), f(f), l(l), ep(std::current_exception()){}
-		Exception(const Exception& e) : std::runtime_error(e.what()), f(e.file()),  l(e.line()), ep(e.ep) {}
+    protected:
+        const char* f;
+        const uint16_t l;
+        const std::exception_ptr ep;
+    public:
+        ~Exception() KNOEXCEPT{}
+        Exception(const char*f, const uint16_t& l, const std::string& s) : std::runtime_error(s), f(f), l(l), ep(std::current_exception()){}
+        Exception(const Exception& e) : std::runtime_error(e.what()), f(e.file()),  l(e.line()), ep(e.ep) {}
 
-		const std::string debug() 			const { return std::string(std::string(f) + " : " + std::to_string(l) + " : " + std::string(what()));}
-		const char* file() 					const { return f;}
-		const uint16_t& line() 					const { return l;}
-		const std::exception_ptr& cause() 	const { return ep;}
-		const std::string stack()	const {
-			std::stringstream ss;
-			if(ep){
-				try{  								std::rethrow_exception(ep); 	}
-				catch(const kul::Exception& e){     ss << e.stack() << std::endl;	}
-				catch(const std::exception& e){		ss << e.what() << std::endl;	}
-				catch(...){							ss << "UNKNOWN EXCEPTION TYPE" << std::endl; }
-			}
-			ss << debug();
-			return ss.str();
-		}
+        const std::string debug()           const { return std::string(std::string(f) + " : " + std::to_string(l) + " : " + std::string(what()));}
+        const char* file()                  const { return f;}
+        const uint16_t& line()                  const { return l;}
+        const std::exception_ptr& cause()   const { return ep;}
+        const std::string stack()   const {
+            std::stringstream ss;
+            if(ep){
+                try{                                std::rethrow_exception(ep);     }
+                catch(const kul::Exception& e){     ss << e.stack() << std::endl;   }
+                catch(const std::exception& e){     ss << e.what() << std::endl;    }
+                catch(...){                         ss << "UNKNOWN EXCEPTION TYPE" << std::endl; }
+            }
+            ss << debug();
+            return ss.str();
+        }
 };
 
 class Exit : public Exception{
-	private:		
-		const uint16_t e;
-	public:
-		Exit(const char*f, const uint16_t& l, const std::string& s, const uint16_t& e) : Exception(f, l, s), e(e){}
-		Exit(const Exit& e) : Exception(*this), e(e.e){}		
-		const uint16_t& code() const { return e; }
+    private:        
+        const uint16_t e;
+    public:
+        Exit(const char*f, const uint16_t& l, const std::string& s, const uint16_t& e) : Exception(f, l, s), e(e){}
+        Exit(const Exit& e) : Exception(*this), e(e.e){}        
+        const uint16_t& code() const { return e; }
 };
 
 #define KEXCEPT(c, m) throw c(__FILE__, __LINE__, m)
