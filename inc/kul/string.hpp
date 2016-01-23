@@ -42,8 +42,7 @@ class String{
     public:
         static void replace(std::string& s, const std::string& f, const std::string& r){
             size_t p = 0;
-            if((p = s.find(f)) != std::string::npos)
-                s.replace(p, f.size(), r);
+            if((p = s.find(f)) != std::string::npos) s.replace(p, f.size(), r);
         }
         static void replaceAll(std::string& s, const std::string& f, const std::string& r){
             while(s.find(f) != std::string::npos) replace(s, f, r);
@@ -101,12 +100,15 @@ class String{
         }
         static std::vector<std::string> lines(const std::string& s){
             std::vector<std::string> v;
+            lines(s, v);
+            return v;
+        }
+        static void lines(const std::string& s, std::vector<std::string>& v){
             if(s.find("\n") != std::string::npos){
                 std::string l;
                 std::stringstream ss(s);
                 while(std::getline(ss, l)) if(!l.empty()) v.push_back(l);
             }else v.push_back(s);
-            return v;
         }
 };
 

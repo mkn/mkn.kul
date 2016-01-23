@@ -108,7 +108,12 @@ class Git : public SCM{
                 KEXCEPT(Exception, "SCM ERROR " + std::string(e.what()));
             }
             if(pc.outs().empty()) KEXCEPT(Exception, "SCM ERROR: Directory may not be git repository : " + d);
-            return kul::String::split(kul::String::split(kul::String::lines(pc.outs())[0], "    ")[1], " ")[0];
+            std::vector<std::string> lines;
+            kul::String::lines(pc.outs(), lines);
+            for(auto& line : lines) kul::String::replaceAll(line, "\t", " ");
+            for(auto& line : lines) kul::String::replaceAll(line, "  ", " ");
+            if(lines.size()) return kul::String::split(lines[0], ' ')[1];
+            KEXCEPT(Exception, "SCM ERROR - Check remote dependency location / version");
         }
         const std::string localVersion(const std::string& d, const std::string& b) const{
             kul::Process p("git", d);
