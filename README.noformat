@@ -24,7 +24,7 @@ Default         "[%M] : %T - %D : %F : %L - %S"
 OS              all
 Description
 Logging format in format view:
-	%M = Mode - DEBUG/INFO/ERROR
+	%M = Mode - INF/ERR/DBG
 	%T = Thread ID
 	%D = DateTime - uses __KUL_LOG_DATE_FRMT__
 	%F = File
@@ -46,7 +46,7 @@ Default
     win         0
 OS              all
 Description
-Used in thread pools. The amount of time in nanoseconds waited after launching a thread. Threads launched too quickly can cause issues on nix platforms, bsd assumed similar.
+Used in thread queues. The amount of time in nanoseconds waited after launching a thread. Threads launched too quickly can cause issues on nix platforms, bsd assumed similar.
 
 Key             __KUL_PROC_BLOCK_ERR__ 
 Type            flag
