@@ -63,7 +63,6 @@ class SignalStatic{
         bool addr = 0, q = 0;
         struct sigaction sigHandler;
         std::vector<std::function<void(int)>> ab, in, se;
-        std::vector<void(*)(const uint16_t&)> lab, lin, lse;
         SignalStatic(){
             addr = kul::env::WHICH("addr2line");
             sigemptyset(&sigHandler.sa_mask);
@@ -74,6 +73,10 @@ class SignalStatic{
         static SignalStatic& INSTANCE(){
             static SignalStatic ss;
             return ss;
+        }
+        void abrt(const std::function<void(int)>& f){
+            if(ab.size() == 0) sigaction(SIGABRT, &sigHandler, NULL);
+            ab.push_back(f); 
         }
         void intr(const std::function<void(int)>& f){
             if(in.size() == 0) sigaction(SIGINT, &sigHandler, NULL);
@@ -90,7 +93,7 @@ class Signal{
         Signal(){
             kul::SignalStatic::INSTANCE();
         }
-        Signal& abrt(const std::function<void(int16_t)>& f){ kul::SignalStatic::INSTANCE().ab.push_back(f); return *this;}
+        Signal& abrt(const std::function<void(int16_t)>& f){ kul::SignalStatic::INSTANCE().abrt(f);         return *this;}
         Signal& intr(const std::function<void(int16_t)>& f){ kul::SignalStatic::INSTANCE().intr(f);         return *this;}
         Signal& segv(const std::function<void(int16_t)>& f){ kul::SignalStatic::INSTANCE().se.push_back(f); return *this;}
 
