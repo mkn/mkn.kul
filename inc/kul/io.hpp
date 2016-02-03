@@ -75,6 +75,10 @@ class AReader{
         virtual ~AReader(){}
         virtual const std::string* readLine() = 0;
         virtual const std::string* read(const uint16_t& s) = 0;
+        virtual void seek(const uint16_t& s) = 0;
+        virtual void seek(std::ifstream& f, const uint16_t& s){
+            f.seekg(s);
+        }
 };
 class Reader : public AReader{
     private:
@@ -91,6 +95,9 @@ class Reader : public AReader{
         const std::string* read(const uint16_t& s){
             return AReader::read(f, s);
         }
+        void seek(const uint16_t& s){
+            AReader::seek(f, s);
+        }
 };
 class BinaryReader : public AReader{
     private:
@@ -106,6 +113,9 @@ class BinaryReader : public AReader{
         }
         const std::string* read(const uint16_t& s){
             return AReader::read(f, s);
+        }
+        void seek(const uint16_t& s){
+            AReader::seek(f, s);
         }
 };
 
