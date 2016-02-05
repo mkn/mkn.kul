@@ -48,7 +48,7 @@ namespace kul{
 namespace cpu{
 inline uint32_t cores() {
     uint16_t numCPU = sysconf( _SC_NPROCESSORS_ONLN );
-    int16_t mib[4];
+    int mib[4];
     size_t len = sizeof(numCPU);
 
     mib[0] = CTL_HW;
