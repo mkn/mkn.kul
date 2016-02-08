@@ -124,7 +124,7 @@ class TestIPC{
 
 class Catch{
     public:
-        void print(const int& s){
+        void print(const int16_t& s){
             KOUT(NON) << "SEGMENTATION FAULT INTERCEPTED";
             KOUT(NON) << "PRINT STACKTRACE";
         }

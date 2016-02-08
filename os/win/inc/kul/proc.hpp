@@ -74,6 +74,7 @@ class Process : public kul::AProcess{
     public:
         Process(const std::string& cmd, const bool& wfe = true)                         : kul::AProcess(cmd, wfe)      {}
         Process(const std::string& cmd, const std::string& path, const bool& wfe = true): kul::AProcess(cmd, path, wfe){}
+        Process(const std::string& cmd, const kul::Dir& d, const bool& wfe = true) : kul::AProcess(cmd, d ? d.real() : d.path(), wfe){}
         ~Process(){ tearDown(); }
         bool kill(int16_t k = 6){
             if(!started()) return 0;

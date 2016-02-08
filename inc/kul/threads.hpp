@@ -49,7 +49,7 @@ class ScopeLock{
 
 class ThreadQueue{
     protected:
-        bool d = 0, s = 0;
+        bool d = 0, f = 0, s = 0;
         uint16_t m = 1; 
         kul::Ref<ThreadQueue> re;
         kul::Thread th;
@@ -57,7 +57,6 @@ class ThreadQueue{
         std::vector<std::shared_ptr<kul::Thread> > ts;
         std::vector<std::exception_ptr> ePs;
         void setStarted()   { s = true; }
-        bool started()      { return s; }
         virtual void start() throw (std::exception) {
             if(started()) KEXCEPT(Exception, "ThreadQueue is already started");
             setStarted();
@@ -104,6 +103,8 @@ class ThreadQueue{
         const std::vector<std::exception_ptr> exceptionPointers() {
             return ePs;
         }
+        bool started() { return s; }
+        bool finished(){ return f; }
 };
 
 template<class P>
