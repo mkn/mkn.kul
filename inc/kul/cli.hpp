@@ -145,6 +145,9 @@ class Args{
         bool has(const std::string& s) const {
             return vals.count(s);
         }
+        size_t size() const {
+            return vals.size();
+        }
         void process(const uint16_t& argc, char* argv[], uint16_t first = 1) throw(ArgNotFoundException){
             for(const Arg& a1 : arguments())
                 for(const Arg& a2 : arguments()){
@@ -257,23 +260,21 @@ inline std::vector<std::string> asArgs(const std::string& cmd){
             case '"':
                 if(openQuotesD && !openQuotesS){
                     openQuotesD = false;
-                    arg += c;
                     args.push_back(arg);
                     arg.clear();
-                    continue;
+                }else{ 
+                    openQuotesD = true;
                 }
-                else openQuotesD = true;
-                break;
+                continue;
             case '\'':
                 if(openQuotesS && !openQuotesD){
                     openQuotesS = false;
-                    arg += c;
                     args.push_back(arg);
                     arg.clear();
-                    continue;
+                }else{ 
+                    openQuotesS = true;
                 }
-                else openQuotesS = true;
-                break;
+                continue;
             case '\\':
                 if(!openQuotesS && !openQuotesD){
                     backSlashed = true;
