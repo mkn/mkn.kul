@@ -110,12 +110,17 @@ class AProcess{
         kul::hash::map::S2S evs;
         friend std::ostream& operator<<(std::ostream&, const AProcess&);
     protected:
-        AProcess(const std::string& cmd, const bool& wfe) : wfe(wfe){ argv.push_back(cmd); }
-        AProcess(const std::string& cmd, const std::string& d, const bool& wfe) : wfe(wfe), d(d){ argv.push_back(cmd); }
+        AProcess(const std::string& cmd, const bool& wfe) : wfe(wfe){ 
+            for(const auto& c : kul::cli::asArgs(cmd)) argv.push_back(c);
+        }
+        AProcess(const std::string& cmd, const std::string& d, const bool& wfe) : wfe(wfe), d(d){ 
+            for(const auto& c : kul::cli::asArgs(cmd)) argv.push_back(c);
+        }
         virtual ~AProcess(){}
 
         const std::string&  directory()const { return d; }
         void setFinished()  { f = 1; }
+        virtual void expand(std::string& s) const = 0;
         virtual bool kill(int16_t k = 6) = 0;
         virtual void preStart() {}
         virtual void finish()   {}

@@ -74,15 +74,46 @@ class Process : public kul::AProcess{
         }
     protected:
         int16_t child(){
-            std::string s(args()[0]);
-            char** as = new char*[args().size() + 1]; // doesnt' need deleting - process exists after method
-            int16_t i = 0;
-            for(const std::string& c : args()){ as[i] = const_cast<char*>(c.c_str()); i++; }
-            as[i] = NULL;
-            return execvp(s.c_str(), as);
+            std::string s(toString());
+            expand(s);
+            std::vector<std::string> cli(kul::cli::asArgs(s));
+            std::vector<char*> argV;
+            for(auto& a : cli) argV.push_back(&a[0]);
+            argV.push_back(NULL);
+            return execvp(cli[0].c_str(), &argV[0]);
         }
         void finish()   { }
         void preStart() { }
+        void expand(std::string& s) const {
+            std::string r = s;
+            int lb  = s.find("$(");
+            int clb = s.find("\\$(");
+            int rb  = s.find(")");
+            int crb = s.find("\\)");
+            while((lb - clb + 1) == 0){
+                lb  = r.substr(clb + 3).find("$(");
+                clb = r.substr(clb + 3).find("\\$(");
+            }
+            while((rb - crb + 1) == 0){
+                rb  = r.substr(crb + 2).find(")");
+                crb = r.substr(crb + 2).find("\\)");
+            }
+            if(lb != -1 && clb == -1 && rb != -1 && crb == -1){
+                std::string k(r.substr(lb + 2, rb - 2 - lb));
+                std::vector<std::string> cli(kul::cli::asArgs(k));
+                if(cli.size()){
+                    kul::Process p(cli[0]);
+                    kul::ProcessCapture pc(p);
+                    for(size_t i = 1; i < cli.size(); i++) p.arg(cli[i]);
+                    p.start();
+                    std::string out(pc.outs());
+                    if(!out.empty()) out.pop_back();
+                    std::string t(r.substr(0, lb) + out + r.substr(rb + 1));
+                    expand(t);
+                    s = t;
+                }
+            }
+        }
     public:
         Process(const std::string& cmd, const bool& wfe = true)                         : kul::AProcess(cmd, wfe){}
         Process(const std::string& cmd, const std::string& path, const bool& wfe = true): kul::AProcess(cmd, path, wfe){}

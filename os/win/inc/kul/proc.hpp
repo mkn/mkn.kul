@@ -92,6 +92,36 @@ class Process : public kul::AProcess{
             CloseHandle(g_hChildStd_OUT_Rd);
             CloseHandle(g_hChildStd_ERR_Rd);
         }
+        void expand(std::string& s) const {
+            std::string r = s;
+            int lb  = s.find("%");
+            int clb = s.find("\\%");
+            int rb  = s.find("%");
+            int crb = s.find("\\%");
+            while((lb - clb + 1) == 0){
+                lb  = r.substr(clb + 3).find("%");
+                clb = r.substr(clb + 3).find("\\%");
+            }
+            while((rb - crb + 1) == 0){
+                rb  = r.substr(crb + 2).find("%");
+                crb = r.substr(crb + 2).find("\\%");
+            }
+            if(lb != -1 && clb == -1 && rb != -1 && crb == -1){
+                std::string k(r.substr(lb + 2, rb - 2 - lb));
+                std::vector<std::string> cli(kul::cli::asArgs(k));
+                if(cli.size()){
+                    kul::Process p(cli[0]);
+                    kul::ProcessCapture pc(p);
+                    for(size_t i = 1; i < cli.size(); i++) p.arg(cli[i]);
+                    p.start();
+                    std::string out(pc.outs());
+                    if(!out.empty()) out.pop_back();
+                    std::string t(r.substr(0, lb) + out + r.substr(rb + 1));
+                    expand(t);
+                    s = t;
+                }
+            }
+        }
         void run() throw (kul::Exception){
             SECURITY_ATTRIBUTES sa;
             ZeroMemory(&sa, sizeof(SECURITY_ATTRIBUTES));
@@ -173,7 +203,9 @@ class Process : public kul::AProcess{
             if(FreeEnvironmentStrings(lpvEnv) == 0) error(__LINE__, "FreeEnvironmentStrings() failed");
 
             const char* dir = directory().empty() ? 0 : directory().c_str();
-            LPSTR szCmdline = _strdup(toString().c_str());
+            std::string cmd(toString());
+            expand(cmd);
+            LPSTR szCmdline = _strdup(cmd.c_str());
             if(vars().size()){
                 WCHAR chNewEnv[__KUL_PROCESS_ENV_BUFFER__];
                 LPWSTR lpszCurrentVariable;
