@@ -152,7 +152,7 @@ class Dir : public fs::Item {
             size_t p = s.find(" ");
             while(p != std::string::npos){
                 s.replace(s.find(" ", p), 1, "\\ ");
-                p = s.find(" ", p + 2) ;
+                p = s.find(" ", p + 2);
             }
 #endif
             return s;

@@ -120,7 +120,6 @@ class AProcess{
 
         const std::string&  directory()const { return d; }
         void setFinished()  { f = 1; }
-        virtual void expand(std::string& s) const = 0;
         virtual bool kill(int16_t k = 6) = 0;
         virtual void preStart() {}
         virtual void finish()   {}

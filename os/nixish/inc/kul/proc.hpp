@@ -59,7 +59,7 @@ inline void kill(const int32_t& e){
 }
 }
 
-class Process : public kul::AProcess{
+class Process : public kul::AnExpandableProcess{
     private:
         int inFd[2];
         int outFd[2];
@@ -82,38 +82,44 @@ class Process : public kul::AProcess{
             argV.push_back(NULL);
             return execvp(cli[0].c_str(), &argV[0]);
         }
+        virtual void expand(std::string& s) const {
+            std::string r = s;
+            auto lb  = s.find("$(");
+            auto clb = s.find("\\$(");
+            while((lb - clb + 1) == 0){
+                lb  = r.find("$(",   clb + 3);
+                clb = r.find("\\$(", clb + 3);
+            }
+            if(lb == -1) return;
+            auto rb  = s.find(")");
+            auto crb = s.find("\\)");
+            while((rb - crb + 1) == 0){
+                rb  = r.find(")",   crb + 2);
+                crb = r.find("\\)", crb + 2);
+            }
+            if(rb == -1) return;
+
+            std::string k(r.substr(lb + 2, rb - 2 - lb));
+            std::vector<std::string> cli(kul::cli::asArgs(k));
+            std::stringstream ss;
+            if(cli.size() > 1){
+                kul::Process p(cli[0]);
+                kul::ProcessCapture pc(p);
+                for(size_t i = 1; i < cli.size(); i++) p.arg(cli[i]);
+                p.start();
+                std::string out(pc.outs());
+                if(*out.rbegin() == '\n') out.pop_back();
+                std::string t(r.substr(0, lb) + out + r.substr(rb + 1));
+                ss << r.substr(0, lb) << out << r.substr(rb + 1);
+            }else
+                ss << r.substr(0, lb) << kul::env::GET(cli[0].c_str()) << r.substr(rb + 1);
+
+            std::string t(ss.str());
+            expand(t);
+            s = t;
+        }
         void finish()   { }
         void preStart() { }
-        void expand(std::string& s) const {
-            std::string r = s;
-            int lb  = s.find("$(");
-            int clb = s.find("\\$(");
-            int rb  = s.find(")");
-            int crb = s.find("\\)");
-            while((lb - clb + 1) == 0){
-                lb  = r.substr(clb + 3).find("$(");
-                clb = r.substr(clb + 3).find("\\$(");
-            }
-            while((rb - crb + 1) == 0){
-                rb  = r.substr(crb + 2).find(")");
-                crb = r.substr(crb + 2).find("\\)");
-            }
-            if(lb != -1 && clb == -1 && rb != -1 && crb == -1){
-                std::string k(r.substr(lb + 2, rb - 2 - lb));
-                std::vector<std::string> cli(kul::cli::asArgs(k));
-                if(cli.size()){
-                    kul::Process p(cli[0]);
-                    kul::ProcessCapture pc(p);
-                    for(size_t i = 1; i < cli.size(); i++) p.arg(cli[i]);
-                    p.start();
-                    std::string out(pc.outs());
-                    if(!out.empty()) out.pop_back();
-                    std::string t(r.substr(0, lb) + out + r.substr(rb + 1));
-                    expand(t);
-                    s = t;
-                }
-            }
-        }
     public:
         Process(const std::string& cmd, const bool& wfe = true)                         : kul::AProcess(cmd, wfe){}
         Process(const std::string& cmd, const std::string& path, const bool& wfe = true): kul::AProcess(cmd, path, wfe){}
