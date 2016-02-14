@@ -59,7 +59,7 @@ inline void kill(const int32_t& e){
 }
 }
 
-class Process : public kul::AnExpandableProcess{
+class Process : public kul::AProcess{
     private:
         int inFd[2];
         int outFd[2];
@@ -90,14 +90,14 @@ class Process : public kul::AnExpandableProcess{
                 lb  = r.find("$(",   clb + 3);
                 clb = r.find("\\$(", clb + 3);
             }
-            if(lb == -1) return;
+            if(lb == std::string::npos) return;
             auto rb  = s.find(")");
             auto crb = s.find("\\)");
             while((rb - crb + 1) == 0){
                 rb  = r.find(")",   crb + 2);
                 crb = r.find("\\)", crb + 2);
             }
-            if(rb == -1) return;
+            if(rb == std::string::npos) return;
 
             std::string k(r.substr(lb + 2, rb - 2 - lb));
             std::vector<std::string> cli(kul::cli::asArgs(k));
