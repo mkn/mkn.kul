@@ -63,9 +63,9 @@ class WString{
                 s = s.substr(0, s.size() - 2);
         }
         static void trim(std::wstring& s){
-            while(s.find(' ') == 0 || s.find('  ') == 0)
+            while(s.find(' ') == 0 || s.find('\t') == 0)
                 s = s.substr(1);
-            while(s.rfind(' ') == 0 || s.rfind('    ') == 0)
+            while(s.rfind(' ') == s.size() - 1 || s.rfind('\t') == s.size() - 1)
                 s = s.substr(0, s.size() - 2);
         }
         static std::vector<std::wstring> split(const std::wstring& s, const wchar_t& d){
