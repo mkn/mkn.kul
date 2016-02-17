@@ -123,17 +123,27 @@ void kul_real_se_handler(EXCEPTION_POINTERS* pExceptionInfo){
 
         STACKFRAME64 stack_frame;
         memset(&stack_frame, 0, sizeof(stack_frame));
-        #if defined(_WIN64)
-        int machine_type = IMAGE_FILE_MACHINE_AMD64;
+
+#if   defined(_ARM_)
+        int mach = 0; //IMAGE_FILE_MACHINE_ARM;
+#elif defined(_ARM64)
+        int mach = 0; //IMAGE_FILE_MACHINE_ARM64;
+#elif defined(_WIN64)
+        int mach = IMAGE_FILE_MACHINE_AMD64;
         stack_frame.AddrPC.Offset = context_record.Rip;
         stack_frame.AddrFrame.Offset = context_record.Rbp;
         stack_frame.AddrStack.Offset = context_record.Rsp;
-        #else
-        int machine_type = IMAGE_FILE_MACHINE_I386;
+#else
+        int mach = IMAGE_FILE_MACHINE_I386;
         stack_frame.AddrPC.Offset = context_record.Eip;
         stack_frame.AddrFrame.Offset = context_record.Ebp;
         stack_frame.AddrStack.Offset = context_record.Esp;
-        #endif
+#endif
+        if(mach == 0) {
+            KERR << "CANNOT WALK STACK <> UNSUPPORTED CPU";
+            exit(sig);
+        };
+
         stack_frame.AddrPC.Mode = AddrModeFlat;
         stack_frame.AddrFrame.Mode = AddrModeFlat;
         stack_frame.AddrStack.Mode = AddrModeFlat;
@@ -143,7 +153,7 @@ void kul_real_se_handler(EXCEPTION_POINTERS* pExceptionInfo){
         symbol->MaxNameLen   = 255;
         symbol->SizeOfStruct = sizeof(SYMBOL_INFO);
         std::cout << "[bt] Stacktrace:" << std::endl;
-        while (StackWalk64(machine_type,
+        while (StackWalk64(mach,
             GetCurrentProcess(),
             GetCurrentThread(),
             &stack_frame,
