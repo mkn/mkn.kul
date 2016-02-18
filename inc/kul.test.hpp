@@ -135,6 +135,12 @@ class Test{
         const std::string s;
     public:
         Test() : s("LAMBDAS ALLOWED IN SIGNAL"){
+            Catch c;
+            kul::Signal sig;                                                         // Windows: each thread requires own handler, static singleton otherwise so only ever one.
+            sig.segv(std::bind(&Catch::print, std::ref(c), std::placeholders::_1));  // Vector of functions to call before exiting - CAUTION! KEEP SIMPLE!
+            sig.segv([this](int16_t){ KOUT(NON) << s; });                            // Allows lamda notation
+
+
             KERR << "KERR";
             KOUT(NON) << "KOUT(NON)";
             KOUT(INF) << "KOUT(INF)";
@@ -160,6 +166,14 @@ class Test{
 
             for(const std::string& arg : kul::cli::asArgs("/path/to \"words in quotes\" words\\ not\\ in\\ quotes end"))
                 KOUT(NON) << "ARG: " << arg;
+
+            for(const std::string& arg : kul::String::split("split - by - char - dash", '-'))
+                KOUT(NON) << "BIT: " << arg;
+            for(const std::string& arg : kul::String::split("split - by - string - dash", "-"))
+                KOUT(NON) << "BIT: " << arg;
+
+            for(const std::string& arg : kul::String::escSplit("split \\- by - char - dash with escape backslash", '-'))
+                KOUT(NON) << "BIT: " << arg;
 
             kul::hash::map::S2S sparse;
             sparse.insert("LEFT", "RIGHT");
@@ -257,10 +271,7 @@ class Test{
             KOUT(NON) << "FOR FULL DEBUG INFO BUILD WITH:";
             KOUT(NON) << "\tWINDOWS cl: -Z7 / link: -DEBUG";
             KOUT(NON) << "\tLINUX  gcc: -g";
-            Catch c;
-            kul::Signal sig;                                                         // Windows: each thread requires own handler, static singleton otherwise so only ever one.
-            sig.segv(std::bind(&Catch::print, std::ref(c), std::placeholders::_1));  // Vector of functions to call before exiting - CAUTION! KEEP SIMPLE!
-            sig.segv([this](int16_t){ KOUT(NON) << s; });                            // Allows lamda notation
+
             *(int *) 0 = 0;                                                          // First seg fault always exits after handling
         }
 };

@@ -34,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string>
 #include <vector>
 #include <sstream>
+#include <string.h>
 #include <algorithm>
 
 namespace kul { 
@@ -85,9 +86,32 @@ class String{
         static void split(const std::string& s, const std::string& d, std::vector<std::string>& v){
             std::string l = s;
             size_t pos = 0;
-            while((pos = s.find(d, pos + 1)) < l.size()){
+            while((pos = l.find(d)) != std::string::npos){
                 v.push_back(l.substr(0, pos));
                 l = l.substr(pos + 1);
+            }
+            v.push_back(l);
+        }
+        static std::vector<std::string> escSplit(const std::string& s, const char& d, const char& e = '\\'){
+            std::vector<std::string> v;
+            escSplit(s, d, v, e);
+            return v;
+        }
+        static void escSplit(const std::string& s, const char& d, std::vector<std::string>& v, const char& e = '\\'){
+            std::string l = s;
+            size_t pos = 0, esc = 0;
+            while((pos = l.find(d, esc)) != std::string::npos){
+                char f[3];
+                strcat(f, &e);
+                strcat(f, &d);
+                f[2] = '\0';
+                if(pos > 0 && l.find(f) == pos - 1){ 
+                    esc++; 
+                    continue; 
+                }
+                v.push_back(l.substr(0, pos));
+                l = l.substr(pos + 1);
+                esc = 0;
             }
             v.push_back(l);
         }
