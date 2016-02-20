@@ -48,9 +48,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace kul {
 class TestThreadObject{
     private:
-        int i;
+        int i = 0;
     public:
-        TestThreadObject() : i(0){}
         void print(){ KLOG(INF) << "i = " << i;}
         friend class kul::ThreadCopy<TestThreadObject>;
         friend class kul::ThreadRef<TestThreadObject>;
@@ -69,10 +68,10 @@ class TestThreadObject{
 
 class TestThreadQueueObject{
     protected:
-        int i;
+        int i = 0;
         Mutex& mutex;
     public:
-        TestThreadQueueObject(Mutex& mutex) : i(0), mutex(mutex){}
+        TestThreadQueueObject(Mutex& mutex) : mutex(mutex){}
         void operator()(){
             kul::ScopeLock lock(mutex);
             KLOG(INF) << "THREAD RUNNING";
