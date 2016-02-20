@@ -452,14 +452,6 @@ inline uint16_t exec(const std::string& cmd, bool q = false){
         return system(std::string(cmd + " > nul").c_str());
     }else return system(cmd.c_str());
 }
-inline kul::Dir userDir(){
-    const std::string h(env::GET("HOME"));
-    if(h.size()) return kul::Dir(h);
-    return kul::Dir(std::string(env::GET("HOMEDRIVE")) + std::string(env::GET("HOMEPATH")));
-}
-inline kul::Dir userAppDir(const std::string& app){
-    return kul::Dir(userDir().join(app));
-}
 inline std::string EOL(){
     #if (_MSC_VER >= 1800 )
     return "\n";
@@ -468,6 +460,16 @@ inline std::string EOL(){
     #endif
 }
 } // END NAMESPACE os
+namespace user{
+inline kul::Dir home(){
+    const std::string h(env::GET("HOME"));
+    if(h.size()) return kul::Dir(h);
+    return kul::Dir(std::string(env::GET("HOMEDRIVE")) + std::string(env::GET("HOMEPATH")));
+}
+inline kul::Dir home(const std::string& app){
+    return kul::Dir(home().join(app));
+}
+} // END NAMESPACE user
 #else
 namespace os{
 inline int exec(const std::string& cmd, bool q = false){
@@ -476,16 +478,18 @@ inline int exec(const std::string& cmd, bool q = false){
     }else return system(cmd.c_str());
     return system(cmd.c_str());
 }
-inline kul::Dir userDir(){
-    return Dir(env::GET("HOME"));
-}
-inline kul::Dir userAppDir(const std::string& app){
-    return Dir(Dir::JOIN(env::GET("HOME"), "." + app));
-}
 inline std::string EOL(){
     return "\n";
 }
 } // END NAMESPACE os
+namespace user{
+inline kul::Dir home(){
+    return Dir(env::GET("HOME"));
+}
+inline kul::Dir home(const std::string& app){
+    return Dir(Dir::JOIN(env::GET("HOME"), "." + app));
+}
+} // END NAMESPACE user
 #endif
 } // END NAMESPACE kul
 
