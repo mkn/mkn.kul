@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <sstream>
 #include <string.h>
 #include <algorithm>
+#include <iostream>
 
 namespace kul { 
 
@@ -101,11 +102,7 @@ class String{
             std::string l = s;
             size_t pos = 0, esc = 0;
             while((pos = l.find(d, esc)) != std::string::npos){
-                char f[3];
-                strcat(f, &e);
-                strcat(f, &d);
-                f[2] = '\0';
-                if(pos > 0 && l.find(f) == pos - 1){ 
+                if(pos > 0 && l.find(std::string(1, e) + std::string(1, d)) == pos - 1){ 
                     esc++; 
                     continue; 
                 }
