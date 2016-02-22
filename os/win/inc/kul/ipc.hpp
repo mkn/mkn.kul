@@ -43,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdio.h>
 #include <windows.h> 
 
-#define BUFSIZE 512
+#define KUL_IPC_BUFFER 512
 
 namespace kul{ namespace ipc{
 
@@ -70,8 +70,8 @@ class Server{
                 PIPE_READMODE_MESSAGE | // message-read mode 
                 PIPE_WAIT,              // blocking mode 
                 PIPE_UNLIMITED_INSTANCES, // max. instances  
-                BUFSIZE,                  // output buffer size 
-                BUFSIZE,                  // input buffer size 
+                KUL_IPC_BUFFER,           // output buffer size 
+                KUL_IPC_BUFFER,           // input buffer size 
                 0,                      // client time-out 
                 NULL);                  // default security attribute 
             if (hPipe == INVALID_HANDLE_VALUE)
@@ -88,7 +88,7 @@ class Server{
         void listen() throw(Exception){
             while(lp){
                 HANDLE hHeap    = GetProcessHeap();
-                pchRequest      = (TCHAR*)HeapAlloc(hHeap, 0, BUFSIZE*sizeof(TCHAR));
+                pchRequest      = (TCHAR*)HeapAlloc(hHeap, 0, KUL_IPC_BUFFER*sizeof(TCHAR));
                 bool fConnected = ConnectNamedPipe(hPipe, NULL) ? TRUE : (GetLastError() == ERROR_PIPE_CONNECTED);
                 if(!fConnected) continue;
                 DWORD cbBytesRead = 0, cbReplyBytes = 0, cbWritten = 0;
@@ -96,7 +96,7 @@ class Server{
                     KEXCEPT(kul::ipc::Exception, "Pipe Server Failure pchRequest: " + std::to_string(GetLastError()));
                 bool fSuccess = FALSE;
                 while(1){
-                    fSuccess = ReadFile(hPipe, pchRequest, BUFSIZE*sizeof(TCHAR), &cbBytesRead, NULL); 
+                    fSuccess = ReadFile(hPipe, pchRequest, KUL_IPC_BUFFER*sizeof(TCHAR), &cbBytesRead, NULL); 
                     if(!fSuccess || cbBytesRead == 0 && (GetLastError() == ERROR_BROKEN_PIPE))
                         break;
                     handle(pchRequest);
