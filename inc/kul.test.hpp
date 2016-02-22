@@ -151,8 +151,8 @@ class Test{
             KOUT(NON) << kul::Dir::SEP();
             KOUT(NON) << kul::env::SEP();
             KOUT(NON) << kul::env::CWD();
-            KOUT(NON) << kul::os::userDir().path();
-            KLOG(INF) << kul::os::userAppDir("maiken").path();
+            KOUT(NON) << kul::user::home().path();
+            KLOG(INF) << kul::user::home("maiken").path();
             for(const kul::Dir& d : kul::Dir(kul::env::CWD()).dirs())
                 for(const kul::File& f : d.files())
                     KOUT(NON) << d.join(f.name()); // or f.full()
