@@ -60,26 +60,27 @@ class Exception : public kul::Exception{
 };
 } // END NAMESPACE log
 
+class LogMan;
 class Logger{
-    public:
-        void out(const std::string& s, const log::mode& m) const{
-            if(m != log::ERR) 
-                printf("%s", s.c_str());
-            else
-                fprintf(stderr, "%s", s.c_str());
-        }
-        void log(const char* f, const uint16_t& l, const std::string& s, const log::mode& m) const{
-            std::string mode(modeTxt(m));
-            std::string tr(kul::this_thread::id());
-            std::string str(__KUL_LOG_FRMT__);
-            kul::String::replace(str, "%M", mode);
-            kul::String::replace(str, "%T", tr);
+    private:
+        void str(const char* f, const uint16_t& l, const std::string& s, const log::mode& m, std::string& str) const {
+            kul::String::replace(str, "%M", modeTxt(m));
+            kul::String::replace(str, "%T", kul::this_thread::id());
             kul::String::replace(str, "%D", kul::DateTime::NOW(__KUL_LOG_TIME_FRMT__));
             kul::String::replace(str, "%F", f);
             kul::String::replace(str, "%L", std::to_string(l));
             kul::String::replace(str, "%S", s);
-            str += kul::os::EOL();
-            out(str, m);
+        }
+        void err(const std::string& s) const {
+            fprintf(stderr, "%s", s.c_str());
+        }
+        void out(const std::string& s) const{
+            printf("%s", s.c_str());
+        }
+        void log(const char* f, const uint16_t& l, const std::string& s, const log::mode& m) const{
+            std::string st(__KUL_LOG_FRMT__);
+            str(f, l, s, m, st);
+            out(st + kul::os::EOL());
         }
         const std::string modeTxt(const log::mode& m) const{
             std::string s("NON");
@@ -88,6 +89,7 @@ class Logger{
             else if(m == 3) s = "DBG";
             return s;
         }
+        friend class LogMan;
 };
 
 class LogMan{
@@ -120,10 +122,15 @@ class LogMan{
             if(this->m >= m) logger.log(f, l, s, m);
         }
         void out(const log::mode& m, const std::string& s){
-            if(this->m >= m) logger.out(s + kul::os::EOL(), m);
+            if(this->m >= m) logger.out(s + kul::os::EOL());
         }
         void err(const log::mode& m, const std::string& s){
-            logger.out(s + kul::os::EOL(), m);
+            logger.err(s + kul::os::EOL());
+        }
+        std::string str(const char* f, const uint16_t& l, const log::mode& m, const std::string& s = "", const std::string fmt = __KUL_LOG_FRMT__){
+            std::string st(fmt);
+            logger.str(f, l, s, m, st);
+            return st;
         }
 };
 

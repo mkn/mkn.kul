@@ -28,15 +28,76 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+#ifndef _KUL_PROC_OS_HPP_
+#define _KUL_PROC_OS_HPP_
 
-#include "kul.test.hpp"
+#include <fcntl.h>
+#include <stdio.h>
+#include <assert.h>
+#include <stdlib.h>
+#include <signal.h>
+#include <unistd.h>
+#include <stdexcept>
+#include <sys/wait.h>
 
-int main(int argc, char* argv[]){
-	try{
-		kul::Test();
-	}
-	catch(const kul::Exception& e){ KERR << e.stack(); }
-	catch(const std::exception& e){ KERR << e.what(); }
-	catch(...)                    { KERR << "UNKNOWN EXCEPTION CAUGHT";	}
-	return 0;
+#if defined(__APPLE__)
+#include <mach/mach.h>
+#endif
+
+#include "kul/proc.base.hpp"
+
+namespace kul { namespace this_proc{
+class MemGetter{
+    private:
+#if defined(__APPLE__)
+        bool f = 0;
+        ProcGetter(){
+            struct task_basic_info inf;
+            mach_msg_type_number_t inf_count = TASK_BASIC_INFO_COUNT;
+            f = KERN_SUCCESS != task_info(mach_task_self(),
+                TASK_BASIC_INFO, (task_info_t)&inf, &inf_count)
+        }
+#else
+#error RAM CHECKING NOT AVAILABLE FOR OS
+#endif
+        void virtula(uint64_t& v){
+#if defined(__APPLE__)
+            if(!f) v += inf.virtual_size;
+#endif
+        }
+        void physical(uint64_t& v){
+#if defined(__APPLE__)
+            if(!f) v += inf.resident_size;
+#endif
+        }
+
+        friend uint64_t virtualMemory();
+        friend uint64_t physicalMemory();
+        friend uint64_t totalMemory();
+};
+
+inline uint64_t virtualMemory(){
+    uint64_t v = 0;
+    MemGetter().virtula(v);
+    return v;
 }
+inline uint64_t physicalMemory(){
+    uint64_t v = 0;
+    MemGetter().physical(v);
+    return v;
+}
+inline uint64_t totalMemory(){
+    uint64_t v = 0;
+    MemGetter pg;
+    pg.virtula(v);
+    pg.physical(v);
+    return v;
+}
+
+inline uint16_t cpuLoad(){
+    return 0;
+}
+
+}
+}
+#endif /* _KUL_PROC_OS_HPP_ */

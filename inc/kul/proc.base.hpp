@@ -43,8 +43,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace kul { 
 
 namespace this_proc{
-    int32_t id();
-    void kill(const uint32_t& e);
+int32_t id();
+void kill(const uint32_t& e);
+
+uint64_t virtualMemory();
+uint64_t physicalMemory();
+uint64_t totalMemory();
+uint16_t cpuLoad();
 }
 
 namespace proc{

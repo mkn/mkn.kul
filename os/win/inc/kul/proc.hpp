@@ -50,13 +50,51 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace kul{ 
 
 namespace this_proc{
+class MemGetter{
+    private:
+        PROCESS_MEMORY_COUNTERS_EX pmc;
+        MemGetter(){
+            GetProcessMemoryInfo(GetCurrentProcess(), &pmc, sizeof(pmc));
+        }
+        void virtula(uint64_t& v){
+            v += pmc.PrivateUsage;
+        }
+        void physical(uint64_t& v){
+            v += pmc.WorkingSetSize;
+        }
+        friend uint64_t virtualMemory();
+        friend uint64_t physicalMemory();
+        friend uint64_t totalMemory();
+};
+inline uint64_t virtualMemory(){
+    uint64_t v = 0;
+    MemGetter().virtula(v);
+    return v;
+}
+inline uint64_t physicalMemory(){
+    uint64_t v = 0;
+    MemGetter().physical(v);
+    return v;
+}
+inline uint64_t totalMemory(){
+    uint64_t v = 0;
+    MemGetter pg;
+    pg.virtula(v);
+    pg.physical(v);
+    return v;
+}
+
+inline uint16_t cpuLoad(){
+    return 0;
+}
+
 inline int32_t id(){
     return GetCurrentProcessId();
 }
 inline void kill(const int32_t& e){
     TerminateProcess(OpenProcess(PROCESS_TERMINATE, 0, kul::this_proc::id()), 128+e);
 }
-}
+} // end namespace this_proc
 
 class Process : public kul::AProcess{
     private:

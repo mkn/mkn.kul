@@ -35,18 +35,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <memory>
 #include <string>
 #include <sstream>
-#include <fcntl.h>
-#include <stdio.h>
-#include <assert.h>
-#include <stdlib.h>
-#include <signal.h>
-#include <unistd.h>
-#include <stdexcept>
-#include <sys/wait.h>
+
 
 #include "kul/os.hpp"
 #include "kul/log.hpp"
-#include "kul/proc.base.hpp"
+#include "kul/proc.os.hpp"
 
 namespace kul {
 

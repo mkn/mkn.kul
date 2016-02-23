@@ -139,7 +139,6 @@ class Test{
             sig.segv(std::bind(&Catch::print, std::ref(c), std::placeholders::_1));  // Vector of functions to call before exiting - CAUTION! KEEP SIMPLE!
             sig.segv([this](int16_t){ KOUT(NON) << s; });                            // Allows lamda notation
 
-
             KERR << "KERR";
             KOUT(NON) << "KOUT(NON)";
             KOUT(INF) << "KOUT(INF)";
