@@ -37,6 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <sstream>
 #include <strsafe.h>
 #include <Windows.h> 
+#include <psapi.h> 
 
 #include "kul/os.hpp"
 #include "kul/def.hpp"
