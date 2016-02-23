@@ -46,7 +46,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "kul/proc.base.hpp"
 
 // extern char **environ;
-#include <iostream> 
 
 namespace kul{ 
 
@@ -55,7 +54,7 @@ class MemGetter{
     private:
         PROCESS_MEMORY_COUNTERS_EX pmc;
         MemGetter(){
-            GetProcessMemoryInfo(GetCurrentProcess(), &pmc, sizeof(pmc));
+            GetProcessMemoryInfo(GetCurrentProcess(), (PROCESS_MEMORY_COUNTERS*)&pmc, sizeof(pmc));
         }
         void virtula(uint64_t& v){
             v += pmc.PrivateUsage;
