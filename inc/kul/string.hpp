@@ -60,6 +60,7 @@ class String{
         static void trim(std::string& s){
             while(s.find(' ') == 0 || s.find('\t') == 0)
                 s.erase(0, 1);
+            if(s.size() == 0) return;
             while(s.rfind(' ') == s.size() - 1 || s.rfind('\t') == s.size() - 1)
                 s.pop_back();
         }
