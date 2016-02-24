@@ -108,7 +108,6 @@ class Server : public IPCCall{
 
 class Client : public IPCCall{
     private:
-        bool m;
         const kul::File uuid;
 
         void start() throw(Exception){
@@ -122,8 +121,8 @@ class Client : public IPCCall{
         virtual ~Client(){
             stop();
         }
-        Client(const std::string& ui) throw(Exception) : m(1), uuid(ui, Dir(_KUL_IPC_UUID_PREFIX_)) { start(); }
-        Client(const int16_t& pid) throw(Exception) : m(1), uuid(std::to_string(pid), Dir(_KUL_IPC_UUID_PREFIX_ + std::string("/pid/"))) { start(); }
+        Client(const std::string& ui) throw(Exception) : uuid(ui, Dir(_KUL_IPC_UUID_PREFIX_)) { start(); }
+        Client(const int16_t& pid) throw(Exception) : uuid(std::to_string(pid), Dir(_KUL_IPC_UUID_PREFIX_ + std::string("/pid/"))) { start(); }
         virtual void send(const std::string& m) const throw(Exception){
             writeLength(m);
             write(fd, m.c_str(), m.size());
