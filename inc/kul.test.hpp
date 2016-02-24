@@ -245,23 +245,9 @@ class Test{
 
             TestIPC().run();
 
-            KOUT(NON) << kul::math::abs(-1);
-
-            KOUT(NON) << kul::math::root(16);
-            KOUT(NON) << kul::math::root(64, 3);
-            KOUT(NON) << std::setprecision(16) << kul::math::root<double>(64, 6);
-            KOUT(NON) << kul::math::root(64, 6, 8);
-            KOUT(NON) << kul::math::root(64, 6, 3, 3);
-            // kul::math::root(root of, nth root(default 2), iterations(default 6), starting guess(default ignored));
-
-            KOUT(NON) << std::setprecision(6) << kul::math::root(2, 2); // float implicit
-            KOUT(NON) << std::setprecision(16) << kul::math::root<double>(2, 3);
-
-            KOUT(NON) << kul::math::pow(-2, 0); // float implicit
-            KOUT(NON) << kul::math::pow(2, 5);
-            KOUT(NON) << kul::math::pow(2, -5);
-            KOUT(NON) << kul::math::pow<double>(2.2974, 5);
-            KOUT(NON) << kul::math::pow(2, 6);
+            KOUT(NON) << "Phsical RAM used in KB: " << kul::this_proc::physicalMemory();
+            KOUT(NON) << "Virtual RAM used in KB: " << kul::this_proc::virtualMemory();
+            KOUT(NON) << "Total RAM used in KB:   " << kul::this_proc::totalMemory();
 
             KOUT(NON);
             KOUT(NON) << "SEG FAULTING MAIN THREAD!";

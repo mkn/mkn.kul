@@ -69,19 +69,19 @@ class MemGetter{
 inline uint64_t virtualMemory(){
     uint64_t v = 0;
     MemGetter().virtula(v);
-    return v;
+    return v / 1000;
 }
 inline uint64_t physicalMemory(){
     uint64_t v = 0;
     MemGetter().physical(v);
-    return v;
+    return v / 1000;
 }
 inline uint64_t totalMemory(){
     uint64_t v = 0;
     MemGetter pg;
     pg.virtula(v);
     pg.physical(v);
-    return v;
+    return v / 1000;
 }
 
 inline uint16_t cpuLoad(){
