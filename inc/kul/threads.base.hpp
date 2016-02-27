@@ -108,8 +108,8 @@ class AThread{
     public:
         virtual ~AThread(){}
         virtual void join() = 0;
-        bool started() { return s; }
-        bool finished(){ return f; }
+        bool started() const { return s; }
+        bool finished()const { return f; }
         const std::exception_ptr& exception(){ return ep;}
         void rethrow(){ if(ep) std::rethrow_exception(ep);}
 };
