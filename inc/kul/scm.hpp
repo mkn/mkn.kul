@@ -59,7 +59,7 @@ class SCM{
         virtual void up(const std::string& d, const std::string& r, const std::string& v) const throw(Exception) = 0;
         virtual const std::string origin(const std::string& d) const = 0;
         virtual const std::string localVersion(const std::string& d, const std::string& b) const = 0;
-        virtual const std::string remoteVersion(const std::string& d, const std::string& url, const std::string& branch) const throw(Exception) = 0;
+        virtual const std::string remoteVersion(const std::string& url, const std::string& branch) const throw(Exception) = 0;
 
         virtual bool hasChanges(const std::string& d) const = 0;
 
@@ -128,8 +128,8 @@ class Git : public SCM{
             return kul::String::lines(pc.outs())[0];
         }
 
-        const std::string remoteVersion(const std::string& d, const std::string& url, const std::string& b) const throw(Exception){
-            kul::Process p("git", d);
+        const std::string remoteVersion(const std::string& url, const std::string& b) const throw(Exception){
+            kul::Process p("git");
             kul::ProcessCapture pc(p);
             try{
                 p.arg("ls-remote").arg(url).arg(b).start();
@@ -140,7 +140,7 @@ class Git : public SCM{
             if(pc.outs().empty()) KEXCEPT(Exception, "SCM ERROR URL OR BRANCH MAY NOT EXIST: " + url + " / " + b);
             std::string s(kul::String::lines(pc.outs())[0]);
             kul::String::trim(s);
-            return s.substr(0, s.find(" "));
+            return s.substr(0, s.find('\t'));
         }
 
         bool hasChanges(const std::string& d) const{
@@ -208,7 +208,7 @@ class Svn : public SCM{
         const std::string localVersion(const std::string& d, const std::string& b) const{
             KEXCEPT(Exception, "SCM ERROR - SVN NOT IMPLEMENTED");
         }
-        const std::string remoteVersion(const std::string& d, const std::string& url, const std::string& b) const throw(Exception){
+        const std::string remoteVersion(const std::string& url, const std::string& b) const throw(Exception){
             KEXCEPT(Exception, "SCM ERROR - SVN NOT IMPLEMENTED");
         }
 
