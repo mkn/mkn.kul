@@ -51,9 +51,8 @@ class ThreadQueue{
     protected:
         bool d = 0, f = 0, s = 0;
         uint16_t m = 1; 
-        kul::Ref<ThreadQueue> re;
         kul::Thread th;
-        std::shared_ptr<kul::threading::ThreadObject> to;
+        std::function<void()> func;
         std::vector<std::shared_ptr<kul::Thread> > ts;
         std::vector<std::exception_ptr> ePs;
         void setStarted()   { s = true; }
@@ -61,15 +60,16 @@ class ThreadQueue{
             if(started()) KEXCEPT(Exception, "ThreadQueue is already started");
             setStarted();
             for(uint16_t i = 0 ; i < m; i++){
-                std::shared_ptr<kul::Thread> at = std::make_shared<kul::Thread>(to);
+                std::shared_ptr<kul::Thread> at = std::make_shared<kul::Thread>(func);
                 at->run();
                 ts.push_back(at);
                 this_thread::nSleep(__KUL_THREAD_SPAWN_WAIT__);
             }
         }
     public:
-        template <class T> ThreadQueue(const T& t)          : re(*this), th(re), to(std::make_shared<kul::ThreadCopy<T> >(t)){}
-        template <class T> ThreadQueue(const Ref<T>& ref)   : re(*this), th(re), to(std::make_shared<kul::ThreadRef<T> >(ref)){}
+        ThreadQueue(const std::function<void()>& func) : th(std::ref(*this)), func(func){}
+        template <class T> ThreadQueue(const T& t)     : th(std::ref(*this)), func(std::bind(&T::operator(), t)){}
+        template <class T> ThreadQueue(const std::reference_wrapper<T>& ref) : th(std::ref(*this)), func(std::bind(&T::operator(), ref)){}
         void setMax(const int16_t& max) { m = max;}
         void run(){
             th.run();
@@ -120,7 +120,7 @@ class PredicatedThreadQueue : public ThreadQueue{
             while(c < ps){
                 for(size_t i = ts.size(); i < m && c < ps; i++){
                     c++;
-                    std::shared_ptr<kul::Thread> at = std::make_shared<kul::Thread>(to);
+                    std::shared_ptr<kul::Thread> at = std::make_shared<kul::Thread>(func);
                     at->run();
                     ts.push_back(at);
                     this_thread::nSleep(__KUL_THREAD_SPAWN_WAIT__);
@@ -141,8 +141,10 @@ class PredicatedThreadQueue : public ThreadQueue{
             }
         }
     public:
-        template <class T> PredicatedThreadQueue(const T& t, P& pr)         : ThreadQueue(t)    , p(pr), ps(p.size()){}
-        template <class T> PredicatedThreadQueue(const Ref<T>& ref, P& pr)  : ThreadQueue(ref)  , p(pr), ps(p.size()){}
+
+        PredicatedThreadQueue(const std::function<void()>& func, P& pr) : ThreadQueue(func), p(pr), ps(p.size()){}
+        template <class T> PredicatedThreadQueue(const T& t, P& pr) : ThreadQueue(t), p(pr), ps(p.size()){}
+        template <class T> PredicatedThreadQueue(const std::reference_wrapper<T>& ref, P& pr) : ThreadQueue(ref), p(pr), ps(p.size()){}
 };
 }// END NAMESPACE kul
 

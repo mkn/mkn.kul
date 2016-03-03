@@ -64,12 +64,12 @@ class LogMan;
 class Logger{
     private:
         void str(const char* f, const uint16_t& l, const std::string& s, const log::mode& m, std::string& str) const {
-            kul::String::replace(str, "%M", modeTxt(m));
-            kul::String::replace(str, "%T", kul::this_thread::id());
-            kul::String::replace(str, "%D", kul::DateTime::NOW(__KUL_LOG_TIME_FRMT__));
-            kul::String::replace(str, "%F", f);
-            kul::String::replace(str, "%L", std::to_string(l));
-            kul::String::replace(str, "%S", s);
+            kul::String::REPLACE(str, "%M", modeTxt(m));
+            kul::String::REPLACE(str, "%T", kul::this_thread::id());
+            kul::String::REPLACE(str, "%D", kul::DateTime::NOW(__KUL_LOG_TIME_FRMT__));
+            kul::String::REPLACE(str, "%F", f);
+            kul::String::REPLACE(str, "%L", std::to_string(l));
+            kul::String::REPLACE(str, "%S", s);
         }
         void err(const std::string& s) const {
             fprintf(stderr, "%s", s.c_str());
@@ -99,7 +99,7 @@ class LogMan{
         LogMan() : m(kul::log::mode::NON), logger(){
             std::string s(kul::env::GET("KLOG"));
             if(s.size()){
-                kul::String::trim(s);
+                kul::String::TRIM(s);
                 if     (s == "0" || s == "NON") m = log::mode::NON;
                 else if(s == "1" || s == "INF") m = log::mode::INF;
                 else if(s == "2" || s == "ERR") m = log::mode::ERR;

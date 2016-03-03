@@ -60,7 +60,7 @@ class DateTime{
         }
     public:
         static const std::string AS(const std::time_t t, std::string f = "%Y-%m-%d-%H:%M:%S"){
-            kul::String::replace(f, "%i", MILLIS());
+            kul::String::REPLACE(f, "%i", MILLIS());
             char buffer [80];
             struct tm ti;
 #ifdef _WIN32

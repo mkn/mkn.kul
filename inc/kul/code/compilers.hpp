@@ -73,10 +73,10 @@ class Compilers{
 			return instance;
 		}
 		const std::string key(std::string comp){
-			kul::String::replaceAll(comp, ".exe", "");
+			kul::String::REPLACE_ALL(comp, ".exe", "");
 			if(cs.count(comp) > 0)return comp;
 			if(comp.find(" ") != std::string::npos)
-				for(const std::string& s :kul::String::split(comp, ' ')){
+				for(const std::string& s :kul::String::SPLIT(comp, ' ')){
 					if(cs.count(s) > 0) return s;
 					if(std::string(kul::Dir(s).locl()).find(kul::Dir::SEP()) != std::string::npos)
 						if(cs.count(s.substr(s.rfind(kul::Dir::SEP()) + 1)) > 0)

@@ -51,19 +51,17 @@ class TestThreadObject{
         int i = 0;
     public:
         void print(){ KLOG(INF) << "i = " << i;}
-        friend class kul::ThreadCopy<TestThreadObject>;
-        friend class kul::ThreadRef<TestThreadObject>;
     protected:
         void operator()(){
             KLOG(INF) << "THREAD RUNNING";
             i++;
             KLOG(INF) << "THREAD FINISHED";
         }
-    public:
         void operator()() const {
             KLOG(INF) << "CONST THREAD RUNNING";
             KLOG(INF) << "CONST THREAD FINISHED";
         }
+        friend class kul::Thread;
 };
 
 class TestThreadQueueObject{
@@ -112,8 +110,7 @@ class TestIPC{
     public:
         void run(){
             TestIPCServer ipc;
-            kul::Ref<TestIPCServer> ref(ipc);
-            kul::Thread t(ref);
+            kul::Thread t(std::ref(ipc));
             t.run();
             kul::this_thread::sleep(1000);
             kul::ipc::Client("uuid").send("TestIPCClient");
@@ -157,6 +154,10 @@ class Test{
                     KOUT(NON) << d.join(f.name()); // or f.full()
             try{
                 kul::Process("echo").arg("Hello").arg("World").start();
+
+            }catch(const kul::proc::ExitException& e){ 
+                KERR << e.stack(); 
+                KERR << e.code(); 
             }catch(const kul::proc::Exception& e){
                 KERR << e.debug()<< " : " << typeid(e).name();
                 KERR << "Error expected on windows without echo on path";
@@ -165,12 +166,12 @@ class Test{
             for(const std::string& arg : kul::cli::asArgs("/path/to \"words in quotes\" words\\ not\\ in\\ quotes end"))
                 KOUT(NON) << "ARG: " << arg;
 
-            for(const std::string& arg : kul::String::split("split - by - char - dash", '-'))
+            for(const std::string& arg : kul::String::SPLIT("split - by - char - dash", '-'))
                 KOUT(NON) << "BIT: " << arg;
-            for(const std::string& arg : kul::String::split("split - by - string - dash", "-"))
+            for(const std::string& arg : kul::String::SPLIT("split - by - string - dash", "-"))
                 KOUT(NON) << "BIT: " << arg;
 
-            for(const std::string& arg : kul::String::escSplit("split \\- by - char - dash with escape backslash", '-'))
+            for(const std::string& arg : kul::String::ESC_SPLIT("split \\- by - char - dash with escape backslash", '-'))
                 KOUT(NON) << "BIT: " << arg;
 
             kul::hash::map::S2S sparse;
@@ -194,8 +195,7 @@ class Test{
             KOUT(NON) << "MAX THREADS: " << kul::cpu::threads();
 
             TestThreadObject tto1;
-            kul::Ref<TestThreadObject> ref(tto1);
-            kul::Thread th(ref);
+            kul::Thread th(std::ref(tto1));
             th.detach();
             th.join();
             tto1.print();
@@ -203,8 +203,7 @@ class Test{
             tto1.print();
 
             TestThreadObject tto2;
-            kul::Ref<const TestThreadObject> cref(tto2);
-            kul::Thread th2(cref);
+            kul::Thread th2(std::cref(tto2));
             th2.detach();
             th2.join();
             tto2.print();
@@ -225,8 +224,7 @@ class Test{
 
             KOUT(NON) << "LAUNCHING THREAD POOL";
             TestThreadQueueObject ttpo1(mutex);
-            kul::Ref<TestThreadQueueObject> ref2(ttpo1);
-            kul::ThreadQueue tp1(ref2);
+            kul::ThreadQueue tp1(std::ref(ttpo1));
             tp1.setMax(4);
             tp1.detach();
             tp1.join();
@@ -236,8 +234,7 @@ class Test{
             for(int i = 0; i < 10; i++) q.push(i);
             KOUT(NON) << "LAUNCHING PREDICATED THREAD POOL";
             TestThreadQueueQObject ttpo2(mutex, q);
-            kul::Ref<TestThreadQueueQObject> ref3(ttpo2);
-            kul::PredicatedThreadQueue<std::queue<int> > tp2(ref3, q);
+            kul::PredicatedThreadQueue<std::queue<int> > tp2(std::ref(ttpo2), q);
             tp2.setMax(kul::cpu::threads());
             tp2.detach();
             tp2.join();

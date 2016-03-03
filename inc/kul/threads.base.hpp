@@ -36,9 +36,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <chrono>
 #include <memory>
 #include <thread>
+#include <functional>
 
 #include "kul/defs.hpp" 
-#include "kul/type.hpp" 
 #include "kul/except.hpp"
 
 namespace kul{ 
@@ -61,49 +61,12 @@ class InterruptionException : public Exception{
         InterruptionException(const char*f, const uint16_t& l, const std::string& s) : Exception(f, l, s){}
 };
 
-class AThread;
-class ThreadObject{
-    private:
-        virtual void act() = 0;
-        friend class AThread;
-    public:
-        virtual ~ThreadObject(){}
-};
-}
-template <class T>
-class ThreadCopy : public threading::ThreadObject{
-    private:
-        T t;
-        void act(){ t(); } 
-    public:
-        ThreadCopy(T t) : t(t){}
-};
-template <class T>
-class ThreadRef : public threading::ThreadObject{
-    private:
-        const Ref<T>& t;
-        void act(){ t.get()(); } 
-    public:
-        ThreadRef(const Ref<T>& t) : t(t){}
-};
-namespace threading{
 class AThread{
     protected:
         std::atomic<bool> f, s;
         std::exception_ptr ep;
-        std::shared_ptr<threading::ThreadObject> to;
 
-        AThread(const std::shared_ptr<ThreadObject>& t) : f(1), s(0), to(t){}
-        template <class T> AThread(const T& t) : f(1), s(0), to(std::make_shared<ThreadCopy<T>>(t)){}
-        template <class T> AThread(const Ref<T>& t) : f(1), s(0), to(std::make_shared<ThreadRef<T>>(t)){}
-        void act(){
-            try{
-                to->act(); 
-            }catch(const std::exception& e){ 
-                ep = std::current_exception();
-            }
-            f = 1;
-        }
+        AThread() : f(1), s(0){}
         virtual void run() throw(kul::threading::Exception) = 0;
     public:
         virtual ~AThread(){}

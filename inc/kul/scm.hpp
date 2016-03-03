@@ -109,10 +109,10 @@ class Git : public SCM{
             }
             if(pc.outs().empty()) KEXCEPT(Exception, "SCM ERROR: Directory may not be git repository : " + d);
             std::vector<std::string> lines;
-            kul::String::lines(pc.outs(), lines);
-            for(auto& line : lines) kul::String::replaceAll(line, "\t", " ");
-            for(auto& line : lines) kul::String::replaceAll(line, "  ", " ");
-            if(lines.size()) return kul::String::split(lines[0], ' ')[1];
+            kul::String::LINES(pc.outs(), lines);
+            for(auto& line : lines) kul::String::REPLACE_ALL(line, "\t", " ");
+            for(auto& line : lines) kul::String::REPLACE_ALL(line, "  ", " ");
+            if(lines.size()) return kul::String::SPLIT(lines[0], ' ')[1];
             KEXCEPT(Exception, "SCM ERROR - Check remote dependency location / version");
         }
         const std::string localVersion(const std::string& d, const std::string& b) const{
@@ -125,7 +125,7 @@ class Git : public SCM{
                 KEXCEPT(Exception, "SCM ERROR " + std::string(e.what()));
             }
             if(pc.outs().empty()) KEXCEPT(Exception, "SCM ERROR: Directory may not be git repository : " + d);
-            return kul::String::lines(pc.outs())[0];
+            return kul::String::LINES(pc.outs())[0];
         }
 
         const std::string remoteVersion(const std::string& url, const std::string& b) const throw(Exception){
@@ -138,8 +138,8 @@ class Git : public SCM{
                 KEXCEPT(Exception, "SCM ERROR " + std::string(e.what()));
             }
             if(pc.outs().empty()) KEXCEPT(Exception, "SCM ERROR URL OR BRANCH MAY NOT EXIST: " + url + " / " + b);
-            std::string s(kul::String::lines(pc.outs())[0]);
-            kul::String::trim(s);
+            std::string s(kul::String::LINES(pc.outs())[0]);
+            kul::String::TRIM(s);
             return s.substr(0, s.find('\t'));
         }
 
@@ -152,7 +152,7 @@ class Git : public SCM{
                 KERR << pc.errs();
                 KEXCEPT(Exception, "SCM ERROR " + std::string(e.what()));
             }
-            return kul::String::lines(pc.outs()).size() > 1;
+            return kul::String::LINES(pc.outs()).size() > 1;
         }
         void status(const std::string& d) const{
             kul::Process p("git", d);

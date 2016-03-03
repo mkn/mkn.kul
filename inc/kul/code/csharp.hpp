@@ -57,7 +57,7 @@ class WINCompiler : public Compiler{
 			std::string cmd = linker;
 			std::vector<std::string> bits;
 			if(linker.find(" ") != std::string::npos){
-				bits = kul::String::split(linker, ' ');
+				bits = kul::String::SPLIT(linker, ' ');
 				cmd = bits[0];
 			}
 			kul::Process p(cmd);
@@ -79,7 +79,7 @@ class WINCompiler : public Compiler{
 			
 			for(const std::string& o : objects)	p.arg(o);
 			if(linkerEnd.find(" ") != std::string::npos)
-				for(const std::string& s: kul::String::split(linkerEnd, ' '))
+				for(const std::string& s: kul::String::SPLIT(linkerEnd, ' '))
 					p.arg(s);
 			else p.arg(linkerEnd);
 
@@ -106,7 +106,7 @@ class WINCompiler : public Compiler{
 			std::string cmd = linker;
 			std::vector<std::string> bits;
 			if(linker.find(" ") != std::string::npos){
-				bits = kul::String::split(linker, ' ');
+				bits = kul::String::SPLIT(linker, ' ');
 				cmd = bits[0];
 			}
 			kul::Process p(cmd);
@@ -114,7 +114,7 @@ class WINCompiler : public Compiler{
 			CompilerProcessCapture pc(p);
 			for(unsigned int i = 1; i < bits.size(); i++) p.arg(bits[i]);
 			for(const std::string& o : objects)	p.arg(o);
-			for(const std::string& s: kul::String::split(linkerEnd, ' ')) p.arg(s);
+			for(const std::string& s: kul::String::SPLIT(linkerEnd, ' ')) p.arg(s);
 			try{
 				p.start();
 			}catch(const kul::proc::Exception& e){

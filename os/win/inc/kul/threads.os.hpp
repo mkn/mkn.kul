@@ -92,12 +92,22 @@ DWORD WINAPI threadFunction(LPVOID th);
 
 class Thread : public threading::AThread{
 	private:
+        std::function<void()> func;
 		HANDLE h;
 		friend DWORD WINAPI threading::threadFunction(LPVOID);
+        void act(){
+            try{
+                func(); 
+            }catch(const std::exception& e){ 
+                ep = std::current_exception();
+            }
+            f = 1;
+        }
 	public:
-		Thread(const std::shared_ptr<threading::ThreadObject>& t) : AThread(t){}
-		template <class T> Thread(const T& t) : AThread(t){}
-		template <class T> Thread(const Ref<T>& t) : AThread(t){}
+        Thread(const std::function<void()>& func) : func(func){}
+        template <class T> Thread(const T& t) : func(std::bind((void(T::*)())&T::operator(), t)){}
+        template <class T> Thread(const std::reference_wrapper<T>& r) : func(std::bind((void(T::*)())&T::operator(), r)){}
+        template <class T> Thread(const std::reference_wrapper<const T>& r) : func(std::bind((void(T::*)()const)&T::operator(), r)){}
 		virtual ~Thread(){}
 		void join(){
 			if(!s) run();

@@ -139,9 +139,9 @@ class Dir : public fs::Item {
         }
         static std::string LOCL(std::string s){
 #ifdef _WIN32
-            kul::String::replaceAll(s, "/", "\\");
+            kul::String::REPLACE_ALL(s, "/", "\\");
 #else
-            kul::String::replaceAll(s, "\\", "/");
+            kul::String::REPLACE_ALL(s, "\\", "/");
 #endif
             return s;
         }
@@ -434,7 +434,7 @@ inline std::ostream& operator<<(std::ostream &s, const File& d){
 
 namespace env{
 inline bool WHICH(const char* c){
-    for(const auto& s : kul::String::split(std::string(env::GET("PATH")), kul::env::SEP())){
+    for(const auto& s : kul::String::SPLIT(std::string(env::GET("PATH")), kul::env::SEP())){
         const kul::Dir d(s);
         if(d)
             for(const auto& f : d.files())
