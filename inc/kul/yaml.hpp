@@ -33,7 +33,7 @@ REQUIRES
     dep:
       - name: parse.yaml
         version: 0.5.5
-        scm: ${github}/parse.yaml.git
+        scm: http://github.com/mkn/parse.yaml.git
 */
 
 
