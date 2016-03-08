@@ -31,10 +31,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _KUL_PROC_OS_HPP_
 #define _KUL_PROC_OS_HPP_
 
-// #include "stdlib.h"
-// #include "stdio.h"
-// #include "string.h"
-
 #include <fcntl.h>
 #include <stdio.h>
 #include <assert.h>

@@ -57,8 +57,6 @@ class MemGetter{
             f = KERN_SUCCESS != task_info(mach_task_self(),
                 TASK_BASIC_INFO, (task_info_t)&inf, &inf_count)
         }
-#else
-#error RAM CHECKING NOT AVAILABLE FOR OS
 #endif
         void virtula(uint64_t& v){
 #if defined(__APPLE__)
