@@ -123,6 +123,12 @@ void kul_sig_handler(int s, siginfo_t* info, void* v) {
             trace[1] = (void *) uc->uc_mcontext->__ss.__rip;
 #elif defined(__NetBSD__)
             trace[1] = (void *) uc->uc_mcontext.__gregs[REG_EIP];
+#elif defined(__FreeBSD__)
+    #if (__x86_64__)
+            trace[1] = (void *) uc->uc_mcontext.mc_rip;
+    #else
+            trace[1] = (void *) uc->uc_mcontext.mc_eip;
+    #endif /* __x86_64__ */
 #else
             trace[1] = (void *) uc->uc_mcontext.gregs[REG_EIP];
 #endif
@@ -147,9 +153,6 @@ void kul_sig_handler(int s, siginfo_t* info, void* v) {
 }
 
 namespace kul{ 
-
-
-
 
 }// END NAMESPACE kul
 
