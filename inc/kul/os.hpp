@@ -145,15 +145,18 @@ class Dir : public fs::Item {
 #endif
             return s;
         }
-
+        static void ESC_REPLACE(std::string& s, const std::string& f, const std::string& r){
+            size_t p = s.find(f);
+            while(p != std::string::npos){
+                s.replace(s.find(f, p), f.size(), r);
+                p = s.find(f, p + r.size());
+            }
+        }
         static std::string ESC(std::string s){
 #ifdef _WIN32
+            ESC_REPLACE(s, "\\", "\\\\");
 #else
-            size_t p = s.find(" ");
-            while(p != std::string::npos){
-                s.replace(s.find(" ", p), 1, "\\ ");
-                p = s.find(" ", p + 2);
-            }
+            ESC_REPLACE(s, " ", "\\ ");
 #endif
             return s;
         }
