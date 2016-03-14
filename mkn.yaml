@@ -1,7 +1,6 @@
 
 
 name: mkn.kul
-version: master
 
 parent: cmn
 
@@ -10,7 +9,7 @@ profile:
     inc: ./inc ./os/${OS}/inc
     dep:
     - name: google.sparsehash
-      version: 2.0.3
+      version: stable
     if_inc:
       bsd: ./os/nixish/inc
       nix: ./os/nixish/inc

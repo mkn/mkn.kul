@@ -32,8 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 REQUIRES
     dep:
       - name: parse.yaml
-        version: 0.5.5
-        scm: http://github.com/mkn/parse.yaml.git
+        version: stable
+        scm: http://github.com/mkn/parse.yaml
 */
 
 
