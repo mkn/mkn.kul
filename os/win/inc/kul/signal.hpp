@@ -31,8 +31,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _KUL_SIGNAL_HPP_
 #define _KUL_SIGNAL_HPP_
 
-#include "kul/proc.hpp"
-
 #include <Windows.h>
 #include <DbgHelp.h>
 #pragma comment(lib, "Dbghelp.lib")
@@ -125,7 +123,10 @@ void kul_real_se_handler(EXCEPTION_POINTERS* pExceptionInfo){
         memset(&stack_frame, 0, sizeof(stack_frame));
 
 #if   defined(_ARM_)
-        int mach = 0; //IMAGE_FILE_MACHINE_ARM;
+        int mach = IMAGE_FILE_MACHINE_ARM;
+        stack_frame.AddrPC.Offset = context_record.Pc;
+        stack_frame.AddrFrame.Offset = context_record.Sp;
+        stack_frame.AddrStack.Offset = context_record.R11;
 #elif defined(_ARM64)
         int mach = 0; //IMAGE_FILE_MACHINE_ARM64;
 #elif defined(_WIN64)
