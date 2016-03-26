@@ -5,7 +5,7 @@ C++ Kommon usage library
 
 Minimal cross platform C++ wrapper for threading/process management/io/logging/signal handling and stack walking.
 
-Supports: Window/OSX/NetBSD/Debian/RHEL (FreeBSD untested but most expected to work)
+Supports: Windows/Debian/RHEL/OSX/NetBSD/FreeBSD
 
 Requires:
 	Windows: Visual Studio 2013+
