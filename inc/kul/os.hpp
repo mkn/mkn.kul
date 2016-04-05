@@ -61,18 +61,19 @@ class Exception : public kul::Exception{
 
 class TimeStamps{
     private:
-        const uint16_t a, c, m;
-        TimeStamps(const uint16_t& a, const uint16_t& c, const uint16_t& m) : a(a), c(c), m(m){}
+        const uint16_t _a, _c, _m;
+        TimeStamps(const uint16_t& a, const uint16_t& c, const uint16_t& m) : _a(a), _c(c), _m(m){}
     public:
-        const uint16_t& accessed() const { return a; }
-        const uint16_t& created () const { return c; }
-        const uint16_t& modified() const { return m; }
+        const uint16_t& accessed() const { return _a; }
+        const uint16_t& created () const { return _c; }
+        const uint16_t& modified() const { return _m; }
         friend class kul::Dir;
         friend class kul::File;
 };
 
 class Item{
     public:
+        virtual ~Item(){}
         virtual fs::TimeStamps timeStamps() const = 0;
         virtual std::string  esc() const = 0;
         virtual std::string  real() const = 0;
@@ -131,7 +132,7 @@ inline char SEP(){
 
 class Dir : public fs::Item {
     private:
-        std::string p;
+        std::string _p;
         static fs::TimeStamps TIMESTAMPS(const std::string& s){ 
             uint16_t a = 0, c = 0, m = 0;
             fs::KulTimeStampsResolver::GET(s.c_str(), a, c, m);
@@ -170,16 +171,16 @@ class Dir : public fs::Item {
                 : a.substr(std::string(env::CWD()).size() + 1);
         }
     public:
-        Dir(){}
+        Dir() : _p(){}
         Dir(const char* p, bool m = false) throw(fs::Exception) : Dir(std::string(p), m) {}
-        Dir(const std::string& p, bool m = false) throw(fs::Exception) : p(Dir::LOCL(p)) {
+        Dir(const std::string& p, bool m = false) throw(fs::Exception) : _p(Dir::LOCL(p)) {
 #ifndef _WIN32
-            if(p.size() && p[0] == '~') this->p = (env::GET("HOME") + p.substr(1));
+            if(p.size() && p[0] == '~') this->_p = (env::GET("HOME") + p.substr(1));
 #endif
             if(m && !is() && !mk()) KEXCEPT(fs::Exception, "Invalid directory path provided");
         }
-        Dir(const Dir& d) : p(d.p){}
-        Dir(const std::string& s, const Dir& d) : p(d.join(s)){}
+        Dir(const Dir& d) : _p(d._p){}
+        Dir(const std::string& s, const Dir& d) : _p(d.join(s)){}
 
         bool cp(const Dir& d) const;
         bool mv(const Dir& d) const{
@@ -218,7 +219,7 @@ class Dir : public fs::Item {
 #endif
 
         const std::string join(const std::string& s) const{ 
-            return p.size() == 0 ? s : root() ? path() + s : JOIN(path(), s); 
+            return _p.size() == 0 ? s : root() ? path() + s : JOIN(path(), s); 
         }
         const std::string name() const{
             return root() ? path() : path().substr(path().rfind(SEP()) + 1);
@@ -226,10 +227,10 @@ class Dir : public fs::Item {
         std::string  esc()  const { return is() ? ESC(real()) : ESC(path()); }
         std::string  escm() const { return ESC(mini()); }
         std::string  locl() const { return LOCL(path()); }
-        const std::string& path() const { return p;}
+        const std::string& path() const { return _p;}
         std::string  real() const { return REAL(path()); }
         std::string  mini() const { return MINI(real()); }
-        fs::TimeStamps timeStamps() const { return TIMESTAMPS(p); }
+        fs::TimeStamps timeStamps() const { return TIMESTAMPS(_p); }
 
         Dir parent() const { return Dir(PRNT(path())); }
 
@@ -303,7 +304,7 @@ class Dir : public fs::Item {
 #endif
         friend class File;
 
-        Dir& operator=(const Dir& d){ this->p = d.p; return *this; } 
+        Dir& operator=(const Dir& d){ this->_p = d._p; return *this; } 
         bool operator==(const Dir& d) const {
             if(is() && d.is()) return real().compare(d.real()) == 0;
             return path().compare(d.path()) == 0;
@@ -317,41 +318,41 @@ inline std::ostream& operator<<(std::ostream &s, const Dir& d){
 
 class File : public fs::Item {
     private:
-        std::string n;
-        Dir d;
+        std::string _n;
+        Dir _d;
     public:
-        File(){}
-        File(const std::string& n, bool m = false) : n(Dir::LOCL(n)), d(env::CWD()){
+        File() : _n(), _d(){}
+        File(const std::string& n, bool m = false) : _n(Dir::LOCL(n)), _d(env::CWD()){
             if(n.find(Dir::SEP()) != std::string::npos){
-                this->d = Dir(n.substr(0, n.rfind(Dir::SEP())));
-                this->n = this->n.substr(n.rfind(Dir::SEP()) + 1);
+                this->_d = Dir(n.substr(0, n.rfind(Dir::SEP())));
+                this->_n = this->_n.substr(n.rfind(Dir::SEP()) + 1);
             }else
                 try{
-                    d = Dir(Dir::PRNT(Dir::REAL(this->n)), m);
+                    this->_d = Dir(Dir::PRNT(Dir::REAL(this->_n)), m);
                 }catch(const kul::fs::Exception& e){}
         }
         File(const char* n, bool m = false) : File(std::string(n), m){}
-        File(const std::string& n, const Dir& d) : n(n), d(d){}
-        File(const std::string& n, const char* c) : n(n), d(c){}
-        File(const std::string& n, const std::string& d1) : n(n), d(d1){}
-        File(const File& f) : n(f.n), d(f.d){}
+        File(const std::string& n, const Dir& d) : _n(n), _d(d){}
+        File(const std::string& n, const char* c) : _n(n), _d(c){}
+        File(const std::string& n, const std::string& d1) : _n(n), _d(d1){}
+        File(const File& f) : _n(f._n), _d(f._d){}
 
         bool cp(const Dir& f) const{
-            if(!d.is() && !d.mk()) KEXCEPT(fs::Exception, "Directory: \"" + d.path() + "\" is not valid");
-            return cp(kul::File(name(), d));
+            if(!_d.is() && !_d.mk()) KEXCEPT(fs::Exception, "Directory: \"" + _d.path() + "\" is not valid");
+            return cp(kul::File(name(), _d));
         }
         bool cp(const File& f) const{
-            std::ifstream src(d.join(n), std::ios::binary);
+            std::ifstream src(_d.join(_n), std::ios::binary);
             std::ofstream dst(f.dir().join(f.name()), std::ios::binary);
             return (bool) (dst << src.rdbuf());
         }
 #ifdef _WIN32
         bool is() const{
-            return !name().empty() && (bool) std::ifstream(d.join(n).c_str());
+            return !name().empty() && (bool) std::ifstream(_d.join(_n).c_str());
         }
         bool rm() const{
             if(is()){
-                _unlink(d.join(n).c_str());
+                _unlink(_d.join(_n).c_str());
                 return true;
             }
             return false;
@@ -360,7 +361,7 @@ class File : public fs::Item {
         bool is() const{
             if(name().empty()) return false;
             struct stat buffer;
-            return (stat (d.join(n).c_str(), &buffer) == 0);
+            return (stat (_d.join(_n).c_str(), &buffer) == 0);
         }
         bool rm() const{
             if(is()){
@@ -386,12 +387,12 @@ class File : public fs::Item {
             return std::rename(this->full().c_str(), f.full().c_str());
         }
 
-        const std::string& name() const { return n; }
+        const std::string& name() const { return _n; }
 
-        std::string esc()  const { return Dir::JOIN(d.esc(), Dir::ESC(n)); }
+        std::string esc()  const { return Dir::JOIN(_d.esc(), Dir::ESC(_n)); }
         std::string escm() const { return Dir::ESC(mini()); }
-        std::string full() const { return Dir::JOIN(d.path(), n); }
-        std::string real() const { return Dir::JOIN(d.real(), n); }
+        std::string full() const { return Dir::JOIN(_d.path(), _n); }
+        std::string real() const { return Dir::JOIN(_d.real(), _n); }
         std::string mini() const { return Dir::MINI(real()); }
 
         ulonglong   size() const{
@@ -412,7 +413,7 @@ class File : public fs::Item {
 #endif
             return r; 
         }
-        const Dir& dir() const { return d; }
+        const Dir& dir() const { return _d; }
          fs::TimeStamps timeStamps() const { return Dir::TIMESTAMPS(mini()); }
 
         File& operator=(const File& f) = default;
