@@ -9,7 +9,7 @@ Supports: Windows/Debian/RHEL/OSX/NetBSD/FreeBSD
 
 Requires:
 	Windows: Visual Studio 2013+
-	Unix   : gcc 4.9 (or equivalent)
+	Unix   : gcc 5.0 (or equivalent)
 
 How to use:
 view inc/kul.test.hpp
