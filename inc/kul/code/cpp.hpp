@@ -279,6 +279,10 @@ class WINCompiler : public CCompiler{
 			const kul::File& out, 
 			const Mode& mode) const throw (kul::Exception) {
 
+			kul::hash::set::String dirs;
+			for(const auto& o : objects) dirs.insert(kul::File(o).dir().mini());
+
+
 			std::string lib = out.dir().join(sharedLib(out.name()));
 			if(mode == Mode::STAT) lib = out.dir().join(staticLib(out.name()));
 			std::string cmd = linker;
@@ -296,7 +300,7 @@ class WINCompiler : public CCompiler{
 				for(const std::string& path : libPaths)	p.arg("-LIBPATH:\"" + path + "\"");
 				for(const std::string& lib : libs) p.arg(staticLib(lib));
 			}
-			for(const std::string& o : objects)	p.arg(o);
+			for(const std::string& d : dirs)	p.arg(kul::Dir(d).join("*.obj"));
 			for(const std::string& s: kul::cli::asArgs(linkerEnd)) p.arg(s);
 			CompilerProcessCapture pc;
 			try{
