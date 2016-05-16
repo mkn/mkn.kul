@@ -246,6 +246,9 @@ class WINCompiler : public CCompiler{
 
 			std::string exe = out + ".exe";
 
+			kul::hash::set::String dirs;
+			for(const auto& o : objects) dirs.insert(kul::File(o).dir().mini());
+
 			std::string cmd = linker;
 			std::vector<std::string> bits;
 			if(linker.find(" ") != std::string::npos){
@@ -256,7 +259,7 @@ class WINCompiler : public CCompiler{
 			for(unsigned int i = 1; i < bits.size(); i++) p.arg(bits[i]);
 			p.arg("-OUT:\"" + exe + "\"").arg("-nologo");
 			for(const std::string& path : libPaths)	p.arg("-LIBPATH:\"" + path + "\"");
-			for(const std::string& o : objects)	p.arg(o);
+			for(const std::string& d : dirs)   p.arg(kul::Dir(d).join("*.obj"));
 			for(const std::string& lib : libs) p.arg(staticLib(lib));
 			for(const std::string& s: kul::cli::asArgs(linkerEnd)) p.arg(s);
 
