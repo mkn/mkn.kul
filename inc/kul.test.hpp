@@ -46,6 +46,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iomanip>
 
 namespace kul {
+
+class Test;
+
 class TestThreadObject{
     private:
         int i = 0;
@@ -61,6 +64,7 @@ class TestThreadObject{
             KLOG(INF) << "CONST THREAD RUNNING";
             KLOG(INF) << "CONST THREAD FINISHED";
         }
+        friend class Test;
         friend class kul::Thread;
 };
 
@@ -194,25 +198,29 @@ class Test{
             KOUT(NON) << "CPU CORES:   " << kul::cpu::cores();
             KOUT(NON) << "MAX THREADS: " << kul::cpu::threads();
 
-            TestThreadObject tto1;
-            kul::Thread th(std::ref(tto1));
-            th.detach();
-            th.join();
-            tto1.print();
-            th.join();
-            tto1.print();
+            {
+                TestThreadObject tto1;
+                kul::Thread th(std::ref(tto1));
+                th.join();
+                tto1.print();
+                th.join();
+                tto1.print();
 
-            TestThreadObject tto2;
-            kul::Thread th2(std::cref(tto2));
-            th2.detach();
-            th2.join();
-            tto2.print();
+                TestThreadObject tto2;
+                kul::Thread th2(std::cref(tto2));
+                th2.join();
+                tto2.print();
 
-            TestThreadObject tto3;
-            kul::Thread th1(tto3);
-            th1.detach();
-            th1.join();
-            tto3.print();
+                TestThreadObject tto3;
+                kul::Thread th3(tto3);
+                th3.join();
+                tto3.print();
+
+                kul::Thread([&tto1](){ tto1(); }).join();
+                tto1.print();
+                kul::Thread([tto1](){ tto1(); }).join();
+                tto1.print();
+            }
 
             kul::Mutex mutex;
             {
@@ -221,25 +229,25 @@ class Test{
                 }
                 kul::ScopeLock lock(mutex);
             }
+            {
+                KOUT(NON) << "LAUNCHING THREAD POOL";
+                TestThreadQueueObject ttpo1(mutex);
+                kul::ThreadQueue tp1(std::ref(ttpo1));
+                tp1.setMax(4);
+                tp1.detach();
+                tp1.join();
+                ttpo1.print();
 
-            KOUT(NON) << "LAUNCHING THREAD POOL";
-            TestThreadQueueObject ttpo1(mutex);
-            kul::ThreadQueue tp1(std::ref(ttpo1));
-            tp1.setMax(4);
-            tp1.detach();
-            tp1.join();
-            ttpo1.print();
-
-            std::queue<int> q;
-            for(int i = 0; i < 10; i++) q.push(i);
-            KOUT(NON) << "LAUNCHING PREDICATED THREAD POOL";
-            TestThreadQueueQObject ttpo2(mutex, q);
-            kul::PredicatedThreadQueue<std::queue<int> > tp2(std::ref(ttpo2), q);
-            tp2.setMax(kul::cpu::threads());
-            tp2.detach();
-            tp2.join();
-            ttpo2.print();
-
+                std::queue<int> q;
+                for(int i = 0; i < 10; i++) q.push(i);
+                KOUT(NON) << "LAUNCHING PREDICATED THREAD POOL";
+                TestThreadQueueQObject ttpo2(mutex, q);
+                kul::PredicatedThreadQueue<std::queue<int> > tp2(std::ref(ttpo2), q);
+                tp2.setMax(kul::cpu::threads());
+                tp2.detach();
+                tp2.join();
+                ttpo2.print();
+            }
             TestIPC().run();
 
             KOUT(NON) << "Phsical RAM used in KB: " << kul::this_proc::physicalMemory();
