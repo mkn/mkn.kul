@@ -195,7 +195,8 @@ class Dir : public fs::Item {
         }
         bool mk() const{
             if(path().empty()) return false;
-            if(!parent().is()) parent().mk();
+            const kul::Dir& prnt(parent());
+            if(_p != prnt.path() && !prnt.is()) parent().mk();
             return CreateDirectory(locl().c_str(), NULL);
         }
         bool root() const{
@@ -210,7 +211,8 @@ class Dir : public fs::Item {
         }
         bool mk() const{
             if(path().empty()) return false;
-            if(!parent().is()) parent().mk();
+            const kul::Dir& prnt(parent());
+            if(_p != prnt.path() && !prnt.is()) parent().mk();
             return mkdir(locl().c_str(), 0777) == 0;
         }
         bool root() const{
