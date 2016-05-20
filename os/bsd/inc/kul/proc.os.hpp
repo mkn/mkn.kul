@@ -51,11 +51,11 @@ class MemGetter{
     private:
 #if defined(__APPLE__)
         bool f = 0;
-        ProcGetter(){
-            struct task_basic_info inf;
+        struct task_basic_info inf;
+        MemGetter(){
             mach_msg_type_number_t inf_count = TASK_BASIC_INFO_COUNT;
             f = KERN_SUCCESS != task_info(mach_task_self(),
-                TASK_BASIC_INFO, (task_info_t)&inf, &inf_count)
+                TASK_BASIC_INFO, (task_info_t)&inf, &inf_count);
         }
 #endif
         void virtula(uint64_t& v){
