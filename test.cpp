@@ -81,14 +81,35 @@ TEST(OperatingSystemTests, HasRAMUsageSupport) {
  	ASSERT_TRUE(kul::this_proc::virtualMemory());
 }
 
-TEST(OperatingSystemTests, HasFullFileTimeStampSupport) {
-  	kul::File f("mkn.yaml");
-  	ASSERT_TRUE(f.is());
-  	kul::fs::TimeStamps fts = f.timeStamps();
- 	ASSERT_TRUE(fts.accessed());
-  	ASSERT_TRUE(fts.created());
-  	ASSERT_TRUE(fts.modified()); 	 	
+class TimeStampHandler{
+	private:
+		kul::File f;
+		kul::fs::TimeStamps fts;
+		TimeStampHandler() : f("mkn.yaml"), fts(f.timeStamps()){}
+	public:
+		static TimeStampHandler&  INSTANCE(){
+			static TimeStampHandler i;
+			return i;
+		}
+		bool is(){ return f.is(); }
+		const kul::fs::TimeStamps& timeStamps() { return fts; }
+};
+
+TEST(OperatingSystemTests, HasFileAccessedTimeStampSupport) {
+  	ASSERT_TRUE(TimeStampHandler::INSTANCE().is());
+ 	ASSERT_TRUE(TimeStampHandler::INSTANCE().timeStamps().accessed());
 }
+
+TEST(OperatingSystemTests, HasFileCreatedTimeStampSupport) {
+  	ASSERT_TRUE(TimeStampHandler::INSTANCE().is());
+ 	ASSERT_TRUE(TimeStampHandler::INSTANCE().timeStamps().created());
+}
+
+TEST(OperatingSystemTests, HasFileModifiedTimeStampSupport) {
+  	ASSERT_TRUE(TimeStampHandler::INSTANCE().is());
+ 	ASSERT_TRUE(TimeStampHandler::INSTANCE().timeStamps().modified());
+}
+
 
 int main(int argc, char* argv[]) {
   ::testing::InitGoogleMock(&argc, argv);
