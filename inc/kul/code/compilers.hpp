@@ -37,59 +37,64 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace kul{ namespace code{ 
 
 class CompilerNotFoundException : public kul::Exception{
-	public:
-		CompilerNotFoundException(const char*f, const int l, std::string s) : kul::Exception(f, l, s){}
+    public:
+        CompilerNotFoundException(const char*f, const int l, std::string s) : kul::Exception(f, l, s){}
 };
 
 class Compilers{
-	private:
-		Compilers(){
-			gcc		= std::make_unique<cpp::GCCompiler>();
-			clang	= std::make_unique<cpp::ClangCompiler>();
-			intel	= std::make_unique<cpp::IntelCompiler>();
-			winc	= std::make_unique<cpp::WINCompiler>();
+    private:
+        Compilers(){
+            gcc     = std::make_unique<cpp::GCCompiler>();
+            clang   = std::make_unique<cpp::ClangCompiler>();
+            intel   = std::make_unique<cpp::IntelCompiler>();
+            winc    = std::make_unique<cpp::WINCompiler>();
 
-			wincs 	= std::make_unique<csharp::WINCompiler>();
+            wincs   = std::make_unique<csharp::WINCompiler>();
 
-			cs.insert(std::pair<std::string, Compiler*>("gcc"		, gcc.get()));
-			cs.insert(std::pair<std::string, Compiler*>("g++"		, gcc.get()));
-			cs.insert(std::pair<std::string, Compiler*>("nvcc"		, gcc.get()));
-			cs.insert(std::pair<std::string, Compiler*>("clang"		, clang.get()));
-			cs.insert(std::pair<std::string, Compiler*>("clang++"	, clang.get()));
-			cs.insert(std::pair<std::string, Compiler*>("icc"		, intel.get()));
-			cs.insert(std::pair<std::string, Compiler*>("icpc"		, intel.get()));
-			cs.insert(std::pair<std::string, Compiler*>("cl"		, winc.get()));
-			cs.insert(std::pair<std::string, Compiler*>("csc"		, wincs.get()));
-		}
-		std::unique_ptr<Compiler> gcc;
-		std::unique_ptr<Compiler> clang;
-		std::unique_ptr<Compiler> intel;
-		std::unique_ptr<Compiler> winc;
-		std::unique_ptr<Compiler> wincs;
-		hash::map::S2T<Compiler*> cs;
-	public:
-		static Compilers& INSTANCE(){ 
-			static Compilers instance;
-			return instance;
-		}
-		const std::string key(std::string comp){
-			kul::String::REPLACE_ALL(comp, ".exe", "");
-			if(cs.count(comp) > 0)return comp;
-			if(comp.find(" ") != std::string::npos)
-				for(const std::string& s :kul::String::SPLIT(comp, ' ')){
-					if(cs.count(s) > 0) return s;
-					if(std::string(kul::Dir(s).locl()).find(kul::Dir::SEP()) != std::string::npos)
-						if(cs.count(s.substr(s.rfind(kul::Dir::SEP()) + 1)) > 0)
-							return s.substr(s.rfind(kul::Dir::SEP()) + 1);
-				}
-			if(std::string(kul::Dir(comp).locl()).find(kul::Dir::SEP()) != std::string::npos)
-				if(cs.count(comp.substr(comp.rfind(kul::Dir::SEP()) + 1)) > 0)
-					return comp.substr(comp.rfind(kul::Dir::SEP()) + 1);
-			KEXCEPT(CompilerNotFoundException, "Compiler for " + comp + " is not implemented");
-		}
-		const Compiler* get(std::string comp) throw(CompilerNotFoundException){
-			return (*cs.find(key(comp))).second;
-		}
+            cs.insert(std::pair<std::string, Compiler*>("gcc"       , gcc.get()));
+            cs.insert(std::pair<std::string, Compiler*>("g++"       , gcc.get()));
+            cs.insert(std::pair<std::string, Compiler*>("nvcc"      , gcc.get()));
+            cs.insert(std::pair<std::string, Compiler*>("clang"     , clang.get()));
+            cs.insert(std::pair<std::string, Compiler*>("clang++"   , clang.get()));
+            cs.insert(std::pair<std::string, Compiler*>("icc"       , intel.get()));
+            cs.insert(std::pair<std::string, Compiler*>("icpc"      , intel.get()));
+            cs.insert(std::pair<std::string, Compiler*>("cl"        , winc.get()));
+            cs.insert(std::pair<std::string, Compiler*>("csc"       , wincs.get()));
+        }
+        std::unique_ptr<Compiler> gcc;
+        std::unique_ptr<Compiler> clang;
+        std::unique_ptr<Compiler> intel;
+        std::unique_ptr<Compiler> winc;
+        std::unique_ptr<Compiler> wincs;
+        hash::map::S2T<Compiler*> cs;
+    public:
+        static Compilers& INSTANCE(){ 
+            static Compilers instance;
+            return instance;
+        }
+        const std::string key(std::string comp){
+            kul::String::REPLACE_ALL(comp, ".exe", "");
+            if(cs.count(comp) > 0) return comp;
+            if(comp.find(" ") != std::string::npos)
+                for(const std::string& s :kul::String::SPLIT(comp, ' ')){
+                    if(cs.count(s) > 0) return s;
+                    if(std::string(kul::Dir(s).locl()).find(kul::Dir::SEP()) != std::string::npos)
+                        if(cs.count(s.substr(s.rfind(kul::Dir::SEP()) + 1)))
+                            return s.substr(s.rfind(kul::Dir::SEP()) + 1);
+                }
+            if(std::string(kul::Dir(comp).locl()).find(kul::Dir::SEP()) != std::string::npos){
+                comp = comp.substr(comp.rfind(kul::Dir::SEP()) + 1);
+                if(cs.count(comp)) return comp;
+
+            }
+            std::vector<std::string> bits;
+            kul::String::SPLIT(comp, '-', bits);
+            for(const auto& s : bits) if(cs.count(s)) return s;
+            KEXCEPT(CompilerNotFoundException, "Compiler for " + comp + " is not implemented");
+        }
+        const Compiler* get(std::string comp) throw(CompilerNotFoundException){
+            return (*cs.find(key(comp))).second;
+        }
 };
 
 

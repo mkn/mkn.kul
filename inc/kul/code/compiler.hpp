@@ -46,59 +46,59 @@ enum Mode { NONE = 0, STAT, SHAR};
 
 class Compiler;
 class CompilerProcessCapture : public kul::ProcessCapture{
-	private:
-		std::exception_ptr ep;
-		std::string c, t;
-	public:
-		CompilerProcessCapture() : ep(){}
-		CompilerProcessCapture(kul::AProcess& p) : kul::ProcessCapture(p), ep(){}
-		CompilerProcessCapture(const CompilerProcessCapture& cp) : kul::ProcessCapture(cp), ep(cp.ep), c(cp.c), t(cp.t){}
+    private:
+        std::exception_ptr ep;
+        std::string c, t;
+    public:
+        CompilerProcessCapture() : ep(){}
+        CompilerProcessCapture(kul::AProcess& p) : kul::ProcessCapture(p), ep(){}
+        CompilerProcessCapture(const CompilerProcessCapture& cp) : kul::ProcessCapture(cp), ep(cp.ep), c(cp.c), t(cp.t){}
 
-		void exception(const std::exception_ptr& e)	{ ep = e; }
-		const std::exception_ptr& exception() const	{ return ep; }
+        void exception(const std::exception_ptr& e) { ep = e; }
+        const std::exception_ptr& exception() const { return ep; }
 
-		void cmd(const std::string& cm) { this->c = cm; }
-		const std::string& cmd() const 	{ return c; }
+        void cmd(const std::string& cm) { this->c = cm; }
+        const std::string& cmd() const  { return c; }
 
-		void tmp(const std::string& tm) { this->t = tm; }
-		const std::string& tmp() const 	{ return t; }
+        void tmp(const std::string& tm) { this->t = tm; }
+        const std::string& tmp() const  { return t; }
 };
 
-class Compiler{	
-	protected:
-		Compiler(const int& v) : version(v){}
-		const int version;
-	public:
-		virtual ~Compiler(){}		
-		virtual bool sourceIsBin()		const = 0;
-		virtual const CompilerProcessCapture buildExecutable(
-			const std::string& linker,
-			const std::string& linkerEnd,
-			const std::vector<std::string>& objects,
-			const std::vector<std::string>& libs,
-			const std::vector<std::string>& libPaths,
-			const std::string& out, 
-			const Mode& mode) 			const throw (kul::Exception) = 0;
-		virtual const CompilerProcessCapture buildLibrary(
-			const std::string& linker, 
-			const std::string& linkerEnd,
-			const std::vector<std::string>& objects,
-			const std::vector<std::string>& libs,
-			const std::vector<std::string>& libPaths,
-			const kul::File& out, 
-			const Mode& mode) 			const throw (kul::Exception) = 0;
-		virtual const CompilerProcessCapture compileSource	(
-			const std::string& compiler,
-			const std::vector<std::string>& args, 		
-			const std::vector<std::string>& incs, 
-			const std::string& in, 
-			const std::string& out, 
-			const Mode& mode) 	const throw (kul::Exception) = 0;
-		virtual void preCompileHeader(
-			const std::vector<std::string>& incs, 
-			const hash::set::String& args, 
-			const std::string& in, 
-			const std::string& out) 	const throw (kul::Exception) = 0;
+class Compiler{ 
+    protected:
+        Compiler(const int& v) : version(v){}
+        const int version;
+    public:
+        virtual ~Compiler(){}       
+        virtual bool sourceIsBin()      const = 0;
+        virtual const CompilerProcessCapture buildExecutable(
+            const std::string& linker,
+            const std::string& linkerEnd,
+            const std::vector<std::string>& objects,
+            const std::vector<std::string>& libs,
+            const std::vector<std::string>& libPaths,
+            const std::string& out, 
+            const Mode& mode)           const throw (kul::Exception) = 0;
+        virtual const CompilerProcessCapture buildLibrary(
+            const std::string& linker, 
+            const std::string& linkerEnd,
+            const std::vector<std::string>& objects,
+            const std::vector<std::string>& libs,
+            const std::vector<std::string>& libPaths,
+            const kul::File& out, 
+            const Mode& mode)           const throw (kul::Exception) = 0;
+        virtual const CompilerProcessCapture compileSource  (
+            const std::string& compiler,
+            const std::vector<std::string>& args,       
+            const std::vector<std::string>& incs, 
+            const std::string& in, 
+            const std::string& out, 
+            const Mode& mode)   const throw (kul::Exception) = 0;
+        virtual void preCompileHeader(
+            const std::vector<std::string>& incs, 
+            const hash::set::String& args, 
+            const std::string& in, 
+            const std::string& out)     const throw (kul::Exception) = 0;
 };
 
 }}
