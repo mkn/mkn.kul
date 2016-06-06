@@ -12,7 +12,7 @@ Requires:
 	Unix   : gcc 5.0 (or equivalent)
 
 How to use:
-view inc/kul.test.hpp
+view inc/usage.hpp
 
 License: BSD
 

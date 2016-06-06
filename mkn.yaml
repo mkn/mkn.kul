@@ -16,4 +16,14 @@ profile:
 
   - name: test 
     parent: cmn
+    dep:
+    - name: google.test
+      version: master
     main: test.cpp
+
+  - name: bench 
+    parent: cmn
+    dep:
+    - name: google.benchmark
+      version: master
+    main: bench.cpp

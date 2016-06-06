@@ -61,12 +61,12 @@ class Exception : public kul::Exception{
 
 class TimeStamps{
     private:
-        const uint16_t _a, _c, _m;
-        TimeStamps(const uint16_t& a, const uint16_t& c, const uint16_t& m) : _a(a), _c(c), _m(m){}
+        const uint64_t _a, _c, _m;
+        TimeStamps(const uint64_t& a, const uint64_t& c, const uint64_t& m) : _a(a), _c(c), _m(m){}
     public:
-        const uint16_t& accessed() const { return _a; }
-        const uint16_t& created () const { return _c; }
-        const uint16_t& modified() const { return _m; }
+        const uint64_t& accessed() const { return _a; }
+        const uint64_t& created () const { return _c; }
+        const uint64_t& modified() const { return _m; }
         friend class kul::Dir;
         friend class kul::File;
 };
@@ -134,7 +134,7 @@ class Dir : public fs::Item {
     private:
         std::string _p;
         static fs::TimeStamps TIMESTAMPS(const std::string& s){ 
-            uint16_t a = 0, c = 0, m = 0;
+            uint64_t a = 0, c = 0, m = 0;
             fs::KulTimeStampsResolver::GET(s.c_str(), a, c, m);
             return fs::TimeStamps(a, c, m);
         }

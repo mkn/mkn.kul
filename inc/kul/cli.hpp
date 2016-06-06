@@ -237,8 +237,8 @@ class Args{
         }
 };
 
-inline std::vector<std::string> asArgs(const std::string& cmd){
-    std::vector<std::string> args;
+
+inline void asArgs(const std::string& cmd, std::vector<std::string>& args){
     std::string arg;
     bool openQuotesS = false;
     bool openQuotesD = false;
@@ -285,8 +285,14 @@ inline std::vector<std::string> asArgs(const std::string& cmd){
         arg += c;
     }
     if(arg.size() > 0) args.push_back(arg);
+}
+
+inline std::vector<std::string> asArgs(const std::string& cmd){
+    std::vector<std::string> args;
+    asArgs(cmd, args);
     return args;
 }
+
 
 } // END NAMESPACE cli
 } // END NAMESPACE kul
