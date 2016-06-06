@@ -40,74 +40,74 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 TEST(StringTest, ParseCommandLineArguments) {
     std::vector<std::string> v;
     kul::cli::asArgs("/path/to \"words in quotes\" words\\ not\\ in\\ quotes end", v);
-	EXPECT_EQ(4, v.size());
-	EXPECT_EQ("/path/to", v[0]);
-	EXPECT_EQ("words in quotes", v[1]);
-	EXPECT_EQ("words not in quotes", v[2]);
-	EXPECT_EQ("end", v[3]);
+    EXPECT_EQ(4, v.size());
+    EXPECT_EQ("/path/to", v[0]);
+    EXPECT_EQ("words in quotes", v[1]);
+    EXPECT_EQ("words not in quotes", v[2]);
+    EXPECT_EQ("end", v[3]);
 }
 
 TEST(StringTest, SplitByChar) {
     std::vector<std::string> v;
     kul::String::SPLIT("split - by - char - dash", '-', v);
-	EXPECT_EQ(4, v.size());
-	EXPECT_EQ("split ", v[0]);
-	EXPECT_EQ(" by ", v[1]);
-	EXPECT_EQ(" char ", v[2]);
-	EXPECT_EQ(" dash", v[3]);
+    EXPECT_EQ(4, v.size());
+    EXPECT_EQ("split ", v[0]);
+    EXPECT_EQ(" by ", v[1]);
+    EXPECT_EQ(" char ", v[2]);
+    EXPECT_EQ(" dash", v[3]);
 }
 
 TEST(StringTest, SplitByString) {
     std::vector<std::string> v;
     kul::String::SPLIT("split - by - char - dash", "-", v);
-	EXPECT_EQ(4, v.size());
-	EXPECT_EQ("split ", v[0]);
-	EXPECT_EQ(" by ", v[1]);
-	EXPECT_EQ(" char ", v[2]);
-	EXPECT_EQ(" dash", v[3]);
+    EXPECT_EQ(4, v.size());
+    EXPECT_EQ("split ", v[0]);
+    EXPECT_EQ(" by ", v[1]);
+    EXPECT_EQ(" char ", v[2]);
+    EXPECT_EQ(" dash", v[3]);
 }
 
 TEST(StringTest, SplitByEscapedChar) {
     std::vector<std::string> v;
     kul::String::ESC_SPLIT("split \\- by - char - dash", '-', v);
-	EXPECT_EQ(3, v.size());
-	EXPECT_EQ("split \\- by ", v[0]);
-	EXPECT_EQ(" char ", v[1]);
-	EXPECT_EQ(" dash", v[2]);
+    EXPECT_EQ(3, v.size());
+    EXPECT_EQ("split \\- by ", v[0]);
+    EXPECT_EQ(" char ", v[1]);
+    EXPECT_EQ(" dash", v[2]);
 }
 
 TEST(OperatingSystemTests, HasRAMUsageSupport) {
- 	ASSERT_TRUE(kul::this_proc::physicalMemory());
- 	ASSERT_TRUE(kul::this_proc::virtualMemory());
+    ASSERT_TRUE(kul::this_proc::physicalMemory());
+    ASSERT_TRUE(kul::this_proc::virtualMemory());
 }
 
 class TimeStampHandler{
-	private:
-		kul::File f;
-		kul::fs::TimeStamps fts;
-		TimeStampHandler() : f("mkn.yaml"), fts(f.timeStamps()){}
-	public:
-		static TimeStampHandler&  INSTANCE(){
-			static TimeStampHandler i;
-			return i;
-		}
-		bool is(){ return f.is(); }
-		const kul::fs::TimeStamps& timeStamps() { return fts; }
+    private:
+        kul::File f;
+        kul::fs::TimeStamps fts;
+        TimeStampHandler() : f("mkn.yaml"), fts(f.timeStamps()){}
+    public:
+        static TimeStampHandler&  INSTANCE(){
+            static TimeStampHandler i;
+            return i;
+        }
+        bool is(){ return f.is(); }
+        const kul::fs::TimeStamps& timeStamps() { return fts; }
 };
 
 TEST(OperatingSystemTests, HasFileAccessedTimeStampSupport) {
-  	ASSERT_TRUE(TimeStampHandler::INSTANCE().is());
- 	ASSERT_TRUE(TimeStampHandler::INSTANCE().timeStamps().accessed());
+    ASSERT_TRUE(TimeStampHandler::INSTANCE().is());
+    ASSERT_TRUE(TimeStampHandler::INSTANCE().timeStamps().accessed());
 }
 
 TEST(OperatingSystemTests, HasFileCreatedTimeStampSupport) {
-  	ASSERT_TRUE(TimeStampHandler::INSTANCE().is());
- 	ASSERT_TRUE(TimeStampHandler::INSTANCE().timeStamps().created());
+    ASSERT_TRUE(TimeStampHandler::INSTANCE().is());
+    ASSERT_TRUE(TimeStampHandler::INSTANCE().timeStamps().created());
 }
 
 TEST(OperatingSystemTests, HasFileModifiedTimeStampSupport) {
-  	ASSERT_TRUE(TimeStampHandler::INSTANCE().is());
- 	ASSERT_TRUE(TimeStampHandler::INSTANCE().timeStamps().modified());
+    ASSERT_TRUE(TimeStampHandler::INSTANCE().is());
+    ASSERT_TRUE(TimeStampHandler::INSTANCE().timeStamps().modified());
 }
 
 

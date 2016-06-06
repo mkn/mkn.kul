@@ -35,44 +35,44 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "kul/cli.hpp"
 
 void createDeleteFile(benchmark::State& state) {
-  	while (state.KeepRunning()) {
-  		kul::File f("tmp.tmp");
-  		f.mk();
-  		f.rm();
-  	}
+    while (state.KeepRunning()) {
+        kul::File f("tmp.tmp");
+        f.mk();
+        f.rm();
+    }
 }
 BENCHMARK(createDeleteFile)->Unit(benchmark::kMicrosecond);
 
 void parseStringAsCommandLineArguments(benchmark::State& state) {
-  	while (state.KeepRunning()) {
+    while (state.KeepRunning()) {
         std::vector<std::string> v;
         kul::cli::asArgs("/path/to \"words in quotes\" words\\ not\\ in\\ quotes end", v);
-  	}
+    }
 }
 BENCHMARK(parseStringAsCommandLineArguments)->Unit(benchmark::kMicrosecond);
 
 void splitStringByChar(benchmark::State& state) {
-  	while (state.KeepRunning()) {
+    while (state.KeepRunning()) {
         std::vector<std::string> v;
         kul::String::SPLIT("split - by - char - dash", '-', v);
             
-  	}
+    }
 }
 BENCHMARK(splitStringByChar)->Unit(benchmark::kMicrosecond);
 
 void splitStringByString(benchmark::State& state) {
-  	while (state.KeepRunning()) {
+    while (state.KeepRunning()) {
         std::vector<std::string> v;
         kul::String::SPLIT("split - by - char - dash", "-", v);
-  	}
+    }
 }
 BENCHMARK(splitStringByString)->Unit(benchmark::kMicrosecond);
 
 void splitStringByEscapedChar(benchmark::State& state) {
-  	while (state.KeepRunning()) {
+    while (state.KeepRunning()) {
         std::vector<std::string> v;
         kul::String::ESC_SPLIT("split \\- by - char - dash", '-', v);
-  	}
+    }
 }
 BENCHMARK(splitStringByEscapedChar)->Unit(benchmark::kMicrosecond);
 
