@@ -27,3 +27,7 @@ profile:
     - name: google.benchmark
       version: master
     main: bench.cpp
+
+  - name: usage
+    parent: cmn
+    main: usage.cpp
