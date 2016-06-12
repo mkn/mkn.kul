@@ -35,7 +35,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include  <signal.h>
 
+#ifdef HAVE_EXECINFO_H
 #include <execinfo.h>
+#endif /* HAVE_EXECINFO_H */
+
 #ifndef   __USE_GNU
 #define   __USE_GNU
 #endif /* __USE_GNU */
@@ -106,6 +109,7 @@ class Signal{
 }
 
 void kul_sig_handler(int s, siginfo_t* info, void* v) {
+#ifdef HAVE_EXECINFO_H
     if(info->si_pid == 0 || info->si_pid == kul::this_proc::id()){
         // if(s == SIGABRT) for(auto& f : kul::SignalStatic::INSTANCE().ab ) f(s);
         if(s == SIGINT ) for(auto& f : kul::SignalStatic::INSTANCE().in ) f(s);
@@ -150,7 +154,9 @@ void kul_sig_handler(int s, siginfo_t* info, void* v) {
         }
         exit(s);
     }
+#endif /* HAVE_EXECINFO_H */
 }
+
 
 namespace kul{ 
 
