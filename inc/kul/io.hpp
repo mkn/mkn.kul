@@ -49,35 +49,35 @@ class Exception : public kul::Exception{
 
 class AReader{
     private:
-        std::unique_ptr<std::string> str;
+        std::string s1;
+        // std::unique_ptr<std::string> str;
     protected:
-        const std::string* readLine(std::ifstream& f){
-            str.reset();
+        const char* readLine(std::ifstream& f){
+            s1.clear();
             if(f.good()){
-                std::string s;
-                std::getline(f, s);
-                str = std::make_unique<std::string>(s);
+                std::getline(f, s1);
+                return s1.c_str();
             }
-            return str.get();
+            return 0;
         }
-        const std::string* read(std::ifstream& f, const uint16_t& s){
-            str.reset();
+        const char* read(std::ifstream& f, const uint16_t& l){
             if(f.good()){
                 std::vector<char> v;
-                v.resize(s);
-                f.read(&v[0], s);
+                v.resize(l);
+                f.read(&v[0], l);
                 v.resize((uint16_t)f.gcount());
-                str = std::make_unique<std::string>(std::string(v.begin(), v.end()));
+                // str = std::make_unique<std::string>(std::string(v.begin(), v.end()));
+                return &v[0];
             }
-            return str.get();
+            return 0;
         }
     public:
         virtual ~AReader(){}
-        virtual const std::string* readLine() = 0;
-        virtual const std::string* read(const uint16_t& s) = 0;
-        virtual void seek(const uint16_t& s) = 0;
-        virtual void seek(std::ifstream& f, const uint16_t& s){
-            f.seekg(s);
+        virtual const char* readLine() = 0;
+        virtual const char* read(const uint16_t& l) = 0;
+        virtual void seek(const uint16_t& l) = 0;
+        virtual void seek(std::ifstream& f, const uint16_t& l){
+            f.seekg(l);
         }
 };
 class Reader : public AReader{
@@ -89,14 +89,14 @@ class Reader : public AReader{
         }
         Reader(const File& c) : Reader(c.full().c_str()){}
         ~Reader() { f.close();}
-        const std::string* readLine(){
+        const char* readLine(){
             return AReader::readLine(f);
         }
-        const std::string* read(const uint16_t& s){
-            return AReader::read(f, s);
+        const char* read(const uint16_t& l){
+            return AReader::read(f, l);
         }
-        void seek(const uint16_t& s){
-            AReader::seek(f, s);
+        void seek(const uint16_t& l){
+            AReader::seek(f, l);
         }
 };
 class BinaryReader : public AReader{
@@ -108,10 +108,10 @@ class BinaryReader : public AReader{
         }
         BinaryReader(const File& c) : BinaryReader(c.full().c_str()){}
         ~BinaryReader() { f.close();}
-        const std::string* readLine(){
+        const char* readLine(){
             return AReader::readLine(f);
         }
-        const std::string* read(const uint16_t& s){
+        const char* read(const uint16_t& s){
             return AReader::read(f, s);
         }
         void seek(const uint16_t& s){

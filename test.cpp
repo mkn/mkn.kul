@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
+#include "kul/io.hpp"
 #include "kul/os.hpp"
 #include "kul/cli.hpp"
 #include "kul/log.hpp"
@@ -74,6 +75,26 @@ TEST(StringTest, SplitByEscapedChar) {
     EXPECT_EQ("split \\- by ", v[0]);
     EXPECT_EQ(" char ", v[1]);
     EXPECT_EQ(" dash", v[2]);
+}
+
+TEST(IOTest, ReadFile) {
+    kul::io::Reader r("LICENSE.md");
+    const char* c = 0;
+    c = r.readLine();
+    std::string s1 = c, s2;
+    while((c = r.readLine())) s2 = c;
+    EXPECT_EQ("Copyright (c) 2013, Philip Deegan.", s1);
+    EXPECT_EQ("OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.", s2);
+}
+
+TEST(IOTest, ReadBinaryFile) {
+    kul::io::BinaryReader r("LICENSE.md");
+    const char* c = 0;
+    c = r.readLine();
+    std::string s1 = c, s2;
+    while((c = r.readLine())) s2 = c;
+    EXPECT_EQ("Copyright (c) 2013, Philip Deegan.\r", s1);
+    EXPECT_EQ("OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.", s2);
 }
 
 TEST(OperatingSystemTests, HasRAMUsageSupport) {
