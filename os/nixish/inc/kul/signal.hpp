@@ -151,8 +151,8 @@ void kul_sig_handler(int s, siginfo_t* info, void* v) {
                 }
             }
         }
-        exit(s);
 #endif /* HAVE_EXECINFO_H */
+        exit(s);
     }
 }
 
