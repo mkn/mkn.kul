@@ -2,10 +2,10 @@
 
 name: mkn.kul
 
-parent: cmn
+parent: lib
 
 profile:
-  - name: cmn
+  - name: lib
     inc: ./inc ./os/${OS}/inc
     dep:
     - name: google.sparsehash
@@ -15,19 +15,19 @@ profile:
       nix: ./os/nixish/inc
 
   - name: test 
-    parent: cmn
+    parent: lib
     dep:
     - name: google.test
       version: master
     main: test.cpp
 
   - name: bench 
-    parent: cmn
+    parent: lib
     dep:
     - name: google.benchmark
       version: master
     main: bench.cpp
 
   - name: usage
-    parent: cmn
+    parent: lib
     main: usage.cpp
