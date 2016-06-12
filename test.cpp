@@ -93,7 +93,11 @@ TEST(IOTest, ReadBinaryFile) {
     c = r.readLine();
     std::string s1 = c, s2;
     while((c = r.readLine())) s2 = c;
+#ifdef _WIN32
     EXPECT_EQ("Copyright (c) 2013, Philip Deegan.\r", s1);
+#else
+    EXPECT_EQ("Copyright (c) 2013, Philip Deegan.", s1);
+#endif
     EXPECT_EQ("OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.", s2);
 }
 
@@ -120,12 +124,12 @@ TEST(OperatingSystemTests, HasFileAccessedTimeStampSupport) {
     ASSERT_TRUE(TimeStampHandler::INSTANCE().is());
     ASSERT_TRUE(TimeStampHandler::INSTANCE().timeStamps().accessed());
 }
-
+#ifdef _WIN32
 TEST(OperatingSystemTests, HasFileCreatedTimeStampSupport) {
     ASSERT_TRUE(TimeStampHandler::INSTANCE().is());
     ASSERT_TRUE(TimeStampHandler::INSTANCE().timeStamps().created());
 }
-
+#endif
 TEST(OperatingSystemTests, HasFileModifiedTimeStampSupport) {
     ASSERT_TRUE(TimeStampHandler::INSTANCE().is());
     ASSERT_TRUE(TimeStampHandler::INSTANCE().timeStamps().modified());
