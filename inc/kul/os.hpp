@@ -339,9 +339,9 @@ class File : public fs::Item {
         File(const std::string& n, const std::string& d1) : _n(n), _d(d1){}
         File(const File& f) : _n(f._n), _d(f._d){}
 
-        bool cp(const Dir& f) const{
-            if(!_d.is() && !_d.mk()) KEXCEPT(fs::Exception, "Directory: \"" + _d.path() + "\" is not valid");
-            return cp(kul::File(name(), _d));
+        bool cp(const Dir& d) const{
+            if(!d.is() && !d.mk()) KEXCEPT(fs::Exception, "Directory: \"" + _d.path() + "\" is not valid");
+            return cp(kul::File(name(), d._p));
         }
         bool cp(const File& f) const{
             std::ifstream src(_d.join(_n), std::ios::binary);
@@ -387,6 +387,9 @@ class File : public fs::Item {
         }
         bool mv(const File& f) const{
             return std::rename(this->full().c_str(), f.full().c_str());
+        }
+        bool mv(const Dir& d) const{
+            return std::rename(this->full().c_str(), d.join(this->name()).c_str());
         }
 
         const std::string& name() const { return _n; }
