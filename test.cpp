@@ -77,20 +77,27 @@ TEST(StringTest, SplitByEscapedChar) {
     EXPECT_EQ(" dash", v[2]);
 }
 
-TEST(IOTest, ReadFile) {
+TEST(IOTest, ReadFileLine) {
     kul::io::Reader r("LICENSE.md");
-    const char* c = 0;
-    c = r.readLine();
+    const char* c = r.readLine();
     std::string s1 = c, s2;
     while((c = r.readLine())) s2 = c;
     EXPECT_EQ("Copyright (c) 2013, Philip Deegan.", s1);
     EXPECT_EQ("OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.", s2);
 }
+TEST(IOTest, ReadFile) {
+    kul::io::Reader r("LICENSE.md");
+    const char* c = r.read(20);
+    std::string s1 = c;
+    std::stringstream ss;
+    while((c = r.read(20))) { ss << c; break; }
+    EXPECT_EQ("Copyright (c) 2013, ", s1);
+    EXPECT_EQ("Philip Deegan.\nAll r", ss.str());
+}
 
-TEST(IOTest, ReadBinaryFile) {
+TEST(IOTest, ReadBinaryFileLine) {
     kul::io::BinaryReader r("LICENSE.md");
-    const char* c = 0;
-    c = r.readLine();
+    const char* c = r.readLine();
     std::string s1 = c, s2;
     while((c = r.readLine())) s2 = c;
 #ifdef _WIN32
@@ -99,6 +106,15 @@ TEST(IOTest, ReadBinaryFile) {
     EXPECT_EQ("Copyright (c) 2013, Philip Deegan.", s1);
 #endif
     EXPECT_EQ("OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.", s2);
+}
+TEST(IOTest, ReadBinaryFile) {
+    kul::io::Reader r("LICENSE.md");
+    const char* c = r.read(20);
+    std::string s1 = c;
+    std::stringstream ss;
+    while((c = r.read(20))) { ss << c; break; }
+    EXPECT_EQ("Copyright (c) 2013, ", s1);
+    EXPECT_EQ("Philip Deegan.\nAll r", ss.str());
 }
 
 TEST(OperatingSystemTests, HasRAMUsageSupport) {

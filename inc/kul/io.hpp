@@ -50,7 +50,6 @@ class Exception : public kul::Exception{
 class AReader{
     private:
         std::string s1;
-        // std::unique_ptr<std::string> str;
     protected:
         const char* readLine(std::ifstream& f){
             s1.clear();
@@ -61,13 +60,14 @@ class AReader{
             return 0;
         }
         const char* read(std::ifstream& f, const uint16_t& l){
+            s1.clear();
             if(f.good()){
                 std::vector<char> v;
                 v.resize(l);
                 f.read(&v[0], l);
                 v.resize((uint16_t)f.gcount());
-                // str = std::make_unique<std::string>(std::string(v.begin(), v.end()));
-                return &v[0];
+                s1 = std::string(v.begin(), v.end());
+                return s1.c_str();
             }
             return 0;
         }
