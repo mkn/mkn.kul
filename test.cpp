@@ -41,7 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 TEST(StringTest, ParseCommandLineArguments) {
     std::vector<std::string> v;
     kul::cli::asArgs("/path/to \"words in quotes\" words\\ not\\ in\\ quotes end", v);
-    EXPECT_EQ(4, v.size());
+    EXPECT_EQ((size_t) 4, v.size());
     EXPECT_EQ("/path/to", v[0]);
     EXPECT_EQ("words in quotes", v[1]);
     EXPECT_EQ("words not in quotes", v[2]);
@@ -51,7 +51,7 @@ TEST(StringTest, ParseCommandLineArguments) {
 TEST(StringTest, SplitByChar) {
     std::vector<std::string> v;
     kul::String::SPLIT("split - by - char - dash", '-', v);
-    EXPECT_EQ(4, v.size());
+    EXPECT_EQ((size_t) 4, v.size());
     EXPECT_EQ("split ", v[0]);
     EXPECT_EQ(" by ", v[1]);
     EXPECT_EQ(" char ", v[2]);
@@ -61,7 +61,7 @@ TEST(StringTest, SplitByChar) {
 TEST(StringTest, SplitByString) {
     std::vector<std::string> v;
     kul::String::SPLIT("split - by - char - dash", "-", v);
-    EXPECT_EQ(4, v.size());
+    EXPECT_EQ((size_t) 4, v.size());
     EXPECT_EQ("split ", v[0]);
     EXPECT_EQ(" by ", v[1]);
     EXPECT_EQ(" char ", v[2]);
@@ -71,7 +71,7 @@ TEST(StringTest, SplitByString) {
 TEST(StringTest, SplitByEscapedChar) {
     std::vector<std::string> v;
     kul::String::ESC_SPLIT("split \\- by - char - dash", '-', v);
-    EXPECT_EQ(3, v.size());
+    EXPECT_EQ((size_t) 3, v.size());
     EXPECT_EQ("split \\- by ", v[0]);
     EXPECT_EQ(" char ", v[1]);
     EXPECT_EQ(" dash", v[2]);
