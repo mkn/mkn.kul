@@ -40,7 +40,7 @@ Logging DateTime format, reference: http://en.cppreference.com/w/cpp/chrono/c/st
 "%i" is custom for milliseconds, method strftime is used for all other
 
 Key             __KUL_THREAD_SPAWN_WAIT__
-Type             number
+Type            number
 Default
     nix/bsd     5000000
     win         0
@@ -56,3 +56,10 @@ Description
 Turns on error checking for creating new processes when running - 
     fcntl(fd, F_SETFL, O_NONBLOCK);
 Can be an issue being on when running many processes rapidly.
+
+Key             __KUL_PROC_DUP_RETRY__ 
+Type            number
+Default         3
+OS              nix/bsd
+Description
+Allows N retries for "dup(fileDescriptor") calls in forked process.

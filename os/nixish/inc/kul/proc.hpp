@@ -41,6 +41,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "kul/log.hpp"
 #include "kul/proc.os.hpp"
 
+#ifndef __KUL_PROC_DUP_RETRY__
+#define __KUL_PROC_DUP_RETRY__ 3
+#endif  __KUL_PROC_DUP_RETRY__
+
 namespace kul {
 
 namespace this_proc{
@@ -220,12 +224,20 @@ class Process : public kul::AProcess{
                 close(errFd[0]);
 
                 int16_t ret = 0; //check rets
+                int8_t retry = __KUL_PROC_DUP_RETRY__;
+                if(retry < 0) retry = 1;
+
                 close(0);
-                if((ret = dup(inFd[0])) < 0)    error(__LINE__, "dup in call failed");
+                for(uint8_t i = 0; i < retry; i++) if((ret = dup(inFd[0])) >= 0) break;
+                if(ret < 0) error(__LINE__, "dup in call failed");
+
                 close(1);
-                if((ret = dup(outFd[1])) < 0)   error(__LINE__, "dup out call failed");
+                for(uint8_t i = 0; i < retry; i++) if((ret = dup(outFd[1])) >= 0) break;
+                if(ret < 0) error(__LINE__, "dup out call failed");
+                
                 close(2);
-                if((ret = dup(errFd[1])) < 0)   error(__LINE__, "dup err call failed");
+                for(uint8_t i = 0; i < retry; i++) if((ret = dup(errFd[1])) >= 0) break;
+                if(ret < 0) error(__LINE__, "dup err call failed");
 
                 /* SETUP EnvVars */ // SET ENV, it's a forked process so it doesn't matter - it'll die soon, like you.
                 for(const std::pair<const std::string, const std::string>& ev : vars())

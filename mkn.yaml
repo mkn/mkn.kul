@@ -5,14 +5,23 @@ name: mkn.kul
 parent: lib
 
 profile:
-  - name: lib
+  - name: base
     inc: ./inc ./os/${OS}/inc
-    dep:
-    - name: google.sparsehash
-      version: master
     if_inc:
-      bsd: ./os/nixish/inc
-      nix: ./os/nixish/inc
+        bsd: ./os/nixish/inc
+        nix: ./os/nixish/inc
+
+  - name: lib
+    parent: base
+    dep:
+      - name: google.sparsehash
+        version: master
+
+  - name: c++0x
+    parent: base
+    dep:
+      - name: google.sparsehash
+        version: c++0x
 
   - name: test 
     parent: lib
