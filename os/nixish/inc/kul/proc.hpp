@@ -225,7 +225,7 @@ class Process : public kul::AProcess{
 
                 int16_t ret = 0; //check rets
                 int8_t retry = __KUL_PROC_DUP_RETRY__;
-                if(retry < 0) retry = 1;
+                if(retry < 1) retry = 1;
 
                 close(0);
                 for(uint8_t i = 0; i < retry; i++) if((ret = dup(inFd[0])) >= 0) break;
