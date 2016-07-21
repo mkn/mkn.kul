@@ -156,7 +156,7 @@ class AProcess{
             return *this; 
         }
         AProcess& arg(const std::string& a) { if(a.size()) argv.push_back(a); return *this; }
-        AProcess& var(const std::string& n, const std::string& v) { evs.insert(n, v); return *this;}
+        AProcess& var(const std::string& n, const std::string& v) { evs[n] = v; return *this;}
         virtual void start() throw(kul::Exception){
             if(this->s) KEXCEPT(kul::proc::Exception, "Process is already started");
             this->s = true;

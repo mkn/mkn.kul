@@ -70,6 +70,9 @@ class GCCompiler : public CCompiler{
             const std::string& out, 
             const Mode& mode) const throw (kul::Exception) {
 
+            kul::hash::set::String dirs;
+            for(const auto& o : objects) dirs.insert(kul::File(o).dir().mini());
+
             std::string cmd = linker;
             std::vector<std::string> bits;
             if(linker.find(" ") != std::string::npos){
@@ -81,7 +84,7 @@ class GCCompiler : public CCompiler{
             for(const std::string& path : libPaths) p.arg("-L" + path);
             if(mode == Mode::STAT) p.arg("-static");
             p.arg("-o").arg(out);
-            for(const std::string& o : objects) p.arg(o);
+            for(const std::string& d : dirs) p.arg(kul::Dir(d).join("*.obj"));
             for(const std::string& lib : libs)  p.arg("-l" + lib);
             for(const std::string& s: kul::cli::asArgs(linkerEnd)) p.arg(s);
             
@@ -104,6 +107,9 @@ class GCCompiler : public CCompiler{
             const kul::File& out, 
             const Mode& mode) const throw (kul::Exception) {
 
+            kul::hash::set::String dirs;
+            for(const auto& o : objects) dirs.insert(kul::File(o).dir().mini());
+
             std::string lib = out.dir().join(sharedLib(out.name()));
             if(mode == Mode::STAT) lib = out.dir().join(staticLib(out.name()));
             lib = kul::File(lib).escm();
@@ -115,9 +121,9 @@ class GCCompiler : public CCompiler{
             }
             kul::Process p(cmd);
             for(unsigned int i = 1; i < bits.size(); i++) p.arg(bits[i]);
-            if(mode == Mode::SHAR)      p.arg("-shared").arg("-o");
+            if(mode == Mode::SHAR) p.arg("-shared").arg("-o");
             p.arg(lib);
-            for(const std::string& o : objects) p.arg(o);
+            for(const std::string& d : dirs) p.arg(kul::Dir(d).join("*.obj"));
             for(const std::string& s: kul::cli::asArgs(linkerEnd)) p.arg(s);
             CompilerProcessCapture pc;
             try{
@@ -284,7 +290,6 @@ class WINCompiler : public CCompiler{
 
             kul::hash::set::String dirs;
             for(const auto& o : objects) dirs.insert(kul::File(o).dir().mini());
-
 
             std::string lib = out.dir().join(sharedLib(out.name()));
             if(mode == Mode::STAT) lib = out.dir().join(staticLib(out.name()));

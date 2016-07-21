@@ -73,11 +73,12 @@ enum EnvVarMode{ APPE = 0, PREP, REPL};
 
 class EnvVar{
     private:
-        const std::string n;
-        const std::string v;
-        const EnvVarMode m;
+        std::string n;
+        std::string v;
+        EnvVarMode m;
     public:
         EnvVar(const std::string n, const std::string v, const EnvVarMode m) : n(n), v(v), m(m){}
+        EnvVar(const EnvVar& e)  : n(e.n), v(e.v), m(e.m){}
         const char*         name()      const { return n.c_str(); }
         const char*         value()     const { return v.c_str(); }
         EnvVarMode          mode()      const { return m; }
@@ -93,6 +94,12 @@ class EnvVar{
                     var = ev + kul::env::SEP() + var;
             }
             return var;
+        }
+        EnvVar& operator=(EnvVar&& e) { 
+            std::swap(m, e.m);
+            std::swap(n, e.n);
+            std::swap(v, e.v);
+            return *this; 
         }
 };
 
