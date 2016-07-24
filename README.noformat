@@ -16,6 +16,30 @@ view inc/usage.hpp
 
 License: BSD
 
+Environment variables
+
+Key             KLOG 
+Type            number or string
+Default         0 / NON
+Description - Enable logging with level given
+	Values include
+		0 / NON
+		1 / INF
+		2 / ERR
+		3 / DBG
+Used by macros KOUT and KLOG : see inc/usage.hpp
+
+Key             KUL_GIT_CO 
+Type            string
+Default         ""
+Description - Add string to git clone as arguments
+
+Key             KUL_SVN_CO 
+Type            string
+Default         ""
+Description - Add string to svn checkout as arguments
+
+
 Switches - OSX is considered BSD for swiches unless otherwise noted
  
 Key             __KUL_LOG_FRMT__ 

@@ -74,7 +74,7 @@ class Git : public SCM{
         const std::string co(const std::string& d, const std::string& r, const std::string& v) const throw(Exception){
             Dir dr(d, true);
             kul::Process p("git");
-            p.arg("clone").arg(r);
+            p << "clone" << kul::env::GET("KUL_GIT_CO") << r;
             if(!v.empty()) p.arg("-b").arg(v);
             try{
                 p.arg(d).start();
@@ -186,7 +186,7 @@ class Svn : public SCM{
         const std::string co(const std::string& d, const std::string& r, const std::string& v) const throw(Exception){
             Dir dr(d, true);
             kul::Process p("svn", d);
-            p.arg("checkout");
+            p.arg("checkout").arg(kul::env::GET("KUL_SVN_CO"));
             if(v.empty()) p.arg(r);
             else p.arg(r + "/" + v);
             try{

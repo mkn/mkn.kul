@@ -155,7 +155,10 @@ class AProcess{
             if(ss.str().size()) argv.push_back(ss.str());
             return *this; 
         }
-        AProcess& arg(const std::string& a) { if(a.size()) argv.push_back(a); return *this; }
+        AProcess& arg(const std::string& a) { 
+            if(a.size()) for(const auto& c : kul::cli::asArgs(a)) argv.push_back(c); 
+            return *this; 
+        }
         AProcess& var(const std::string& n, const std::string& v) { evs[n] = v; return *this;}
         virtual void start() throw(kul::Exception){
             if(this->s) KEXCEPT(kul::proc::Exception, "Process is already started");
@@ -179,6 +182,10 @@ class AProcess{
         void setOut(std::function<void(std::string)> o) { this->o = o; }
         void setErr(std::function<void(std::string)> e) { this->e = e; }
         const int32_t& exitCode(){ return pec; }
+        AProcess& operator<<(const std::string& s){
+            arg(s);
+            return *this;
+        }
 };
 
 inline std::ostream& operator<<(std::ostream &s, const AProcess &p){
