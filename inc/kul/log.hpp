@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace kul{ namespace log{
 
-enum mode { NON = 0, INF, ERR, DBG};
+enum mode { OFF = -1, NON = 0, INF, ERR, DBG};
 
 class Exception : public kul::Exception{
     public:
@@ -100,10 +100,11 @@ class LogMan{
             std::string s(kul::env::GET("KLOG"));
             if(s.size()){
                 kul::String::TRIM(s);
-                if     (s == "0" || s == "NON") m = log::mode::NON;
-                else if(s == "1" || s == "INF") m = log::mode::INF;
-                else if(s == "2" || s == "ERR") m = log::mode::ERR;
-                else if(s == "3" || s == "DBG") m = log::mode::DBG;
+                if     (s == "-1" || s == "OFF") m = log::mode::OFF;
+                else if(s == "0"  || s == "NON") m = log::mode::NON;
+                else if(s == "1"  || s == "INF") m = log::mode::INF;
+                else if(s == "2"  || s == "ERR") m = log::mode::ERR;
+                else if(s == "3"  || s == "DBG") m = log::mode::DBG;
                 else {
                     m = log::mode::ERR;
                     out(m, "ERROR DISCERNING LOG LEVEL, ERROR LEVEL IN USE");
@@ -115,6 +116,7 @@ class LogMan{
             static LogMan instance;
             return instance;
         };
+        void setMode(const log::mode& m1) { m = m1; }
         bool inf(){ return m >= log::INF;}
         bool err(){ return m >= log::ERR;}
         bool dbg(){ return m >= log::DBG;}

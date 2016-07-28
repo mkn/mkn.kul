@@ -48,11 +48,11 @@ class Compiler;
 class CompilerProcessCapture : public kul::ProcessCapture{
     private:
         std::exception_ptr ep;
-        std::string c, t;
+        std::string c, f;
     public:
         CompilerProcessCapture() : ep(){}
         CompilerProcessCapture(kul::AProcess& p) : kul::ProcessCapture(p), ep(){}
-        CompilerProcessCapture(const CompilerProcessCapture& cp) : kul::ProcessCapture(cp), ep(cp.ep), c(cp.c), t(cp.t){}
+        CompilerProcessCapture(const CompilerProcessCapture& cp) : kul::ProcessCapture(cp), ep(cp.ep), c(cp.c), f(cp.f){}
 
         void exception(const std::exception_ptr& e) { ep = e; }
         const std::exception_ptr& exception() const { return ep; }
@@ -60,8 +60,8 @@ class CompilerProcessCapture : public kul::ProcessCapture{
         void cmd(const std::string& cm) { this->c = cm; }
         const std::string& cmd() const  { return c; }
 
-        void tmp(const std::string& tm) { this->t = tm; }
-        const std::string& tmp() const  { return t; }
+        void file(const std::string& f) { this->f = f; }
+        const std::string& file() const  { return f; }
 };
 
 class Compiler{ 
@@ -78,7 +78,8 @@ class Compiler{
             const std::vector<std::string>& libs,
             const std::vector<std::string>& libPaths,
             const std::string& out, 
-            const Mode& mode)           const throw (kul::Exception) = 0;
+            const Mode& mode,
+            bool dryRun = false)           const throw (kul::Exception) = 0;
         virtual const CompilerProcessCapture buildLibrary(
             const std::string& linker, 
             const std::string& linkerEnd,
@@ -86,19 +87,22 @@ class Compiler{
             const std::vector<std::string>& libs,
             const std::vector<std::string>& libPaths,
             const kul::File& out, 
-            const Mode& mode)           const throw (kul::Exception) = 0;
+            const Mode& mode,
+            bool dryRun = false)           const throw (kul::Exception) = 0;
         virtual const CompilerProcessCapture compileSource  (
             const std::string& compiler,
             const std::vector<std::string>& args,       
             const std::vector<std::string>& incs, 
             const std::string& in, 
             const std::string& out, 
-            const Mode& mode)   const throw (kul::Exception) = 0;
+            const Mode& mode,
+            bool dryRun = false)   const throw (kul::Exception) = 0;
         virtual void preCompileHeader(
             const std::vector<std::string>& incs, 
             const hash::set::String& args, 
             const std::string& in, 
-            const std::string& out)     const throw (kul::Exception) = 0;
+            const std::string& out,
+            bool dryRun = false)     const throw (kul::Exception) = 0;
 };
 
 }}

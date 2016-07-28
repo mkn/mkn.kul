@@ -68,10 +68,11 @@ class GCCompiler : public CCompiler{
             const std::vector<std::string>& libs,
             const std::vector<std::string>& libPaths,
             const std::string& out, 
-            const Mode& mode) const throw (kul::Exception) {
+            const Mode& mode,
+            bool dryRun = false) const throw (kul::Exception) {
 
             kul::hash::set::String dirs;
-            for(const auto& o : objects) dirs.insert(kul::File(o).dir().mini());
+            for(const auto& o : objects) dirs.insert(kul::File(o).dir().real());
 
             std::string cmd = linker;
             std::vector<std::string> bits;
@@ -90,11 +91,11 @@ class GCCompiler : public CCompiler{
             
             CompilerProcessCapture pc;
             try{
-                p.start();
+                if(!dryRun) p.start();
             }catch(const kul::proc::Exception& e){
                 pc.exception(std::current_exception());
             }
-            pc.tmp(out);
+            pc.file(out);
             pc.cmd(p.toString());
             return pc; 
         }
@@ -105,10 +106,11 @@ class GCCompiler : public CCompiler{
             const std::vector<std::string>& libs,
             const std::vector<std::string>& libPaths,
             const kul::File& out, 
-            const Mode& mode) const throw (kul::Exception) {
+            const Mode& mode,
+            bool dryRun = false) const throw (kul::Exception) {
 
             kul::hash::set::String dirs;
-            for(const auto& o : objects) dirs.insert(kul::File(o).dir().mini());
+            for(const auto& o : objects) dirs.insert(kul::File(o).dir().real());
 
             std::string lib = out.dir().join(sharedLib(out.name()));
             if(mode == Mode::STAT) lib = out.dir().join(staticLib(out.name()));
@@ -127,11 +129,11 @@ class GCCompiler : public CCompiler{
             for(const std::string& s: kul::cli::asArgs(linkerEnd)) p.arg(s);
             CompilerProcessCapture pc;
             try{
-                p.start();
+                if(!dryRun) p.start();
             }catch(const kul::proc::Exception& e){
                 pc.exception(std::current_exception());
             }
-            pc.tmp(lib);
+            pc.file(lib);
             pc.cmd(p.toString());
             return pc; 
         }
@@ -141,7 +143,8 @@ class GCCompiler : public CCompiler{
             const std::vector<std::string>& incs,
             const std::string& in, 
             const std::string& out, 
-            const Mode& mode) const throw (kul::Exception){ 
+            const Mode& mode,
+            bool dryRun = false) const throw (kul::Exception){ 
 
             std::string cmd = compiler;
             std::vector<std::string> bits;
@@ -157,11 +160,11 @@ class GCCompiler : public CCompiler{
             CompilerProcessCapture pc;
             if(!kul::LogMan::INSTANCE().inf()) pc.setProcess(p);
             try{
-                p.start();
+                if(!dryRun) p.start();
             }catch(const kul::proc::Exception& e){
                 pc.exception(std::current_exception());
             }
-            pc.tmp(out);
+            pc.file(out);
             pc.cmd(p.toString());
             return pc;
         }
@@ -169,7 +172,8 @@ class GCCompiler : public CCompiler{
             const std::vector<std::string>& incs,
             const hash::set::String& args, 
             const std::string& in, 
-            const std::string& out)     const throw (kul::Exception) {
+            const std::string& out,
+            bool dryRun = false)     const throw (kul::Exception) {
 
             using namespace kul;
             
@@ -248,12 +252,13 @@ class WINCompiler : public CCompiler{
             const std::vector<std::string>& libs,
             const std::vector<std::string>& libPaths,
             const std::string& out, 
-            const Mode& mode) const throw (kul::Exception){ 
+            const Mode& mode,
+            bool dryRun = false) const throw (kul::Exception){ 
 
             std::string exe = out + ".exe";
 
             kul::hash::set::String dirs;
-            for(const auto& o : objects) dirs.insert(kul::File(o).dir().mini());
+            for(const auto& o : objects) dirs.insert(kul::File(o).dir().real());
 
             std::string cmd = linker;
             std::vector<std::string> bits;
@@ -271,11 +276,11 @@ class WINCompiler : public CCompiler{
 
             CompilerProcessCapture pc;
             try{
-                p.start();
+                if(!dryRun) p.start();
             }catch(const kul::proc::Exception& e){
                 pc.exception(std::current_exception());
             }
-            pc.tmp(exe);
+            pc.file(exe);
             pc.cmd(p.toString());
             return pc; 
         }
@@ -286,10 +291,11 @@ class WINCompiler : public CCompiler{
             const std::vector<std::string>& libs,
             const std::vector<std::string>& libPaths,
             const kul::File& out, 
-            const Mode& mode) const throw (kul::Exception) {
+            const Mode& mode,
+            bool dryRun = false) const throw (kul::Exception) {
 
             kul::hash::set::String dirs;
-            for(const auto& o : objects) dirs.insert(kul::File(o).dir().mini());
+            for(const auto& o : objects) dirs.insert(kul::File(o).dir().real());
 
             std::string lib = out.dir().join(sharedLib(out.name()));
             if(mode == Mode::STAT) lib = out.dir().join(staticLib(out.name()));
@@ -312,11 +318,11 @@ class WINCompiler : public CCompiler{
             for(const std::string& s: kul::cli::asArgs(linkerEnd)) p.arg(s);
             CompilerProcessCapture pc;
             try{
-                p.start();
+                if(!dryRun) p.start();
             }catch(const kul::proc::Exception& e){
                 pc.exception(std::current_exception());
             }
-            pc.tmp(lib);
+            pc.file(lib);
             pc.cmd(p.toString());
             return pc; 
         }
@@ -326,7 +332,8 @@ class WINCompiler : public CCompiler{
             const std::vector<std::string>& incs,
             const std::string& in, 
             const std::string& out, 
-            const Mode& mode) const throw (kul::Exception){ 
+            const Mode& mode,
+            bool dryRun = false) const throw (kul::Exception){ 
 
             std::string cmd = compiler;
             std::vector<std::string> bits;
@@ -343,11 +350,11 @@ class WINCompiler : public CCompiler{
             CompilerProcessCapture pc;
             if(!kul::LogMan::INSTANCE().inf()) pc.setProcess(p);
             try{
-                p.start();
+                if(!dryRun) p.start();
             }catch(const kul::Exception& e){
                 pc.exception(std::current_exception());
             }
-            pc.tmp(out);
+            pc.file(out);
             pc.cmd(p.toString());
             return pc;
         }
@@ -355,7 +362,8 @@ class WINCompiler : public CCompiler{
             const std::vector<std::string>& incs,
             const hash::set::String& args, 
             const std::string& in, 
-            const std::string& out)     const throw (kul::Exception) {
+            const std::string& out,
+            bool dryRun = false)     const throw (kul::Exception) {
 
             KEXCEPTION("Method is not implemented");
         }

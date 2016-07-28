@@ -51,7 +51,8 @@ class WINCompiler : public Compiler{
             const std::vector<std::string>& libs,
             const std::vector<std::string>& libPaths,
             const std::string& out, 
-            const Mode& mode) const throw (kul::Exception){
+            const Mode& mode,
+            bool dryRun = false) const throw (kul::Exception){
             
             std::string exe = out + ".exe";
             std::string cmd = linker;
@@ -84,11 +85,11 @@ class WINCompiler : public Compiler{
             else p.arg(linkerEnd);
 
             try{
-                p.start();
+                if(!dryRun) p.start();
             }catch(const kul::proc::Exception& e){
                 pc.exception(std::current_exception());
             }
-            pc.tmp(exe);
+            pc.file(exe);
             pc.cmd(p.toString());
             return pc;
         }
@@ -99,10 +100,11 @@ class WINCompiler : public Compiler{
             const std::vector<std::string>& libs,
             const std::vector<std::string>& libPaths,
             const kul::File& out, 
-            const Mode& mode) const throw (kul::Exception){
+            const Mode& mode,
+            bool dryRun = false) const throw (kul::Exception){
 
 
-            std::string dll = out.mini() + ".dll";
+            std::string dll = out.real() + ".dll";
             std::string cmd = linker;
             std::vector<std::string> bits;
             if(linker.find(" ") != std::string::npos){
@@ -116,11 +118,11 @@ class WINCompiler : public Compiler{
             for(const std::string& o : objects) p.arg(o);
             for(const std::string& s: kul::String::SPLIT(linkerEnd, ' ')) p.arg(s);
             try{
-                p.start();
+                if(!dryRun) p.start();
             }catch(const kul::proc::Exception& e){
                 pc.exception(std::current_exception());
             }
-            pc.tmp(dll);
+            pc.file(dll);
             pc.cmd(p.toString());
             return pc;
         }
@@ -130,7 +132,8 @@ class WINCompiler : public Compiler{
             const std::vector<std::string>& incs, 
             const std::string& in, 
             const std::string& out, 
-            const Mode& mode) const throw (kul::Exception){
+            const Mode& mode,
+            bool dryRun = false) const throw (kul::Exception){
 
             KEXCEPTION("Method compileSource is not implemented in C Sharp");
         }
@@ -138,7 +141,8 @@ class WINCompiler : public Compiler{
             const std::vector<std::string>& incs,
             const hash::set::String& args, 
             const std::string& in, 
-            const std::string& out)     const throw (kul::Exception) {
+            const std::string& out,
+            bool dryRun = false)     const throw (kul::Exception) {
 
             KEXCEPTION("Method preCompileHeader is not implemented in C Sharp");
         }
