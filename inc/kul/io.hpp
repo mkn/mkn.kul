@@ -54,8 +54,25 @@ class AReader{
         const char* readLine(std::ifstream& f){
             s1.clear();
             if(f.good()){
-                std::getline(f, s1);
-                return s1.c_str();
+                std::stringstream ss;
+                std::istream::sentry sen(f, true);
+                std::streambuf* sb = f.rdbuf();
+                for(;;) {
+                    int c = sb->sbumpc();
+                    switch (c) {
+                    case '\n':
+                        return (s1 = ss.str()).c_str();
+                    case '\r':
+                        if(sb->sgetc() == '\n') sb->sbumpc();
+                        return (s1 = ss.str()).c_str();
+                    case EOF:
+                        s1 = ss.str();
+                        if(s1.empty()) f.setstate(std::ios::eofbit);
+                        return s1.empty() ? 0 : s1.c_str();
+                    default:
+                        ss << (char)c;
+                    }
+                }
             }
             return 0;
         }

@@ -100,11 +100,7 @@ TEST(IOTest, ReadBinaryFileLine) {
     const char* c = r.readLine();
     std::string s1 = c, s2;
     while((c = r.readLine())) s2 = c;
-#ifdef _WIN32
-    EXPECT_EQ("Copyright (c) 2013, Philip Deegan.\r", s1);
-#else
     EXPECT_EQ("Copyright (c) 2013, Philip Deegan.", s1);
-#endif
     EXPECT_EQ("OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.", s2);
 }
 TEST(IOTest, ReadBinaryFile) {
