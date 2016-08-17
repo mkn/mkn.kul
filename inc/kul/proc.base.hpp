@@ -116,10 +116,10 @@ class AProcess{
         friend std::ostream& operator<<(std::ostream&, const AProcess&);
     protected:
         AProcess(const std::string& cmd, const bool& wfe) : wfe(wfe){ 
-            for(const auto& c : kul::cli::asArgs(cmd)) argv.push_back(c);
+            argv.push_back(cmd);
         }
         AProcess(const std::string& cmd, const std::string& d, const bool& wfe) : wfe(wfe), d(d){ 
-            for(const auto& c : kul::cli::asArgs(cmd)) argv.push_back(c);
+            argv.push_back(cmd);
         }
         virtual ~AProcess(){}
 
@@ -156,6 +156,10 @@ class AProcess{
             return *this; 
         }
         AProcess& arg(const std::string& a) { 
+            argv.push_back(a); 
+            return *this; 
+        }
+        AProcess& args(const std::string& a) { 
             if(a.size()) for(const auto& c : kul::cli::asArgs(a)) argv.push_back(c); 
             return *this; 
         }

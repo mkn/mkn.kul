@@ -226,12 +226,15 @@ class Dir : public fs::Item {
         const std::string name() const{
             return root() ? path() : path().substr(path().rfind(SEP()) + 1);
         }
-        std::string  esc()  const { return is() ? ESC(real()) : ESC(path()); }
+        const std::string& path() const { return _p;}
+
+        std::string  esc()  const { return ESC(path()); }
+        std::string  escr() const { return ESC(is() ? real() : path()); }
         std::string  escm() const { return ESC(mini()); }
         std::string  locl() const { return LOCL(path()); }
-        const std::string& path() const { return _p;}
         std::string  real() const { return REAL(path()); }
         std::string  mini() const { return MINI(real()); }
+
         fs::TimeStamps timeStamps() const { return TIMESTAMPS(_p); }
 
         Dir parent() const { return Dir(PRNT(path())); }
@@ -394,7 +397,8 @@ class File : public fs::Item {
 
         const std::string& name() const { return _n; }
 
-        std::string esc()  const { return Dir::JOIN(_d.esc(), Dir::ESC(_n)); }
+        std::string esc()  const { return Dir::ESC(full()); }
+        std::string escr() const { return Dir::ESC(is() ? real() : full()); }
         std::string escm() const { return Dir::ESC(mini()); }
         std::string full() const { return Dir::JOIN(_d.path(), _n); }
         std::string real() const { return Dir::JOIN(_d.real(), _n); }
