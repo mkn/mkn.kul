@@ -109,7 +109,7 @@ void kul_sig_function_handler(const uint16_t& s){
 
 #ifndef _KUL_COMPILED_LIB_
 void kul_real_se_handler(EXCEPTION_POINTERS* pExceptionInfo){
-#include "kul/src/proc/se_handler.cpp"
+#include "kul/src/signal/se_handler.cpp"
 }
 #else
 void kul_real_se_handler(EXCEPTION_POINTERS* pExceptionInfo);
