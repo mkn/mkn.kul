@@ -224,28 +224,6 @@ class Svn : public SCM{
         // void setOrigin(const std::string& d, const std::string& r) const;
 };
 
-class Manager{
-    private:
-        Manager(){
-            git = std::make_unique<Git>();
-            svn = std::make_unique<Svn>();
-            SCMs.insert(std::pair<std::string, SCM*>("git", git.get()));
-            SCMs.insert(std::pair<std::string, SCM*>("svn", svn.get()));
-        }
-        hash::map::S2T<SCM*> SCMs;
-        std::unique_ptr<SCM> git;
-        std::unique_ptr<SCM> svn;
-    public:
-        static Manager& INSTANCE(){ 
-            static Manager instance; 
-            return instance;
-        }
-        const SCM& get(const std::string& s) throw(NotFoundException){
-            if(SCMs.count(s) > 0) return *(*SCMs.find(s)).second;
-            KEXCEPT(NotFoundException, "Source Control Management for " + s + " is not implemented");
-        }
-};
-
 }// END NAMESPACE scm
 }// END NAMESPACE kul
 #endif /* _KUL_SCM_HPP_ */
