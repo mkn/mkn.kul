@@ -46,37 +46,23 @@ namespace kul { namespace this_proc{
 
 class ProcParser{
     private:
+
+#ifndef _KUL_COMPILED_LIB_
         static int PARSE_LINE(char* line){
-            int i = strlen(line);
-            while (*line < '0' || *line > '9') line++;
-            line[i-3] = '\0';
-            i = atoi(line);
-            return i;
+#include "kul/src/proc/xparse_line.cpp"
         }
-
         static void VIRTUAL(uint64_t& mem){
-            FILE* file = fopen("/proc/self/status", "r");
-            char line[128];
-            while (fgets(line, 128, file) != NULL){
-                if (strncmp(line, "VmSize:", 7) == 0){
-                    mem += PARSE_LINE(line);
-                    break;
-                }
-            }
-            fclose(file);
+#include "kul/src/proc/xvirtual.cpp"
         }
-
         static void PHYSICAL(uint64_t& mem){ //Note: this value is in KB!
-            FILE* file = fopen("/proc/self/status", "r");
-            char line[128];
-            while (fgets(line, 128, file) != NULL){
-                if (strncmp(line, "VmRSS:", 6) == 0){
-                    mem += PARSE_LINE(line);
-                    break;
-                }
-            }
-            fclose(file);
+#include "kul/src/proc/xphysical.cpp"
         }
+#else
+        static int PARSE_LINE(char* line);
+        static void VIRTUAL(uint64_t& mem);
+        static void PHYSICAL(uint64_t& mem); //Note: this value is in KB!
+#endif
+
         friend uint64_t virtualMemory();
         friend uint64_t physicalMemory();
         friend uint64_t totalMemory();

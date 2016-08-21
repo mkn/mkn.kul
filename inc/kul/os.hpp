@@ -239,70 +239,24 @@ class Dir : public fs::Item {
 
         Dir parent() const { return Dir(PRNT(path())); }
 
-        std::vector<Dir>    dirs(bool incHidden = false) const throw(fs::Exception){
-            if(!is()) KEXCEPT(fs::Exception, "Directory : \"" + path() + "\" does not exist");
-            std::vector<Dir> dirs;
-#ifdef _WIN32
-            WIN32_FIND_DATA fdFile;
-            HANDLE hFind = NULL;
-            char sPath[2048];
-            sprintf_s(sPath, "%s\\*.*", path().c_str());
-            if((hFind = FindFirstFile(sPath, &fdFile)) == INVALID_HANDLE_VALUE)
-                KEXCEPT(fs::Exception, "Directory : \"" + path() + "\" does not exist");
-            do{
-                if(strcmp(fdFile.cFileName, ".") != 0 && strcmp(fdFile.cFileName, "..") != 0){
-                    sprintf_s(sPath, "%s\\%s", path().c_str(), fdFile.cFileName);
-                    if(fdFile.dwFileAttributes &FILE_ATTRIBUTE_DIRECTORY){
-                        if(!incHidden && std::string(sPath).substr(std::string(sPath).rfind(kul::Dir::SEP()) + 1).substr(0, 1).compare(".") == 0) continue; 
-                        dirs.push_back(Dir(sPath));
-                    }
-                }
-            }while(FindNextFile(hFind, &fdFile));
-            FindClose(hFind);
-#else
-            DIR *dir = opendir(real().c_str());
-            struct dirent *entry = readdir(dir);
-            while (entry != NULL){
-                std::string d(entry->d_name);
-                kul::Dir dd(JOIN(real(), entry->d_name));
-                if(d.compare(".") != 0 && d.compare("..") != 0
-                    && !(d.substr(0, 1).compare(".") == 0 && !incHidden)
-                    && dd.is())
-                    dirs.push_back(dd);
-                entry = readdir(dir);
-            }
-            closedir(dir);
-#endif
-            return dirs;
-        }
+        std::vector<Dir> dirs(bool incHidden = false) const throw(fs::Exception);
         std::vector<File> files(bool recursive = false) const throw(fs::Exception);
 
         static std::string JOIN(const std::string& a, const std::string& b) { return a + SEP() + b; }
-#ifdef _WIN32
+
+#ifndef  _KUL_COMPILED_LIB_
         static std::string REAL(const std::string& s) throw(fs::Exception){
-            char* expanded = _fullpath(NULL, s.c_str(), _MAX_PATH);
-            if(expanded){
-                std::string dir(expanded);
-                delete expanded;
-                if(dir.size() && dir[dir.size() - 1] == '\\') dir.pop_back();
-                return dir;
-            }
-            KEXCEPT(fs::Exception, "Item: \"" + s + "\" does not exist");
+#include "kul/src/os/dir/Xreal.cpp"
         }
+#else
+        static std::string REAL(const std::string& s) throw(fs::Exception);
+#endif//_KUL_COMPILED_LIB_
+
+#ifdef _WIN32
         static std::string SEP(){
             return std::string("\\");
         }
 #else
-        static std::string REAL(const std::string& s) throw(fs::Exception){
-            char* expanded = realpath(s.c_str() , NULL);
-            if(expanded){
-                std::string dir(expanded);
-                free(expanded);
-                if(dir.size() > PATH_MAX) KEXCEPT(fs::Exception, "Directory path too large");
-                return dir;
-            }
-            KEXCEPT(fs::Exception, "Directory \"" + s + "\" does not exist");
-        }
         static const std::string SEP(){
             return std::string("/");
         }
@@ -331,10 +285,11 @@ class File : public fs::Item {
             if(n.find(Dir::SEP()) != std::string::npos){
                 this->_d = Dir(n.substr(0, n.rfind(Dir::SEP())));
                 this->_n = this->_n.substr(n.rfind(Dir::SEP()) + 1);
-            }else
+            }else{
                 try{
                     this->_d = Dir(Dir::PRNT(Dir::REAL(this->_n)), m);
                 }catch(const kul::fs::Exception& e){}
+            }
         }
         File(const char* n, bool m = false) : File(std::string(n), m){}
         File(const std::string& n, const Dir& d) : _n(n), _d(d){}
@@ -404,7 +359,7 @@ class File : public fs::Item {
         std::string real() const { return Dir::JOIN(_d.real(), _n); }
         std::string mini() const { return Dir::MINI(real()); }
 
-        ulonglong   size() const{
+        ulonglong size() const{
             ulonglong r = 0;
 #ifdef _WIN32
             WIN32_FIND_DATA ffd;
@@ -522,35 +477,6 @@ inline void kul::Dir::rm() const{
         _rmdir(path().c_str());
     }
 }
-inline std::vector<kul::File> kul::Dir::files(bool recursive) const throw(fs::Exception){
-    if(!is()) KEXCEPT(fs::Exception, "Directory : \"" + path() + "\" does not exist");
-
-    std::vector<File> fs;
-    WIN32_FIND_DATA fdFile;
-    HANDLE hFind = NULL;
-    char sPath[2048];
-    sprintf_s(sPath, "%s\\*.*", path().c_str());
-    if((hFind = FindFirstFile(sPath, &fdFile)) == INVALID_HANDLE_VALUE) 
-        KEXCEPT(fs::Exception, "Directory : \"" + path() + "\" does not exist");
-
-    do{
-        if(strcmp(fdFile.cFileName, ".") != 0 && strcmp(fdFile.cFileName, "..") != 0){
-            sprintf_s(sPath, "%s\\%s", path().c_str(), fdFile.cFileName);
-            if(!(fdFile.dwFileAttributes &FILE_ATTRIBUTE_DIRECTORY)){
-                std::string f(sPath);
-                fs.push_back(File(f.substr(f.rfind(kul::Dir::SEP()) + 1), *this));
-            }
-        }
-    }while(FindNextFile(hFind, &fdFile));
-    FindClose(hFind);
-    if(recursive){
-        for(const Dir& d : dirs()){
-            std::vector<File> tFiles = d.files(true);
-            fs.insert(fs.end(), tFiles.begin(), tFiles.end());
-        }
-    }
-    return fs;
-}
 #else
 inline bool kul::env::CWD(const std::string& c){
     return chdir(c.c_str()) != -1;
@@ -565,27 +491,18 @@ inline void kul::Dir::rm() const{
         remove(real().c_str());
     }
 }
-inline std::vector<kul::File> kul::Dir::files(bool recursive) const throw(fs::Exception){
-    if(!is()) KEXCEPT(fs::Exception, "Directory : \"" + path() + "\" does not exist");
-
-    std::vector<File> fs;
-    DIR *dir = opendir(path().c_str());
-    struct dirent *entry = readdir(dir);
-    while (entry != NULL){
-        if(!kul::Dir(JOIN(real(), entry->d_name)).is())
-            fs.push_back(File(entry->d_name, *this));
-        entry = readdir(dir);
-    }
-    closedir(dir);
-    if(recursive){
-        for(const kul::Dir& d : dirs()){
-            const std::vector<kul::File>& tFs = d.files(true);
-            fs.insert(fs.end(), tFs.begin(), tFs.end());
-        }
-    }
-    return fs;
-}
 #endif
 
+#ifndef  _KUL_COMPILED_LIB_
+
+inline std::vector<kul::Dir> kul::Dir::dirs(bool incHidden) const throw(fs::Exception){
+#include "kul/src/os/dir/dirs.cpp"
+}
+
+inline std::vector<kul::File> kul::Dir::files(bool recursive) const throw(fs::Exception){
+#include "kul/src/os/dir/files.cpp"
+}
+
+#endif//_KUL_COMPILED_LIB_
 
 #endif /* _KUL_OS_HPP_ */

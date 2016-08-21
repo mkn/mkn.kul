@@ -1,12 +1,18 @@
 
 
+# mkn.kul - Kommon Usage Library
+#   Cross platform wrapper for systems operations / IO / threads / processes
+#   Default profile "lib" is header only, use "-compiled" profiles for library linking
+#   
+
 name: mkn.kul
 
 parent: lib
 
 profile:
   - name: base
-    inc: ./inc ./os/${OS}/inc
+    inc: | 
+        ./inc ./os/${OS}/inc
     if_inc:
         bsd: ./os/nixish/inc
         nix: ./os/nixish/inc
@@ -19,6 +25,26 @@ profile:
 
   - name: c++0x
     parent: base
+    dep:
+      - name: google.sparsehash
+        version: c++0x
+
+  - name: base-compiled
+    parent: base
+    src: ./src ./os/${OS}/src
+    if_src:
+        bsd: ./os/nixish/src
+        nix: ./os/nixish/src
+    arg: -D_KUL_COMPILED_LIB_
+
+  - name: lib-compiled
+    parent: base-compiled
+    dep:
+      - name: google.sparsehash
+        version: master
+
+  - name: c++0x-compiled
+    parent: base-compiled
     dep:
       - name: google.sparsehash
         version: c++0x
@@ -38,5 +64,5 @@ profile:
     main: bench.cpp
 
   - name: usage
-    parent: lib
+    parent: lib-compiled
     main: usage.cpp

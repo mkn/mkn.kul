@@ -69,54 +69,7 @@ class Process : public kul::AProcess{
             while((ret = (s)) < 0x0 && (errno == EINTR)){}
             return ret;
         }
-    protected:
-        int16_t child(){
-            std::string s(toString());
-            expand(s);
-            std::vector<std::string> cli(kul::cli::asArgs(s));
-            std::vector<char*> argV;
-            for(auto& a : cli) argV.push_back(&a[0]);
-            argV.push_back(NULL);
-            return execvp(cli[0].c_str(), &argV[0]);
-        }
-        virtual void expand(std::string& s) const {
-            std::string r = s;
-            auto lb  = s.find("$(");
-            auto clb = s.find("\\$(");
-            while((lb - clb + 1) == 0){
-                lb  = r.find("$(",   clb + 3);
-                clb = r.find("\\$(", clb + 3);
-            }
-            if(lb == std::string::npos) return;
-            auto rb  = s.find(")");
-            auto crb = s.find("\\)");
-            while((rb - crb + 1) == 0){
-                rb  = r.find(")",   crb + 2);
-                crb = r.find("\\)", crb + 2);
-            }
-            if(rb == std::string::npos) return;
 
-            std::string k(r.substr(lb + 2, rb - 2 - lb));
-            std::vector<std::string> cli(kul::cli::asArgs(k));
-            std::stringstream ss;
-            if(cli.size() > 1){
-                kul::Process p(cli[0]);
-                kul::ProcessCapture pc(p);
-                for(size_t i = 1; i < cli.size(); i++) p.arg(cli[i]);
-                p.start();
-                std::string out(pc.outs());
-                if(*out.rbegin() == '\n') out.pop_back();
-                std::string t(r.substr(0, lb) + out + r.substr(rb + 1));
-                ss << r.substr(0, lb) << out << r.substr(rb + 1);
-            }else
-                ss << r.substr(0, lb) << kul::env::GET(cli[0].c_str()) << r.substr(rb + 1);
-
-            std::string t(ss.str());
-            expand(t);
-            s = t;
-        }
-        void finish()   { }
-        void preStart() { }
     public:
         Process(const std::string& cmd, const bool& wfe = true)                         : kul::AProcess(cmd, wfe){}
         Process(const std::string& cmd, const std::string& path, const bool& wfe = true): kul::AProcess(cmd, path, wfe){}
@@ -129,124 +82,38 @@ class Process : public kul::AProcess{
             }
             return 0;
         }
+
     protected:
+#ifndef _KUL_COMPILED_LIB_
+        int16_t child(){
+#include "kul/src/proc/child.cpp"
+        }
+        virtual void expand(std::string& s) const {
+#include "kul/src/proc/expand.cpp"
+        }
         void waitForStatus(){
-            int16_t ret = 0;
-            ret = recall(waitpid(pid(), &cStat, 0));
-            assert(ret);
+#include "kul/src/proc/waitForStatus.cpp"
         }
         void waitExit() throw (kul::proc::ExitException){
-            tearDown();
-            exitCode(WEXITSTATUS(cStat));
-            finish();
-            setFinished();
+#include "kul/src/proc/waitExit.cpp"
         }
         void tearDown(){
-            recall(close(popPip[0]));
-            recall(close(popPip[1]));
-            recall(close(popPip[2]));
-            recall(close(errFd[1]));
-            recall(close(errFd[0]));
-            recall(close(outFd[1]));
-            recall(close(outFd[0]));
-            recall(close(inFd[1]));
-            recall(close(inFd[0]));
+#include "kul/src/proc/tearDown.cpp"
         }
         void run() throw (kul::proc::Exception){
-            int16_t ret = 0;
-
-            if((ret = pipe(inFd)) < 0)  error(__LINE__, "Failed to pipe in");
-            if((ret = pipe(outFd)) < 0) error(__LINE__, "Failed to pipe out");
-            if((ret = pipe(errFd)) < 0) error(__LINE__, "Failed to pipe err");
-
-            this->preStart();
-            pid(fork());
-            if(pid() > 0){
-                if(this->waitForExit()){ // parent
-                    popPip[0] = inFd[1];
-                    popPip[1] = outFd[0];
-                    popPip[2] = errFd[0];
-
-        #ifdef __KUL_PROC_BLOCK_ERR__
-                    if((ret = fcntl(popPip[1], F_SETFL, O_NONBLOCK)) < 0) error(__LINE__, "Failed nonblocking for popPip[1]");
-                    if((ret = fcntl(popPip[2], F_SETFL, O_NONBLOCK)) < 0) error(__LINE__, "Failed nonblocking for popPip[2]");
-        #else
-                    fcntl(popPip[1], F_SETFL, O_NONBLOCK);
-                    fcntl(popPip[2], F_SETFL, O_NONBLOCK);
-        #endif
-                    fd_set childOutFds;
-                    FD_ZERO(&childOutFds);
-                    FD_SET(popPip[1], &childOutFds);
-                    FD_SET(popPip[2], &childOutFds);
-                    close(inFd[1]);
-                    bool alive = true;
-
-                    do {
-                        alive = ::kill(pid(), 0) == 0;
-                        if(FD_ISSET(popPip[1], &childOutFds)) {
-                            bool b = 0;
-                            do {
-                                char cOut[1024] = {'\0'};
-                                int16_t ret = recall(read(popPip[1], cOut, sizeof(cOut)));
-                                cOut[ret > 0 ? ret : 0] = 0;
-                                if (ret < 0){
-                                    if(b && ((errno != EAGAIN) || (errno != EWOULDBLOCK)))
-                                        error(__LINE__, "read on childout failed");
-                                    if(((errno != EAGAIN) || (errno != EWOULDBLOCK))) b = 1;
-                                }
-                                else if (ret) out(cOut);
-                                else waitForStatus();
-                            } while(ret > 0);
-                        }
-                        if(FD_ISSET(popPip[2], &childOutFds)) {
-                            bool b = 0;
-                            do {
-                                char cErr[1024] = {'\0'};
-                                int16_t ret = recall(read(popPip[2], cErr, sizeof(cErr)));
-                                cErr[ret > 0 ? ret : 0] = 0;
-                                if (ret < 0){
-                                    if(b && ((errno != EAGAIN) || (errno != EWOULDBLOCK)))
-                                        error(__LINE__, "read on childout failed");
-                                    if(((errno != EAGAIN) || (errno != EWOULDBLOCK))) b = 1;
-                                }
-                                else if (ret) err(cErr);
-                                else waitForStatus();
-                            } while(ret > 0);
-                        }
-                        recall(waitpid(pid(), &cStat, WNOHANG));
-                    }while(alive);
-
-                    waitExit();
-                }
-            }else if(pid() == 0){ // child
-                close(inFd[1]);
-                close(outFd[0]);
-                close(errFd[0]);
-
-                int16_t ret = 0; //check rets
-                int8_t retry = __KUL_PROC_DUP_RETRY__;
-                if(retry < 1) retry = 1;
-
-                close(0);
-                for(uint8_t i = 0; i < retry; i++) if((ret = dup(inFd[0])) >= 0) break;
-                if(ret < 0) error(__LINE__, "dup in call failed");
-
-                close(1);
-                for(uint8_t i = 0; i < retry; i++) if((ret = dup(outFd[1])) >= 0) break;
-                if(ret < 0) error(__LINE__, "dup out call failed");
-                
-                close(2);
-                for(uint8_t i = 0; i < retry; i++) if((ret = dup(errFd[1])) >= 0) break;
-                if(ret < 0) error(__LINE__, "dup err call failed");
-
-                /* SETUP EnvVars */ // SET ENV, it's a forked process so it doesn't matter - it'll die soon, like you.
-                for(const std::pair<const std::string, const std::string>& ev : vars())
-                    env::SET(ev.first.c_str(), ev.second.c_str());
-
-                if(!this->directory().empty()) kul::env::CWD(this->directory());
-                exit(this->child());
-            }else error(__LINE__, "Unhandled process id for child: " + std::to_string(pid()));
+#include "kul/src/proc/tearDown.cpp"
         }
+#else
+        int16_t child();
+        virtual void expand(std::string& s) const;
+        void waitForStatus();
+        void waitExit() throw (kul::proc::ExitException);
+        void tearDown();
+        void run() throw (kul::proc::Exception);
+#endif
+        virtual void finish()   { }
+        virtual void preStart() { }
+
 };
 
 

@@ -28,25 +28,17 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#ifndef _KUL_CLI_OS_HPP_
-#define _KUL_CLI_OS_HPP_
 
-#include <Windows.h>
+// This file is included by other files and is not in itself syntactically correct.
 
-namespace kul{ namespace cli{
-#ifndef _KUL_COMPILED_LIB_
-inline std::string hidden(const std::string& t){
-#include "kul/src/cli/hidden.cpp"
-}
-inline void show(){
-#include "kul/src/cli/show.cpp"
-}
-#else
-std::string hidden(const std::string& t);
-void show();
-#endif
-} // END NAMESPACE cli
-} // END NAMESPACE kul
+// int16_t kul::Process::child(){
 
+    std::string s(toString());
+    expand(s);
+    std::vector<std::string> cli(kul::cli::asArgs(s));
+    std::vector<char*> argV;
+    for(auto& a : cli) argV.push_back(&a[0]);
+    argV.push_back(NULL);
+    return execvp(cli[0].c_str(), &argV[0]);
 
-#endif /* _KUL_CLI_OS_HPP_ */
+// }

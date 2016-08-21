@@ -101,7 +101,7 @@ class Call{
             return s.size() ? kul::os::exec(s) : 1;
         }
 };
-}
+} // end namespace proc
 
 class AProcess{
     private:
@@ -164,32 +164,29 @@ class AProcess{
             return *this; 
         }
         AProcess& var(const std::string& n, const std::string& v) { evs[n] = v; return *this;}
+
+#ifndef _KUL_COMPILED_LIB_
         virtual void start() throw(kul::Exception){
-            if(this->s) KEXCEPT(kul::proc::Exception, "Process is already started");
-            this->s = true;
-            if(this->o || this->e) this->run();
-            else pec = proc::Call(toString(), evs, d).run();
-            if(pec != 0)
-                kul::LogMan::INSTANCE().err()
-                    ? throw proc::ExitException(__FILE__, __LINE__, pec, "Process exit code: " + std::to_string(pec) + kul::os::EOL() + toString())
-                    : throw proc::ExitException(__FILE__, __LINE__, pec, "Process exit code: " + std::to_string(pec));
+#include "kul/src/proc.base/start.cpp"
         }
+        virtual std::string toString() const{
+#include "kul/src/proc.base/toString.cpp"
+        }
+#else
+        virtual void start() throw(kul::Exception);
+        virtual std::string toString() const;
+#endif
+
         const int32_t& pid() const { return pi; }
         bool started()       const { return pi > 0; }
         bool finished()      const { return f; }
-        virtual const std::string toString() const{
-            std::string s;
-            for(const std::string& a : args()) s += a + " ";
-            s.pop_back();
-            return s;
-        }
-        void setOut(std::function<void(std::string)> o) { this->o = o; }
-        void setErr(std::function<void(std::string)> e) { this->e = e; }
         const int32_t& exitCode(){ return pec; }
         AProcess& operator<<(const std::string& s){
             arg(s);
             return *this;
         }
+        void setOut(std::function<void(std::string)> o) { this->o = o; }
+        void setErr(std::function<void(std::string)> e) { this->e = e; }
 };
 
 inline std::ostream& operator<<(std::ostream &s, const AProcess &p){

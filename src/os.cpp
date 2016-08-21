@@ -28,25 +28,16 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#ifndef _KUL_CLI_OS_HPP_
-#define _KUL_CLI_OS_HPP_
+#include "kul/os.hpp"
 
-#include <Windows.h>
-
-namespace kul{ namespace cli{
-#ifndef _KUL_COMPILED_LIB_
-inline std::string hidden(const std::string& t){
-#include "kul/src/cli/hidden.cpp"
+std::vector<kul::Dir> kul::Dir::dirs(bool incHidden) const throw(kul::fs::Exception) {
+#include "kul/src/os/dir/dirs.cpp"
 }
-inline void show(){
-#include "kul/src/cli/show.cpp"
+
+std::vector<kul::File> kul::Dir::files(bool recursive) const throw(kul::fs::Exception) {
+#include "kul/src/os/dir/files.cpp"
 }
-#else
-std::string hidden(const std::string& t);
-void show();
-#endif
-} // END NAMESPACE cli
-} // END NAMESPACE kul
 
-
-#endif /* _KUL_CLI_OS_HPP_ */
+std::string kul::Dir::REAL(const std::string& s) throw(fs::Exception){
+#include "kul/src/os/dir/Xreal.cpp"
+}

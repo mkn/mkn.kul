@@ -31,31 +31,25 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _KUL_CLI_OS_HPP_
 #define _KUL_CLI_OS_HPP_
 
+#include <string>
 #include <unistd.h>
 #include <termios.h>
 
 namespace kul{ namespace cli{
-inline const std::string hidden(const std::string& t){
-    if(!t.empty()) std::cout << t << std::endl;
-    termios oldt;
-    tcgetattr(STDIN_FILENO, &oldt);
-    termios newt = oldt;
-    newt.c_lflag &= ~ECHO;
-    tcsetattr(STDIN_FILENO, TCSANOW, &newt);
-    std::string s;
-    std::getline(std::cin, s);
-    tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
-    return s;
+#ifndef _KUL_COMPILED_LIB_
+inline std::string hidden(const std::string& t){
+#include "kul/src/cli/hidden.cpp"
 }
-
 inline void show(){
-    termios tty;
-    tcgetattr(STDIN_FILENO, &tty);
-    tty.c_lflag |= ECHO;
-    tcsetattr(STDIN_FILENO, TCSANOW, &tty);
+#include "kul/src/cli/show.cpp"
 }
+#else
+std::string hidden(const std::string& t);
+void show();
+#endif
 } // END NAMESPACE cli
 } // END NAMESPACE kul
 
 
 #endif /* _KUL_CLI_OS_HPP_ */
+

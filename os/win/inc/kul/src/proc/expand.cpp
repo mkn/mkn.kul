@@ -28,25 +28,44 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#ifndef _KUL_CLI_OS_HPP_
-#define _KUL_CLI_OS_HPP_
 
-#include <Windows.h>
+// This file is included by other files and is not in itself syntactically correct.
 
-namespace kul{ namespace cli{
-#ifndef _KUL_COMPILED_LIB_
-inline std::string hidden(const std::string& t){
-#include "kul/src/cli/hidden.cpp"
-}
-inline void show(){
-#include "kul/src/cli/show.cpp"
-}
-#else
-std::string hidden(const std::string& t);
-void show();
-#endif
-} // END NAMESPACE cli
-} // END NAMESPACE kul
+// void kul::Process::expand(std::string& s) const {
 
+    std::string r = s;
+    auto lb  = s.find("$(");
+    auto clb = s.find("\\$(");
+    while((lb - clb + 1) == 0){
+        lb  = r.find("$(",   clb + 3);
+        clb = r.find("\\$(", clb + 3);
+    }
+    if(lb == std::string::npos) return;
+    auto rb  = s.find(")");
+    auto crb = s.find("\\)");
+    while((rb - crb + 1) == 0){
+        rb  = r.find(")",   crb + 2);
+        crb = r.find("\\)", crb + 2);
+    }
+    if(rb == std::string::npos) return;
 
-#endif /* _KUL_CLI_OS_HPP_ */
+    std::string k(r.substr(lb + 2, rb - 2 - lb));
+    std::vector<std::string> cli(kul::cli::asArgs(k));
+    std::stringstream ss;
+    if(cli.size() > 1){
+        kul::Process p(cli[0]);
+        kul::ProcessCapture pc(p);
+        for(size_t i = 1; i < cli.size(); i++) p.arg(cli[i]);
+        p.start();
+        std::string out(pc.outs());
+        if(*out.rbegin() == '\n') out.pop_back();
+        std::string t(r.substr(0, lb) + out + r.substr(rb + 1));
+        ss << r.substr(0, lb) << out << r.substr(rb + 1);
+    }else
+        ss << r.substr(0, lb) << kul::env::GET(cli[0].c_str()) << r.substr(rb + 1);
+
+    std::string t(ss.str());
+    expand(t);
+    s = t;
+
+// }

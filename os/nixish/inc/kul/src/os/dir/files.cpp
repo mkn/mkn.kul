@@ -28,25 +28,28 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#ifndef _KUL_CLI_OS_HPP_
-#define _KUL_CLI_OS_HPP_
 
-#include <Windows.h>
+// This file is included by other files and is not in itself syntactically correct.
 
-namespace kul{ namespace cli{
-#ifndef _KUL_COMPILED_LIB_
-inline std::string hidden(const std::string& t){
-#include "kul/src/cli/hidden.cpp"
-}
-inline void show(){
-#include "kul/src/cli/show.cpp"
-}
-#else
-std::string hidden(const std::string& t);
-void show();
-#endif
-} // END NAMESPACE cli
-} // END NAMESPACE kul
+// std::vector<kul::File> kul::Dir::files(bool recursive) const throw(fs::Exception){
 
+    if(!is()) KEXCEPT(fs::Exception, "Directory : \"" + path() + "\" does not exist");
 
-#endif /* _KUL_CLI_OS_HPP_ */
+    std::vector<File> fs;
+    DIR *dir = opendir(path().c_str());
+    struct dirent *entry = readdir(dir);
+    while (entry != NULL){
+        if(!kul::Dir(JOIN(real(), entry->d_name)).is())
+            fs.push_back(File(entry->d_name, *this));
+        entry = readdir(dir);
+    }
+    closedir(dir);
+    if(recursive){
+        for(const kul::Dir& d : dirs()){
+            const std::vector<kul::File>& tFs = d.files(true);
+            fs.insert(fs.end(), tFs.begin(), tFs.end());
+        }
+    }
+    return fs;
+
+// }

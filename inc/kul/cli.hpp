@@ -244,55 +244,13 @@ class Args{
         }
 };
 
-
+#ifndef _KUL_COMPILED_LIB_
 inline void asArgs(const std::string& cmd, std::vector<std::string>& args){
-    std::string arg;
-    bool openQuotesS = false;
-    bool openQuotesD = false;
-    bool backSlashed = false;
-    for(const char c : cmd){
-        if(backSlashed){
-            backSlashed = false;
-            arg += c;
-            continue;
-        }
-        switch(c){
-            case ' ':
-                if(!openQuotesD && !openQuotesS){               //     ||||| ||||| ||||| ||||| |||||
-                    if(arg.size() > 0) args.push_back(arg);     //     ||    || || || || ||    ||
-                    arg.clear();                                //     ||||| ||||| ||||| ||    |||||
-                    continue;                                   //        || ||    || || ||    ||
-                }                                               //     ||||| ||    || || ||||| |||||
-                break;
-            case '"':
-                if(openQuotesD && !openQuotesS){
-                    openQuotesD = false;
-                    args.push_back(arg);
-                    arg.clear();
-                }else{ 
-                    openQuotesD = true;
-                }
-                continue;
-            case '\'':
-                if(openQuotesS && !openQuotesD){
-                    openQuotesS = false;
-                    args.push_back(arg);
-                    arg.clear();
-                }else{ 
-                    openQuotesS = true;
-                }
-                continue;
-            case '\\':
-                if(!openQuotesS && !openQuotesD){
-                    backSlashed = true;
-                    continue;
-                }
-                break;
-        }
-        arg += c;
-    }
-    if(arg.size() > 0) args.push_back(arg);
+#include "kul/src/cli/asArgs.cpp"
 }
+#else
+void asArgs(const std::string& cmd, std::vector<std::string>& args);
+#endif
 
 inline std::vector<std::string> asArgs(const std::string& cmd){
     std::vector<std::string> args;

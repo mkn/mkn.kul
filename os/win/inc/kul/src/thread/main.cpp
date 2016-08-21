@@ -28,25 +28,24 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#ifndef _KUL_CLI_OS_HPP_
-#define _KUL_CLI_OS_HPP_
 
-#include <Windows.h>
+// This file is included by other files and is not in itself syntactically correct.
 
-namespace kul{ namespace cli{
-#ifndef _KUL_COMPILED_LIB_
-inline std::string hidden(const std::string& t){
-#include "kul/src/cli/hidden.cpp"
-}
-inline void show(){
-#include "kul/src/cli/show.cpp"
-}
-#else
-std::string hidden(const std::string& t);
-void show();
-#endif
-} // END NAMESPACE cli
-} // END NAMESPACE kul
+// bool kul::this_thread::main(){
 
+	const std::tr1::shared_ptr<void> hThreadSnapshot(CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0), CloseHandle);
+    if (hThreadSnapshot.get() == INVALID_HANDLE_VALUE) throw std::runtime_error("GetMainThreadId failed");
+    THREADENTRY32 tEntry;
+    tEntry.dwSize = sizeof(THREADENTRY32);
+    DWORD result = 0;
+    DWORD currentPID = GetCurrentProcessId();
+    for (BOOL success = Thread32First(hThreadSnapshot.get(), &tEntry);
+        !result && success && GetLastError() != ERROR_NO_MORE_FILES;
+        success = Thread32Next(hThreadSnapshot.get(), &tEntry))
+        if (tEntry.th32OwnerProcessID == currentPID) result = tEntry.th32ThreadID;
 
-#endif /* _KUL_CLI_OS_HPP_ */
+    std::stringstream ss;
+    ss << std::this_thread::get_id();
+    return std::to_string(result) == ss.str();
+
+// }

@@ -28,25 +28,18 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#ifndef _KUL_CLI_OS_HPP_
-#define _KUL_CLI_OS_HPP_
 
-#include <Windows.h>
+// This file is included by other files and is not in itself syntactically correct.
 
-namespace kul{ namespace cli{
-#ifndef _KUL_COMPILED_LIB_
-inline std::string hidden(const std::string& t){
-#include "kul/src/cli/hidden.cpp"
-}
-inline void show(){
-#include "kul/src/cli/show.cpp"
-}
-#else
-std::string hidden(const std::string& t);
-void show();
-#endif
-} // END NAMESPACE cli
-} // END NAMESPACE kul
+// void kul::AProcess::start() throw(kul::Exception){
 
+    if(this->s) KEXCEPT(kul::proc::Exception, "Process is already started");
+    this->s = true;
+    if(this->o || this->e) this->run();
+    else pec = proc::Call(toString(), evs, d).run();
+    if(pec != 0)
+        kul::LogMan::INSTANCE().err()
+            ? throw proc::ExitException(__FILE__, __LINE__, pec, "Process exit code: " + std::to_string(pec) + kul::os::EOL() + toString())
+            : throw proc::ExitException(__FILE__, __LINE__, pec, "Process exit code: " + std::to_string(pec));
 
-#endif /* _KUL_CLI_OS_HPP_ */
+// }

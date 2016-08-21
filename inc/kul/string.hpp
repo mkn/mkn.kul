@@ -141,12 +141,12 @@ class String{
 
         static bool BOOL(std::string s){
             TRIM(s);
-            const std::vector<std::string>& pos {"yes", "y", "true", "1"}; 
-            const std::vector<std::string>& neg {"no", "n", "false", "0"}; 
+            const std::vector<std::string>& pos {"yes", "y", "true" , "1"}; 
+            const std::vector<std::string>& neg {"no" , "n", "false", "0"}; 
             std::transform(s.begin(), s.end(), s.begin(), ::tolower);
             if (std::find(pos.begin(), pos.end(), s) != pos.end()) return true;
             if (std::find(neg.begin(), neg.end(), s) != neg.end()) return false;
-            KEXCEPT(StringException, "input not bool-able");
+            KEXCEPT(StringException, "input not bool-able, " + s);
         }
 
         static uint16_t UINT16(const std::string& s) throw(StringException){

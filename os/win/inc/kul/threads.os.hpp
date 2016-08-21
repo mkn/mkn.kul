@@ -43,24 +43,16 @@ inline const std::string id(){
 	os << std::hex << std::hash<std::thread::id>()(std::this_thread::get_id());
 	return os.str();
 }
+
+#ifndef _KUL_COMPILED_LIB_
 inline bool main(){
-	const std::tr1::shared_ptr<void> hThreadSnapshot(CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0), CloseHandle);
-    if (hThreadSnapshot.get() == INVALID_HANDLE_VALUE) throw std::runtime_error("GetMainThreadId failed");
-    THREADENTRY32 tEntry;
-    tEntry.dwSize = sizeof(THREADENTRY32);
-    DWORD result = 0;
-    DWORD currentPID = GetCurrentProcessId();
-    for (BOOL success = Thread32First(hThreadSnapshot.get(), &tEntry);
-        !result && success && GetLastError() != ERROR_NO_MORE_FILES;
-        success = Thread32Next(hThreadSnapshot.get(), &tEntry))
-        if (tEntry.th32OwnerProcessID == currentPID) result = tEntry.th32ThreadID;
-
-    std::stringstream ss;
-    ss << std::this_thread::get_id();
-    return std::to_string(result) == ss.str();
+#include "kul/src/thread/main.cpp"
 }
-inline void kill(){
+#else
+bool main();
+#endif
 
+inline void kill(){
 	HANDLE h = GetCurrentThread();
 	TerminateThread(h, 0); 
 	CloseHandle(h);
@@ -111,10 +103,8 @@ class Thread : public threading::AThread{
 		virtual ~Thread(){}
 		void join(){
 			if(!s) run();
-			// if(h){
-				WaitForSingleObject(h, INFINITE);
-				CloseHandle(h);
-			// }
+			WaitForSingleObject(h, INFINITE);
+			CloseHandle(h);
 			s = 0;
 		}
 		bool detach(){ return CloseHandle(h); }
