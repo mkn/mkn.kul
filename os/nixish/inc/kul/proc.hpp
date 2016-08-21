@@ -101,7 +101,7 @@ class Process : public kul::AProcess{
 #include "kul/src/proc/tearDown.cpp"
         }
         void run() throw (kul::proc::Exception){
-#include "kul/src/proc/tearDown.cpp"
+#include "kul/src/proc/run.cpp"
         }
 #else
         int16_t child();
