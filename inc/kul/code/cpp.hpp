@@ -85,7 +85,7 @@ class GCCompiler : public CCompiler{
             for(const std::string& path : libPaths) p.arg("-L" + path);
             if(mode == Mode::STAT) p.arg("-static");
             p.arg("-o").arg(out);
-            for(const std::string& d : dirs) p.arg(kul::File("*.obj", d).esc());
+            for(const std::string& d : dirs) p.arg(kul::File("*.obj", d).escm());
             for(const std::string& lib : libs)  p.arg("-l" + lib);
             for(const std::string& s: kul::cli::asArgs(linkerEnd)) p.arg(s);
             
@@ -125,7 +125,7 @@ class GCCompiler : public CCompiler{
             for(unsigned int i = 1; i < bits.size(); i++) p.arg(bits[i]);
             if(mode == Mode::SHAR) p.arg("-shared").arg("-o");
             p.arg(lib);
-            for(const std::string& d : dirs) p.arg(kul::File("*.obj", d).esc());
+            for(const std::string& d : dirs) p.arg(kul::File("*.obj", d).escm());
             for(const std::string& s: kul::cli::asArgs(linkerEnd)) p.arg(s);
             CompilerProcessCapture pc;
             try{
@@ -270,7 +270,7 @@ class WINCompiler : public CCompiler{
             for(unsigned int i = 1; i < bits.size(); i++) p.arg(bits[i]);
             p.arg("-OUT:\"" + exe + "\"").arg("-nologo");
             for(const std::string& path : libPaths) p.arg("-LIBPATH:\"" + path + "\"");
-            for(const std::string& d : dirs) p.arg(kul::File("*.obj", d).esc());
+            for(const std::string& d : dirs) p.arg(kul::File("*.obj", d).escm());
             for(const std::string& lib : libs) p.arg(staticLib(lib));
             for(const std::string& s: kul::cli::asArgs(linkerEnd)) p.arg(s);
 
@@ -314,7 +314,7 @@ class WINCompiler : public CCompiler{
                 for(const std::string& path : libPaths) p.arg("-LIBPATH:\"" + path + "\"");
                 for(const std::string& lib : libs) p.arg(staticLib(lib));
             }
-            for(const std::string& d : dirs) p.arg(kul::File("*.obj", d).esc());
+            for(const std::string& d : dirs) p.arg(kul::File("*.obj", d).escm());
             for(const std::string& s: kul::cli::asArgs(linkerEnd)) p.arg(s);
             CompilerProcessCapture pc;
             try{
