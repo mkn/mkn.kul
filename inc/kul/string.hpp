@@ -120,11 +120,11 @@ class String{
             v.push_back(l);
         }
         static bool NO_CASE_CMP(const std::string& a, const std::string& b){
-                std::string aCpy(a);
-                std::string bCpy(b);
-                std::transform(aCpy.begin(), aCpy.end(), aCpy.begin(), ::tolower);
-                std::transform(bCpy.begin(), bCpy.end(), bCpy.begin(), ::tolower);
-                return (aCpy == bCpy);
+            std::string aCpy(a);
+            std::string bCpy(b);
+            std::transform(aCpy.begin(), aCpy.end(), aCpy.begin(), ::tolower);
+            std::transform(bCpy.begin(), bCpy.end(), bCpy.begin(), ::tolower);
+            return (aCpy == bCpy);
         }
         static std::vector<std::string> LINES(const std::string& s){
             std::vector<std::string> v;
