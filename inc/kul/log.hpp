@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 #ifndef __KUL_LOG_FRMT__
-#define __KUL_LOG_FRMT__ "[%M]: %T - %D : %F/fn(%N)#%L - %S"
+#define __KUL_LOG_FRMT__ "[%M]: %T - %D : %F fn(%N)#%L - %S"
 #endif
 
 namespace kul{ namespace log{

@@ -44,7 +44,7 @@ Switches - OSX is considered BSD for swiches unless otherwise noted
  
 Key             __KUL_LOG_FRMT__ 
 Type            string
-Default         "[%M]: %T - %D : %F/fn(%N)#%L - %S"
+Default         "[%M]: %T - %D : %F fn(%N)#%L - %S"
 OS              all
 Description
 Logging format in format view:
