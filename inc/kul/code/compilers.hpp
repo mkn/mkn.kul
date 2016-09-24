@@ -41,26 +41,41 @@ class CompilerNotFoundException : public kul::Exception{
         CompilerNotFoundException(const char*f, const int l, std::string s) : kul::Exception(f, l, s){}
 };
 
+template<typename T, typename... Args> 
+std::unique_ptr<T> make_unique(Args&&... args){
+    return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
+}
+
 class Compilers{
     private:
         Compilers(){
-            gcc     = std::make_unique<cpp::GCCompiler>();
-            clang   = std::make_unique<cpp::ClangCompiler>();
-            intel   = std::make_unique<cpp::IntelCompiler>();
-            winc    = std::make_unique<cpp::WINCompiler>();
+            clang   = make_unique<cpp::ClangCompiler>();
+            gcc     = make_unique<cpp::GccCompiler>();
+            hcc     = make_unique<cpp::HccCompiler>();
 
-            wincs   = std::make_unique<csharp::WINCompiler>();
+            intel   = make_unique<cpp::IntelCompiler>();
+            winc    = make_unique<cpp::WINCompiler>();
+
+            wincs   = make_unique<csharp::WINCompiler>();
+
+            cs.insert(std::pair<std::string, Compiler*>("cl"        , winc.get()));
+            cs.insert(std::pair<std::string, Compiler*>("csc"       , wincs.get()));
+
+            cs.insert(std::pair<std::string, Compiler*>("clang"     , clang.get()));
+            cs.insert(std::pair<std::string, Compiler*>("clang++"   , clang.get()));
 
             cs.insert(std::pair<std::string, Compiler*>("gcc"       , gcc.get()));
             cs.insert(std::pair<std::string, Compiler*>("g++"       , gcc.get()));
-            cs.insert(std::pair<std::string, Compiler*>("nvcc"      , gcc.get()));
-            cs.insert(std::pair<std::string, Compiler*>("clang"     , clang.get()));
-            cs.insert(std::pair<std::string, Compiler*>("clang++"   , clang.get()));
+
+            cs.insert(std::pair<std::string, Compiler*>("hcc"       , hcc.get()));
+            cs.insert(std::pair<std::string, Compiler*>("h++"       , hcc.get()));
+
             cs.insert(std::pair<std::string, Compiler*>("icc"       , intel.get()));
             cs.insert(std::pair<std::string, Compiler*>("icpc"      , intel.get()));
-            cs.insert(std::pair<std::string, Compiler*>("cl"        , winc.get()));
-            cs.insert(std::pair<std::string, Compiler*>("csc"       , wincs.get()));
+
+            cs.insert(std::pair<std::string, Compiler*>("nvcc"      , gcc.get()));
         }
+        std::unique_ptr<Compiler> hcc;
         std::unique_ptr<Compiler> gcc;
         std::unique_ptr<Compiler> clang;
         std::unique_ptr<Compiler> intel;

@@ -52,9 +52,9 @@ class CCompiler : public Compiler{
         bool sourceIsBin() const{ return false; }
 };
 
-class GCCompiler : public CCompiler{
+class GccCompiler : public CCompiler{
     public:
-        GCCompiler(const int& v = 0) : CCompiler(v){}
+        GccCompiler(const int& v = 0) : CCompiler(v){}
         const std::string sharedLib(const std::string& lib) const {
             return "lib" + lib + ".so";
         }
@@ -208,9 +208,9 @@ class GCCompiler : public CCompiler{
         }
 };
 
-class ClangCompiler : public GCCompiler{
+class ClangCompiler : public GccCompiler{
     public:
-        ClangCompiler(const int& v = 0) : GCCompiler(v){}
+        ClangCompiler(const int& v = 0) : GccCompiler(v){}
         virtual const std::string cc() const {
             return "clang";
         }
@@ -219,9 +219,20 @@ class ClangCompiler : public GCCompiler{
         }
 };
 
-class IntelCompiler : public GCCompiler{
+class HccCompiler : public GccCompiler{
     public:
-        IntelCompiler(const int& v = 0) : GCCompiler(v){}
+        HccCompiler(const int& v = 0) : GccCompiler(v){}
+        virtual const std::string cc() const {
+            return "hcc";
+        }
+        virtual const std::string cxx() const {
+            return "h++";
+        }
+};
+
+class IntelCompiler : public GccCompiler{
+    public:
+        IntelCompiler(const int& v = 0) : GccCompiler(v){}
         virtual const std::string cc() const {
             return "icc";
         }
