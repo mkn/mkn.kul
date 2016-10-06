@@ -119,12 +119,10 @@ class String{
             }
             v.push_back(l);
         }
-        static bool NO_CASE_CMP(const std::string& a, const std::string& b){
-            std::string aCpy(a);
-            std::string bCpy(b);
-            std::transform(aCpy.begin(), aCpy.end(), aCpy.begin(), ::tolower);
-            std::transform(bCpy.begin(), bCpy.end(), bCpy.begin(), ::tolower);
-            return (aCpy == bCpy);
+        static bool NO_CASE_CMP(std::string a, std::string b){
+            std::transform(a.begin(), a.end(), a.begin(), ::tolower);
+            std::transform(b.begin(), b.end(), b.begin(), ::tolower);
+            return (a == b);
         }
         static std::vector<std::string> LINES(const std::string& s){
             std::vector<std::string> v;
