@@ -419,7 +419,8 @@ namespace os{
 inline uint16_t exec(const std::string& cmd, bool q = false){
     if(q){
         return system(std::string(cmd + " > nul").c_str());
-    }else return system(cmd.c_str());
+    }
+    return system(cmd.c_str());
 }
 inline std::string EOL(){
     #if (_MSC_VER >= 1800 )
@@ -442,10 +443,11 @@ inline kul::Dir home(const std::string& app){
 #else
 namespace os{
 inline int exec(const std::string& cmd, bool q = false){
-    if(q){
-        return system(std::string(cmd + " > /dev/null").c_str());
-    }else return system(cmd.c_str());
-    return system(cmd.c_str());
+    int r = 0;
+    if(q) r = system(std::string(cmd + " > /dev/null").c_str());
+    else  r = system(cmd.c_str());
+    if(r < 0) return r;
+    return WEXITSTATUS(r);
 }
 inline std::string EOL(){
     return "\n";
