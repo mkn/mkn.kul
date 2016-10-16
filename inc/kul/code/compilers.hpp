@@ -36,6 +36,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace kul{ namespace code{ 
 
+class Exception : public kul::Exception{
+    public:
+        Exception(const char*f, const int l, std::string s) : kul::Exception(f, l, s){}
+};
+
 class CompilerNotFoundException : public kul::Exception{
     public:
         CompilerNotFoundException(const char*f, const int l, std::string s) : kul::Exception(f, l, s){}
@@ -81,11 +86,19 @@ class Compilers{
         std::unique_ptr<Compiler> intel;
         std::unique_ptr<Compiler> winc;
         std::unique_ptr<Compiler> wincs;
+
+        kul::hash::map::S2T<Compiler*> masks;
+
         hash::map::S2T<Compiler*> cs;
     public:
         static Compilers& INSTANCE(){ 
             static Compilers instance;
             return instance;
+        }
+        const std::vector<std::string> keys(){
+            std::vector<std::string> ks;
+            for(const auto& p : cs) ks.push_back(p.first);
+            return ks;
         }
         const std::string key(std::string comp){
             kul::String::REPLACE_ALL(comp, ".exe", "");
@@ -100,15 +113,22 @@ class Compilers{
             if(std::string(kul::Dir(comp).locl()).find(kul::Dir::SEP()) != std::string::npos){
                 comp = comp.substr(comp.rfind(kul::Dir::SEP()) + 1);
                 if(cs.count(comp)) return comp;
-
             }
-            std::vector<std::string> bits;
-            kul::String::SPLIT(comp, '-', bits);
-            for(const auto& s : bits) if(cs.count(s)) return s;
+
             KEXCEPT(CompilerNotFoundException, "Compiler for " + comp + " is not implemented");
         }
+        void addMask(const std::string& m, const std::string& c) throw(CompilerNotFoundException){
+            const std::string k(key(c));
+            if(cs.count(m)) KEXCEPT(Exception, "Mask cannot replace compiler");
+            masks[m] = (*cs.find(k)).second; 
+        }
         const Compiler* get(std::string comp) throw(CompilerNotFoundException){
-            return (*cs.find(key(comp))).second;
+            try{
+                return (*cs.find(key(comp))).second;
+            }catch(const CompilerNotFoundException& e){
+                if(masks.count(comp)) return (*masks.find(key(comp))).second;
+            }
+            KEXCEPT(CompilerNotFoundException, "Compiler for " + comp + " is not implemented");
         }
 };
 
