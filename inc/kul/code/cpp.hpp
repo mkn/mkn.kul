@@ -31,6 +31,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _KUL_CODE_CPP_HPP_
 #define _KUL_CODE_CPP_HPP_
 
+#include <unordered_map>
+
 #include "kul/code/compiler.hpp"
 
 namespace kul{ namespace code{ namespace cpp{ 
@@ -50,6 +52,27 @@ class CCompiler : public Compiler{
         virtual const std::string sharedLib(const std::string& lib) const = 0;
         virtual const std::string staticLib(const std::string& lib) const = 0;
         bool sourceIsBin() const{ return false; }
+
+        const std::string oType(const std::vector<std::string>& objs) const {
+            size_t i = 0;
+            std::string most("o");
+            std::unordered_map<std::string, size_t> keys;
+            for(const auto& s : objs){
+                std::string t(s.substr(s.rfind(".") + 1));
+                if(!keys.count(t)) keys[t] = 0;
+                keys[t]++;
+            }
+            for(const auto& p : keys){
+                if(p.second > i){
+                    i = p.second;
+                    most = p.first;
+                }
+            }
+            return most;
+        }
+        const std::string oStar(const std::vector<std::string>& objs) const {
+            return "*." + oType(objs);
+        }
 };
 
 class GccCompiler : public CCompiler{
@@ -85,7 +108,7 @@ class GccCompiler : public CCompiler{
             for(const std::string& path : libPaths) p.arg("-L" + path);
             if(mode == Mode::STAT) p.arg("-static");
             p.arg("-o").arg(out);
-            for(const std::string& d : dirs) p.arg(kul::File("*.obj", d).escm());
+            for(const std::string& d : dirs) p.arg(kul::File(oStar(objects), d).escm());
             for(const std::string& lib : libs)  p.arg("-l" + lib);
             for(const std::string& s: kul::cli::asArgs(linkerEnd)) p.arg(s);
             
@@ -125,7 +148,7 @@ class GccCompiler : public CCompiler{
             for(unsigned int i = 1; i < bits.size(); i++) p.arg(bits[i]);
             if(mode == Mode::SHAR) p.arg("-shared").arg("-o");
             p.arg(lib);
-            for(const std::string& d : dirs) p.arg(kul::File("*.obj", d).escm());
+            for(const std::string& d : dirs) p.arg(kul::File(oStar(objects), d).escm());
             for(const std::string& s: kul::cli::asArgs(linkerEnd)) p.arg(s);
             CompilerProcessCapture pc;
             try{
@@ -281,7 +304,7 @@ class WINCompiler : public CCompiler{
             for(unsigned int i = 1; i < bits.size(); i++) p.arg(bits[i]);
             p.arg("-OUT:\"" + exe + "\"").arg("-nologo");
             for(const std::string& path : libPaths) p.arg("-LIBPATH:\"" + path + "\"");
-            for(const std::string& d : dirs) p.arg(kul::File("*.obj", d).escm());
+            for(const std::string& d : dirs) p.arg(kul::File(oStar(objects), d).escm());
             for(const std::string& lib : libs) p.arg(staticLib(lib));
             for(const std::string& s: kul::cli::asArgs(linkerEnd)) p.arg(s);
 
@@ -325,7 +348,7 @@ class WINCompiler : public CCompiler{
                 for(const std::string& path : libPaths) p.arg("-LIBPATH:\"" + path + "\"");
                 for(const std::string& lib : libs) p.arg(staticLib(lib));
             }
-            for(const std::string& d : dirs) p.arg(kul::File("*.obj", d).escm());
+            for(const std::string& d : dirs) p.arg(kul::File(oStar(objects), d).escm());
             for(const std::string& s: kul::cli::asArgs(linkerEnd)) p.arg(s);
             CompilerProcessCapture pc;
             try{
