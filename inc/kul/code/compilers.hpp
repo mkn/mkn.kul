@@ -87,9 +87,25 @@ class Compilers{
         std::unique_ptr<Compiler> winc;
         std::unique_ptr<Compiler> wincs;
 
-        kul::hash::map::S2T<Compiler*> masks;
+        hash::map::S2T<Compiler*> cs, masks;
 
-        hash::map::S2T<Compiler*> cs;
+        const std::string key(std::string comp, const hash::map::S2T<Compiler*>& map){
+            kul::String::REPLACE_ALL(comp, ".exe", "");
+            if(map.count(comp) > 0) return comp;
+            if(comp.find(" ") != std::string::npos)
+                for(const std::string& s :kul::String::SPLIT(comp, ' ')){
+                    if(map.count(s) > 0) return s;
+                    if(std::string(kul::Dir(s).locl()).find(kul::Dir::SEP()) != std::string::npos)
+                        if(map.count(s.substr(s.rfind(kul::Dir::SEP()) + 1)))
+                            return s.substr(s.rfind(kul::Dir::SEP()) + 1);
+                }
+            if(std::string(kul::Dir(comp).locl()).find(kul::Dir::SEP()) != std::string::npos){
+                comp = comp.substr(comp.rfind(kul::Dir::SEP()) + 1);
+                if(map.count(comp)) return comp;
+            }
+
+            KEXCEPT(CompilerNotFoundException, "Compiler for " + comp + " is not implemented");
+        }
     public:
         static Compilers& INSTANCE(){ 
             static Compilers instance;
@@ -100,35 +116,16 @@ class Compilers{
             for(const auto& p : cs) ks.push_back(p.first);
             return ks;
         }
-        const std::string key(std::string comp){
-            kul::String::REPLACE_ALL(comp, ".exe", "");
-            if(cs.count(comp) > 0) return comp;
-            if(comp.find(" ") != std::string::npos)
-                for(const std::string& s :kul::String::SPLIT(comp, ' ')){
-                    if(cs.count(s) > 0) return s;
-                    if(std::string(kul::Dir(s).locl()).find(kul::Dir::SEP()) != std::string::npos)
-                        if(cs.count(s.substr(s.rfind(kul::Dir::SEP()) + 1)))
-                            return s.substr(s.rfind(kul::Dir::SEP()) + 1);
-                }
-            if(std::string(kul::Dir(comp).locl()).find(kul::Dir::SEP()) != std::string::npos){
-                comp = comp.substr(comp.rfind(kul::Dir::SEP()) + 1);
-                if(cs.count(comp)) return comp;
-            }
-
-            KEXCEPT(CompilerNotFoundException, "Compiler for " + comp + " is not implemented");
-        }
         void addMask(const std::string& m, const std::string& c) throw(CompilerNotFoundException){
-            const std::string k(key(c));
+            const std::string k(key(c, cs));
             if(cs.count(m)) KEXCEPT(Exception, "Mask cannot replace compiler");
-            masks[m] = (*cs.find(k)).second; 
+            masks[m] = cs[k];
         }
-        const Compiler* get(std::string comp) throw(CompilerNotFoundException){
+        const Compiler* get(const std::string& comp) throw(CompilerNotFoundException){
             try{
-                return (*cs.find(key(comp))).second;
-            }catch(const CompilerNotFoundException& e){
-                if(masks.count(comp)) return (*masks.find(key(comp))).second;
-            }
-            KEXCEPT(CompilerNotFoundException, "Compiler for " + comp + " is not implemented");
+                return cs[key(comp, cs)];
+            }catch(const CompilerNotFoundException& e){}
+            return masks[key(comp, masks)];
         }
 };
 
