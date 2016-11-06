@@ -282,17 +282,22 @@ class File : public fs::Item {
     public:
         File() : _n(), _d(){}
         File(const std::string& n, bool m = false) : _n(Dir::LOCL(n)), _d(env::CWD()){
-            if(!is()){
-                if(n.find(Dir::SEP()) != std::string::npos){
-                    this->_n = this->_n.substr(n.rfind(Dir::SEP()) + 1);
-                }
-            }
-            if(n.find(Dir::SEP()) != std::string::npos){
-                this->_d = Dir(n.substr(0, n.rfind(Dir::SEP())));
-            }else{
+            if(is()){
                 try{
-                    this->_d = Dir(Dir::PRNT(Dir::REAL(this->_n)), m);
+                    this->_n = Dir::REAL(this->_n);
+                    this->_d = Dir(Dir::PRNT(this->_n), m);
+                    this->_n = this->_n.substr(_d.path().size() + 1);
                 }catch(const kul::fs::Exception& e){}
+            }
+            else{
+                if(n.find(Dir::SEP()) != std::string::npos){
+                    this->_d = Dir(n.substr(0, n.rfind(Dir::SEP())));
+                    this->_n = this->_n.substr(n.rfind(Dir::SEP()) + 1);
+                }else{
+                    try{
+                        this->_d = Dir(Dir::PRNT(Dir::REAL(this->_n)), m);
+                    }catch(const kul::fs::Exception& e){}
+                }
             }
         }
         File(const char* n, bool m = false) : File(std::string(n), m){}
