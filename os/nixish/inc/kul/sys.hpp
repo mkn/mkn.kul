@@ -70,7 +70,7 @@ class SharedFunction {
     public:
         SharedFunction(SharedLibrary& lib, const std::string& f) throw(Exception) : _lib(lib){
             _funcP = (F*) dlsym(_lib._handle, f.c_str());
-            dlsym_error = dlerror();
+            const char* dlsym_error = dlerror();
             if (dlsym_error) KEXCEPSTREAM << "Cannot load symbol create " << dlsym_error;
         }
         ~SharedFunction(){
