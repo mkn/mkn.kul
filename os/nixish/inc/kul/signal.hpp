@@ -31,6 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _KUL_SIGNAL_HPP_
 #define _KUL_SIGNAL_HPP_
 
+#include <kul/log.hpp>
 #include "kul/proc.hpp"
 
 #include  <signal.h>

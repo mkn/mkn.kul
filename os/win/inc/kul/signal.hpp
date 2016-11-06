@@ -31,6 +31,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _KUL_SIGNAL_HPP_
 #define _KUL_SIGNAL_HPP_
 
+#include <kul/log.hpp>
+
 #include <Windows.h>
 #include <DbgHelp.h>
 #pragma comment(lib, "Dbghelp.lib")
