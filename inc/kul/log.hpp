@@ -144,7 +144,8 @@ class Message{
 
         Message(const log::mode& m) : m(m){}
     public:
-        template<class T> Message& operator<<(const T& s){
+        template<class T> 
+        Message& operator<<(const T& s){
             ss << s;
             return *this;
         }

@@ -44,17 +44,22 @@ class Exception : public std::runtime_error{
         const char* _f;
         const uint16_t _l;
         const std::exception_ptr _ep;
+        std::stringstream msg;
     public:
         ~Exception() KNOEXCEPT{}
-        Exception(const char*f, const uint16_t& l, const std::string& s) : std::runtime_error(s), _f(f), _l(l), _ep(std::current_exception()){}
+        Exception(const char*f, const uint16_t& l, const std::string& s = "") : std::runtime_error(s), _f(f), _l(l), _ep(std::current_exception()){}
         Exception(const Exception& e) : std::runtime_error(e.what()), _f(e.file()),  _l(e.line()), _ep(e._ep) {}
         Exception& operator=(const Exception& e) = default;
 
-        const std::string debug()         const { return std::string(std::string(_f) + " : " + std::to_string(_l) + " : " + std::string(what()));}
+        const std::string debug()         const { 
+            std::stringstream ss;
+            ss << _f << " : " << _l << " : " << what() << msg.str();
+            return ss.str();
+        }
         const char* file()                const { return _f;}
         const uint16_t& line()            const { return _l;}
         const std::exception_ptr& cause() const { return _ep;}
-        const std::string stack()   const {
+        const std::string stack()         const {
             std::stringstream ss;
             if(_ep){
                 try{                            std::rethrow_exception(_ep); }
@@ -64,6 +69,11 @@ class Exception : public std::runtime_error{
             }
             ss << debug();
             return ss.str();
+        }
+        template<class T> 
+        Exception& operator<<(const T& s){
+            msg << s;
+            return *this;
         }
 };
 
@@ -76,8 +86,10 @@ class Exit : public Exception{
         const uint16_t& code() const { return _e; }
 };
 
-#define KEXCEPT(c, m) throw c(__FILE__, __LINE__, m)
+#define KEXCEPT(e, m) throw e(__FILE__, __LINE__, m)
+#define KEXCEPTSTR(e) throw e(__FILE__, __LINE__, "")
 #define KEXCEPTION(m) throw Exception(__FILE__, __LINE__, m)
+#define KEXCEPSTREAM  throw Exception(__FILE__, __LINE__, "")
 
 #define KEXIT(e, m) throw kul::Exit(__FILE__, __LINE__, m, e)
 

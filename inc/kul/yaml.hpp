@@ -151,7 +151,8 @@ class File : public Item{
             reload();
         }
     public:
-        template <class T> static T CREATE(const std::string& f) throw(Exception) {
+        template <class T> 
+        static T CREATE(const std::string& f) throw(Exception) {
             T file(f);
             file.validate(file.root(), file.validator().children());
             return file;
