@@ -98,7 +98,6 @@ class SharedClass{
             t = _c.pointer()();
             if(!t) KEXCEPSTREAM << "Dynamically loaded class was not created";
         }
-        template <class T>
         void destruct (T*& t){
             _d.pointer()(t);
             t = nullptr;

@@ -52,7 +52,7 @@ class SharedLibrary {
     public:
         SharedLibrary(const kul::File& f) throw(Exception) : _f(f){
             if(!_f) KEXCEPSTREAM << "Library attempted to be loaded does not exist: " << _f.full();
-            _handle = dlopen(_f.real(), RTLD_LAZY);
+            _handle = dlopen(_f.real().c_str(), RTLD_LAZY);
             if(!_handle) KEXCEPSTREAM << "Cannot load library: " << dlerror();
             _loaded = 1;
         }
@@ -62,16 +62,6 @@ class SharedLibrary {
         }
 };
 
-
-
-
-    destroy_t* destroy_triangle = (destroy_t*) dlsym(triangle, "destroy");
-    dlsym_error = dlerror();
-    if (dlsym_error) {
-        KERR << "Cannot load symbol destroy: " << dlsym_error;
-        return 1;
-    }
-
 template <class F>
 class SharedFunction {
     private:
@@ -79,7 +69,7 @@ class SharedFunction {
         SharedLibrary& _lib;
     public:
         SharedFunction(SharedLibrary& lib, const std::string& f) throw(Exception) : _lib(lib){
-            _funcP = (F*) dlsym(_lib._handle, f);
+            _funcP = (F*) dlsym(_lib._handle, f.c_str());
             dlsym_error = dlerror();
             if (dlsym_error) KEXCEPSTREAM << "Cannot load symbol create " << dlsym_error;
         }
@@ -110,7 +100,6 @@ class SharedClass{
             t = _c.pointer()();
             if(!t) KEXCEPSTREAM << "Dynamically loaded class was not created";
         }
-        template <class T>
         void destruct (T*& t){
             _d.pointer()(t);
             t = nullptr;
