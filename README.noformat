@@ -94,3 +94,10 @@ Default         3
 OS              nix/bsd
 Description
 Allows N retries for "dup(fileDescriptor") calls in forked process.
+
+Key             __KUL_SYS_DLOPEN__ 
+Type            text
+Default         RTLD_NOW|RTLD_GLOBAL
+OS              nix/bsd
+Description
+Flags for dlopen, see https://linux.die.net/man/3/dlopen

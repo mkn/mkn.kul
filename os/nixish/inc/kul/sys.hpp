@@ -36,8 +36,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <dlfcn.h>
 
-namespace kul{
+#ifndef __KUL_SYS_DLOPEN__
+#define __KUL_SYS_DLOPEN__ RTLD_NOW|RTLD_GLOBAL
+#endif//__KUL_SYS_DLOPEN__
 
+namespace kul{
 namespace sys {
 
 template <class F>
@@ -51,14 +54,17 @@ class SharedLibrary {
         const kul::File _f;
     public:
         SharedLibrary(const kul::File& f) throw(Exception) : _f(f){
+            KLOG(INF) << f;
+            if(f) KLOG(INF) << f.real();
             if(!_f) KEXCEPSTREAM << "Library attempted to be loaded does not exist: " << _f.full();
-            _handle = dlopen(_f.real().c_str(), RTLD_LAZY);
+            _handle = dlopen(_f.real().c_str(), __KUL_SYS_DLOPEN__);
             if(!_handle) KEXCEPSTREAM << "Cannot load library: " << dlerror();
             _loaded = 1;
+            if(f) KLOG(INF);
         }
         ~SharedLibrary(){
             if(_loaded) dlclose(_handle);
-    		dlerror();
+            dlerror();
         }
 };
 
@@ -74,7 +80,7 @@ class SharedFunction {
             if (dlsym_error) KEXCEPSTREAM << "Cannot load symbol create " << dlsym_error;
         }
         ~SharedFunction(){
-    		dlerror();
+            dlerror();
         }
         F* pointer(){
             return _funcP;

@@ -67,7 +67,7 @@ class FunctionScope {
 		const char* m_fi;
 		const char* m_fu;
 	public:
-		FunctionScope(const char* fi, const char* fu) : m_fi(fi), m_fu(fu), m_start(kul::Now::MICROS()){
+		FunctionScope(const char* fi, const char* fu) : m_start(kul::Now::MICROS()), m_fi(fi), m_fu(fu) {
 			KUL_DBG_FUNC_ON_ENTER
 		}
 		~FunctionScope(){
