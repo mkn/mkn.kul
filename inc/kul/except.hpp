@@ -48,12 +48,15 @@ class Exception : public std::runtime_error{
     public:
         ~Exception() KNOEXCEPT{}
         Exception(const char*f, const uint16_t& l, const std::string& s = "") : std::runtime_error(s), _f(f), _l(l), _ep(std::current_exception()){}
-        Exception(const Exception& e) : std::runtime_error(e.what()), _f(e.file()),  _l(e.line()), _ep(e._ep) {}
+        Exception(const Exception& e) : std::runtime_error(e.what()), _f(e.file()),  _l(e.line()), _ep(e._ep), msg(e.msg.str()) {}
         Exception& operator=(const Exception& e) = default;
 
         const std::string debug()         const { 
             std::stringstream ss;
-            ss << _f << " : " << _l << " : " << what() << msg.str();
+            ss  << (_f ? _f : "<UNKNOWN FILE>") << " : "
+                << _l << " : " 
+                << what() 
+                << msg.str();
             return ss.str();
         }
         const char* file()                const { return _f;}

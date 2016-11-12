@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 REQUIRES
     dep:
       - name: parse.yaml
-        version: stable
+        version: master
         scm: http://github.com/mkn/parse.yaml
 */
 
@@ -42,12 +42,13 @@ REQUIRES
 
 #include "kul/io.hpp"
 #include "kul/map.hpp"
-#include "kul/except.hpp"
+#include "kul/dbg.hpp"
 
 #include "yaml-cpp/yaml.h"
 
 namespace kul{ namespace yaml{
 
+class Validator;
 class NodeValidator;
 
 class Exception : public kul::Exception{
@@ -56,14 +57,6 @@ class Exception : public kul::Exception{
 };
 
 enum NodeType { NON = 0, STRING, LIST, MAP };
-
-class Validator{
-    private:
-        const std::vector<NodeValidator> kids;
-    public:
-        Validator(const std::vector<NodeValidator>& kids) : kids(kids){}
-        const std::vector<NodeValidator>&   children()  const { return this->kids; }
-};
 
 class NodeValidator{
     private:        
@@ -84,41 +77,55 @@ class NodeValidator{
 };
 
 class Item{
+    friend class Validator;
     protected:
         YAML::Node r;
-        void validate(const YAML::Node& n, const std::vector<NodeValidator>& nvs) throw(Exception){
+
+        Item(){}
+        Item(const YAML::Node& r) : r(r){}
+
+        static void VALIDATE(const YAML::Node& n, const std::vector<NodeValidator>& nvs) throw(Exception){
+            KUL_DBG_FUNC_ENTER
             kul::hash::set::String keys;
             for(const auto& nv : nvs) if(nv.name() == "*") return;
 
             for(YAML::const_iterator it = n.begin(); it != n.end(); ++it){
                 const std::string& key(it->first.as<std::string>());
-                if(keys.count(key)) KEXCEPTION("Duplicate key detected: " + key + "\n" + str());
+                if(keys.count(key)) KEXCEPTION("Duplicate key detected: " + key);
                 keys.insert(key);
                 bool f = 0;
                 for(const auto& nv : nvs){
                     if(nv.name() != key) continue;
                     f = 1;
-                    if(nv.type() == 1 && it->second.Type() != 2) KEXCEPTION("String expected: " + nv.name() + "\n" + str());
-                    if(nv.type() == 2 && it->second.Type() != 3) KEXCEPTION("List expected: " + nv.name() + "\n" + str());
-                    if(nv.type() == 3 && it->second.Type() != 4) KEXCEPTION("Map expected: " + nv.name() + "\n" + str());
+                    if(nv.type() == 1 && it->second.Type() != 2) KEXCEPTION("String expected: " + nv.name());
+                    if(nv.type() == 2 && it->second.Type() != 3) KEXCEPTION("List expected: " + nv.name());
+                    if(nv.type() == 3 && it->second.Type() != 4) KEXCEPTION("Map expected: " + nv.name());
                     if(nv.type() == 2)
                         for(size_t i = 0; i < it->second.size(); i++)
-                            validate(it->second[i], nv.children());
-                    if(nv.type() == 3) validate(it->second, nv.children());
+                            VALIDATE(it->second[i], nv.children());
+                    if(nv.type() == 3) VALIDATE(it->second, nv.children());
                 }
-                if(!f) KEXCEPTION("Unexpected key: " + key + "\n" + str());
+                if(!f) KEXCEPTION("Unexpected key: " + key);
             }
             for(const auto& nv : nvs){
                 if(nv.mandatory() && !keys.count(nv.name()))
-                    KEXCEPTION("Key mandatory: : " + nv.name() + "\n" + str());
+                    KEXCEPTION("Key mandatory: : " + nv.name());
             }
         }
-        Item(){}
-        Item(const YAML::Node& r) : r(r){}
-        const virtual std::string str() const = 0;
     public:
         virtual ~Item(){}
         const YAML::Node&       root() const { return r; }
+};
+
+class Validator{
+    private:
+        const std::vector<NodeValidator> kids;
+    public:
+        Validator(const std::vector<NodeValidator>& kids) : kids(kids){}
+        const std::vector<NodeValidator>&   children()  const { return this->kids; }
+        void validate(const YAML::Node& n){
+            Item::VALIDATE(n, children());
+        }
 };
 
 class String : public Item{
@@ -131,10 +138,9 @@ class String : public Item{
             }catch(const std::exception& e){ KEXCEPTION("YAML failed to parse\nString: "+s); }
         }
         const YAML::Node& validate(const Validator&& v) throw(Exception) {
-            Item::validate(root(), v.children());
+            Item::VALIDATE(root(), v.children());
             return r;
         }
-        const std::string str()   const { return s; } 
 };
 
 class File : public Item{
@@ -154,12 +160,15 @@ class File : public Item{
         template <class T> 
         static T CREATE(const std::string& f) throw(Exception) {
             T file(f);
-            file.validate(file.root(), file.validator().children());
+            try{
+                Item::VALIDATE(file.root(), file.validator().children());
+            }catch(const kul::yaml::Exception& e){
+                KEXCEPTION("YAML error encountered in file: " + f);
+            }
             return file;
         }
         virtual ~File(){}
         const std::string& file() const  { return f; }
-        const std::string  str()  const { return file(); } 
         const virtual Validator validator() const = 0;
 };
 
