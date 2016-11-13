@@ -54,7 +54,7 @@ class SharedLibrary {
             if(!_f) KEXCEPSTREAM << "Library attempted to be loaded does not exist: " << _f.full();
             LPSTR lib = _strdup(_f.real().c_str());
             _handle = LoadLibrary(lib);
-            if(!_handle) KEXCEPSTREAM << "Cannot load library: " << GetLastError();
+            if(!_handle) KEXCEPSTREAM << "Cannot load library: " << f.name() << " - Error: " << GetLastError();
             _loaded = 1;
         }
         ~SharedLibrary(){
