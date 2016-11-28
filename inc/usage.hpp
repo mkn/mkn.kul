@@ -98,6 +98,15 @@ class TestThreadQueueQObject : public TestThreadQueueObject{
         void print(){ KLOG(INF) << "i = " << i;}
 };
 
+class TestConcQueueQObject{
+    public:
+        TestConcQueueQObject(){}
+        void operator()(){
+            KLOG(INF) << "TestConcQueueQObject RUNNING";
+            kul::this_thread::sleep(10);
+        }
+};
+
 class TestIPCServer : public kul::ipc::Server{
     public:
         TestIPCServer() : kul::ipc::Server("uuid", 1){} // UUID     CHECKS ONCE
@@ -248,6 +257,26 @@ class Test{
                 tp2.join();
                 ttpo2.print();
             }
+
+
+            TestConcQueueQObject tcqqo;
+            ConcurrentThreadQueue<void()> ctq(5, 1);
+            for(size_t i = 0; i < 10; i++) 
+                ctq.async(std::bind(&TestConcQueueQObject::operator(), std::ref(tcqqo)));
+            kul::this_thread::sleep(500);
+            ctq.shutdown();
+            ctq.join();
+
+            kul::ConcurrentThreadPool<> ctp(5, 1);
+            auto lambda = [](uint a, uint b){ KLOG(INF) << (a + b); };
+            ctp.async(std::bind(lambda, 2, 4));
+            auto lambdb = [](uint a, uint b){ KLOG(INF) << (a + b); KEXCEPT(kul::Exception, "Exceptional!"); };
+            auto lambex = [](const kul::Exception& e){ KLOG(ERR) << e.stack(); };
+            ctp.async(std::bind(lambdb, 2, 4), std::bind(lambex, std::placeholders::_1));
+            kul::this_thread::sleep(500);
+            ctp.shutdown();
+            ctp.join();
+
             TestIPC().run();
 
             KOUT(NON) << "Phsical RAM used in KB: " << kul::this_proc::physicalMemory();

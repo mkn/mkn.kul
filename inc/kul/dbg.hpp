@@ -46,8 +46,8 @@ namespace kul{ namespace dbg{
 #endif//KUL_DBG_FUNC_ON_ENTER
 
 #ifndef KUL_DBG_FUNC_ON_EXIT
-#define KUL_DBG_FUNC_ON_EXIT KOUT(DBG) \
-	    << kul::LogMan::INSTANCE().str(m_fi, m_fu, 0, kul::log::mode::DBG, "", "[%M]: %T - %D : %F fn(%N)") \
+#define KUL_DBG_FUNC_ON_EXIT KOUT(TRC) \
+	    << kul::LogMan::INSTANCE().str(m_fi, m_fu, 0, kul::log::mode::TRC, "", "[%M]: %T - %D : %F fn(%N)") \
 		<< " - Time in function: " << (kul::Now::MICROS() - m_start);
 #endif//KUL_DBG_FUNC_ON_EXIT
 

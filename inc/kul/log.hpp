@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace kul{ namespace log{
 
-enum mode { OFF = -1, NON = 0, INF, ERR, DBG};
+enum mode { OFF = -1, NON = 0, INF, ERR, DBG, OTH, TRC};
 
 class Exception : public kul::Exception{
     public:
@@ -88,6 +88,8 @@ class Logger{
             if(m == 1)      s = "INF";
             else if(m == 2) s = "ERR";
             else if(m == 3) s = "DBG";
+            else if(m == 4) s = "OTH";
+            else if(m == 5) s = "TRC";
             return s;
         }
         friend class LogMan;
@@ -106,6 +108,8 @@ class LogMan{
                 else if(s == "1"  || s == "INF") m = log::mode::INF;
                 else if(s == "2"  || s == "ERR") m = log::mode::ERR;
                 else if(s == "3"  || s == "DBG") m = log::mode::DBG;
+                else if(s == "4"  || s == "OTH") m = log::mode::OTH;
+                else if(s == "5"  || s == "TRC") m = log::mode::TRC;
                 else {
                     m = log::mode::ERR;
                     out(m, "ERROR DISCERNING LOG LEVEL, ERROR LEVEL IN USE");
@@ -179,12 +183,14 @@ class ErrMessage : public Message{
 #define KLOG_INF    kul::LogMessage(__FILE__, __func__, __LINE__, kul::log::mode::INF)
 #define KLOG_ERR    kul::LogMessage(__FILE__, __func__, __LINE__, kul::log::mode::ERR)
 #define KLOG_DBG    kul::LogMessage(__FILE__, __func__, __LINE__, kul::log::mode::DBG)
+#define KLOG_TRC    kul::LogMessage(__FILE__, __func__, __LINE__, kul::log::mode::TRC)
 #define KLOG(sev) KLOG_ ## sev
 
 #define KOUT_NON    kul::OutMessage()
 #define KOUT_INF    kul::OutMessage(kul::log::mode::INF)
 #define KOUT_ERR    kul::OutMessage(kul::log::mode::ERR)
 #define KOUT_DBG    kul::OutMessage(kul::log::mode::DBG)
+#define KOUT_TRC    kul::OutMessage(kul::log::mode::TRC)
 #define KOUT(sev) KOUT_ ## sev
 
 #define KERR        kul::ErrMessage()
