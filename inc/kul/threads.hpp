@@ -154,13 +154,15 @@ template<class F, class E = kul::Exception>
 class ConcurrentThreadQueue{
     friend class kul::Thread;
     protected:
-        bool _detatched = 0, _up = 0;
+        size_t _cur = 0, _max = 1;
+        const uint64_t m_nWait;
+        std::atomic<bool> _block, _detatched, _up;
         std::queue<std::pair<std::function<F>, std::function<void(const E&)>>> _q;
         kul::hash::map::S2T<std::shared_ptr<kul::Thread>> _k;
         kul::hash::map::S2T<std::function<void(const E&)>> _e;
-        size_t _cur = 0, _max = 1;
+
         kul::Thread _thread;
-        kul::Mutex _qmutex;
+        kul::Mutex _mmutex, _qmutex;
 
         void _throw(const std::exception_ptr& ep, const std::function<void(const E&)>& func){
             try{
@@ -171,7 +173,7 @@ class ConcurrentThreadQueue{
         }
         virtual void operator()(){
             while(_up){
-                this_thread::nSleep(1000000);
+                this_thread::nSleep(m_nWait);
                 {
                     kul::ScopeLock l(_qmutex);
                     if(_q.empty()) continue;      
@@ -206,34 +208,56 @@ class ConcurrentThreadQueue{
             }
         }
     public:
-        ConcurrentThreadQueue(const size_t& max = 1, bool strt = 0) : _max(max), _thread(std::ref(*this)){
+        ConcurrentThreadQueue(const size_t& max = 1, bool strt = 0, const uint64_t& nWait = 1000000) 
+                : _max(max), m_nWait(nWait), _block(0), _detatched(0), _up(0), _thread(std::ref(*this)){
             _k.setDeletedKey("");
             _e.setDeletedKey("");
             if(strt) start();
         }
-        void detatch(bool d = 1){
-            _detatched = d;
+
+        virtual ConcurrentThreadQueue& detach(){
+            _detatched = 1;
+            return *this;
         }
-        virtual void shutdown(bool wait = 1, uint8_t timeout = 5){
-            _up = 0;
-            if(wait) join();
-        }
-        virtual void join(){
+        virtual ConcurrentThreadQueue& join(){
             _thread.join();
+            return *this;
         }
-        void stop(bool force = 1){
+        virtual ConcurrentThreadQueue& stop(){
             _up = 0;
-            if(!force) while(_q.size()){}
+            return *this;
         }
-        virtual void start(){
+        virtual ConcurrentThreadQueue& finish(const uint64_t& nWait = 1000000){
+            while(_up){
+                this_thread::nSleep(m_nWait);
+                {
+                    kul::ScopeLock l(_qmutex);
+                    if(_q.empty()) stop();
+                }
+            }
+            return *this;
+        }
+        virtual ConcurrentThreadQueue& block(){
+            _block = 1;
+            return *this;
+        }
+        virtual ConcurrentThreadQueue& unblock(){
+            _block = 0;
+            return *this;
+        }
+        virtual ConcurrentThreadQueue& start(){
             if(!_up){
                 _up  = 1;
                 _thread.run();
             }
+            return *this;
         }
-        void async(const std::function<F>& function, const std::function<void(const E&)>& exception = std::function<void(const E&)>()){
+
+        ConcurrentThreadQueue& async(const std::function<F>& function, const std::function<void(const E&)>& exception = std::function<void(const E&)>()){
+            if(_block) return *this;
             kul::ScopeLock l(_qmutex);
             _q.push(std::make_pair(function, exception));
+            return *this;
         }
 
         const std::exception_ptr& exception(){ 
@@ -241,68 +265,67 @@ class ConcurrentThreadQueue{
         }
 };
 
-template<class E>
+template<class E, class PT>
 class ConcurrentThreadPool;
 
 class PoolThread{
-    template<class E>
+    template<class E, class PT>
     friend class ConcurrentThreadPool;
-    private:
-        bool _finished = 0, _ready = 1, _run = 1;
-        std::function<void()> _function;
+    protected:
+        const uint64_t m_nWait;
+        std::atomic<bool> m_ready, m_run;
+        std::function<void()> m_function;
         kul::Mutex _mutex;
 
-        void set(const std::function<void()>& f){
-            kul::ScopeLock l(_mutex);
-            _function = f;
-            _ready = 0;
+        bool if_ready_set(const std::function<void()>& f){           
+            if(!m_ready) return false;
+            m_function = f;
+            m_ready = 0;
+            return true;
         }
-        bool ready(){
-             kul::ScopeLock l(_mutex);
-            return _ready;
+
+        void stop(){
+            m_run = 0;
         }
-        void shutdown(bool wait = 0, uint8_t timeout = 5){
-            {
-                kul::ScopeLock l(_mutex);
-                _run = 0;
-            }
-            uint8_t t = 0;
-            if(wait && timeout) 
-                while(!_finished) {
-                    kul::this_thread::sleep(1);
-                    t++;
-                    if(t == timeout) break;
-                }
+
+        virtual bool operate(){
+            if(m_ready) return false;
+            m_function();
+            m_function = 0;
+            m_ready = 1;
+            return true;
         }
     public:
-        PoolThread(){}
-        void operator()(){
-            while(1){
-                this_thread::nSleep(1000000);
-                {
-                    kul::ScopeLock l(_mutex);
-                    if(!_run) break;
-                }
-                if(!_function) continue;
-                _function();
-                kul::ScopeLock l(_mutex);
-                _function = 0;
-                _ready = 1;
+        PoolThread(const uint64_t& nWait = 1000000) 
+                : m_nWait(nWait), m_ready(1), m_run(1){}
+        virtual void operator()(){
+            while(m_run){
+                this_thread::nSleep(m_nWait);
+                operate();
             }
-            _finished = 1;
         } 
 };
 
-template<class E = kul::Exception>
+template<class E = kul::Exception, class PT = kul::PoolThread>
 class ConcurrentThreadPool : public ConcurrentThreadQueue<void()>{
-
     protected:
-        kul::hash::map::S2T<std::shared_ptr<kul::PoolThread>> _p;
+        kul::hash::map::S2T<std::shared_ptr<PT>> _p;
 
-        virtual void operator()(){
-            while(_up){
-                this_thread::nSleep(1000000);
-                std::vector<std::string> del;
+        virtual bool operate(){
+            for(size_t i = 0; i < _max; i++){
+                const auto n = std::to_string(i);
+                kul::ScopeLock l(_qmutex);
+                if(_q.empty()) break;
+                auto& f(_q.front());
+                if(!_p[n]->if_ready_set(f.first)) continue;
+                _e[n] = f.second;
+                _q.pop();
+            }
+
+            std::vector<std::string> del;
+            {
+                kul::ScopeLock l(_mmutex);
+                if(!_up) return false;
                 for(const auto& t : _k){
                     if(t.second->started() && t.second->finished()){
                         t.second->join();
@@ -314,41 +337,31 @@ class ConcurrentThreadPool : public ConcurrentThreadQueue<void()>{
                         }
                     }
                 }
+            }
+            {
+                kul::ScopeLock l(_mmutex);
+                if(!_up) return false;
                 for(const auto& n : del){
                     _e.erase(n);
-                    _k.erase(n);
-                    _p.erase(n);
-                    _p[n] = std::make_shared<kul::PoolThread>();
+                    _p[n] = std::make_shared<PT>();
                     _k[n] = std::make_shared<kul::Thread>(std::ref(*_p[n].get()));
                     _k[n]->run();
                 }
-
-                {
-                    kul::ScopeLock l(_qmutex);
-                    if(_q.empty()) continue;
-                }
-
-                std::vector<std::string> ready;
-                for(size_t i = 0; i < _max; i++){
-                    const auto n = std::to_string(i);
-                    if(_p[n]->ready()) ready.push_back(n);
-                }
-
-                for(const auto& n : ready){  
-                    kul::ScopeLock l(_qmutex);
-                    if(_q.empty()) break;
-                    auto& f(_q.front());
-                    _p[n]->set(f.first);
-                    _e[n] = f.second;
-                    _q.pop();
-                }
+            }
+            return true;
+        }
+        virtual void operator()(){
+            while(_up){
+                this_thread::nSleep(m_nWait);
+                operate();
             }
         }
     public:
-        ConcurrentThreadPool(const size_t& max = 1, bool strt = 0) : ConcurrentThreadQueue(max, 0){
+        ConcurrentThreadPool(const size_t& max = 1, bool strt = 0, const uint64_t& nWait = 1000000) 
+                : ConcurrentThreadQueue(max, 0, nWait){
             for(size_t i = 0; i < max; i++){
                 auto n = std::to_string(i);
-                _p.insert(n, std::make_shared<kul::PoolThread>());
+                _p.insert(n, std::make_shared<PT>());
                 _k.insert(n, std::make_shared<kul::Thread>(std::ref(*_p[n].get())));
             }
             _p.setDeletedKey("");
@@ -360,30 +373,78 @@ class ConcurrentThreadPool : public ConcurrentThreadQueue<void()>{
             _e.clear();
             _p.clear();
         }
-        virtual void start() override {
+        virtual ConcurrentThreadQueue& start() override {
             if(!_up){
                 _up  = 1;
                 _thread.run();
                 for(const auto& t : _k) t.second->run();
             }
+            return *this;
         }
-        virtual void shutdown(bool wait = 0, uint8_t timeout = 5) override{
+        virtual ConcurrentThreadPool& stop() override{
             _up = 0;
-            for(const auto& t : _p) t.second->shutdown(wait, timeout);
-            if(wait) join();
+            kul::ScopeLock l(_mmutex);
+            for(auto& t : _p) t.second->stop();            
+            return *this;
         }
-        virtual void join(){
+        virtual ConcurrentThreadQueue& join() override {
             _thread.join();
-            for(const auto& t : _k) t.second->join();
+            kul::ScopeLock l(_mmutex);
+            for(auto& t : _k) if(t.second->started()) t.second->join();
+            return *this;
         }
-        void detach(){
+        virtual ConcurrentThreadQueue& detach() override {
             if(_up){
                 _thread.detach();
-                for(const auto& t : _k) t.second->detach();
+                kul::ScopeLock l(_mmutex);
+                for(auto& t : _k) t.second->detach();
             }
+            return *this;
         }
 };
 
+class AutoChronPoolThread : public PoolThread{
+    protected:
+        uint64_t m_scale = 0;
+    public:
+        AutoChronPoolThread(const uint64_t& nWait = 1000000, const uint64_t& scale = 1000) 
+                : PoolThread(nWait), m_scale(scale){
+            if(m_scale > nWait) KEXCEPTION("Time scale cannot be larger than wait period");
+        }
+        virtual void operator()(){
+            auto nWait(m_nWait / m_scale);
+            uint8_t fails = 0;
+            while(m_run){
+                this_thread::nSleep(nWait);
+                auto run1 = operate();
+                fails = (!run1 && fails < m_scale) ? fails + 1 : fails > 0 ? fails - 1 : fails;
+                nWait = (m_nWait / (m_scale / (fails + 1)));
+            }
+        } 
+};
+
+template<class E = kul::Exception>
+class ChroncurrentThreadPool : public ConcurrentThreadPool<void(), AutoChronPoolThread>{
+    protected:
+        uint64_t m_scale = 0;
+    public:
+        ChroncurrentThreadPool(const size_t& max = 1, bool strt = 0, const uint64_t& nWait = 1000000, const uint64_t& scale = 1000) 
+                : ConcurrentThreadPool(max, 0, nWait), m_scale(scale){
+            if(m_scale > nWait) KEXCEPTION("Time scale cannot be larger than wait period");
+            if(strt) start();
+        }
+
+        virtual void operator()() override {
+            auto nWait(m_nWait / m_scale);
+            uint8_t fails = 0;
+            while(_up){
+                this_thread::nSleep(nWait);
+                auto run1 = operate();
+                fails = (!run1 && fails < m_scale) ? fails + 1 : fails > 0 ? fails - 1 : fails;
+                nWait = (m_nWait / (m_scale / (fails + 1)));
+            }
+        }
+};
 
 }// END NAMESPACE kul
 

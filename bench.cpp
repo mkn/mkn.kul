@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "kul/os.hpp"
 #include "kul/cli.hpp"
+#include "kul/log.hpp"
+#include "kul/threads.hpp"
 
 void createDeleteFile(benchmark::State& state) {
     while (state.KeepRunning()) {
@@ -76,4 +78,28 @@ void splitStringByEscapedChar(benchmark::State& state) {
 }
 BENCHMARK(splitStringByEscapedChar)->Unit(benchmark::kMicrosecond);
 
+
+auto lambda = [](uint a, uint b){ auto c = (a + b); (void) c; };
+
+void concurrentThreadPool(benchmark::State& state) {
+    while (state.KeepRunning()) {
+        kul::ConcurrentThreadPool<> ctp(3, 1);
+        for(size_t i = 0; i < 100; i++)
+            ctp.async(std::bind(lambda, 2, 4));
+        ctp.block().finish().join();
+    }
+}
+BENCHMARK(concurrentThreadPool)->Unit(benchmark::kMicrosecond);
+
+void chroncurrentThreadPool(benchmark::State& state) {
+    while (state.KeepRunning()) {
+        kul::ChroncurrentThreadPool<> ctp(3, 1);
+        for(size_t i = 0; i < 100; i++)
+            ctp.async(std::bind(lambda, 2, 4));
+        ctp.block().finish().join();
+    }
+}
+BENCHMARK(chroncurrentThreadPool)->Unit(benchmark::kMicrosecond);
+
 BENCHMARK_MAIN()
+

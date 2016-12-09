@@ -264,18 +264,29 @@ class Test{
             for(size_t i = 0; i < 10; i++) 
                 ctq.async(std::bind(&TestConcQueueQObject::operator(), std::ref(tcqqo)));
             kul::this_thread::sleep(500);
-            ctq.shutdown();
-            ctq.join();
+            ctq.stop().join();
 
-            kul::ConcurrentThreadPool<> ctp(5, 1);
-            auto lambda = [](uint a, uint b){ KLOG(INF) << (a + b); };
-            ctp.async(std::bind(lambda, 2, 4));
-            auto lambdb = [](uint a, uint b){ KLOG(INF) << (a + b); KEXCEPT(kul::Exception, "Exceptional!"); };
-            auto lambex = [](const kul::Exception& e){ KLOG(ERR) << e.stack(); };
-            ctp.async(std::bind(lambdb, 2, 4), std::bind(lambex, std::placeholders::_1));
-            kul::this_thread::sleep(500);
-            ctp.shutdown();
-            ctp.join();
+            {
+                kul::ConcurrentThreadPool<> ctp(5, 1);
+                auto lambda = [](uint a, uint b){ KLOG(INF) << (a + b); };
+                ctp.async(std::bind(lambda, 2, 4));
+                auto lambdb = [](uint a, uint b){ KLOG(INF) << (a + b); KEXCEPT(kul::Exception, "Exceptional!"); };
+                auto lambex = [](const kul::Exception& e){ KLOG(ERR) << e.stack(); };
+                ctp.async(std::bind(lambdb, 2, 4), std::bind(lambex, std::placeholders::_1));
+                kul::this_thread::sleep(500);
+                ctp.block().finish().join();
+            }
+
+            {
+                kul::AutoChronConcurrentThreadPool<> ctp(5, 1);
+                auto lambda = [](uint a, uint b){ KLOG(INF) << (a + b); };
+                ctp.async(std::bind(lambda, 2, 4));
+                auto lambdb = [](uint a, uint b){ KLOG(INF) << (a + b); KEXCEPT(kul::Exception, "Exceptional!"); };
+                auto lambex = [](const kul::Exception& e){ KLOG(ERR) << e.stack(); };
+                ctp.async(std::bind(lambdb, 2, 4), std::bind(lambex, std::placeholders::_1));
+                kul::this_thread::sleep(500);
+                ctp.block().finish().join();
+            }
 
             TestIPC().run();
 
