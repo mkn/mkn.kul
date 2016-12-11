@@ -84,7 +84,7 @@ auto lambda = [](uint a, uint b){ auto c = (a + b); (void) c; };
 void concurrentThreadPool(benchmark::State& state) {
     while (state.KeepRunning()) {
         kul::ConcurrentThreadPool<> ctp(3, 1);
-        for(size_t i = 0; i < 100; i++)
+        for(size_t i = 0; i < 10000; i++)
             ctp.async(std::bind(lambda, 2, 4));
         ctp.block().finish().join();
     }
@@ -94,7 +94,7 @@ BENCHMARK(concurrentThreadPool)->Unit(benchmark::kMicrosecond);
 void chroncurrentThreadPool(benchmark::State& state) {
     while (state.KeepRunning()) {
         kul::ChroncurrentThreadPool<> ctp(3, 1);
-        for(size_t i = 0; i < 100; i++)
+        for(size_t i = 0; i < 10000; i++)
             ctp.async(std::bind(lambda, 2, 4));
         ctp.block().finish().join();
     }
