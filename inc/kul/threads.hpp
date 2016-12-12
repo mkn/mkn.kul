@@ -227,6 +227,11 @@ class ConcurrentThreadQueue{
             _up = 0;
             return *this;
         }
+        virtual ConcurrentThreadQueue& interrupt(){
+            kul::ScopeLock l(_mmutex);
+            _thread.interrupt();
+            return *this;
+        }
         virtual ConcurrentThreadQueue& finish(const uint64_t& nWait = 1000000){
             while(_up){
                 this_thread::nSleep(m_nWait);
@@ -350,7 +355,7 @@ class ConcurrentThreadPool : public ConcurrentThreadQueue<void()>{
             }
             return true;
         }
-        virtual void operator()(){
+        virtual void operator()() override {
             while(_up){
                 this_thread::nSleep(m_nWait);
                 operate();
@@ -373,7 +378,7 @@ class ConcurrentThreadPool : public ConcurrentThreadQueue<void()>{
             _e.clear();
             _p.clear();
         }
-        virtual ConcurrentThreadQueue& start() override {
+        virtual ConcurrentThreadPool& start() override {
             if(!_up){
                 _up  = 1;
                 _thread.run();
@@ -384,16 +389,22 @@ class ConcurrentThreadPool : public ConcurrentThreadQueue<void()>{
         virtual ConcurrentThreadPool& stop() override{
             _up = 0;
             kul::ScopeLock l(_mmutex);
-            for(auto& t : _p) t.second->stop();            
+            for(auto& t : _p) t.second->stop();
             return *this;
         }
-        virtual ConcurrentThreadQueue& join() override {
+        virtual ConcurrentThreadPool& interrupt() override{
+            kul::ScopeLock l(_mmutex);
+            _thread.interrupt();
+            for(auto& t : _k) t.second->interrupt();
+            return *this;
+        }
+        virtual ConcurrentThreadPool& join() override {
             _thread.join();
             kul::ScopeLock l(_mmutex);
             for(auto& t : _k) if(t.second->started()) t.second->join();
             return *this;
         }
-        virtual ConcurrentThreadQueue& detach() override {
+        virtual ConcurrentThreadPool& detach() override {
             if(_up){
                 _thread.detach();
                 kul::ScopeLock l(_mmutex);
@@ -411,7 +422,7 @@ class AutoChronPoolThread : public PoolThread{
                 : PoolThread(nWait), m_scale(scale){
             if(m_scale > nWait) KEXCEPTION("Time scale cannot be larger than wait period");
         }
-        virtual void operator()(){
+        virtual void operator()() override {
             auto nWait(m_nWait / m_scale);
             uint8_t fails = 0;
             while(m_run){

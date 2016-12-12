@@ -38,7 +38,7 @@ namespace kul{ namespace dbg{
 #ifndef NDEBUG
 
 #ifndef KUL_DBG_FUNC_ENTER
-#define KUL_DBG_FUNC_ENTER kul::dbg::FunctionScope(__FILE__, __func__);
+#define KUL_DBG_FUNC_ENTER kul::dbg::FunctionScope(__FILE__, __func__, __LINE__);
 #endif//KUL_DBG_FUNC_ENTER
 
 #ifndef KUL_DBG_FUNC_ON_ENTER
@@ -47,8 +47,8 @@ namespace kul{ namespace dbg{
 
 #ifndef KUL_DBG_FUNC_ON_EXIT
 #define KUL_DBG_FUNC_ON_EXIT KOUT(TRC) \
-	    << kul::LogMan::INSTANCE().str(m_fi, m_fu, 0, kul::log::mode::TRC, "", "[%M]: %T - %D : %F fn(%N)") \
-		<< " - Time in function: " << (kul::Now::MICROS() - m_start);
+	    << kul::LogMan::INSTANCE().str(m_fi, m_fu, m_li, kul::log::mode::TRC, "", "[%M]: %T - %D : %F:%L fn(%N)") \
+		<< " - Function time: " << (kul::Now::MICROS() - m_start) << " μs";
 #endif//KUL_DBG_FUNC_ON_EXIT
 
 #else//
@@ -66,8 +66,10 @@ class FunctionScope {
 		uint64_t m_start = 0;
 		const char* m_fi;
 		const char* m_fu;
+        const uint16_t& m_li;
 	public:
-		FunctionScope(const char* fi, const char* fu) : m_start(kul::Now::MICROS()), m_fi(fi), m_fu(fu) {
+		FunctionScope(const char* fi, const char* fu, const uint16_t& li) 
+				: m_start(kul::Now::MICROS()), m_fi(fi), m_fu(fu), m_li(li) {
 			KUL_DBG_FUNC_ON_ENTER
 		}
 		~FunctionScope(){
