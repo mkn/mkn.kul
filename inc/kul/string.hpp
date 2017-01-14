@@ -106,17 +106,21 @@ class String{
             return v;
         }
         static void ESC_SPLIT(const std::string& s, const char& d, std::vector<std::string>& v, const char& e = '\\'){
-            std::string l = s;
+            std::string l = s, ds = std::string(1, d), es = std::string(1, e);
             size_t pos = 0, esc = 0;
             while((pos = l.find(d, esc)) != std::string::npos){
-                if(pos > 0 && l.find(std::string(1, e) + std::string(1, d)) == pos - 1){ 
-                    esc++; 
+                if(pos > 0 && l.find(es + ds) == pos - 1){ 
+                    esc++;
                     continue; 
                 }
-                v.push_back(l.substr(0, pos));
+                std::string t = l.substr(0, pos);
+                REPLACE_ALL(t, es, "");
+                v.push_back(t);
                 l = l.substr(pos + 1);
                 esc = 0;
             }
+            REPLACE_ALL(l, es, "");
+            std::cout << "ESC_SPLIT: " << l << std::endl;
             v.push_back(l);
         }
         static bool NO_CASE_CMP(std::string a, std::string b){

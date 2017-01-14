@@ -72,7 +72,7 @@ TEST(StringTest, SplitByEscapedChar) {
     std::vector<std::string> v;
     kul::String::ESC_SPLIT("split \\- by - char - dash", '-', v);
     EXPECT_EQ((size_t) 3, v.size());
-    EXPECT_EQ("split \\- by ", v[0]);
+    EXPECT_EQ("split - by ", v[0]);
     EXPECT_EQ(" char ", v[1]);
     EXPECT_EQ(" dash", v[2]);
 }
