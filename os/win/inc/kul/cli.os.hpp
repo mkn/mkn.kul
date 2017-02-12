@@ -33,6 +33,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <Windows.h>
 
+#include <string>
+#include <iostream>
+#include <sstream>
+
 namespace kul{ namespace cli{
 #ifndef _KUL_COMPILED_LIB_
 inline std::string hidden(const std::string& t){

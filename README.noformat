@@ -18,7 +18,7 @@ Requires:
 	Unix   : gcc 5.0 (or equivalent)
 
 How to use:
-view inc/usage.hpp
+view usage.cpp
 
 License: BSD
 

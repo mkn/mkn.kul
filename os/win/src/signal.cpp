@@ -30,6 +30,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "kul/signal.hpp"
 
-void kul_sig_handler(int s, siginfo_t* info, void* v) {
-#include "kul/src/signal/handler.cpp"
+void kul_real_se_handler(EXCEPTION_POINTERS* pExceptionInfo){
+#include "kul/src/signal/se_handler.cpp"
 }

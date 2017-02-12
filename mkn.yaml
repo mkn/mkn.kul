@@ -1,4 +1,4 @@
-
+#! clean build -dtKp usage
 
 # mkn.kul - Kommon Usage Library
 #   Cross platform wrapper for systems operations / IO / threads / processes
@@ -64,5 +64,5 @@ profile:
     main: bench.cpp
 
   - name: usage
-    parent: lib-compiled
+    self: lib-compiled
     main: usage.cpp
