@@ -28,6 +28,7 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+#include "kul/io.hpp"
 #include "kul/os.hpp"
 #include "kul/cli.hpp"
 #include "kul/ipc.hpp"
@@ -39,6 +40,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "kul/string.hpp"
 #include "kul/wstring.hpp"
 #include "kul/threads.hpp"
+
+#include "kul/asio/log.hpp"
 
 #include <iomanip>
 
@@ -159,6 +162,35 @@ class Test{
             KOUT(NON) << kul::env::CWD();
             KOUT(NON) << kul::user::home().path();
             KLOG(INF) << kul::user::home("maiken").path();
+
+            kul::File fo("TEST_WRITE_OUT");
+            kul::File fe("TEST_WRITE_ERR");
+
+            {
+                kul::io::Writer wo(fo);
+                kul::io::Writer we(fe);
+                auto lo = [&](const std::string& s){ wo << s; };
+                auto le = [&](const std::string& s){ we << s; };
+                kul::LogMan::INSTANCE().setOut(lo);
+                kul::LogMan::INSTANCE().setErr(le);
+
+                KOUT(INF) << "KOUT(INF)";
+                KERR      << "KOUT(ERR)";
+                // scoped for autoflush - segfault later drops stream
+            }
+            fo.rm();
+            fe.rm();
+
+            kul::LogMan::INSTANCE().setOut(nullptr);
+            kul::LogMan::INSTANCE().setErr(nullptr);
+
+            // {
+            //     kul::asio::Logger logger;
+            //     logger.out("ASYNCHRONOUS QUEUED LOGGING");
+            // }
+
+            KASIO_OUT(NON) << "ASYNCHRONOUS QUEUED LOGGING";
+
             for(const kul::Dir& d : kul::Dir(kul::env::CWD()).dirs())
                 for(const kul::File& f : d.files())
                     KOUT(NON) << d.join(f.name()); // or f.full()

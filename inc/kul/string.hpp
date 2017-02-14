@@ -120,7 +120,6 @@ class String{
                 esc = 0;
             }
             REPLACE_ALL(l, es, "");
-            std::cout << "ESC_SPLIT: " << l << std::endl;
             v.push_back(l);
         }
         static bool NO_CASE_CMP(std::string a, std::string b){

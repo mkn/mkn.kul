@@ -60,29 +60,11 @@ class Exception : public kul::Exception{
 };
 } // END NAMESPACE log
 
-class LogMan;
+class ALogMan;
 class Logger{
-    private:
-        void str(const char* f, const char* fn, const uint16_t& l, const std::string& s, const log::mode& m, std::string& str) const {
-            kul::String::REPLACE(str, "%M", modeTxt(m));
-            kul::String::REPLACE(str, "%T", kul::this_thread::id());
-            kul::String::REPLACE(str, "%D", kul::DateTime::NOW(__KUL_LOG_TIME_FRMT__));
-            kul::String::REPLACE(str, "%F", f);
-            kul::String::REPLACE(str, "%N", fn);
-            kul::String::REPLACE(str, "%L", std::to_string(l));
-            kul::String::REPLACE(str, "%S", s);
-        }
-        void err(const std::string& s) const {
-            fprintf(stderr, "%s", s.c_str());
-        }
-        void out(const std::string& s) const{
-            printf("%s", s.c_str());
-        }
-        void log(const char* f, const char* fn, const uint16_t& l, const std::string& s, const log::mode& m) const{
-            std::string st(__KUL_LOG_FRMT__);
-            str(f, fn, l, s, m, st);
-            out(st + kul::os::EOL());
-        }
+    friend class ALogMan;
+    protected:
+        std::function<void(const std::string&)> e, o;
         const std::string modeTxt(const log::mode& m) const{
             std::string s("NON");
             if(m == 1)      s = "INF";
@@ -92,14 +74,38 @@ class Logger{
             else if(m == 5) s = "TRC";
             return s;
         }
-        friend class LogMan;
+    public:
+        void str(const char* f, const char* fn, const uint16_t& l, const std::string& s, const log::mode& m, std::string& str){
+            kul::String::REPLACE(str, "%M", modeTxt(m));
+            kul::String::REPLACE(str, "%T", kul::this_thread::id());
+            kul::String::REPLACE(str, "%D", kul::DateTime::NOW(__KUL_LOG_TIME_FRMT__));
+            kul::String::REPLACE(str, "%F", f);
+            kul::String::REPLACE(str, "%N", fn);
+            kul::String::REPLACE(str, "%L", std::to_string(l));
+            kul::String::REPLACE(str, "%S", s);
+        }
+        virtual void err(const std::string& s){
+            if(e) e(s);
+            else  fprintf(stderr, "%s", s.c_str());
+        }
+        virtual void out(const std::string& s){
+            if(o) o(s);
+            else printf("%s", s.c_str());
+        }
+        void log(const char* f, const char* fn, const uint16_t& l, const std::string& s, const log::mode& m){
+            std::string st(__KUL_LOG_FRMT__);
+            str(f, fn, l, s, m, st);
+            out(st + kul::os::EOL());
+        }
+        void setOut(std::function<void(const std::string&)> o) { this->o = o; }
+        void setErr(std::function<void(const std::string&)> e) { this->e = e; }
 };
 
-class LogMan{
-    private:
+class ALogMan{
+    protected:
         log::mode m;
-        const Logger logger;
-        LogMan() : m(kul::log::mode::NON), logger(){
+        mutable std::unique_ptr<Logger> logger;
+        ALogMan(Logger* _logger) : m(kul::log::mode::NON), logger(_logger){
             std::string s(kul::env::GET("KLOG"));
             if(s.size()){
                 kul::String::TRIM(s);
@@ -117,28 +123,37 @@ class LogMan{
             }
         }
     public:
-        static LogMan& INSTANCE(){
-            static LogMan instance;
-            return instance;
-        };
+        virtual ~ALogMan(){}
         void setMode(const log::mode& m1) { m = m1; }
         bool inf(){ return m >= log::INF;}
         bool err(){ return m >= log::ERR;}
         bool dbg(){ return m >= log::DBG;}
         void log(const char* f, const char* fn, const uint16_t& l, const log::mode& m, const std::string& s){
-            if(this->m >= m) logger.log(f, fn, l, s, m);
+            if(this->m >= m) logger->log(f, fn, l, s, m);
         }
         void out(const log::mode& m, const std::string& s){
-            if(this->m >= m) logger.out(s + kul::os::EOL());
+            if(this->m >= m) logger->out(s + kul::os::EOL());
         }
         void err(const log::mode& m, const std::string& s){
-            logger.err(s + kul::os::EOL());
+            logger->err(s + kul::os::EOL());
         }
         std::string str(const char* f, const char* fn, const uint16_t& l, const log::mode& m, const std::string& s = "", const std::string fmt = __KUL_LOG_FRMT__){
             std::string st(fmt);
-            logger.str(f, fn, l, s, m, st);
+            logger->str(f, fn, l, s, m, st);
             return st;
         }
+        void setOut(std::function<void(const std::string&)> o) { logger->setOut(o); }
+        void setErr(std::function<void(const std::string&)> e) { logger->setErr(e); }
+};
+
+class LogMan : public ALogMan{
+    protected:
+        LogMan() : ALogMan(new Logger()){}
+    public:
+        static LogMan& INSTANCE(){
+            static LogMan instance;
+            return instance;
+        };
 };
 
 class Message{

@@ -109,8 +109,7 @@ class AProcess{
         const bool wfe = 1;
         int32_t pec = 0, pi = 0;
         const std::string d;
-        std::function<void(std::string)> e;
-        std::function<void(std::string)> o;
+        std::function<void(const std::string&)> e, o;
         std::vector<std::string> argv;
         kul::hash::map::S2S evs;
         friend std::ostream& operator<<(std::ostream&, const AProcess&);
@@ -185,8 +184,8 @@ class AProcess{
             arg(s);
             return *this;
         }
-        void setOut(std::function<void(std::string)> o) { this->o = o; }
-        void setErr(std::function<void(std::string)> e) { this->e = e; }
+        void setOut(std::function<void(const std::string&)> o) { this->o = o; }
+        void setErr(std::function<void(const std::string&)> e) { this->e = e; }
 };
 
 inline std::ostream& operator<<(std::ostream &s, const AProcess &p){
