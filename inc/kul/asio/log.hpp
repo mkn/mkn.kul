@@ -49,8 +49,8 @@ class Logger : public kul::Logger{
         kul::ChroncurrentThreadPool<> ctp;
         std::function<void(const std::string&)> defE, defO;
     public:
-    	Logger(const size_t& threads = 1) : 
-    			ctp(threads, 1),
+    	Logger() : 
+    			ctp(1, 1),
     			defE([&](const std::string& s){ kul::Logger::err(s); }),
     			defO([&](const std::string& s){ kul::Logger::out(s); }){
     	}
