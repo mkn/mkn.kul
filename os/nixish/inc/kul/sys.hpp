@@ -54,13 +54,10 @@ class SharedLibrary {
         const kul::File _f;
     public:
         SharedLibrary(const kul::File& f) throw(Exception) : _f(f){
-            KLOG(INF) << f;
-            if(f) KLOG(INF) << f.real();
             if(!_f) KEXCEPSTREAM << "Library attempted to be loaded does not exist: " << _f.full();
             _handle = dlopen(_f.real().c_str(), __KUL_SYS_DLOPEN__);
             if(!_handle) KEXCEPSTREAM << "Cannot load library: " << f << " - Error: " << dlerror();
             _loaded = 1;
-            if(f) KLOG(INF);
         }
         ~SharedLibrary(){
             if(_loaded) dlclose(_handle);

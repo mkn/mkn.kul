@@ -68,6 +68,7 @@ class SCM{
         virtual void diff(const std::string& d) const = 0;
 };
 
+// review https://gist.github.com/aleksey-bykov/1273f4982c317c92d532
 namespace scm{
 class Git : public SCM{
     public:
