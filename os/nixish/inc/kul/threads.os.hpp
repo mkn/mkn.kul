@@ -81,6 +81,9 @@ class Mutex{
         ~Mutex() {
             pthread_mutex_destroy(&mute);
         }
+        bool tryLock(){
+            return pthread_mutex_trylock(&mute);
+        }
         void lock() {
             pthread_mutex_lock(&mute); 
         }

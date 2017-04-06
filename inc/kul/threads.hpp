@@ -36,6 +36,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace kul{
 
+// class TryScopeLock{
+//     private:
+//         bool m_locked = 0;
+//         Mutex& m_m;
+//     public:
+//         TryScopeLock(Mutex& m) : m_m(m) {
+//             m_locked = this->m_m.tryLock();
+//         }
+//         ~TryScopeLock(){
+//             if(m_locked) this->m_m.unlock();
+//         }
+//         bool locked(){
+//             return m_locked;
+//         }
+// };
+
 class ScopeLock{
     private:
         Mutex& m;
@@ -232,7 +248,7 @@ class ConcurrentThreadQueue{
             _thread.interrupt();
             return *this;
         }
-        virtual ConcurrentThreadQueue& finish(const uint64_t& nWait = 1000000){
+        virtual ConcurrentThreadQueue& finish(const uint64_t& nWait = 1000000) throw(kul::Exception) {
             while(_up){
                 this_thread::nSleep(m_nWait);
                 {
@@ -258,11 +274,13 @@ class ConcurrentThreadQueue{
             return *this;
         }
 
-        ConcurrentThreadQueue& async(const std::function<F>& function, const std::function<void(const E&)>& exception = std::function<void(const E&)>()){
-            if(_block) return *this;
-            kul::ScopeLock l(_qmutex);
-            _q.push(std::make_pair(function, exception));
-            return *this;
+        bool async(const std::function<F>& function, const std::function<void(const E&)>& exception = std::function<void(const E&)>()){
+            if(_block) return false;
+            {
+                kul::ScopeLock l(_qmutex);
+                _q.push(std::make_pair(function, exception));
+            }
+            return true;
         }
 
         const std::exception_ptr& exception(){ 
@@ -317,14 +335,21 @@ class ConcurrentThreadPool : public ConcurrentThreadQueue<void()>{
         kul::hash::map::S2T<std::shared_ptr<PT>> _p;
 
         virtual bool operate(){
-            for(size_t i = 0; i < _max; i++){
-                const auto n = std::to_string(i);
+            bool qEmpty = 0;
+            {
+                kul::ScopeLock l(_qmutex); 
+                qEmpty = _q.empty();
+            }
+            if(!qEmpty){
                 kul::ScopeLock l(_qmutex);
-                if(_q.empty()) break;
-                auto& f(_q.front());
-                if(!_p[n]->if_ready_set(f.first)) continue;
-                _e[n] = f.second;
-                _q.pop();
+                for(size_t i = 0; i < _max; i++){
+                    const auto n = std::to_string(i);
+                    auto& f(_q.front());
+                    if(!_p[n]->if_ready_set(f.first)) continue;
+                    _e[n] = f.second;
+                    _q.pop();
+                    if(_q.empty()) break;
+                }
             }
 
             std::vector<std::string> del;
@@ -333,12 +358,13 @@ class ConcurrentThreadPool : public ConcurrentThreadQueue<void()>{
                 if(!_up) return false;
                 for(const auto& t : _k){
                     if(t.second->started() && t.second->finished()){
-                        t.second->join();
+                        // t.second->join();
                         if(t.second->exception() != std::exception_ptr()){
                             if(_e.count(t.first)) _throw(t.second->exception(), _e[t.first]);
                             else
                             if(!_detatched)       std::rethrow_exception(t.second->exception());
                             del.push_back(t.first);
+                            _p[t.first]->stop();
                         }
                     }
                 }
@@ -347,13 +373,14 @@ class ConcurrentThreadPool : public ConcurrentThreadQueue<void()>{
                 kul::ScopeLock l(_mmutex);
                 if(!_up) return false;
                 for(const auto& n : del){
-                    _e.erase(n);
-                    _p[n] = std::make_shared<PT>();
-                    _k[n] = std::make_shared<kul::Thread>(std::ref(*_p[n].get()));
+                    _k[n]->join();
+                    _e.erase(n); _k.erase(n); _p.erase(n);
+                    _p.insert(n, std::make_shared<PT>());
+                    _k.insert(n, std::make_shared<kul::Thread>(std::ref(*_p[n].get())));
                     _k[n]->run();
                 }
             }
-            return true;
+            return qEmpty;
         }
         virtual void operator()() override {
             while(_up){
@@ -372,11 +399,9 @@ class ConcurrentThreadPool : public ConcurrentThreadQueue<void()>{
             _p.setDeletedKey("");
             if(strt) start();
         }
-        ~ConcurrentThreadPool(){
-            kul::ScopeLock l(_qmutex);
-            _k.clear();
-            _e.clear();
-            _p.clear();
+        virtual ~ConcurrentThreadPool(){
+            stop(); 
+            join();
         }
         virtual ConcurrentThreadPool& start() override {
             if(!_up){
