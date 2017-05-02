@@ -151,8 +151,10 @@ class GccCompiler : public CCompiler{
             for(const std::string& d : dirs) p.arg(kul::File(oStar(objects), d).escm());
             {
                 auto ll(kul::env::GET("KUL_GCC_LIB_LINK_LIB"));
-                if((ll.size() ? kul::String::BOOL(ll) : 0))
+                if((ll.size() ? kul::String::BOOL(ll) : 0)){
+                    for(const std::string& path : libPaths) p.arg("-L" + path);
                     for(const std::string& lib : libs)  p.arg("-l" + lib);
+                }
             }
             for(const std::string& s: kul::cli::asArgs(linkerEnd)) p.arg(s);
             CompilerProcessCapture pc;
