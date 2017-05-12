@@ -98,20 +98,15 @@ class Exit : public Exception{
 
 // For function signatures
 
-#if     __cplusplus > 201103L
+#if     __cplusplus > 199711L
+
 #ifndef KNOTHROW 
 #define KNOTHROW(x) noexcept(true)
 #endif//KNOTHROW
 #ifndef KTHROW 
 #define KTHROW(x) noexcept(false)
 #endif//KTHROW
-#elif __cplusplus > 199711L
-#ifndef KNOTHROW 
-#define KNOTHROW(x) throw()
-#endif//KNOTHROW
-#ifndef KTHROW 
-#define KTHROW(x) throw(x)
-#endif//KTHROW
+
 #endif//__cplusplus
 
 #ifndef KNOTHROW 
@@ -120,7 +115,7 @@ class Exit : public Exception{
 
 #ifndef KTHROW 
 #define KTHROW(x)
-#endif  KTHROW
+#endif//KTHROW
 
 }//end namespace kul
 #endif /* _KUL_EXCEPT_HPP_ */
