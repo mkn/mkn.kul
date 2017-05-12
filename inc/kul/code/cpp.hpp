@@ -92,7 +92,7 @@ class GccCompiler : public CCompiler{
             const std::vector<std::string>& libPaths,
             const std::string& out, 
             const Mode& mode,
-            bool dryRun = false) const throw (kul::Exception) {
+            bool dryRun = false) const KTHROW(kul::Exception) {
 
             kul::hash::set::String dirs;
             for(const auto& o : objects) dirs.insert(kul::File(o).dir().real());
@@ -130,7 +130,7 @@ class GccCompiler : public CCompiler{
             const std::vector<std::string>& libPaths,
             const kul::File& out, 
             const Mode& mode,
-            bool dryRun = false) const throw (kul::Exception) {
+            bool dryRun = false) const KTHROW(kul::Exception) {
 
             kul::hash::set::String dirs;
             for(const auto& o : objects) dirs.insert(kul::File(o).dir().real());
@@ -174,7 +174,7 @@ class GccCompiler : public CCompiler{
             const std::string& in, 
             const std::string& out, 
             const Mode& mode,
-            bool dryRun = false) const throw (kul::Exception){ 
+            bool dryRun = false) const KTHROW(kul::Exception){ 
 
             std::string cmd = compiler;
             std::vector<std::string> bits;
@@ -203,7 +203,7 @@ class GccCompiler : public CCompiler{
             const hash::set::String& args, 
             const std::string& in, 
             const std::string& out,
-            bool dryRun = false)     const throw (kul::Exception) {
+            bool dryRun = false)     const KTHROW(kul::Exception) {
 
             using namespace kul;
             
@@ -294,7 +294,7 @@ class WINCompiler : public CCompiler{
             const std::vector<std::string>& libPaths,
             const std::string& out, 
             const Mode& mode,
-            bool dryRun = false) const throw (kul::Exception){ 
+            bool dryRun = false) const KTHROW(kul::Exception){ 
 
             std::string exe = out + ".exe";
 
@@ -333,7 +333,7 @@ class WINCompiler : public CCompiler{
             const std::vector<std::string>& libPaths,
             const kul::File& out, 
             const Mode& mode,
-            bool dryRun = false) const throw (kul::Exception) {
+            bool dryRun = false) const KTHROW(kul::Exception) {
 
             kul::hash::set::String dirs;
             for(const auto& o : objects) dirs.insert(kul::File(o).dir().real());
@@ -374,7 +374,7 @@ class WINCompiler : public CCompiler{
             const std::string& in, 
             const std::string& out, 
             const Mode& mode,
-            bool dryRun = false) const throw (kul::Exception){ 
+            bool dryRun = false) const KTHROW(kul::Exception){ 
 
             std::string cmd = compiler;
             std::vector<std::string> bits;
@@ -404,7 +404,7 @@ class WINCompiler : public CCompiler{
             const hash::set::String& args, 
             const std::string& in, 
             const std::string& out,
-            bool dryRun = false)     const throw (kul::Exception) {
+            bool dryRun = false)     const KTHROW(kul::Exception) {
 
             KEXCEPTION("Method is not implemented");
         }

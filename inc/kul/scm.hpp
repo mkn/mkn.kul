@@ -55,11 +55,11 @@ class SCM{
     public:
         virtual ~SCM(){}
         const std::string type() { return typeid(*this).name(); }
-        virtual const std::string co(const std::string& d, const std::string& r, const std::string& v) const throw(Exception) = 0;
-        virtual void up(const std::string& d, const std::string& r, const std::string& v) const throw(Exception) = 0;
+        virtual const std::string co(const std::string& d, const std::string& r, const std::string& v) const KTHROW(Exception) = 0;
+        virtual void up(const std::string& d, const std::string& r, const std::string& v) const KTHROW(Exception) = 0;
         virtual const std::string origin(const std::string& d) const = 0;
         virtual const std::string localVersion(const std::string& d, const std::string& b) const = 0;
-        virtual const std::string remoteVersion(const std::string& url, const std::string& branch) const throw(Exception) = 0;
+        virtual const std::string remoteVersion(const std::string& url, const std::string& branch) const KTHROW(Exception) = 0;
 
         virtual bool hasChanges(const std::string& d) const = 0;
 
@@ -72,7 +72,7 @@ class SCM{
 namespace scm{
 class Git : public SCM{
     public:
-        const std::string co(const std::string& d, const std::string& r, const std::string& v) const throw(Exception){
+        const std::string co(const std::string& d, const std::string& r, const std::string& v) const KTHROW(Exception){
             Dir dr(d, true);
             kul::Process p("git");
             p << "clone" << kul::env::GET("KUL_GIT_CO") << r;
@@ -85,7 +85,7 @@ class Git : public SCM{
             }
             return p.toString();
         }
-        void up(const std::string& d, const std::string& r, const std::string& v) const throw(Exception){
+        void up(const std::string& d, const std::string& r, const std::string& v) const KTHROW(Exception){
             if(!Dir(d).is()) co(d, r, v);
             else{
                 kul::Process p("git", d);
@@ -129,7 +129,7 @@ class Git : public SCM{
             return kul::String::LINES(pc.outs())[0];
         }
 
-        const std::string remoteVersion(const std::string& url, const std::string& b) const throw(Exception){
+        const std::string remoteVersion(const std::string& url, const std::string& b) const KTHROW(Exception){
             kul::Process p("git");
             kul::ProcessCapture pc(p);
             try{
@@ -184,7 +184,7 @@ class Git : public SCM{
 
 class Svn : public SCM{
     public:
-        const std::string co(const std::string& d, const std::string& r, const std::string& v) const throw(Exception){
+        const std::string co(const std::string& d, const std::string& r, const std::string& v) const KTHROW(Exception){
             Dir dr(d, true);
             kul::Process p("svn", d);
             p.arg("checkout").arg(kul::env::GET("KUL_SVN_CO"));
@@ -198,7 +198,7 @@ class Svn : public SCM{
             }
             return p.toString();
         }
-        void up(const std::string& d, const std::string& r, const std::string& v) const throw(Exception){
+        void up(const std::string& d, const std::string& r, const std::string& v) const KTHROW(Exception){
             if(!Dir(d).is()) co(d, r, v);
             else KEXCEPT(Exception, "SCM ERROR - SVN NOT IMPLEMENTED");
         }
@@ -209,7 +209,7 @@ class Svn : public SCM{
         const std::string localVersion(const std::string& d, const std::string& b) const{
             KEXCEPT(Exception, "SCM ERROR - SVN NOT IMPLEMENTED");
         }
-        const std::string remoteVersion(const std::string& url, const std::string& b) const throw(Exception){
+        const std::string remoteVersion(const std::string& url, const std::string& b) const KTHROW(Exception){
             KEXCEPT(Exception, "SCM ERROR - SVN NOT IMPLEMENTED");
         }
 

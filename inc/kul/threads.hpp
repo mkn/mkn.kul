@@ -73,7 +73,7 @@ class ThreadQueue{
         std::vector<std::shared_ptr<kul::Thread> > ts;
         std::vector<std::exception_ptr> ePs;
         void setStarted()   { s = true; }
-        virtual void start() throw (std::exception) {
+        virtual void start() KTHROW(std::exception) {
             if(started()) KEXCEPT(Exception, "ThreadQueue is already started");
             setStarted();
             for(uint16_t i = 0 ; i < m; i++){
@@ -94,7 +94,7 @@ class ThreadQueue{
         void operator()(){
             start();
         }
-        virtual void join() throw (std::exception){
+        virtual void join() KTHROW(std::exception){
             th.join();
             while(ts.size()){
                 const std::shared_ptr<kul::Thread>* del = 0;
@@ -116,7 +116,7 @@ class ThreadQueue{
             d = true;
             th.detach();
         }
-        void interrupt() throw(kul::threading::InterruptionException){ }
+        void interrupt() KTHROW(kul::threading::InterruptionException){ }
         const std::vector<std::exception_ptr> exceptionPointers() {
             return ePs;
         }
@@ -131,7 +131,7 @@ class PredicatedThreadQueue : public ThreadQueue{
         P& p;
         size_t ps;
     protected:
-        void start() throw (std::exception) {
+        void start() KTHROW(std::exception) {
             if(started()) KEXCEPT(Exception, "ThreadQueue is already started");
             setStarted();
             size_t c = 0;
@@ -180,7 +180,7 @@ class ConcurrentThreadQueue{
         kul::Thread _thread;
         kul::Mutex _mmutex, _qmutex;
 
-        void _throw(const std::exception_ptr& ep, const std::function<void(const E&)>& func){
+        void _KTHROW(const std::exception_ptr& ep, const std::function<void(const E&)>& func){
             try{
                 std::rethrow_exception(ep);
             }catch(const E& e){
@@ -212,7 +212,7 @@ class ConcurrentThreadQueue{
                     if(t.second->finished()){
                         t.second->join();
                         if(t.second->exception() != std::exception_ptr()){
-                            if(_e.count(t.first)) _throw(t.second->exception(), _e[t.first]);
+                            if(_e.count(t.first)) _KTHROW(t.second->exception(), _e[t.first]);
                             else
                             if(!_detatched)       std::rethrow_exception(t.second->exception());
                         }
@@ -248,7 +248,7 @@ class ConcurrentThreadQueue{
             _thread.interrupt();
             return *this;
         }
-        virtual ConcurrentThreadQueue& finish(const uint64_t& nWait = 1000000) throw(kul::Exception) {
+        virtual ConcurrentThreadQueue& finish(const uint64_t& nWait = 1000000) KTHROW(kul::Exception) {
             while(_up){
                 this_thread::nSleep(m_nWait);
                 {
@@ -360,7 +360,7 @@ class ConcurrentThreadPool : public ConcurrentThreadQueue<void()>{
                     if(t.second->started() && t.second->finished()){
                         // t.second->join();
                         if(t.second->exception() != std::exception_ptr()){
-                            if(_e.count(t.first)) _throw(t.second->exception(), _e[t.first]);
+                            if(_e.count(t.first)) _KTHROW(t.second->exception(), _e[t.first]);
                             else
                             if(!_detatched)       std::rethrow_exception(t.second->exception());
                             del.push_back(t.first);

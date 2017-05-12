@@ -116,12 +116,12 @@ class Compilers{
             for(const auto& p : cs) ks.push_back(p.first);
             return ks;
         }
-        void addMask(const std::string& m, const std::string& c) throw(CompilerNotFoundException){
+        void addMask(const std::string& m, const std::string& c) KTHROW(CompilerNotFoundException){
             const std::string k(key(c, cs));
             if(cs.count(m)) KEXCEPT(Exception, "Mask cannot replace compiler");
             masks[m] = cs[k];
         }
-        const Compiler* get(const std::string& comp) throw(CompilerNotFoundException){
+        const Compiler* get(const std::string& comp) KTHROW(CompilerNotFoundException){
             try{
                 return cs[key(comp, cs)];
             }catch(const CompilerNotFoundException& e){}

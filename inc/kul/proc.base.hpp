@@ -128,7 +128,7 @@ class AProcess{
         virtual void preStart() {}
         virtual void finish()   {}
         virtual void tearDown() {}
-        virtual void run() throw (kul::Exception) = 0;
+        virtual void run() KTHROW(kul::Exception) = 0;
         bool waitForExit()  const { return wfe; }
         void pid(const int32_t& pi )  { this->pi = pi; }
 
@@ -142,7 +142,7 @@ class AProcess{
             if(this->e) this->e(s);
             else        fprintf(stderr, "%s", s.c_str());
         }
-        void error(const int16_t& line, const std::string& s) throw (kul::Exception){
+        void error(const int16_t& line, const std::string& s) KTHROW(kul::Exception){
             tearDown();
             throw Exception("kul/proc.hpp", line, s);
         }
@@ -165,14 +165,14 @@ class AProcess{
         AProcess& var(const std::string& n, const std::string& v) { evs[n] = v; return *this;}
 
 #ifndef _KUL_COMPILED_LIB_
-        virtual void start() throw(kul::Exception){
+        virtual void start() KTHROW(kul::Exception){
 #include "kul/src/proc.base/start.cpp"
         }
         virtual std::string toString() const{
 #include "kul/src/proc.base/toString.cpp"
         }
 #else
-        virtual void start() throw(kul::Exception);
+        virtual void start() KTHROW(kul::Exception);
         virtual std::string toString() const;
 #endif
 

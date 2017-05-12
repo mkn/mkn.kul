@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // This file is included by other files and is not in itself syntactically correct.
 
-// std::vector<kul::File> kul::Dir::files(bool recursive) const throw(fs::Exception){
+// std::vector<kul::File> kul::Dir::files(bool recursive) const KTHROW(fs::Exception){
 
     if(!is()) KEXCEPT(fs::Exception, "Directory : \"" + path() + "\" does not exist");
 

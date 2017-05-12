@@ -67,14 +67,14 @@ class AThread{
         std::exception_ptr ep;
 
         AThread() : f(1), s(0){}
-        virtual void run() throw(kul::threading::Exception) = 0;
+        virtual void run() KTHROW(kul::threading::Exception) = 0;
     public:
         virtual ~AThread(){}
         virtual void join() = 0;
         bool started() const { return s; }
         bool finished()const { return f; }
         const std::exception_ptr& exception(){ return ep;}
-        void rethrow(){ if(ep) std::rethrow_exception(ep);}
+        void reKTHROW(){ if(ep) std::rethrow_exception(ep);}
 };
 
 } // END NAMESPACE threading

@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // This file is included by other files and is not in itself syntactically correct.
 
-// void kul::AProcess::start() throw(kul::Exception){
+// void kul::AProcess::start() KTHROW(kul::Exception){
 
     if(this->s) KEXCEPT(kul::proc::Exception, "Process is already started");
     this->s = true;

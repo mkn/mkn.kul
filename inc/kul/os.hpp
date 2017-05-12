@@ -172,8 +172,8 @@ class Dir : public fs::Item {
         }
     public:
         Dir() : _p(){}
-        Dir(const char* p, bool m = false) throw(fs::Exception) : Dir(std::string(p), m) {}
-        Dir(const std::string& p, bool m = false) throw(fs::Exception) : _p(Dir::LOCL(p)) {
+        Dir(const char* p, bool m = false) KTHROW(fs::Exception) : Dir(std::string(p), m) {}
+        Dir(const std::string& p, bool m = false) KTHROW(fs::Exception) : _p(Dir::LOCL(p)) {
 #ifndef _WIN32
             if(p.size() && p[0] == '~') this->_p = (env::GET("HOME") + p.substr(1));
 #endif
@@ -239,17 +239,17 @@ class Dir : public fs::Item {
 
         Dir parent() const { return Dir(PRNT(path())); }
 
-        std::vector<Dir> dirs(bool incHidden = false) const throw(fs::Exception);
-        std::vector<File> files(bool recursive = false) const throw(fs::Exception);
+        std::vector<Dir> dirs(bool incHidden = false) const KTHROW(fs::Exception);
+        std::vector<File> files(bool recursive = false) const KTHROW(fs::Exception);
 
         static std::string JOIN(const std::string& a, const std::string& b) { return a + SEP() + b; }
 
 #ifndef  _KUL_COMPILED_LIB_
-        static std::string REAL(const std::string& s) throw(fs::Exception){
+        static std::string REAL(const std::string& s) KTHROW(fs::Exception){
 #include "kul/src/os/dir/Xreal.cpp"
         }
 #else
-        static std::string REAL(const std::string& s) throw(fs::Exception);
+        static std::string REAL(const std::string& s) KTHROW(fs::Exception);
 #endif//_KUL_COMPILED_LIB_
 
 #ifdef _WIN32
@@ -506,11 +506,11 @@ inline void kul::Dir::rm() const{
 
 #ifndef  _KUL_COMPILED_LIB_
 
-inline std::vector<kul::Dir> kul::Dir::dirs(bool incHidden) const throw(fs::Exception){
+inline std::vector<kul::Dir> kul::Dir::dirs(bool incHidden) const KTHROW(fs::Exception){
 #include "kul/src/os/dir/dirs.cpp"
 }
 
-inline std::vector<kul::File> kul::Dir::files(bool recursive) const throw(fs::Exception){
+inline std::vector<kul::File> kul::Dir::files(bool recursive) const KTHROW(fs::Exception){
 #include "kul/src/os/dir/files.cpp"
 }
 

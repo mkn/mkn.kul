@@ -94,22 +94,22 @@ class Process : public kul::AProcess{
         void waitForStatus(){
 #include "kul/src/proc/waitForStatus.cpp"
         }
-        void waitExit() throw (kul::proc::ExitException){
+        void waitExit() KTHROW(kul::proc::ExitException){
 #include "kul/src/proc/waitExit.cpp"
         }
         void tearDown(){
 #include "kul/src/proc/tearDown.cpp"
         }
-        void run() throw (kul::proc::Exception){
+        void run() KTHROW(kul::proc::Exception){
 #include "kul/src/proc/run.cpp"
         }
 #else
         int16_t child();
         virtual void expand(std::string& s) const;
         void waitForStatus();
-        void waitExit() throw (kul::proc::ExitException);
+        void waitExit() KTHROW(kul::proc::ExitException);
         void tearDown();
-        void run() throw (kul::proc::Exception);
+        void run() KTHROW(kul::proc::Exception);
 #endif
         virtual void finish()   { }
         virtual void preStart() { }

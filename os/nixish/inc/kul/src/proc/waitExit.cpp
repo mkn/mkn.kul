@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // This file is included by other files and is not in itself syntactically correct.
 
-// void kul::Process::waitExit() throw (kul::proc::ExitException){
+// void kul::Process::waitExit() KTHROW(kul::proc::ExitException){
 
     tearDown();
     exitCode(WEXITSTATUS(cStat));

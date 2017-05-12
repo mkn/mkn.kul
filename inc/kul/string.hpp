@@ -150,7 +150,7 @@ class String{
             KEXCEPT(StringException, "input not bool-able, " + s);
         }
 
-        static uint16_t UINT16(const std::string& s) throw(StringException){
+        static uint16_t UINT16(const std::string& s) KTHROW(StringException){
             try{
                 uint32_t lresult = stoul(s, 0, 10);
                 uint16_t result = lresult;
@@ -159,18 +159,18 @@ class String{
             }catch(const std::invalid_argument& e){ KEXCEPT(StringException, "UINT failed"); }
             return 0;
         }
-        static int16_t INT16(const std::string& s) throw(StringException){
+        static int16_t INT16(const std::string& s) KTHROW(StringException){
             try{
                 return std::stoi(s); 
             }catch(const std::invalid_argument& e){ KEXCEPT(StringException, "stoi failed"); }
         }
-        static uint32_t UINT32(const std::string& s) throw(StringException){
+        static uint32_t UINT32(const std::string& s) KTHROW(StringException){
             try{
                 return std::stoul(s);
             }catch(const std::invalid_argument& e){ KEXCEPT(StringException, "ULONG failed"); }
             return 0;
         }
-        static uint64_t UINT64(const std::string& s) throw(StringException){
+        static uint64_t UINT64(const std::string& s) KTHROW(StringException){
             try{
                 return std::stoull(s);
             }catch(const std::invalid_argument& e){ KEXCEPT(StringException, "ULONGLONG failed"); }

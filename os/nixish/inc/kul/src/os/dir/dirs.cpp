@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // This file is included by other files and is not in itself syntactically correct.
 
-// std::vector<kul::Dir> kul::Dir::dirs(bool incHidden) const throw(fs::Exception){
+// std::vector<kul::Dir> kul::Dir::dirs(bool incHidden) const KTHROW(fs::Exception){
 
     if(!is()) KEXCEPT(fs::Exception, "Directory : \"" + path() + "\" does not exist");
     std::vector<Dir> dirs;

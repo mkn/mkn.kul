@@ -52,7 +52,7 @@ class WINCompiler : public Compiler{
             const std::vector<std::string>& libPaths,
             const std::string& out, 
             const Mode& mode,
-            bool dryRun = false) const throw (kul::Exception){
+            bool dryRun = false) const KTHROW(kul::Exception){
             
             std::string exe = out + ".exe";
             std::string cmd = linker;
@@ -101,7 +101,7 @@ class WINCompiler : public Compiler{
             const std::vector<std::string>& libPaths,
             const kul::File& out, 
             const Mode& mode,
-            bool dryRun = false) const throw (kul::Exception){
+            bool dryRun = false) const KTHROW(kul::Exception){
 
 
             std::string dll = out.real() + ".dll";
@@ -133,7 +133,7 @@ class WINCompiler : public Compiler{
             const std::string& in, 
             const std::string& out, 
             const Mode& mode,
-            bool dryRun = false) const throw (kul::Exception){
+            bool dryRun = false) const KTHROW(kul::Exception){
 
             KEXCEPTION("Method compileSource is not implemented in C Sharp");
         }
@@ -142,7 +142,7 @@ class WINCompiler : public Compiler{
             const hash::set::String& args, 
             const std::string& in, 
             const std::string& out,
-            bool dryRun = false)     const throw (kul::Exception) {
+            bool dryRun = false)     const KTHROW(kul::Exception) {
 
             KEXCEPTION("Method preCompileHeader is not implemented in C Sharp");
         }

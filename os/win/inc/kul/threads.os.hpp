@@ -108,11 +108,11 @@ class Thread : public threading::AThread{
 			s = 0;
 		}
 		bool detach(){ return CloseHandle(h); }
-		void interrupt() throw(kul::threading::InterruptionException){
+		void interrupt() KTHROW(kul::threading::InterruptionException){
 			TerminateThread(h, 1);
 			f = 1;
 		}
-		void run() throw(kul::threading::Exception){
+		void run() KTHROW(kul::threading::Exception){
 			if(s) KEXCEPTION("Thread running");
 			f = 0;
 			s = 1;

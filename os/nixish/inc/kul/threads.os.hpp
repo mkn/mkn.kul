@@ -118,7 +118,7 @@ class Thread : public threading::AThread{
         bool detach(){
             return pthread_detach(thr);
         }
-        void interrupt() throw(kul::threading::InterruptionException){
+        void interrupt() KTHROW(kul::threading::InterruptionException){
             pthread_cancel(thr);
             f = 1;
         }
@@ -127,7 +127,7 @@ class Thread : public threading::AThread{
             pthread_join(thr, 0);
             s = 0;
         }
-        void run() throw(kul::threading::Exception){
+        void run() KTHROW(kul::threading::Exception){
             if(s) KEXCEPTION("Thread running");
             f = 0;
             s = 1;

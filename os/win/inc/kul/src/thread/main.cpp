@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // bool kul::this_thread::main(){
 
 	const std::tr1::shared_ptr<void> hThreadSnapshot(CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0), CloseHandle);
-    if (hThreadSnapshot.get() == INVALID_HANDLE_VALUE) throw std::runtime_error("GetMainThreadId failed");
+    if (hThreadSnapshot.get() == INVALID_HANDLE_VALUE) KEXCEPT(kul::threading::Exception, "GetMainThreadId failed");
     THREADENTRY32 tEntry;
     tEntry.dwSize = sizeof(THREADENTRY32);
     DWORD result = 0;

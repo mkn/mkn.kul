@@ -84,7 +84,7 @@ class Item{
         Item(){}
         Item(const YAML::Node& r) : r(r){}
 
-        static void VALIDATE(const YAML::Node& n, const std::vector<NodeValidator>& nvs) throw(Exception){
+        static void VALIDATE(const YAML::Node& n, const std::vector<NodeValidator>& nvs) KTHROW(Exception){
             KUL_DBG_FUNC_ENTER
             kul::hash::set::String keys;
             for(const auto& nv : nvs) if(nv.name() == "*") return;
@@ -132,12 +132,12 @@ class String : public Item{
     private:
         const std::string s;
     public:
-        String(const std::string& s) throw(Exception) : s(s) {
+        String(const std::string& s) KTHROW(Exception) : s(s) {
             try{
                 r = YAML::Load(s); 
             }catch(const std::exception& e){ KEXCEPTION("YAML failed to parse\nString: "+s); }
         }
-        const YAML::Node& validate(const Validator&& v) throw(Exception) {
+        const YAML::Node& validate(const Validator&& v) KTHROW(Exception) {
             Item::VALIDATE(root(), v.children());
             return r;
         }
@@ -147,18 +147,18 @@ class File : public Item{
     private:
         const std::string f;
     protected:
-        void reload() throw(Exception){
+        void reload() KTHROW(Exception){
             try{
                 r = YAML::LoadFile(f); 
             }catch(const std::exception& e){ KEXCEPTION("YAML failed to parse\nFile: "+f); }
         }
         File(const File& f) : Item(f.r), f(f.f){}
-        File(const std::string& f) throw(Exception) : f(f) {
+        File(const std::string& f) KTHROW(Exception) : f(f) {
             reload();
         }
     public:
         template <class T> 
-        static T CREATE(const std::string& f) throw(Exception) {
+        static T CREATE(const std::string& f) KTHROW(Exception) {
             T file(f);
             try{
                 Item::VALIDATE(file.root(), file.validator().children());

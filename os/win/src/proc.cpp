@@ -38,6 +38,6 @@ void kul::Process::tearDown(){
 #include "kul/src/proc/tearDown.cpp"
 }
 
-void kul::Process::run() throw (kul::proc::Exception){
+void kul::Process::run() KTHROW(kul::proc::Exception){
 #include "kul/src/proc/tearDown.cpp"
 }

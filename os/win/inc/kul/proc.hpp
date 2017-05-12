@@ -134,13 +134,13 @@ class Process : public kul::AProcess{
         virtual void expand(std::string& s) const {
 #include "kul/src/proc/expand.cpp"
         }
-        void run() throw (kul::Exception){
+        void run() KTHROW(kul::Exception){
 #include "kul/src/proc/run.cpp"
         }
 #else
         void tearDown();
         virtual void expand(std::string& s) const;
-        void run() throw (kul::Exception);
+        void run() KTHROW(kul::Exception);
 #endif
 
     };

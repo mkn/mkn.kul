@@ -59,7 +59,7 @@ class Server{
         HANDLE hPipe;
         TCHAR *pchRequest = 0;
 
-        void start() throw(Exception){
+        void start() KTHROW(Exception){
             DWORD  dwThreadId = 0; 
             hPipe = INVALID_HANDLE_VALUE;
             LPTSTR lpszPipename = _strdup(uuid.c_str()); 
@@ -85,7 +85,7 @@ class Server{
         virtual ~Server(){
             if (pchRequest) HeapFree(GetProcessHeap(), 0, pchRequest);
         }
-        void listen() throw(Exception){
+        void listen() KTHROW(Exception){
             while(lp){
                 HANDLE hHeap    = GetProcessHeap();
                 pchRequest      = (TCHAR*)HeapAlloc(hHeap, 0, KUL_IPC_BUFFER*sizeof(TCHAR));
@@ -107,8 +107,8 @@ class Server{
             }
             CloseHandle(hPipe); 
         }
-        Server(const int16_t& lp = -1) throw(Exception) : lp(lp), uuid(_KUL_IPC_UUID_PREFIX_ + std::string("pid\\") + std::to_string(kul::this_proc::id())){ start();}
-        Server(const std::string& ui, const int16_t& lp = -1) throw(Exception) : uuid(_KUL_IPC_UUID_PREFIX_ + ui), lp(lp){ start();}
+        Server(const int16_t& lp = -1) KTHROW(Exception) : lp(lp), uuid(_KUL_IPC_UUID_PREFIX_ + std::string("pid\\") + std::to_string(kul::this_proc::id())){ start();}
+        Server(const std::string& ui, const int16_t& lp = -1) KTHROW(Exception) : uuid(_KUL_IPC_UUID_PREFIX_ + ui), lp(lp){ start();}
 };
 
 class Client{
@@ -116,7 +116,7 @@ class Client{
         const std::string uuid;
 
         HANDLE hPipe; 
-        void start() throw(Exception){
+        void start() KTHROW(Exception){
             bool fSuccess = FALSE; 
             DWORD  dwMode; 
             LPTSTR lpszPipename = _strdup(uuid.c_str());
@@ -143,16 +143,16 @@ class Client{
             if(!fSuccess)
                 KEXCEPT(kul::ipc::Exception, "SetNamedPipeHandleState failed: " + std::to_string(GetLastError()));
         }
-        void stop() const throw(Exception){
+        void stop() const KTHROW(Exception){
             CloseHandle(hPipe); 
         }
     public:
         virtual ~Client(){
             stop();
         }
-        Client(const std::string& ui) throw(Exception) : uuid(_KUL_IPC_UUID_PREFIX_ + ui) { start(); }
-        Client(const int16_t& pid) throw(Exception) : uuid(_KUL_IPC_UUID_PREFIX_ + std::string("pid\\") + std::to_string(pid)) { start(); }
-        virtual void send(const std::string& m) const throw(Exception){
+        Client(const std::string& ui) KTHROW(Exception) : uuid(_KUL_IPC_UUID_PREFIX_ + ui) { start(); }
+        Client(const int16_t& pid) KTHROW(Exception) : uuid(_KUL_IPC_UUID_PREFIX_ + std::string("pid\\") + std::to_string(pid)) { start(); }
+        virtual void send(const std::string& m) const KTHROW(Exception){
             DWORD  cbToWrite, cbWritten;
             LPTSTR lpvMessage = _strdup(m.c_str()); 
             cbToWrite = (lstrlen(lpvMessage)+1)*sizeof(TCHAR);

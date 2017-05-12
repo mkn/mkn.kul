@@ -79,7 +79,7 @@ class Compiler{
             const std::vector<std::string>& libPaths,
             const std::string& out, 
             const Mode& mode,
-            bool dryRun = false)           const throw (kul::Exception) = 0;
+            bool dryRun = false)           const KTHROW(kul::Exception) = 0;
         virtual const CompilerProcessCapture buildLibrary(
             const std::string& linker, 
             const std::string& linkerEnd,
@@ -88,7 +88,7 @@ class Compiler{
             const std::vector<std::string>& libPaths,
             const kul::File& out, 
             const Mode& mode,
-            bool dryRun = false)           const throw (kul::Exception) = 0;
+            bool dryRun = false)           const KTHROW(kul::Exception) = 0;
         virtual const CompilerProcessCapture compileSource  (
             const std::string& compiler,
             const std::vector<std::string>& args,       
@@ -96,13 +96,13 @@ class Compiler{
             const std::string& in, 
             const std::string& out, 
             const Mode& mode,
-            bool dryRun = false)   const throw (kul::Exception) = 0;
+            bool dryRun = false)   const KTHROW(kul::Exception) = 0;
         virtual void preCompileHeader(
             const std::vector<std::string>& incs, 
             const hash::set::String& args, 
             const std::string& in, 
             const std::string& out,
-            bool dryRun = false)     const throw (kul::Exception) = 0;
+            bool dryRun = false)     const KTHROW(kul::Exception) = 0;
 };
 
 }}

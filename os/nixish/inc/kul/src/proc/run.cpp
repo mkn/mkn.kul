@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // This file is included by other files and is not in itself syntactically correct.
 
-// void kul::Process::run() throw (kul::proc::Exception){
+// void kul::Process::run() KTHROW(kul::proc::Exception){
 
     int16_t ret = 0;
 

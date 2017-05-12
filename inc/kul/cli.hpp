@@ -155,7 +155,7 @@ class Args{
         size_t size() const {
             return vals.size();
         }
-        void process(const uint16_t& argc, char* argv[], uint16_t first = 1) throw(ArgNotFoundException){
+        void process(const uint16_t& argc, char* argv[], uint16_t first = 1) KTHROW(ArgNotFoundException){
             for(const Arg& a1 : arguments())
                 for(const Arg& a2 : arguments()){
                     if(&a1 == &a2) continue;

@@ -74,7 +74,7 @@ class Server : public IPCCall{
         int16_t lp;
         const kul::File uuid;
 
-        void start() throw(Exception){
+        void start() KTHROW(Exception){
             uuid.dir().mk();
             mkfifo(uuid.full().c_str(), 0666);
         }
@@ -85,7 +85,7 @@ class Server : public IPCCall{
         void respond(const std::string& s);
     public:
         virtual ~Server(){}
-        void listen() throw(Exception){
+        void listen() KTHROW(Exception){
             char buff[BUFSIZE];
             while(lp){
                 memset(buff, 0, BUFSIZE);
@@ -102,28 +102,28 @@ class Server : public IPCCall{
                 if(lp != -1) lp--;
             }
         }
-        Server(const int16_t& lp = -1) throw(Exception) : lp(lp), uuid(std::to_string(kul::this_proc::id()), Dir(_KUL_IPC_UUID_PREFIX_ + std::string("/pid/"))){ start();}
-        Server(const std::string& ui, const int16_t& lp = -1) throw(Exception) : lp(lp), uuid(ui, Dir(_KUL_IPC_UUID_PREFIX_)){ start();}
+        Server(const int16_t& lp = -1) KTHROW(Exception) : lp(lp), uuid(std::to_string(kul::this_proc::id()), Dir(_KUL_IPC_UUID_PREFIX_ + std::string("/pid/"))){ start();}
+        Server(const std::string& ui, const int16_t& lp = -1) KTHROW(Exception) : lp(lp), uuid(ui, Dir(_KUL_IPC_UUID_PREFIX_)){ start();}
 };
 
 class Client : public IPCCall{
     private:
         const kul::File uuid;
 
-        void start() throw(Exception){
+        void start() KTHROW(Exception){
             fd = open(uuid.full().c_str(), O_WRONLY);
             if (fd == -1) KEXCEPT(kul::ipc::Exception, "Cannot contact server");
         }
-        void stop() const throw(Exception){
+        void stop() const KTHROW(Exception){
             close(fd);
         }
     public:
         virtual ~Client(){
             stop();
         }
-        Client(const std::string& ui) throw(Exception) : uuid(ui, Dir(_KUL_IPC_UUID_PREFIX_)) { start(); }
-        Client(const int16_t& pid) throw(Exception) : uuid(std::to_string(pid), Dir(_KUL_IPC_UUID_PREFIX_ + std::string("/pid/"))) { start(); }
-        virtual void send(const std::string& m) const throw(Exception){
+        Client(const std::string& ui) KTHROW(Exception) : uuid(ui, Dir(_KUL_IPC_UUID_PREFIX_)) { start(); }
+        Client(const int16_t& pid) KTHROW(Exception) : uuid(std::to_string(pid), Dir(_KUL_IPC_UUID_PREFIX_ + std::string("/pid/"))) { start(); }
+        virtual void send(const std::string& m) const KTHROW(Exception){
             writeLength(m);
             write(fd, m.c_str(), m.size());
         }
