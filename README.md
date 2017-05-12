@@ -6,12 +6,8 @@
 
 Supported Architectures/Operating Systems: 
 
-	x86_64 / Linux
-	
-	x86_64 / BSD
-	
-	x86_64 / Windows
-	
-	ARMv7  / Linux
-	
+	x86_64 / Linux	
+	x86_64 / BSD	
+	x86_64 / Windows	
+	ARMv7  / Linux	
 	ARMv7  / Windows
