@@ -5,6 +5,7 @@
 **Cross platform C++ wrapper for threading/process management/io/logging/signal handling and stack walking.** 
 
 Supported Architectures/Operating Systems: 
+
 	x86_64 / Linux
 	
 	x86_64 / BSD
