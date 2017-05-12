@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "kul/log.hpp"
 #include "kul/proc.base.hpp"
 
-void kul::AProcess::start() throw(kul::Exception){
+void kul::AProcess::start() KTHROW(kul::Exception){
 #include "kul/src/proc.base/start.cpp"
 }
 
