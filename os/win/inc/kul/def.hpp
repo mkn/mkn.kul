@@ -59,14 +59,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #pragma warning(disable : 4503)
 #pragma warning(disable : 4800)
 
-#ifndef KNOEXCEPT
-    #if (_MSC_VER >= 1900 )
-        #define KNOEXCEPT noexcept
-    #else
-        #define KNOEXCEPT
-    #endif
-#endif /*  KNOEXCEPT */
-
 #ifndef INTMAX_MAX
     #define INTMAX_MAX _I64_MAX
 #endif /*  INTMAX_MAX */

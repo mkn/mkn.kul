@@ -41,8 +41,4 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     #define __KUL_THREAD_SPAWN_WAIT__ 10000000
 #endif /*  __KUL_THREAD_SPAWN_WAIT__ */
 
-#ifndef KNOEXCEPT
-    #define KNOEXCEPT noexcept
-#endif /*  KNOEXCEPT */
-
 #endif /* _KUL_DEF_HPP_ */
