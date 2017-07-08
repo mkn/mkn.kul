@@ -35,22 +35,42 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string>
 #include <vector>
 #include <string.h>
-#include <algorithm>
 #include <iostream>
+#include <algorithm>
+#include <unordered_map>
 
 #include "kul/except.hpp"
 
 namespace kul { 
+
+enum STR_INT_RET { IS_SUCCESS = 0, IS_OVERFLOW, IS_UNDERFLOW, IS_INCONVERTIBLE };
 
 class StringException : public kul::Exception{
     public:
         StringException(const char*f, const uint16_t& l, const std::string& s) : kul::Exception(f, l, s){}
 };
 
-class String{
+class String;
+class StringOpHelper{
+    friend class String;
     private:
-        enum STR_INT_RET { IS_SUCCESS, IS_OVERFLOW, IS_UNDERFLOW, IS_INCONVERTIBLE };
+        const std::unordered_map<STR_INT_RET, std::string> STR_INT_STR {
+            {IS_SUCCESS       , "SUCCSESS"},
+            {IS_OVERFLOW      , "OVERFLOW"},
+            {IS_UNDERFLOW     , "UNDERFLOW"},
+            {IS_INCONVERTIBLE , "INCONVERTIBLE"}
+        };
+        std::string getStrForRet(STR_INT_RET ret){
+            return (*STR_INT_STR.find(ret)).second;
+        }
+    public:
+        static StringOpHelper& INSTANCE (){
+            static StringOpHelper i;
+            return i;
+        }
+};
 
+class String{
     public:
         static void REPLACE(std::string& s, const std::string& f, const std::string& r){
             size_t p = 0;
@@ -166,7 +186,7 @@ class String{
             };
             uint32_t lresult = 0;
             STR_INT_RET ret = lambda(str.c_str(), lresult);
-            if(ret != IS_SUCCESS) KEXCEPT(StringException, "UINT16 conversion failed, enum value: " + std::to_string(ret));
+            if(ret != IS_SUCCESS) KEXCEPT(StringException, "UINT16 conversion failed, reason: " + StringOpHelper::INSTANCE().getStrForRet(ret));
             uint16_t result = lresult;
             if (result != lresult) KEXCEPT(StringException, "UINT16 conversion failed");
             return result;
@@ -183,7 +203,7 @@ class String{
             };
             int32_t lresult = 0;
             STR_INT_RET ret = lambda(str.c_str(), lresult);
-            if(ret != IS_SUCCESS) KEXCEPT(StringException, "INT16 conversion failed, enum value: " + std::to_string(ret));
+            if(ret != IS_SUCCESS) KEXCEPT(StringException, "INT16 conversion failed, reason: " + StringOpHelper::INSTANCE().getStrForRet(ret));
             int16_t result = lresult;
             if (result != lresult) KEXCEPT(StringException, "INT16 conversion failed");
             return result;
@@ -201,7 +221,7 @@ class String{
             };
             uint64_t lresult = 0;
             STR_INT_RET ret = lambda(str.c_str(), lresult);
-            if(ret != IS_SUCCESS) KEXCEPT(StringException, "UINT32 conversion failed, enum value: " + std::to_string(ret));
+            if(ret != IS_SUCCESS) KEXCEPT(StringException, "UINT32 conversion failed, reason: " + StringOpHelper::INSTANCE().getStrForRet(ret));
             uint32_t result = lresult;
             if (result != lresult) KEXCEPT(StringException, "UINT32 conversion failed");
             return result;
@@ -218,7 +238,7 @@ class String{
             };
             int64_t lresult = 0;
             STR_INT_RET ret = lambda(str.c_str(), lresult);
-            if(ret != IS_SUCCESS) KEXCEPT(StringException, "INT32 conversion failed, enum value: " + std::to_string(ret));
+            if(ret != IS_SUCCESS) KEXCEPT(StringException, "INT32 conversion failed, reason: " + StringOpHelper::INSTANCE().getStrForRet(ret));
             int32_t result = lresult;
             if (result != lresult) KEXCEPT(StringException, "INT32 conversion failed");
             return result;
@@ -236,7 +256,7 @@ class String{
             };
             uint64_t lresult = 0;
             STR_INT_RET ret = lambda(str.c_str(), lresult);
-            if(ret != IS_SUCCESS) KEXCEPT(StringException, "UINT64 conversion failed, enum value: " + std::to_string(ret));
+            if(ret != IS_SUCCESS) KEXCEPT(StringException, "UINT64 conversion failed, reason: " + StringOpHelper::INSTANCE().getStrForRet(ret));
             uint64_t result = lresult;
             if (result != lresult) KEXCEPT(StringException, "UINT64 conversion failed");
             return result;
