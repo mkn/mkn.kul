@@ -88,7 +88,8 @@ inline std::string CWD(){
     _getcwd(c, _MAX_PATH);
 #else
     char c[PATH_MAX];
-    getcwd(c, PATH_MAX);
+    auto r = getcwd(c, PATH_MAX);
+    (void) r;
 #endif
     std::string str(c);
     return str;
