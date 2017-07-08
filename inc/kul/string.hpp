@@ -59,10 +59,10 @@ class StringOpHelper{
             return (*STR_INT_STR.find(ret)).second;
         }
         StringOpHelper(){
-            STR_INT_STR[IS_SUCCESS]       = "SUCCESS";
-            STR_INT_STR[IS_OVERFLOW]      = "OVERFLOW";
-            STR_INT_STR[IS_UNDERFLOW]     = "UNDERFLOW";
-            STR_INT_STR[IS_INCONVERTIBLE] = "INCONVERTIBLE";
+            STR_INT_STR.insert(std::make_pair(IS_SUCCESS      , "SUCCESS"));
+            STR_INT_STR.insert(std::make_pair(IS_OVERFLOW     , "OVERFLOW"));
+            STR_INT_STR.insert(std::make_pair(IS_UNDERFLOW    , "UNDERFLOW"));
+            STR_INT_STR.insert(std::make_pair(IS_INCONVERTIBLE, "INCONVERTIBLE"));
         }
     public:
         static StringOpHelper& INSTANCE (){
