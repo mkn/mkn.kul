@@ -31,6 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _KUL_STRING_HPP_
 #define _KUL_STRING_HPP_
 
+#include <cmath>
 #include <string>
 #include <vector>
 #include <string.h>
@@ -47,6 +48,9 @@ class StringException : public kul::Exception{
 };
 
 class String{
+    private:
+        enum STR_INT_RET { IS_SUCCESS, IS_OVERFLOW, IS_UNDERFLOW, IS_INCONVERTIBLE };
+
     public:
         static void REPLACE(std::string& s, const std::string& f, const std::string& r){
             size_t p = 0;
@@ -150,32 +154,94 @@ class String{
             KEXCEPT(StringException, "input not bool-able, " + s);
         }
 
-        static uint16_t UINT16(const std::string& s) KTHROW(StringException){
-            try{
-                uint32_t lresult = stoul(s, 0, 10);
-                uint16_t result = lresult;
-                if (result != lresult) KEXCEPT(StringException, "UINT failed");
-                return result;
-            }catch(const std::invalid_argument& e){ KEXCEPT(StringException, "UINT failed"); }
-            return 0;
+        static uint16_t UINT16(const std::string& str) KTHROW(StringException){
+            auto lambda = [](const char* s, uint32_t& lresult){
+                char *end;
+                errno = 0;
+                lresult = strtol(s, &end, 10);
+                if ((errno == ERANGE) || lresult > UINT16_MAX) return IS_OVERFLOW;
+                if ((errno == ERANGE) || lresult < 0)          return IS_UNDERFLOW;
+                if (*s == '\0' || *end != '\0')                return IS_INCONVERTIBLE;
+                return IS_SUCCESS;
+            };
+            uint32_t lresult = 0;
+            STR_INT_RET ret = lambda(str.c_str(), lresult);
+            if(ret != IS_SUCCESS) KEXCEPT(StringException, "UINT16 conversion failed, enum value: " + std::to_string(ret));
+            uint16_t result = lresult;
+            if (result != lresult) KEXCEPT(StringException, "UINT16 conversion failed");
+            return result;
         }
-        static int16_t INT16(const std::string& s) KTHROW(StringException){
-            try{
-                return std::stoi(s); 
-            }catch(const std::invalid_argument& e){ KEXCEPT(StringException, "stoi failed"); }
+        static int16_t INT16(const std::string& str) KTHROW(StringException){
+            auto lambda = [](const char* s, int32_t& lresult){
+                char *end;
+                errno = 0;
+                lresult = strtol(s, &end, 10);
+                if ((errno == ERANGE) || lresult > INT16_MAX) return IS_OVERFLOW;
+                if ((errno == ERANGE) || lresult < INT16_MIN) return IS_UNDERFLOW;
+                if (*s == '\0' || *end != '\0')               return IS_INCONVERTIBLE;
+                return IS_SUCCESS;
+            };
+            int32_t lresult = 0;
+            STR_INT_RET ret = lambda(str.c_str(), lresult);
+            if(ret != IS_SUCCESS) KEXCEPT(StringException, "INT16 conversion failed, enum value: " + std::to_string(ret));
+            int16_t result = lresult;
+            if (result != lresult) KEXCEPT(StringException, "INT16 conversion failed");
+            return result;
         }
-        static uint32_t UINT32(const std::string& s) KTHROW(StringException){
-            try{
-                return std::stoul(s);
-            }catch(const std::invalid_argument& e){ KEXCEPT(StringException, "ULONG failed"); }
-            return 0;
+
+        static uint32_t UINT32(const std::string& str) KTHROW(StringException){
+            auto lambda = [](const char* s, uint64_t& lresult){
+                char *end;
+                errno = 0;
+                lresult = strtoll(s, &end, 10);
+                if ((errno == ERANGE) || lresult > UINT32_MAX) return IS_OVERFLOW;
+                if ((errno == ERANGE) || lresult < 0)          return IS_UNDERFLOW;
+                if (*s == '\0' || *end != '\0')                return IS_INCONVERTIBLE;
+                return IS_SUCCESS;
+            };
+            uint64_t lresult = 0;
+            STR_INT_RET ret = lambda(str.c_str(), lresult);
+            if(ret != IS_SUCCESS) KEXCEPT(StringException, "UINT32 conversion failed, enum value: " + std::to_string(ret));
+            uint32_t result = lresult;
+            if (result != lresult) KEXCEPT(StringException, "UINT32 conversion failed");
+            return result;
         }
-        static uint64_t UINT64(const std::string& s) KTHROW(StringException){
-            try{
-                return std::stoull(s);
-            }catch(const std::invalid_argument& e){ KEXCEPT(StringException, "ULONGLONG failed"); }
-            return 0;
+        static int32_t INT32(const std::string& str) KTHROW(StringException){
+            auto lambda = [](const char* s, int64_t& lresult){
+                char *end;
+                errno = 0;
+                lresult = strtoll(s, &end, 10);
+                if ((errno == ERANGE) || lresult > INT32_MAX) return IS_OVERFLOW;
+                if ((errno == ERANGE) || lresult < INT32_MIN) return IS_UNDERFLOW;
+                if (*s == '\0' || *end != '\0')               return IS_INCONVERTIBLE;
+                return IS_SUCCESS;
+            };
+            int64_t lresult = 0;
+            STR_INT_RET ret = lambda(str.c_str(), lresult);
+            if(ret != IS_SUCCESS) KEXCEPT(StringException, "INT32 conversion failed, enum value: " + std::to_string(ret));
+            int32_t result = lresult;
+            if (result != lresult) KEXCEPT(StringException, "INT32 conversion failed");
+            return result;
         }
+
+        static uint64_t UINT64(const std::string& str) KTHROW(StringException){
+            auto lambda = [](const char* s, uint64_t& lresult){
+                char *end;
+                errno = 0;
+                lresult = strtoll(s, &end, 10);
+                if ((errno == ERANGE) || lresult > UINT64_MAX) return IS_OVERFLOW;
+                if ((errno == ERANGE) || lresult < 0)          return IS_UNDERFLOW;
+                if (*s == '\0' || *end != '\0')                return IS_INCONVERTIBLE;
+                return IS_SUCCESS;
+            };
+            uint64_t lresult = 0;
+            STR_INT_RET ret = lambda(str.c_str(), lresult);
+            if(ret != IS_SUCCESS) KEXCEPT(StringException, "UINT64 conversion failed, enum value: " + std::to_string(ret));
+            uint64_t result = lresult;
+            if (result != lresult) KEXCEPT(StringException, "UINT64 conversion failed");
+            return result;
+        }
+
 };
 
 }

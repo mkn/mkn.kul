@@ -118,6 +118,142 @@ TEST(OperatingSystemTests, HasRAMUsageSupport) {
     ASSERT_TRUE(kul::this_proc::virtualMemory());
 }
 
+auto tryCatch = [](std::vector<std::function<void()>> funcs){
+    for(const auto& func : funcs)
+        try{
+            func();
+            ASSERT_TRUE(0);
+        }catch(const kul::StringException& e){
+            ASSERT_TRUE(1);
+            KOUT(DBG) << e.debug();
+        }
+};
+
+TEST(StringOperations, String_2_UInt16_t) {
+    tryCatch(
+        {
+            //toolarge
+            [](){
+                kul::String::UINT16(std::to_string((std::numeric_limits<uint16_t>::max)() + 10));
+            },
+            //tooNegative
+            [](){
+                kul::String::UINT16("-1");
+            },
+            //contains letters * 3
+            [](){
+                kul::String::UINT16("a2c");
+            },
+            [](){
+                kul::String::UINT16("1bc");
+            },
+            [](){
+                kul::String::UINT16("ab3");
+            }
+        }
+    );
+
+    std::string positive = "100";
+    kul::String::UINT16(positive);
+    ASSERT_TRUE(1);
+}
+
+
+TEST(StringOperations, String_2_Int16_t) {
+    tryCatch(
+        {
+            //toolarge
+            [](){
+                kul::String::INT16(std::to_string((std::numeric_limits<int16_t>::max)() + 10));
+            },
+            //tooNegative
+            [](){
+                kul::String::INT16(std::to_string(((std::numeric_limits<int16_t>::max)() + 10) * -1));
+            },
+            //contains letters * 3
+            [](){
+                kul::String::INT16("a2c");
+            },
+            [](){
+                kul::String::INT16("1bc");
+            },
+            [](){
+                kul::String::INT16("ab3");
+            }
+        }
+    );
+
+    kul::String::INT16("100");
+    ASSERT_TRUE(1);
+    kul::String::INT16("-100");
+    ASSERT_TRUE(1);
+}
+
+TEST(StringOperations, String_2_UInt32_t) {
+    tryCatch(
+        {
+            //toolarge
+            [](){
+                uint64_t val = (std::numeric_limits<uint32_t>::max)();
+                val += 10;
+                kul::String::UINT32(std::to_string(val));
+            },
+            //tooNegative
+            [](){
+                kul::String::UINT32(std::to_string(-1));
+            },
+            //contains letters * 3
+            [](){
+                kul::String::UINT32("a2c");
+            },
+            [](){
+                kul::String::UINT32("1bc");
+            },
+            [](){
+                kul::String::UINT32("ab3");
+            }
+        }
+    );
+
+    kul::String::UINT32("100");
+    ASSERT_TRUE(1);
+}
+
+TEST(StringOperations, String_2_Int32_t) {
+    tryCatch(
+        {
+            //toolarge
+            [](){
+                int64_t val = (std::numeric_limits<int32_t>::max)();
+                val += 10;
+                kul::String::INT32(std::to_string(val));
+            },
+            //tooNegative
+            [](){
+                int64_t val = (std::numeric_limits<int32_t>::max)();
+                val += 10;
+                kul::String::INT32("-" + std::to_string(val));
+            },
+            //contains letters * 3
+            [](){
+                kul::String::INT32("a2c");
+            },
+            [](){
+                kul::String::INT32("1bc");
+            },
+            [](){
+                kul::String::INT32("ab3");
+            }
+        }
+    );
+
+    kul::String::INT32("100");
+    ASSERT_TRUE(1);
+    kul::String::INT32("-100");
+    ASSERT_TRUE(1);
+}
+
+
 class TimeStampHandler{
     private:
         kul::File f;
