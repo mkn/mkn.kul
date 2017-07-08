@@ -54,15 +54,15 @@ class String;
 class StringOpHelper{
     friend class String;
     private:
-        std::unordered_map<const STR_INT_RET, std::string> STR_INT_STR;
+        std::unordered_map<uint16_t, std::string> STR_INT_STR;
         std::string getStrForRet(const STR_INT_RET& ret){
             return (*STR_INT_STR.find(ret)).second;
         }
         StringOpHelper(){
-            STR_INT_STR.insert(std::make_pair(IS_SUCCESS      , "SUCCESS"));
-            STR_INT_STR.insert(std::make_pair(IS_OVERFLOW     , "OVERFLOW"));
-            STR_INT_STR.insert(std::make_pair(IS_UNDERFLOW    , "UNDERFLOW"));
-            STR_INT_STR.insert(std::make_pair(IS_INCONVERTIBLE, "INCONVERTIBLE"));
+            STR_INT_STR.insert(std::make_pair(0, "SUCCESS"));
+            STR_INT_STR.insert(std::make_pair(1, "OVERFLOW"));
+            STR_INT_STR.insert(std::make_pair(2, "UNDERFLOW"));
+            STR_INT_STR.insert(std::make_pair(3, "INCONVERTIBLE"));
         }
     public:
         static StringOpHelper& INSTANCE (){
