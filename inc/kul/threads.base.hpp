@@ -74,7 +74,7 @@ class AThread{
         bool started() const { return s; }
         bool finished()const { return f; }
         const std::exception_ptr& exception(){ return ep;}
-        void reKTHROW(){ if(ep) std::rethrow_exception(ep);}
+        void rethrow(){ if(ep) std::rethrow_exception(ep);}
 };
 
 } // END NAMESPACE threading
