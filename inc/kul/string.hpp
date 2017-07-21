@@ -1,5 +1,5 @@
 /**
-Copyright (c) 2013, Philip Deegan.
+Copyright (c) 2017, Philip Deegan.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -179,7 +179,7 @@ class String{
             auto lambda = [](const char* s, uint32_t& lresult){
                 char *end;
                 errno = 0;
-                lresult = strtol(s, &end, 10);
+                lresult = strtoul(s, &end, 10);
                 if ((errno == ERANGE) || lresult > UINT16_MAX) return IS_OVERFLOW;
                 if ((errno == ERANGE) || lresult < 0)          return IS_UNDERFLOW;
                 if (*s == '\0' || *end != '\0')                return IS_INCONVERTIBLE;
@@ -214,7 +214,7 @@ class String{
             auto lambda = [](const char* s, uint64_t& lresult){
                 char *end;
                 errno = 0;
-                lresult = strtoll(s, &end, 10);
+                lresult = strtoull(s, &end, 10);
                 if ((errno == ERANGE) || lresult > UINT32_MAX) return IS_OVERFLOW;
                 if ((errno == ERANGE) || lresult < 0)          return IS_UNDERFLOW;
                 if (*s == '\0' || *end != '\0')                return IS_INCONVERTIBLE;
@@ -249,7 +249,7 @@ class String{
             auto lambda = [](const char* s, uint64_t& lresult){
                 char *end;
                 errno = 0;
-                lresult = strtoll(s, &end, 10);
+                lresult = strtoull(s, &end, 10);
                 if ((errno == ERANGE) || lresult > UINT64_MAX) return IS_OVERFLOW;
                 if ((errno == ERANGE) || lresult < 0)          return IS_UNDERFLOW;
                 if (*s == '\0' || *end != '\0')                return IS_INCONVERTIBLE;
@@ -263,6 +263,23 @@ class String{
             return result;
         }
 
+        static int64_t INT64(const std::string& str) KTHROW(StringException){
+            auto lambda = [](const char* s, int64_t& lresult){
+                char *end;
+                errno = 0;
+                lresult = strtoll(s, &end, 10);
+                if ((errno == ERANGE) || lresult > UINT64_MAX) return IS_OVERFLOW;
+                if ((errno == ERANGE) || lresult < 0)          return IS_UNDERFLOW;
+                if (*s == '\0' || *end != '\0')                return IS_INCONVERTIBLE;
+                return IS_SUCCESS;
+            };
+            int64_t lresult = 0;
+            STR_INT_RET ret = lambda(str.c_str(), lresult);
+            if(ret != IS_SUCCESS) KEXCEPT(StringException, "INT64 conversion failed, reason: " + StringOpHelper::INSTANCE().getStrForRet(ret));
+            int64_t result = lresult;
+            if (result != lresult) KEXCEPT(StringException, "INT64 conversion failed");
+            return result;
+        }
 };
 
 }

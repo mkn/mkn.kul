@@ -28,31 +28,13 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#ifndef _KUL_HASH_HPP_
-#define _KUL_HASH_HPP_
 
-/*
-* REQUIRES libcrypto 
-*/
-
-#include "openssl/sha.h"
-
-namespace kul{ namespace hash{
-
-class SHA{
-	public:
-		static void _256(const std::string& str, std::string& ret){
-		    unsigned char h[SHA256_DIGEST_LENGTH];
-		    SHA256_CTX sha;
-		    SHA256_Init(&sha);
-		    SHA256_Update(&sha, str.c_str(), str.size());
-		    SHA256_Final(h, &sha);
-		    std::stringstream ss;
-		    for(uint16_t i = 0; i < SHA256_DIGEST_LENGTH; i++)
-		        ss << std::hex << std::setw(2) << std::setfill('0') << (int16_t)h[i];
-		    ret = ss.str();
-		}
-};
-
-}}
-#endif /* _KUL_HASH_HPP_ */
+TEST(CLI_Test, ParseCommandLineArguments) {
+    std::vector<std::string> v;
+    kul::cli::asArgs("/path/to \"words in quotes\" words\\ not\\ in\\ quotes end", v);
+    EXPECT_EQ((size_t) 4, v.size());
+    EXPECT_EQ("/path/to", v[0]);
+    EXPECT_EQ("words in quotes", v[1]);
+    EXPECT_EQ("words not in quotes", v[2]);
+    EXPECT_EQ("end", v[3]);
+}

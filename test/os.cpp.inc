@@ -28,31 +28,37 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#ifndef _KUL_HASH_HPP_
-#define _KUL_HASH_HPP_
 
-/*
-* REQUIRES libcrypto 
-*/
+TEST(OperatingSystemTests, HasRAMUsageSupport) {
+    ASSERT_TRUE(kul::this_proc::physicalMemory());
+    ASSERT_TRUE(kul::this_proc::virtualMemory());
+}
 
-#include "openssl/sha.h"
-
-namespace kul{ namespace hash{
-
-class SHA{
-	public:
-		static void _256(const std::string& str, std::string& ret){
-		    unsigned char h[SHA256_DIGEST_LENGTH];
-		    SHA256_CTX sha;
-		    SHA256_Init(&sha);
-		    SHA256_Update(&sha, str.c_str(), str.size());
-		    SHA256_Final(h, &sha);
-		    std::stringstream ss;
-		    for(uint16_t i = 0; i < SHA256_DIGEST_LENGTH; i++)
-		        ss << std::hex << std::setw(2) << std::setfill('0') << (int16_t)h[i];
-		    ret = ss.str();
-		}
+class TimeStampHandler{
+    private:
+        kul::File f;
+        kul::fs::TimeStamps fts;
+        TimeStampHandler() : f("mkn.yaml"), fts(f.timeStamps()){}
+    public:
+        static TimeStampHandler&  INSTANCE(){
+            static TimeStampHandler i;
+            return i;
+        }
+        bool is(){ return f.is(); }
+        const kul::fs::TimeStamps& timeStamps() { return fts; }
 };
 
-}}
-#endif /* _KUL_HASH_HPP_ */
+TEST(OperatingSystemTests, HasFileAccessedTimeStampSupport) {
+    ASSERT_TRUE(TimeStampHandler::INSTANCE().is());
+    ASSERT_TRUE(TimeStampHandler::INSTANCE().timeStamps().accessed());
+}
+#ifdef _WIN32
+TEST(OperatingSystemTests, HasFileCreatedTimeStampSupport) {
+    ASSERT_TRUE(TimeStampHandler::INSTANCE().is());
+    ASSERT_TRUE(TimeStampHandler::INSTANCE().timeStamps().created());
+}
+#endif
+TEST(OperatingSystemTests, HasFileModifiedTimeStampSupport) {
+    ASSERT_TRUE(TimeStampHandler::INSTANCE().is());
+    ASSERT_TRUE(TimeStampHandler::INSTANCE().timeStamps().modified());
+}

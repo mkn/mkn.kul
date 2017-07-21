@@ -28,31 +28,39 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#ifndef _KUL_HASH_HPP_
-#define _KUL_HASH_HPP_
 
-/*
-* REQUIRES libcrypto 
-*/
+TEST(IO_Test, ReadFileLine) {
+    kul::io::Reader r("LICENSE.md");
+    const char* c = r.readLine();
+    std::string s1 = c, s2;
+    while((c = r.readLine())) s2 = c;
+    EXPECT_EQ("Copyright (c) 2017, Philip Deegan.", s1);
+    EXPECT_EQ("OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.", s2);
+}
+TEST(IO_Test, ReadFile) {
+    kul::io::Reader r("LICENSE.md");
+    const char* c = r.read(20);
+    std::string s1 = c;
+    std::stringstream ss;
+    while((c = r.read(20))) { ss << c; break; }
+    EXPECT_EQ("Copyright (c) 2017, ", s1);
+    EXPECT_EQ("Philip Deegan.\nAll r", ss.str());
+}
 
-#include "openssl/sha.h"
-
-namespace kul{ namespace hash{
-
-class SHA{
-	public:
-		static void _256(const std::string& str, std::string& ret){
-		    unsigned char h[SHA256_DIGEST_LENGTH];
-		    SHA256_CTX sha;
-		    SHA256_Init(&sha);
-		    SHA256_Update(&sha, str.c_str(), str.size());
-		    SHA256_Final(h, &sha);
-		    std::stringstream ss;
-		    for(uint16_t i = 0; i < SHA256_DIGEST_LENGTH; i++)
-		        ss << std::hex << std::setw(2) << std::setfill('0') << (int16_t)h[i];
-		    ret = ss.str();
-		}
-};
-
-}}
-#endif /* _KUL_HASH_HPP_ */
+TEST(IO_Test, ReadBinaryFileLine) {
+    kul::io::BinaryReader r("LICENSE.md");
+    const char* c = r.readLine();
+    std::string s1 = c, s2;
+    while((c = r.readLine())) s2 = c;
+    EXPECT_EQ("Copyright (c) 2017, Philip Deegan.", s1);
+    EXPECT_EQ("OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.", s2);
+}
+TEST(IO_Test, ReadBinaryFile) {
+    kul::io::Reader r("LICENSE.md");
+    const char* c = r.read(20);
+    std::string s1 = c;
+    std::stringstream ss;
+    while((c = r.read(20))) { ss << c; break; }
+    EXPECT_EQ("Copyright (c) 2017, ", s1);
+    EXPECT_EQ("Philip Deegan.\nAll r", ss.str());
+}

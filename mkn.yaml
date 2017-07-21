@@ -50,6 +50,7 @@ profile:
         version: c++0x
 
   - name: test 
+    inc: test
     parent: lib
     dep:
     - name: google.test
