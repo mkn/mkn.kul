@@ -268,9 +268,9 @@ class String{
                 char *end;
                 errno = 0;
                 lresult = strtoll(s, &end, 10);
-                if ((errno == ERANGE) || lresult > UINT64_MAX) return IS_OVERFLOW;
-                if ((errno == ERANGE) || lresult < 0)          return IS_UNDERFLOW;
-                if (*s == '\0' || *end != '\0')                return IS_INCONVERTIBLE;
+                if ((errno == ERANGE) || lresult > INT64_MAX) return IS_OVERFLOW;
+                if ((errno == ERANGE) || lresult < 0)         return IS_UNDERFLOW;
+                if (*s == '\0' || *end != '\0')               return IS_INCONVERTIBLE;
                 return IS_SUCCESS;
             };
             int64_t lresult = 0;
