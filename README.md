@@ -11,3 +11,4 @@ Supported Architectures/Operating Systems:
 	x86_64 / Windows	
 	ARMv7  / Linux	
 	ARMv7  / Windows
+	ARM64  / Linux (TBC - should work, stack walking might not)
