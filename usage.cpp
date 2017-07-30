@@ -299,7 +299,7 @@ class Test{
                 kul::ConcurrentThreadPool<> ctp(5, 1);
                 auto lambda = [](uint a, uint b){ KLOG(INF) << (a + b); };
                 ctp.async(std::bind(lambda, 2, 4));
-                auto lambdb = [](uint a, uint b){ KLOG(INF) << (a + b); KEXCEPT(kul::Exception, "Exceptional!"); };
+                auto lambdb = [](uint a, uint b){ KLOG(INF) << (a + b); KEXCEPTION("Exceptional!"); };
                 auto lambex = [](const kul::Exception& e){ KLOG(ERR) << e.stack(); };
                 ctp.async(std::bind(lambdb, 2, 4), std::bind(lambex, std::placeholders::_1));
                 kul::this_thread::sleep(500);

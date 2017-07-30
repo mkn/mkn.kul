@@ -250,7 +250,7 @@ class ConcurrentThreadQueue{
         }
         virtual ConcurrentThreadQueue& finish(const uint64_t& nWait = 1000000) KTHROW(kul::Exception) {
             while(_up){
-                this_thread::nSleep(m_nWait);
+                this_thread::nSleep(nWait);
                 {
                     kul::ScopeLock l(_qmutex);
                     if(_q.empty()) stop();
@@ -286,6 +286,10 @@ class ConcurrentThreadQueue{
         const std::exception_ptr& exception(){ 
             return _thread.exception();
         }
+
+        void rethrow(){
+            if(_thread.exception()) std::rethrow_exception(_thread.exception());
+        }
 };
 
 template<class E, class PT>
@@ -300,11 +304,15 @@ class PoolThread{
         std::function<void()> m_function;
         kul::Mutex _mutex;
 
-        bool if_ready_set(const std::function<void()>& f){           
+        bool if_ready_set(const std::function<void()>& f){
             if(!m_ready) return false;
             m_function = f;
             m_ready = 0;
             return true;
+        }
+
+        bool ready(){ // be careful!
+            return m_ready;
         }
 
         void stop(){
@@ -354,11 +362,10 @@ class ConcurrentThreadPool : public ConcurrentThreadQueue<void()>{
 
             std::vector<std::string> del;
             {
-                kul::ScopeLock l(_mmutex);
                 if(!_up) return false;
+                kul::ScopeLock l(_mmutex);
                 for(const auto& t : _k){
                     if(t.second->started() && t.second->finished()){
-                        // t.second->join();
                         if(t.second->exception() != std::exception_ptr()){
                             if(_e.count(t.first)) _KTHROW(t.second->exception(), _e[t.first]);
                             else
@@ -415,6 +422,24 @@ class ConcurrentThreadPool : public ConcurrentThreadQueue<void()>{
             _up = 0;
             kul::ScopeLock l(_mmutex);
             for(auto& t : _p) t.second->stop();
+            return *this;
+        }
+        virtual ConcurrentThreadPool& finish(const uint64_t& nWait = 1000000) KTHROW(kul::Exception) {
+            while(_up && !_thread.exception()){
+                this_thread::nSleep(nWait);
+                {
+                    kul::ScopeLock l1(_qmutex);
+                    kul::ScopeLock l2(_mmutex);
+                    if(_q.empty()){
+                        size_t i;
+                        for(i = 0; i < _max; i++) if(!_p[std::to_string(i)]->ready()) break;
+                        if(i >= _max) {
+                            _up = 0;
+                            for(auto& t : _p) t.second->stop();
+                        }
+                    } 
+                }
+            }
             return *this;
         }
         virtual ConcurrentThreadPool& interrupt() override{
