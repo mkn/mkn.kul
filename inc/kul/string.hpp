@@ -78,7 +78,11 @@ class String{
             if((p = s.find(f)) != std::string::npos) s.replace(p, f.size(), r);
         }
         static void REPLACE_ALL(std::string& s, const std::string& f, const std::string& r){
-            while(s.find(f) != std::string::npos) REPLACE(s, f, r);
+            size_t p = s.find(f);
+            while(p != std::string::npos){
+                s.replace(s.find(f, p), f.size(), r);
+                p = s.find(f, p + r.size());
+            }
         }
         static void TRIM_LEFT(std::string& s, const char& delim=' '){
             while(s.find(delim) == 0)

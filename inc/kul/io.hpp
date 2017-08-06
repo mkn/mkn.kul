@@ -139,17 +139,22 @@ class BinaryReader : public AReader{
 
 class AWriter{
     protected:
+        std::ofstream f;
         void write(std::ofstream& f, const char*c, bool nl){ 
             if(nl)  f << c << kul::os::EOL();
             else    f << c;
         }
     public:
+        virtual ~AWriter(){
+            if(f.is_open()) f.close();
+        }
         virtual AWriter& write(const char*c, bool nl = false) = 0;
+        void close(){
+            f.close();
+        }
 };
 
 class Writer: public AWriter{
-    private:
-        std::ofstream f;
     public:
         Writer(const char*c, bool a = 0){ 
             if(a) f.open(c, std::ios::out | std::ios::app);
@@ -157,7 +162,7 @@ class Writer: public AWriter{
             if(!f) KEXCEPT(Exception, "FileException : file \"" + std::string(c) + "\" not found");
         }
         Writer(const File& c, bool a = 0) : Writer(c.full().c_str(), a){}
-        ~Writer() { f.close();}
+        ~Writer() { }
         AWriter& write(const char*c, bool nl = false){
             AWriter::write(f, c, nl);
             return *this;
@@ -176,15 +181,14 @@ class Writer: public AWriter{
         }
 };
 class BinaryWriter : public AWriter{
-    private:
-        std::ofstream f;
     public:
-        BinaryWriter(const char* c) : f(c, std::ios::out |std::ios::binary){ 
+        BinaryWriter(const char* c){
+            f.open(c, std::ios::out | std::ios::binary);
             if(!f) KEXCEPT(Exception, "FileException : file \"" + std::string(c) + "\" not found");
             f.unsetf(std::ios_base::skipws);
         }
         BinaryWriter(const File& c) : BinaryWriter(c.full().c_str()){}
-        ~BinaryWriter() { f.close();}
+        ~BinaryWriter() { }
         AWriter& write(const char*c, bool nl = false){
             AWriter::write(f, c, nl);
             return *this;
