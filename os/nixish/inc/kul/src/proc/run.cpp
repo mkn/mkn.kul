@@ -62,6 +62,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             bool alive = true;
 
             do {
+#if defined(_KUL_PROC_LOOP_NSLEEP_) && (_KUL_PROC_LOOP_NSLEEP_ > 0)
+                kul::this_thread::nSleep(_KUL_PROC_LOOP_NSLEEP_);
+#endif
                 alive = ::kill(pid(), 0) == 0;
                 if(FD_ISSET(popPip[1], &childOutFds)) {
                     bool b = 0;

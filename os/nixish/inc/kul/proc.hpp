@@ -36,10 +36,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string>
 #include <sstream>
 
-
 #include "kul/os.hpp"
 #include "kul/log.hpp"
 #include "kul/proc.os.hpp"
+#include "kul/threads.base.hpp"
 
 #ifndef __KUL_PROC_DUP_RETRY__
 #define __KUL_PROC_DUP_RETRY__ 3

@@ -161,6 +161,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         bSuccess = FALSE;
         bool alive = true;
         do{
+#if defined(_KUL_PROC_LOOP_NSLEEP_) && (_KUL_PROC_LOOP_NSLEEP_ > 0)
+            kul::this_thread::nSleep(_KUL_PROC_LOOP_NSLEEP_);
+#endif
             alive = WaitForSingleObject(piProcInfo.hProcess, 11) == WAIT_TIMEOUT;
             for (;;) { 
                 dwRead = 0;

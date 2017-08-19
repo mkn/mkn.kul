@@ -101,3 +101,11 @@ Default         RTLD_NOW|RTLD_GLOBAL
 OS              nix/bsd
 Description
 Flags for dlopen, see https://linux.die.net/man/3/dlopen
+
+Key             _KUL_PROC_LOOP_NSLEEP_
+Type            number
+Default         undefined
+OS              nix/bsd
+Description
+Nanosecond sleep while reading running processes pipe output, if defined and greater than 0
+
