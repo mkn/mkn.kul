@@ -47,7 +47,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace kul{
 namespace cpu{
 inline uint32_t cores() {
+#ifdef _SC_NPROCESSORS_ONLN
     uint16_t numCPU = sysconf( _SC_NPROCESSORS_ONLN );
+#else
+    uint16_t numCPU;
+#endif
     int mib[4];
     size_t len = sizeof(numCPU);
 

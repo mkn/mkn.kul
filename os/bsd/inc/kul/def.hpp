@@ -43,6 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #if defined(__APPLE__)
     #define _XOPEN_SOURCE 600
+    #include <sys/types.h>
 #endif /* __APPLE__ */
 
 #endif /* _KUL_DEF_HPP_ */

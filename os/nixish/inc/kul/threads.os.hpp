@@ -58,6 +58,8 @@ inline bool main(){
     return _lwp_self();
 #elif defined(__OpenBSD__)
     return 0;
+#elif defined(__APPLE__)
+    return pthread_main_np();
 #else
     return getpid() == syscall(SYS_gettid);
 #endif
