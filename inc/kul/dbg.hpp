@@ -62,7 +62,6 @@ namespace kul{ namespace dbg{
 
 class FunctionScope {
 	private:
-		uint16_t m_line = 0;
 		uint64_t m_start = 0;
 		const char* m_fi;
 		const char* m_fu;
