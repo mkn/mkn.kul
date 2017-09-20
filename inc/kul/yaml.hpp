@@ -84,6 +84,10 @@ class Item{
         Item(){}
         Item(const YAML::Node& r) : r(r){}
 
+    public:
+        virtual ~Item(){}
+        const YAML::Node& root() const { return r; }
+
         static void VALIDATE(const YAML::Node& n, const std::vector<NodeValidator>& nvs) KTHROW(Exception){
             KUL_DBG_FUNC_ENTER
             kul::hash::set::String keys;
@@ -112,9 +116,6 @@ class Item{
                     KEXCEPTION("Key mandatory: : " + nv.name());
             }
         }
-    public:
-        virtual ~Item(){}
-        const YAML::Node&       root() const { return r; }
 };
 
 class Validator{

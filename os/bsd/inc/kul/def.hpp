@@ -42,8 +42,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif /*  __KUL_THREAD_SPAWN_WAIT__ */
 
 #if defined(__APPLE__)
-    #define _XOPEN_SOURCE 600
-    #include <sys/types.h>
+
+    #ifndef _XOPEN_SOURCE
+        #define _XOPEN_SOURCE 700
+    #endif //_XOPEN_SOURCE
+
 #endif /* __APPLE__ */
 
 #endif /* _KUL_DEF_HPP_ */
