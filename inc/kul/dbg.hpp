@@ -38,7 +38,7 @@ namespace kul{ namespace dbg{
 #ifndef NDEBUG
 
 #ifndef KUL_DBG_FUNC_ENTER
-#define KUL_DBG_FUNC_ENTER kul::dbg::FunctionScope(__FILE__, __func__, __LINE__);
+#define KUL_DBG_FUNC_ENTER kul::dbg::FunctionScope s_dbg_functionScopeDBG(__FILE__, __func__, __LINE__);
 #endif//KUL_DBG_FUNC_ENTER
 
 #ifndef KUL_DBG_FUNC_ON_ENTER
@@ -66,7 +66,7 @@ class FunctionScope {
 		uint64_t m_start = 0;
 		const char* m_fi;
 		const char* m_fu;
-        const uint16_t& m_li;
+        const uint16_t m_li;
 	public:
 		FunctionScope(const char* fi, const char* fu, const uint16_t& li) 
 				: m_start(kul::Now::MICROS()), m_fi(fi), m_fu(fu), m_li(li) {

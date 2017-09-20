@@ -107,7 +107,7 @@ class AProcess{
     private:
         bool f = 0, s = 0;
         const bool wfe = 1;
-        int32_t pec = 0, pi = 0;
+        int32_t pec = -1, pi = 0;
         const std::string d;
         std::function<void(const std::string&)> e, o;
         std::vector<std::string> argv;
