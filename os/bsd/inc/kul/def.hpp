@@ -47,6 +47,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         #define _XOPEN_SOURCE 700
     #endif //_XOPEN_SOURCE
 
+    #ifndef   _DARWIN_C_SOURCE
+        #define   _DARWIN_C_SOURCE
+        #include "sys/types.h"
+        #undef    _DARWIN_C_SOURCE
+    #else
+        #include "sys/types.h"
+    #endif // _DARWIN_C_SOURCE
+
 #endif /* __APPLE__ */
 
 #endif /* _KUL_DEF_HPP_ */
