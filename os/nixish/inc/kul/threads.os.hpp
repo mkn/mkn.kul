@@ -59,7 +59,7 @@ inline bool main(){
 #elif defined(__OpenBSD__)
     return 0;
 #elif defined(__APPLE__)
-    return pthread_main_np();
+    return 0;
 #else
     return getpid() == syscall(SYS_gettid);
 #endif

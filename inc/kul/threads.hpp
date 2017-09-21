@@ -424,7 +424,7 @@ class ConcurrentThreadPool : public ConcurrentThreadQueue<void()>{
             for(auto& t : _p) t.second->stop();
             return *this;
         }
-        virtual ConcurrentThreadPool& finish(const uint64_t& nWait = 1000000) KTHROW(kul::Exception) {
+        virtual ConcurrentThreadPool& finish(const uint64_t& nWait = 1000000) KTHROW(kul::Exception) override {
             while(_up && !_thread.exception()){
                 this_thread::nSleep(nWait);
                 {
