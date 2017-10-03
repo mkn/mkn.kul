@@ -1,0 +1,13 @@
+
+
+language: cpp
+
+os:
+  - osx
+compiler:
+  - clang
+
+script:
+  - wget https://github.com/Dekken/maiken/raw/binaries/mac10_clang4_x64/mkn
+  - chmod +x mkn
+  - ./mkn build -dtKa "-O2 -std=c++14" -l "-pthread -ldl" -p test run
