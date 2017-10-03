@@ -29,38 +29,25 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
+TEST(Process_Test, LaunchProcess) {
+    kul::Process p("bash");
+    p << "-c" << "\"seq" << "1" << "10\"";
+    p.start();
+    KOUT(NON) << "Process exit code: " << p.exitCode();
+    EXPECT_EQ(p.exitCode(), 0);
+}
 
-#include "kul/io.hpp"
-#include "kul/os.hpp"
-#include "kul/cli.hpp"
-#include "kul/log.hpp"
-#include "kul/proc.hpp"
-#include "kul/threads.hpp"
-
-#ifdef _WIN32
-#define bzero ZeroMemory
-#endif
-
-auto tryCatch = [](std::vector<std::function<void()>> funcs, bool katch){
-    for(const auto& func : funcs)
-        try{
-            func();
-            ASSERT_TRUE(!katch);
-        }catch(const kul::Exception& e){
-            if(!katch) KOUT(NON) << e.debug();
-            ASSERT_TRUE(katch);
-        }
-};
-
-#include "cli.cpp.inc"
-#include "io.cpp.inc"
-#include "os.cpp.inc"
-#include "string.cpp.inc"
-#include "proc.cpp.inc"
-
-int main(int argc, char* argv[]) {
-  ::testing::InitGoogleMock(&argc, argv);
-  return RUN_ALL_TESTS();
+TEST(Process_Test, CaptureProcess) {
+	std::string lines;
+    kul::Process p("bash");
+    kul::ProcessCapture pc(p);
+    p << "-c" << "\"seq" << "1" << "10\"";
+    p.start();
+    lines = pc.outs();
+	ASSERT_TRUE (lines.size());
+    ASSERT_FALSE(pc.errs().size());
+    uint8_t i = 0;
+    for(auto s : kul::String::LINES(lines)){
+    	EXPECT_EQ(s, std::to_string(++i));
+    }
 }

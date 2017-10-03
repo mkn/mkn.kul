@@ -38,11 +38,15 @@ TEST(IO_Test, ReadFileLine) {
     EXPECT_EQ("OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.", s2);
 }
 TEST(IO_Test, ReadFile) {
+    char c[20] = {0};
+    bzero(c, 20);
+    kul::File file("LICENSE.md");
+    if(!file) KEXCEPT(kul::Exception, "ReadFile: FileNotFound: ") << file.full();
     kul::io::Reader r("LICENSE.md");
-    const char* c = r.read(20);
+    r.read(c, 20);
     std::string s1 = c;
     std::stringstream ss;
-    while((c = r.read(20))) { ss << c; break; }
+    while((r.read(c, 20))) { ss << c; break; }
     EXPECT_EQ("Copyright (c) 2017, ", s1);
     EXPECT_EQ("Philip Deegan.\nAll r", ss.str());
 }
@@ -56,11 +60,12 @@ TEST(IO_Test, ReadBinaryFileLine) {
     EXPECT_EQ("OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.", s2);
 }
 TEST(IO_Test, ReadBinaryFile) {
-    kul::io::Reader r("LICENSE.md");
-    const char* c = r.read(20);
+    char c[20] = {0};
+    kul::io::BinaryReader r("LICENSE.md");
+    r.read(c, 20);
     std::string s1 = c;
     std::stringstream ss;
-    while((c = r.read(20))) { ss << c; break; }
+    while((r.read(c, 20))) { ss << c; break; }
     EXPECT_EQ("Copyright (c) 2017, ", s1);
     EXPECT_EQ("Philip Deegan.\nAll r", ss.str());
 }
