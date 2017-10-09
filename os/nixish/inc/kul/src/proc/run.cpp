@@ -61,6 +61,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             close(inFd[1]);
             bool alive = true;
 
+            char cOut[30024] = {'\0'};
+            char cErr[30024] = {'\0'};
             do {
 #if defined(_KUL_PROC_LOOP_NSLEEP_) && (_KUL_PROC_LOOP_NSLEEP_ > 0)
                 kul::this_thread::nSleep(_KUL_PROC_LOOP_NSLEEP_);
@@ -69,8 +71,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                 if(FD_ISSET(popPip[1], &childOutFds)) {
                     bool b = 0;
                     do {
-                        char cOut[1024] = {'\0'};
-                        int16_t ret = recall(read(popPip[1], cOut, sizeof(cOut)));
+                        memset(cOut, 0, sizeof(cOut));
+                        ret = recall(read(popPip[1], cOut, sizeof(cOut)));
                         cOut[ret > 0 ? ret : 0] = 0;
                         if (ret < 0){
                             if(b && ((errno != EAGAIN) || (errno != EWOULDBLOCK)))
@@ -84,8 +86,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                 if(FD_ISSET(popPip[2], &childOutFds)) {
                     bool b = 0;
                     do {
-                        char cErr[1024] = {'\0'};
-                        int16_t ret = recall(read(popPip[2], cErr, sizeof(cErr)));
+                        memset(cErr, 0, sizeof(cErr));
+                        ret = recall(read(popPip[2], cErr, sizeof(cErr)));
                         cErr[ret > 0 ? ret : 0] = 0;
                         if (ret < 0){
                             if(b && ((errno != EAGAIN) || (errno != EWOULDBLOCK)))
