@@ -11,7 +11,7 @@ parent: lib
 
 profile:
   - name: base
-    inc: | 
+    inc: |
         ./inc ./os/${OS}/inc
     if_inc:
         bsd: ./os/nixish/inc
@@ -56,6 +56,7 @@ profile:
     - name: google.test
       version: master
     main: test.cpp
+    mode: none
 
   - name: bench 
     parent: lib
