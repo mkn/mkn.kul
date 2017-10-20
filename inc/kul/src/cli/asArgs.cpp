@@ -29,55 +29,59 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-// This file is included by other files and is not in itself syntactically correct.
+// This file is included by other files and is not in itself syntactically
+// correct.
 
-// void kul::cli::asArgs(const std::string& cmd, std::vector<std::string>& args){
+// void kul::cli::asArgs(const std::string& cmd, std::vector<std::string>&
+// args){
 
-    std::string arg;
-    bool openQuotesS = false;
-    bool openQuotesD = false;
-    bool backSlashed = false;
-    for(const char c : cmd){
-        if(backSlashed){
-            backSlashed = false;
-            arg += c;
-            continue;
-        }
-        switch(c){
-            case ' ':
-                if(!openQuotesD && !openQuotesS){               //     ||||| ||||| ||||| ||||| |||||
-                    if(arg.size() > 0) args.push_back(arg);     //     ||    || || || || ||    ||
-                    arg.clear();                                //     ||||| ||||| ||||| ||    |||||
-                    continue;                                   //        || ||    || || ||    ||
-                }                                               //     ||||| ||    || || ||||| |||||
-                break;
-            case '"':
-                if(openQuotesD && !openQuotesS){
-                    openQuotesD = false;
-                    args.push_back(arg);
-                    arg.clear();
-                }else{ 
-                    openQuotesD = true;
-                }
-                continue;
-            case '\'':
-                if(openQuotesS && !openQuotesD){
-                    openQuotesS = false;
-                    args.push_back(arg);
-                    arg.clear();
-                }else{ 
-                    openQuotesS = true;
-                }
-                continue;
-            case '\\':
-                if(!openQuotesS && !openQuotesD){
-                    backSlashed = true;
-                    continue;
-                }
-                break;
-        }
-        arg += c;
-    }
-    if(arg.size() > 0) args.push_back(arg);
-                    
+std::string arg;
+bool openQuotesS = false;
+bool openQuotesD = false;
+bool backSlashed = false;
+for (const char c : cmd) {
+  if (backSlashed) {
+    backSlashed = false;
+    arg += c;
+    continue;
+  }
+  switch (c) {
+    case ' ':
+      if (!openQuotesD && !openQuotesS) { //     ||||| ||||| ||||| ||||| |||||
+        if (arg.size() > 0)
+          args.push_back(arg); //     ||    || || || || ||    ||
+        arg.clear();           //     ||||| ||||| ||||| ||    |||||
+        continue;              //        || ||    || || ||    ||
+      }                        //     ||||| ||    || || ||||| |||||
+      break;
+    case '"':
+      if (openQuotesD && !openQuotesS) {
+        openQuotesD = false;
+        args.push_back(arg);
+        arg.clear();
+      } else {
+        openQuotesD = true;
+      }
+      continue;
+    case '\'':
+      if (openQuotesS && !openQuotesD) {
+        openQuotesS = false;
+        args.push_back(arg);
+        arg.clear();
+      } else {
+        openQuotesS = true;
+      }
+      continue;
+    case '\\':
+      if (!openQuotesS && !openQuotesD) {
+        backSlashed = true;
+        continue;
+      }
+      break;
+  }
+  arg += c;
+}
+if (arg.size() > 0)
+  args.push_back(arg);
+
 // }

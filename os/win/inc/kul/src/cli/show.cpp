@@ -29,13 +29,14 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-// This file is included by other files and is not in itself syntactically correct.
+// This file is included by other files and is not in itself syntactically
+// correct.
 
 // void kul::cli::show(){
 
-    HANDLE hStdin = GetStdHandle(STD_INPUT_HANDLE); 
-    DWORD mode = 0;
-    GetConsoleMode(hStdin, &mode);
-    SetConsoleMode(hStdin, mode | (ENABLE_ECHO_INPUT));
+HANDLE hStdin = GetStdHandle(STD_INPUT_HANDLE);
+DWORD mode = 0;
+GetConsoleMode(hStdin, &mode);
+SetConsoleMode(hStdin, mode | (ENABLE_ECHO_INPUT));
 
 // }

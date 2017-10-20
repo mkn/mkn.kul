@@ -29,26 +29,28 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-// This file is included by other files and is not in itself syntactically correct.
+// This file is included by other files and is not in itself syntactically
+// correct.
 
-// std::vector<kul::Dir> kul::Dir::dirs(bool incHidden) const KTHROW(fs::Exception){
+// std::vector<kul::Dir> kul::Dir::dirs(bool incHidden) const
+// KTHROW(fs::Exception){
 
-    if(!is()) KEXCEPT(fs::Exception, "Directory : \"" + path() + "\" does not exist");
-    std::vector<Dir> dirs;
+if (!is())
+  KEXCEPT(fs::Exception, "Directory : \"" + path() + "\" does not exist");
+std::vector<Dir> dirs;
 
-    DIR *dir = opendir(real().c_str());
-    struct dirent *entry = readdir(dir);
-    while (entry != NULL){
-        std::string d(entry->d_name);
-        kul::Dir dd(JOIN(real(), entry->d_name));
-        if(d.compare(".") != 0 && d.compare("..") != 0
-            && !(d.substr(0, 1).compare(".") == 0 && !incHidden)
-            && dd.is())
-            dirs.push_back(dd);
-        entry = readdir(dir);
-    }
-    closedir(dir);
+DIR* dir = opendir(real().c_str());
+struct dirent* entry = readdir(dir);
+while (entry != NULL) {
+  std::string d(entry->d_name);
+  kul::Dir dd(JOIN(real(), entry->d_name));
+  if (d.compare(".") != 0 && d.compare("..") != 0 &&
+      !(d.substr(0, 1).compare(".") == 0 && !incHidden) && dd.is())
+    dirs.push_back(dd);
+  entry = readdir(dir);
+}
+closedir(dir);
 
-    return dirs;
+return dirs;
 
 // }

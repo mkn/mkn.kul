@@ -29,18 +29,19 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-// This file is included by other files and is not in itself syntactically correct.
+// This file is included by other files and is not in itself syntactically
+// correct.
 
 // void kul::this_proc::PHYSICAL(uint64_t& mem){
 
-    FILE* file = fopen("/proc/self/status", "r");
-    char line[128];
-    while (fgets(line, 128, file) != NULL){
-        if (strncmp(line, "VmRSS:", 6) == 0){
-            mem += PARSE_LINE(line);
-            break;
-        }
-    }
-    fclose(file);
+FILE* file = fopen("/proc/self/status", "r");
+char line[128];
+while (fgets(line, 128, file) != NULL) {
+  if (strncmp(line, "VmRSS:", 6) == 0) {
+    mem += PARSE_LINE(line);
+    break;
+  }
+}
+fclose(file);
 
 // }

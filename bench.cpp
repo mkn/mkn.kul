@@ -31,75 +31,90 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "benchmark/benchmark_api.h"
 
-#include "kul/os.hpp"
 #include "kul/cli.hpp"
 #include "kul/log.hpp"
+#include "kul/os.hpp"
 #include "kul/threads.hpp"
 
-void createDeleteFile(benchmark::State& state) {
-    while (state.KeepRunning()) {
-        kul::File f("tmp.tmp");
-        f.mk();
-        f.rm();
-    }
+void
+createDeleteFile(benchmark::State& state)
+{
+  while (state.KeepRunning()) {
+    kul::File f("tmp.tmp");
+    f.mk();
+    f.rm();
+  }
 }
 BENCHMARK(createDeleteFile)->Unit(benchmark::kMicrosecond);
 
-void parseStringAsCommandLineArguments(benchmark::State& state) {
-    while (state.KeepRunning()) {
-        std::vector<std::string> v;
-        kul::cli::asArgs("/path/to \"words in quotes\" words\\ not\\ in\\ quotes end", v);
-    }
+void
+parseStringAsCommandLineArguments(benchmark::State& state)
+{
+  while (state.KeepRunning()) {
+    std::vector<std::string> v;
+    kul::cli::asArgs(
+      "/path/to \"words in quotes\" words\\ not\\ in\\ quotes end", v);
+  }
 }
 BENCHMARK(parseStringAsCommandLineArguments)->Unit(benchmark::kMicrosecond);
 
-void splitStringByChar(benchmark::State& state) {
-    while (state.KeepRunning()) {
-        std::vector<std::string> v;
-        kul::String::SPLIT("split - by - char - dash", '-', v);
-            
-    }
+void
+splitStringByChar(benchmark::State& state)
+{
+  while (state.KeepRunning()) {
+    std::vector<std::string> v;
+    kul::String::SPLIT("split - by - char - dash", '-', v);
+  }
 }
 BENCHMARK(splitStringByChar)->Unit(benchmark::kMicrosecond);
 
-void splitStringByString(benchmark::State& state) {
-    while (state.KeepRunning()) {
-        std::vector<std::string> v;
-        kul::String::SPLIT("split - by - char - dash", "-", v);
-    }
+void
+splitStringByString(benchmark::State& state)
+{
+  while (state.KeepRunning()) {
+    std::vector<std::string> v;
+    kul::String::SPLIT("split - by - char - dash", "-", v);
+  }
 }
 BENCHMARK(splitStringByString)->Unit(benchmark::kMicrosecond);
 
-void splitStringByEscapedChar(benchmark::State& state) {
-    while (state.KeepRunning()) {
-        std::vector<std::string> v;
-        kul::String::ESC_SPLIT("split \\- by - char - dash", '-', v);
-    }
+void
+splitStringByEscapedChar(benchmark::State& state)
+{
+  while (state.KeepRunning()) {
+    std::vector<std::string> v;
+    kul::String::ESC_SPLIT("split \\- by - char - dash", '-', v);
+  }
 }
 BENCHMARK(splitStringByEscapedChar)->Unit(benchmark::kMicrosecond);
 
+auto lambda = [](uint a, uint b) {
+  auto c = (a + b);
+  (void)c;
+};
 
-auto lambda = [](uint a, uint b){ auto c = (a + b); (void) c; };
-
-void concurrentThreadPool(benchmark::State& state) {
-    while (state.KeepRunning()) {
-        kul::ConcurrentThreadPool<> ctp(3, 1);
-        for(size_t i = 0; i < 10000; i++)
-            ctp.async(std::bind(lambda, 2, 4));
-        ctp.block().finish().join();
-    }
+void
+concurrentThreadPool(benchmark::State& state)
+{
+  while (state.KeepRunning()) {
+    kul::ConcurrentThreadPool<> ctp(3, 1);
+    for (size_t i = 0; i < 10000; i++)
+      ctp.async(std::bind(lambda, 2, 4));
+    ctp.block().finish().join();
+  }
 }
 BENCHMARK(concurrentThreadPool)->Unit(benchmark::kMicrosecond);
 
-void chroncurrentThreadPool(benchmark::State& state) {
-    while (state.KeepRunning()) {
-        kul::ChroncurrentThreadPool<> ctp(3, 1);
-        for(size_t i = 0; i < 10000; i++)
-            ctp.async(std::bind(lambda, 2, 4));
-        ctp.block().finish().join();
-    }
+void
+chroncurrentThreadPool(benchmark::State& state)
+{
+  while (state.KeepRunning()) {
+    kul::ChroncurrentThreadPool<> ctp(3, 1);
+    for (size_t i = 0; i < 10000; i++)
+      ctp.async(std::bind(lambda, 2, 4));
+    ctp.block().finish().join();
+  }
 }
 BENCHMARK(chroncurrentThreadPool)->Unit(benchmark::kMicrosecond);
 
 BENCHMARK_MAIN()
-

@@ -32,24 +32,29 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _KUL_CLI_OS_HPP_
 
 #include <string>
-#include <unistd.h>
 #include <termios.h>
+#include <unistd.h>
 
-namespace kul{ namespace cli{
+namespace kul {
+namespace cli {
 #ifndef _KUL_COMPILED_LIB_
-inline std::string hidden(const std::string& t){
+inline std::string
+hidden(const std::string& t)
+{
 #include "kul/src/cli/hidden.cpp"
 }
-inline void show(){
+inline void
+show()
+{
 #include "kul/src/cli/show.cpp"
 }
 #else
-std::string hidden(const std::string& t);
-void show();
+std::string
+hidden(const std::string& t);
+void
+show();
 #endif
 } // END NAMESPACE cli
 } // END NAMESPACE kul
 
-
 #endif /* _KUL_CLI_OS_HPP_ */
-

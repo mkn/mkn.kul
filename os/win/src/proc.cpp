@@ -30,14 +30,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "kul/proc.hpp"
 
-void kul::Process::expand(std::string& s) const {
+void
+kul::Process::expand(std::string& s) const
+{
 #include "kul/src/proc/expand.cpp"
 }
 
-void kul::Process::tearDown(){
+void
+kul::Process::tearDown()
+{
 #include "kul/src/proc/tearDown.cpp"
 }
 
-void kul::Process::run() KTHROW(kul::proc::Exception){
+void
+kul::Process::run() KTHROW(kul::proc::Exception)
+{
 #include "kul/src/proc/tearDown.cpp"
 }

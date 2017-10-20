@@ -33,51 +33,60 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <kul/log.hpp>
 
-namespace kul{ namespace dbg{
+namespace kul {
+namespace dbg {
 
 #ifndef NDEBUG
 
 #ifndef KUL_DBG_FUNC_ENTER
-#define KUL_DBG_FUNC_ENTER kul::dbg::FunctionScope s_dbg_functionScopeDBG(__FILE__, __func__, __LINE__);
-#endif//KUL_DBG_FUNC_ENTER
+#define KUL_DBG_FUNC_ENTER                                                     \
+  kul::dbg::FunctionScope s_dbg_functionScopeDBG(__FILE__, __func__, __LINE__);
+#endif // KUL_DBG_FUNC_ENTER
 
 #ifndef KUL_DBG_FUNC_ON_ENTER
-#define KUL_DBG_FUNC_ON_ENTER 
-#endif//KUL_DBG_FUNC_ON_ENTER
+#define KUL_DBG_FUNC_ON_ENTER
+#endif // KUL_DBG_FUNC_ON_ENTER
 
 #ifndef KUL_DBG_FUNC_ON_EXIT
-#define KUL_DBG_FUNC_ON_EXIT KOUT(TRC) \
-	    << kul::LogMan::INSTANCE().str(m_fi, m_fu, m_li, kul::log::mode::TRC, "", "[%M]: %T - %D : %F:%L fn(%N)") \
-		<< " - Function time: " << (kul::Now::MICROS() - m_start) << " μs";
-#endif//KUL_DBG_FUNC_ON_EXIT
+#define KUL_DBG_FUNC_ON_EXIT                                                   \
+  KOUT(TRC) << kul::LogMan::INSTANCE().str(m_fi,                               \
+                                           m_fu,                               \
+                                           m_li,                               \
+                                           kul::log::mode::TRC,                \
+                                           "",                                 \
+                                           "[%M]: %T - %D : %F:%L fn(%N)")     \
+            << " - Function time: " << (kul::Now::MICROS() - m_start)          \
+            << " μs";
+#endif // KUL_DBG_FUNC_ON_EXIT
 
-#else//
+#else //
 
-#define KUL_DBG_FUNC_ENTER 
+#define KUL_DBG_FUNC_ENTER
 #define KUL_DBG_FUNC_ON_ENTER
-#define KUL_DBG_FUNC_ON_EXIT 
+#define KUL_DBG_FUNC_ON_EXIT
 
+#endif // NDEBUG
 
-#endif//NDEBUG
+class FunctionScope
+{
+private:
+  uint64_t m_start = 0;
+  const char* m_fi;
+  const char* m_fu;
+  const uint16_t m_li;
 
-class FunctionScope {
-	private:
-		uint64_t m_start = 0;
-		const char* m_fi;
-		const char* m_fu;
-        const uint16_t m_li;
-	public:
-		FunctionScope(const char* fi, const char* fu, const uint16_t& li) 
-				: m_start(kul::Now::MICROS()), m_fi(fi), m_fu(fu), m_li(li) {
-			KUL_DBG_FUNC_ON_ENTER
-		}
-		~FunctionScope(){
-			KUL_DBG_FUNC_ON_EXIT
-		}
+public:
+  FunctionScope(const char* fi, const char* fu, const uint16_t& li)
+    : m_start(kul::Now::MICROS())
+    , m_fi(fi)
+    , m_fu(fu)
+    , m_li(li)
+  {
+    KUL_DBG_FUNC_ON_ENTER
+  }
+  ~FunctionScope() { KUL_DBG_FUNC_ON_EXIT }
 };
-}}
-
+}
+}
 
 #endif /* _KUL_DBG_HPP_ */
-
-

@@ -29,88 +29,95 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-// This file is included by other files and is not in itself syntactically correct.
+// This file is included by other files and is not in itself syntactically
+// correct.
 
 // void kul_real_se_handler(EXCEPTION_POINTERS* pExceptionInfo){
 
-    const std::string& tid(kul::this_thread::id());
-    uint16_t sig = pExceptionInfo->ExceptionRecord->ExceptionCode;
-    if(pExceptionInfo->ExceptionRecord->ExceptionCode == EXCEPTION_ACCESS_VIOLATION)
-        kul_sig_function_handler(sig = 11);
+const std::string& tid(kul::this_thread::id());
+uint16_t sig = pExceptionInfo->ExceptionRecord->ExceptionCode;
+if (pExceptionInfo->ExceptionRecord->ExceptionCode ==
+    EXCEPTION_ACCESS_VIOLATION)
+  kul_sig_function_handler(sig = 11);
 
-    if(!kul::SignalStatic::INSTANCE().q){
-        HANDLE process = GetCurrentProcess();
-        SymInitialize(process, NULL, TRUE);
+if (!kul::SignalStatic::INSTANCE().q) {
+  HANDLE process = GetCurrentProcess();
+  SymInitialize(process, NULL, TRUE);
 
-        CONTEXT context_record = *pExceptionInfo->ContextRecord;
+  CONTEXT context_record = *pExceptionInfo->ContextRecord;
 
-        STACKFRAME64 stack_frame;
-        memset(&stack_frame, 0, sizeof(stack_frame));
+  STACKFRAME64 stack_frame;
+  memset(&stack_frame, 0, sizeof(stack_frame));
 
-#if   defined(_ARM_)
-        int mach = IMAGE_FILE_MACHINE_ARM;
-        stack_frame.AddrPC.Offset = context_record.Pc;
-        stack_frame.AddrFrame.Offset = context_record.Sp;
-        stack_frame.AddrStack.Offset = context_record.R11;
+#if defined(_ARM_)
+  int mach = IMAGE_FILE_MACHINE_ARM;
+  stack_frame.AddrPC.Offset = context_record.Pc;
+  stack_frame.AddrFrame.Offset = context_record.Sp;
+  stack_frame.AddrStack.Offset = context_record.R11;
 #elif defined(_ARM64)
-        int mach = 0; //IMAGE_FILE_MACHINE_ARM64;
+  int mach = 0; // IMAGE_FILE_MACHINE_ARM64;
 #elif defined(_WIN64)
-        int mach = IMAGE_FILE_MACHINE_AMD64;
-        stack_frame.AddrPC.Offset = context_record.Rip;
-        stack_frame.AddrFrame.Offset = context_record.Rbp;
-        stack_frame.AddrStack.Offset = context_record.Rsp;
+  int mach = IMAGE_FILE_MACHINE_AMD64;
+  stack_frame.AddrPC.Offset = context_record.Rip;
+  stack_frame.AddrFrame.Offset = context_record.Rbp;
+  stack_frame.AddrStack.Offset = context_record.Rsp;
 #else
-        int mach = IMAGE_FILE_MACHINE_I386;
-        stack_frame.AddrPC.Offset = context_record.Eip;
-        stack_frame.AddrFrame.Offset = context_record.Ebp;
-        stack_frame.AddrStack.Offset = context_record.Esp;
+  int mach = IMAGE_FILE_MACHINE_I386;
+  stack_frame.AddrPC.Offset = context_record.Eip;
+  stack_frame.AddrFrame.Offset = context_record.Ebp;
+  stack_frame.AddrStack.Offset = context_record.Esp;
 #endif
-        if(mach == 0) {
-            KERR << "CANNOT WALK STACK <> UNSUPPORTED CPU";
-            exit(sig);
-        };
-
-        stack_frame.AddrPC.Mode = AddrModeFlat;
-        stack_frame.AddrFrame.Mode = AddrModeFlat;
-        stack_frame.AddrStack.Mode = AddrModeFlat;
-
-        SYMBOL_INFO* symbol;
-        symbol               = ( SYMBOL_INFO * )calloc( sizeof( SYMBOL_INFO ) + 256 * sizeof( char ), 1 );
-        symbol->MaxNameLen   = 255;
-        symbol->SizeOfStruct = sizeof(SYMBOL_INFO);
-        std::cout << "[bt] Stacktrace:" << std::endl;
-        while (StackWalk64(mach,
-            GetCurrentProcess(),
-            GetCurrentThread(),
-            &stack_frame,
-            &context_record,
-            NULL,
-            &SymFunctionTableAccess64,
-            &SymGetModuleBase64,
-            NULL)) {
-
-            DWORD64 displacement = 0;
-            if (SymFromAddr(process, (DWORD64)stack_frame.AddrPC.Offset, &displacement, symbol)){
-                DWORD  dwDisplacement;
-                IMAGEHLP_LINE64 line;
-                IMAGEHLP_MODULE64 moduleInfo;
-                ZeroMemory(&moduleInfo, sizeof(IMAGEHLP_MODULE64));
-                moduleInfo.SizeOfStruct = sizeof(moduleInfo);
-
-                std::cout << "[bt] ";
-                if (::SymGetModuleInfo64(process, symbol->ModBase, &moduleInfo))
-                    std::cout << moduleInfo.ModuleName << " ";
-
-                std::cout << symbol->Name << " + [0x" << std::hex << displacement << "]"; 
-
-                if (SymGetLineFromAddr64(process, (DWORD64)stack_frame.AddrPC.Offset, &dwDisplacement, &line))
-                    std::cout << " - " << line.FileName << ": " << std::to_string(line.LineNumber);
-                else
-                    std::cout << " - ??:";
-                std::cout << std::endl;
-            }
-        }
-    }
+  if (mach == 0) {
+    KERR << "CANNOT WALK STACK <> UNSUPPORTED CPU";
     exit(sig);
+  };
+
+  stack_frame.AddrPC.Mode = AddrModeFlat;
+  stack_frame.AddrFrame.Mode = AddrModeFlat;
+  stack_frame.AddrStack.Mode = AddrModeFlat;
+
+  SYMBOL_INFO* symbol;
+  symbol = (SYMBOL_INFO*)calloc(sizeof(SYMBOL_INFO) + 256 * sizeof(char), 1);
+  symbol->MaxNameLen = 255;
+  symbol->SizeOfStruct = sizeof(SYMBOL_INFO);
+  std::cout << "[bt] Stacktrace:" << std::endl;
+  while (StackWalk64(mach,
+                     GetCurrentProcess(),
+                     GetCurrentThread(),
+                     &stack_frame,
+                     &context_record,
+                     NULL,
+                     &SymFunctionTableAccess64,
+                     &SymGetModuleBase64,
+                     NULL)) {
+
+    DWORD64 displacement = 0;
+    if (SymFromAddr(
+          process, (DWORD64)stack_frame.AddrPC.Offset, &displacement, symbol)) {
+      DWORD dwDisplacement;
+      IMAGEHLP_LINE64 line;
+      IMAGEHLP_MODULE64 moduleInfo;
+      ZeroMemory(&moduleInfo, sizeof(IMAGEHLP_MODULE64));
+      moduleInfo.SizeOfStruct = sizeof(moduleInfo);
+
+      std::cout << "[bt] ";
+      if (::SymGetModuleInfo64(process, symbol->ModBase, &moduleInfo))
+        std::cout << moduleInfo.ModuleName << " ";
+
+      std::cout << symbol->Name << " + [0x" << std::hex << displacement << "]";
+
+      if (SymGetLineFromAddr64(process,
+                               (DWORD64)stack_frame.AddrPC.Offset,
+                               &dwDisplacement,
+                               &line))
+        std::cout << " - " << line.FileName << ": "
+                  << std::to_string(line.LineNumber);
+      else
+        std::cout << " - ??:";
+      std::cout << std::endl;
+    }
+  }
+}
+exit(sig);
 
 // }

@@ -36,76 +36,99 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <windows.h>
 
-namespace kul{
+namespace kul {
 
 namespace sys {
 
-template <class F>
+template<class F>
 class SharedFunctionp;
 
-class SharedLibrary {
-    template <class F> friend class SharedFunction;
-    private:
-        bool _loaded = 0;
-        HINSTANCE _handle;
-        const kul::File _f;
-    public:
-        SharedLibrary(const kul::File& f) KTHROW(Exception) : _f(f){
-            if(!_f) KEXCEPSTREAM << "Library attempted to be loaded does not exist: " << _f.full();
-            LPSTR lib = _strdup(_f.real().c_str());
-            _handle = LoadLibrary(lib);
-            if(!_handle) KEXCEPSTREAM << "Cannot load library: " << f << " - Error: " << GetLastError();
-            _loaded = 1;
-        }
-        ~SharedLibrary(){
-            if(_loaded) FreeLibrary(_handle);
-        }
+class SharedLibrary
+{
+  template<class F>
+  friend class SharedFunction;
+
+private:
+  bool _loaded = 0;
+  HINSTANCE _handle;
+  const kul::File _f;
+
+public:
+  SharedLibrary(const kul::File& f) KTHROW(Exception)
+    : _f(f)
+  {
+    if (!_f)
+      KEXCEPSTREAM << "Library attempted to be loaded does not exist: "
+                   << _f.full();
+    LPSTR lib = _strdup(_f.real().c_str());
+    _handle = LoadLibrary(lib);
+    if (!_handle)
+      KEXCEPSTREAM << "Cannot load library: " << f
+                   << " - Error: " << GetLastError();
+    _loaded = 1;
+  }
+  ~SharedLibrary()
+  {
+    if (_loaded)
+      FreeLibrary(_handle);
+  }
 };
 
-template <class F>
-class SharedFunction {
-    private:
-        F* _funcP;
-        SharedLibrary& _lib;
-    public:
-        SharedFunction(SharedLibrary& lib, const std::string& f) KTHROW(Exception) : _lib(lib){
-            LPSTR func = _strdup(f.c_str());
-            _funcP = (F*) GetProcAddress(_lib._handle, func);
-            if (!_funcP) KEXCEPSTREAM << "Cannot load symbol create " << GetLastError();
-        }
+template<class F>
+class SharedFunction
+{
+private:
+  F* _funcP;
+  SharedLibrary& _lib;
 
-        F* pointer(){
-            return _funcP;
-        }
+public:
+  SharedFunction(SharedLibrary& lib, const std::string& f) KTHROW(Exception)
+    : _lib(lib)
+  {
+    LPSTR func = _strdup(f.c_str());
+    _funcP = (F*)GetProcAddress(_lib._handle, func);
+    if (!_funcP)
+      KEXCEPSTREAM << "Cannot load symbol create " << GetLastError();
+  }
+
+  F* pointer() { return _funcP; }
 };
 
-template <class T>
-class SharedClass{
-    typedef T*   construct_t();
-    typedef void destruct_t (T* t);
-    private:
-        SharedLibrary _lib;
-        SharedFunction<construct_t> _c;
-        SharedFunction<destruct_t>  _d;
-    public: 
+template<class T>
+class SharedClass
+{
+  typedef T* construct_t();
+  typedef void destruct_t(T* t);
 
-        SharedClass(const kul::File& f, const std::string& c, const std::string& d) KTHROW(Exception) 
-            : _lib(f), _c(_lib, c), _d(_lib, d) {}
-        virtual ~SharedClass(){}
+private:
+  SharedLibrary _lib;
+  SharedFunction<construct_t> _c;
+  SharedFunction<destruct_t> _d;
 
-    protected: 
-        void construct(T*& t) KTHROW(Exception) {
-            t = _c.pointer()();
-            if(!t) KEXCEPSTREAM << "Dynamically loaded class was not created";
-        }
-        void destruct (T*& t){
-            _d.pointer()(t);
-            t = nullptr;
-            if(t)  KEXCEPSTREAM << "Dynamically loaded class was not destroyed";
-        }
+public:
+  SharedClass(const kul::File& f, const std::string& c, const std::string& d)
+    KTHROW(Exception)
+    : _lib(f)
+    , _c(_lib, c)
+    , _d(_lib, d)
+  {}
+  virtual ~SharedClass() {}
 
+protected:
+  void construct(T*& t) KTHROW(Exception)
+  {
+    t = _c.pointer()();
+    if (!t)
+      KEXCEPSTREAM << "Dynamically loaded class was not created";
+  }
+  void destruct(T*& t)
+  {
+    _d.pointer()(t);
+    t = nullptr;
+    if (t)
+      KEXCEPSTREAM << "Dynamically loaded class was not destroyed";
+  }
 };
-
 
 } // END NAMESPACE sys
 } // END NAMESPACE kul

@@ -32,41 +32,44 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _KUL_DEFS_HPP_
 
 #ifndef uint
-    typedef unsigned int uint;
+typedef unsigned int uint;
 #endif /*  uint */
 
 #ifndef ulong
-    typedef unsigned long ulong;
+typedef unsigned long ulong;
 #endif /*  ulong */
 #ifndef ulonglong
-    typedef unsigned long long ulonglong;
+typedef unsigned long long ulonglong;
 #endif /*  ulonglong */
-
 
 #define KSTRINGIFY(x) #x
 #define KTOSTRING(x) KSTRINGIFY(x)
 
 #ifdef KUL_SHARED
-    #if defined _WIN32 || defined __CYGWIN__
-      #ifdef KUL_EXPORT
-        #ifdef __GNUC__
-          #define KUL_PUBLISH __attribute__ ((dllexport))
-        #else
-          #define KUL_PUBLISH __declspec(dllexport) // Note: actually gcc seems to also supports this syntax.
-        #endif
-      #else
-        #ifdef __GNUC__
-          #define KUL_PUBLISH __attribute__ ((dllimport))
-        #else
-          #define KUL_PUBLISH __declspec(dllimport) // Note: actually gcc seems to also supports this syntax.
-        #endif
-      #endif
-    #else
-      #if __GNUC__ >= 4
-        #define KUL_PUBLISH __attribute__ ((visibility ("default")))
-        #define KUL_PRIVATE __attribute__ ((visibility ("hidden")))
-      #endif
-    #endif
+#if defined _WIN32 || defined __CYGWIN__
+#ifdef KUL_EXPORT
+#ifdef __GNUC__
+#define KUL_PUBLISH __attribute__((dllexport))
+#else
+#define KUL_PUBLISH                                                            \
+  __declspec(                                                                  \
+    dllexport) // Note: actually gcc seems to also supports this syntax.
+#endif
+#else
+#ifdef __GNUC__
+#define KUL_PUBLISH __attribute__((dllimport))
+#else
+#define KUL_PUBLISH                                                            \
+  __declspec(                                                                  \
+    dllimport) // Note: actually gcc seems to also supports this syntax.
+#endif
+#endif
+#else
+#if __GNUC__ >= 4
+#define KUL_PUBLISH __attribute__((visibility("default")))
+#define KUL_PRIVATE __attribute__((visibility("hidden")))
+#endif
+#endif
 #endif
 
 #ifndef KUL_PUBLISH

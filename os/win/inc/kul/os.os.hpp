@@ -31,46 +31,48 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _KUL_OS_OS_HPP_
 #define _KUL_OS_OS_HPP_
 
-#include <io.h>
-#include <fstream>
-#include <stdio.h>
-#include <direct.h>
-#include <stdlib.h>
 #include <algorithm>
+#include <direct.h>
+#include <fstream>
+#include <io.h>
 #include <process.h>
-#include <windows.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <windows.h>
 
 #include "kul/def.hpp"
 
-
-namespace kul{
+namespace kul {
 
 class Dir;
 namespace fs {
 
-class KulTimeStampsResolver{
-    private:
-        static uint64_t FileTimeToPOSIX(FILETIME& ft){
-            LARGE_INTEGER date, adjust;
-            date.HighPart = ft.dwHighDateTime;
-            date.LowPart = ft.dwLowDateTime;
-            adjust.QuadPart = 11644473600000 * 10000;
-            date.QuadPart -= adjust.QuadPart;
-            return (uint64_t) date.QuadPart / 10000000;
-        }
-        static void GET(const char*const p, uint64_t& a, uint64_t& c, uint64_t& m){
-            WIN32_FIND_DATA ffd;
-            HANDLE h = FindFirstFile(TEXT(p), &ffd);
-            if(h){
-                a = FileTimeToPOSIX(ffd.ftLastAccessTime);
-                c = FileTimeToPOSIX(ffd.ftCreationTime);
-                m = FileTimeToPOSIX(ffd.ftLastWriteTime);
-                FindClose(h);
-            }
-        }
-        friend class kul::Dir;
+class KulTimeStampsResolver
+{
+private:
+  static uint64_t FileTimeToPOSIX(FILETIME& ft)
+  {
+    LARGE_INTEGER date, adjust;
+    date.HighPart = ft.dwHighDateTime;
+    date.LowPart = ft.dwLowDateTime;
+    adjust.QuadPart = 11644473600000 * 10000;
+    date.QuadPart -= adjust.QuadPart;
+    return (uint64_t)date.QuadPart / 10000000;
+  }
+  static void GET(const char* const p, uint64_t& a, uint64_t& c, uint64_t& m)
+  {
+    WIN32_FIND_DATA ffd;
+    HANDLE h = FindFirstFile(TEXT(p), &ffd);
+    if (h) {
+      a = FileTimeToPOSIX(ffd.ftLastAccessTime);
+      c = FileTimeToPOSIX(ffd.ftCreationTime);
+      m = FileTimeToPOSIX(ffd.ftLastWriteTime);
+      FindClose(h);
+    }
+  }
+  friend class kul::Dir;
 };
 } // END NAMESPACE fs
 

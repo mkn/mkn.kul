@@ -31,66 +31,80 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _KUL_WSTRING_HPP_
 #define _KUL_WSTRING_HPP_
 
+#include <algorithm>
+#include <sstream>
 #include <string>
 #include <vector>
-#include <sstream>
-#include <algorithm>
 
-namespace kul { 
+namespace kul {
 
-
-class WString{
-    public:
-        static std::string toString(const std::wstring& ws){
-            return std::string(ws.begin(), ws.end());
-        }
-        static std::wstring toWString(const std::string& s){
-            return std::wstring(s.begin(), s.end());
-        }
-        static void replace(std::wstring& s, const std::wstring& f, const std::wstring& r){
-            s = s.substr(0, s.find(f)) + r + s.substr(s.find(f) + f.size());
-        }
-        static void replaceAll(std::wstring& s, const std::wstring& f, const std::wstring& r){
-            while(s.find(f) < s.size())
-                replace(s, f, r);
-        }
-        static void leftTrim(std::wstring& s, const wchar_t& d=' '){
-            while(s.find(d) == 0)
-                s = s.substr(1);
-        }
-        static void rightTrim(std::wstring& s, const wchar_t& d=' '){
-            while(s.rfind(d) == s.size())
-                s = s.substr(0, s.size() - 2);
-        }
-        static void trim(std::wstring& s){
-            while(s.find(' ') == 0 || s.find('\t') == 0)
-                s = s.substr(1);
-            while(s.rfind(' ') == s.size() - 1 || s.rfind('\t') == s.size() - 1)
-                s = s.substr(0, s.size() - 2);
-        }
-        static std::vector<std::wstring> split(const std::wstring& s, const wchar_t& d){
-            std::vector<std::wstring> ss;
-            std::wstring l = s;
-            uint16_t pos = 0;
-            while((pos = s.find(d, pos + 1)) < l.size()){
-                ss.push_back(l.substr(0, pos));
-                l = l.substr(pos + 1);
-            }
-            ss.push_back(l);
-            return ss;
-        }
-        static std::vector<std::wstring> split(const std::wstring& s, const std::wstring& d){
-            std::vector<std::wstring> ss;
-            std::wstring l = s;         
-            uint16_t pos = 0;
-            while((pos = s.find(d, pos + 1)) < l.size()){
-                ss.push_back(l.substr(0, pos));
-                l = l.substr(pos + 1);
-            }
-            ss.push_back(l);
-            return ss;
-        }       
+class WString
+{
+public:
+  static std::string toString(const std::wstring& ws)
+  {
+    return std::string(ws.begin(), ws.end());
+  }
+  static std::wstring toWString(const std::string& s)
+  {
+    return std::wstring(s.begin(), s.end());
+  }
+  static void replace(std::wstring& s,
+                      const std::wstring& f,
+                      const std::wstring& r)
+  {
+    s = s.substr(0, s.find(f)) + r + s.substr(s.find(f) + f.size());
+  }
+  static void replaceAll(std::wstring& s,
+                         const std::wstring& f,
+                         const std::wstring& r)
+  {
+    while (s.find(f) < s.size())
+      replace(s, f, r);
+  }
+  static void leftTrim(std::wstring& s, const wchar_t& d = ' ')
+  {
+    while (s.find(d) == 0)
+      s = s.substr(1);
+  }
+  static void rightTrim(std::wstring& s, const wchar_t& d = ' ')
+  {
+    while (s.rfind(d) == s.size())
+      s = s.substr(0, s.size() - 2);
+  }
+  static void trim(std::wstring& s)
+  {
+    while (s.find(' ') == 0 || s.find('\t') == 0)
+      s = s.substr(1);
+    while (s.rfind(' ') == s.size() - 1 || s.rfind('\t') == s.size() - 1)
+      s = s.substr(0, s.size() - 2);
+  }
+  static std::vector<std::wstring> split(const std::wstring& s,
+                                         const wchar_t& d)
+  {
+    std::vector<std::wstring> ss;
+    std::wstring l = s;
+    uint16_t pos = 0;
+    while ((pos = s.find(d, pos + 1)) < l.size()) {
+      ss.push_back(l.substr(0, pos));
+      l = l.substr(pos + 1);
+    }
+    ss.push_back(l);
+    return ss;
+  }
+  static std::vector<std::wstring> split(const std::wstring& s,
+                                         const std::wstring& d)
+  {
+    std::vector<std::wstring> ss;
+    std::wstring l = s;
+    uint16_t pos = 0;
+    while ((pos = s.find(d, pos + 1)) < l.size()) {
+      ss.push_back(l.substr(0, pos));
+      l = l.substr(pos + 1);
+    }
+    ss.push_back(l);
+    return ss;
+  }
 };
-
 }
 #endif /* _KUL_WSTRING_HPP_ */

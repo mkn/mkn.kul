@@ -35,18 +35,21 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <thread>
 
-namespace kul{ namespace cpu{
-inline uint32_t cores() {
-    SYSTEM_INFO sysinfo;
-    GetSystemInfo( &sysinfo );
-    return sysinfo.dwNumberOfProcessors;
+namespace kul {
+namespace cpu {
+inline uint32_t
+cores()
+{
+  SYSTEM_INFO sysinfo;
+  GetSystemInfo(&sysinfo);
+  return sysinfo.dwNumberOfProcessors;
 }
-inline uint16_t threads() {
-    return std::thread::hardware_concurrency();
+inline uint16_t
+threads()
+{
+  return std::thread::hardware_concurrency();
 }
 } // END NAMESPACE cpu
 } // END NAMESPACE kul
 
 #endif /* _KUL_CPU_HPP_ */
-
-

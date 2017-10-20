@@ -31,32 +31,34 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _KUL_OS_OS_HPP_
 #define _KUL_OS_OS_HPP_
 
-#include <pwd.h>
-#include <thread>
-#include <fstream>
-#include <stdio.h>
-#include <dirent.h>
-#include <stdlib.h>
-#include <unistd.h>
 #include <algorithm>
+#include <dirent.h>
+#include <fstream>
+#include <pwd.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <thread>
+#include <unistd.h>
 
-namespace kul{
+namespace kul {
 
 class Dir;
 namespace fs {
 
-class KulTimeStampsResolver{
-    private:
-        static void GET(const char*const p, uint64_t& a, uint64_t& c, uint64_t& m){
-            struct stat att;
-            if(stat(p, &att) != -1){
-                a = att.st_atime;
-                m = att.st_mtime;
-            }
-        }
-        friend class kul::Dir;
+class KulTimeStampsResolver
+{
+private:
+  static void GET(const char* const p, uint64_t& a, uint64_t& c, uint64_t& m)
+  {
+    struct stat att;
+    if (stat(p, &att) != -1) {
+      a = att.st_atime;
+      m = att.st_mtime;
+    }
+  }
+  friend class kul::Dir;
 };
 
 } // END NAMESPACE fs

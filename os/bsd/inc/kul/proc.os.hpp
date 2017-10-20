@@ -31,14 +31,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _KUL_PROC_OS_HPP_
 #define _KUL_PROC_OS_HPP_
 
-#include <fcntl.h>
-#include <stdio.h>
 #include <assert.h>
-#include <stdlib.h>
+#include <fcntl.h>
 #include <signal.h>
-#include <unistd.h>
 #include <stdexcept>
+#include <stdio.h>
+#include <stdlib.h>
 #include <sys/wait.h>
+#include <unistd.h>
 
 #if defined(__APPLE__)
 #include <mach/mach.h>
@@ -46,56 +46,71 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "kul/proc.base.hpp"
 
-namespace kul { namespace this_proc{
-class MemGetter{
-    private:
+namespace kul {
+namespace this_proc {
+class MemGetter
+{
+private:
 #if defined(__APPLE__)
-        bool f = 0;
-        struct task_basic_info inf;
-        MemGetter(){
-            mach_msg_type_number_t inf_count = TASK_BASIC_INFO_COUNT;
-            f = KERN_SUCCESS != task_info(mach_task_self(),
-                TASK_BASIC_INFO, (task_info_t)&inf, &inf_count);
-        }
+  bool f = 0;
+  struct task_basic_info inf;
+  MemGetter()
+  {
+    mach_msg_type_number_t inf_count = TASK_BASIC_INFO_COUNT;
+    f = KERN_SUCCESS !=
+        task_info(
+          mach_task_self(), TASK_BASIC_INFO, (task_info_t)&inf, &inf_count);
+  }
 #endif
-        void virtula(uint64_t& v){
+  void virtula(uint64_t& v)
+  {
 #if defined(__APPLE__)
-            if(!f) v += inf.virtual_size;
+    if (!f)
+      v += inf.virtual_size;
 #endif
-        }
-        void physical(uint64_t& v){
+  }
+  void physical(uint64_t& v)
+  {
 #if defined(__APPLE__)
-            if(!f) v += inf.resident_size;
+    if (!f)
+      v += inf.resident_size;
 #endif
-        }
+  }
 
-        friend uint64_t virtualMemory();
-        friend uint64_t physicalMemory();
-        friend uint64_t totalMemory();
+  friend uint64_t virtualMemory();
+  friend uint64_t physicalMemory();
+  friend uint64_t totalMemory();
 };
 
-inline uint64_t virtualMemory(){
-    uint64_t v = 0;
-    MemGetter().virtula(v);
-    return v;
+inline uint64_t
+virtualMemory()
+{
+  uint64_t v = 0;
+  MemGetter().virtula(v);
+  return v;
 }
-inline uint64_t physicalMemory(){
-    uint64_t v = 0;
-    MemGetter().physical(v);
-    return v;
+inline uint64_t
+physicalMemory()
+{
+  uint64_t v = 0;
+  MemGetter().physical(v);
+  return v;
 }
-inline uint64_t totalMemory(){
-    uint64_t v = 0;
-    MemGetter pg;
-    pg.virtula(v);
-    pg.physical(v);
-    return v;
+inline uint64_t
+totalMemory()
+{
+  uint64_t v = 0;
+  MemGetter pg;
+  pg.virtula(v);
+  pg.physical(v);
+  return v;
 }
 
-inline uint16_t cpuLoad(){
-    return 0;
+inline uint16_t
+cpuLoad()
+{
+  return 0;
 }
-
 }
 }
 #endif /* _KUL_PROC_OS_HPP_ */

@@ -31,51 +31,54 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _KUL_CPU_HPP_
 #define _KUL_CPU_HPP_
 
-#include <pwd.h>
-#include <thread>
-#include <fstream>
-#include <stdio.h>
-#include <dirent.h>
-#include <stdlib.h>
-#include <unistd.h>
 #include <algorithm>
-#include <sys/stat.h>
+#include <dirent.h>
+#include <fstream>
+#include <pwd.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <sys/param.h>
-#include <sys/types.h>
+#include <sys/stat.h>
 #include <sys/sysctl.h>
+#include <sys/types.h>
+#include <thread>
+#include <unistd.h>
 
-namespace kul{
-namespace cpu{
-inline uint32_t cores() {
+namespace kul {
+namespace cpu {
+inline uint32_t
+cores()
+{
 #ifdef _SC_NPROCESSORS_ONLN
-    uint16_t numCPU = sysconf( _SC_NPROCESSORS_ONLN );
+  uint16_t numCPU = sysconf(_SC_NPROCESSORS_ONLN);
 #else
-    uint16_t numCPU;
+  uint16_t numCPU;
 #endif
-    int mib[4];
-    size_t len = sizeof(numCPU);
+  int mib[4];
+  size_t len = sizeof(numCPU);
 
-    mib[0] = CTL_HW;
+  mib[0] = CTL_HW;
 #if defined(__APPLE__)
-    mib[1] = HW_AVAILCPU;
+  mib[1] = HW_AVAILCPU;
 #else
-    mib[1] = HW_NCPU;
+  mib[1] = HW_NCPU;
 #endif
-    sysctl(mib, 2, &numCPU, &len, NULL, 0);
+  sysctl(mib, 2, &numCPU, &len, NULL, 0);
 
-    if(numCPU < 1){
-        mib[1] = HW_NCPU;
-        sysctl( mib, 2, &numCPU, &len, NULL, 0 );
-        if(numCPU < 1) numCPU = 1;
-    }
-    return numCPU;
+  if (numCPU < 1) {
+    mib[1] = HW_NCPU;
+    sysctl(mib, 2, &numCPU, &len, NULL, 0);
+    if (numCPU < 1)
+      numCPU = 1;
+  }
+  return numCPU;
 }
-inline uint16_t threads() {
-    return std::thread::hardware_concurrency();
+inline uint16_t
+threads()
+{
+  return std::thread::hardware_concurrency();
 }
 } // END NAMESPACE cpu
 } // END NAMESPACE kul
 
 #endif /* _KUL_CPU_HPP_ */
-
-

@@ -32,10 +32,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
-#include "kul/io.hpp"
-#include "kul/os.hpp"
 #include "kul/cli.hpp"
+#include "kul/io.hpp"
 #include "kul/log.hpp"
+#include "kul/os.hpp"
 #include "kul/proc.hpp"
 #include "kul/threads.hpp"
 
@@ -43,24 +43,27 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define bzero ZeroMemory
 #endif
 
-auto tryCatch = [](std::vector<std::function<void()>> funcs, bool katch){
-    for(const auto& func : funcs)
-        try{
-            func();
-            ASSERT_TRUE(!katch);
-        }catch(const kul::Exception& e){
-            if(!katch) KOUT(NON) << e.debug();
-            ASSERT_TRUE(katch);
-        }
+auto tryCatch = [](std::vector<std::function<void()>> funcs, bool katch) {
+  for (const auto& func : funcs)
+    try {
+      func();
+      ASSERT_TRUE(!katch);
+    } catch (const kul::Exception& e) {
+      if (!katch)
+        KOUT(NON) << e.debug();
+      ASSERT_TRUE(katch);
+    }
 };
 
 #include "cli.cpp.inc"
 #include "io.cpp.inc"
 #include "os.cpp.inc"
-#include "string.cpp.inc"
 #include "proc.cpp.inc"
+#include "string.cpp.inc"
 
-int main(int argc, char* argv[]) {
+int
+main(int argc, char* argv[])
+{
   ::testing::InitGoogleMock(&argc, argv);
   return RUN_ALL_TESTS();
 }

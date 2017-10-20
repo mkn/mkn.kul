@@ -29,17 +29,19 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-// This file is included by other files and is not in itself syntactically correct.
+// This file is included by other files and is not in itself syntactically
+// correct.
 
 // std::string kul::Dir::REAL(const std::string& s) KTHROW(fs::Exception){
 
-    char* expanded = realpath(s.c_str() , NULL);
-    if(expanded){
-        std::string dir(expanded);
-        free(expanded);
-        if(dir.size() > PATH_MAX) KEXCEPT(fs::Exception, "Directory path too large");
-        return dir;
-    }
-    KEXCEPT(fs::Exception, "Directory \"" + s + "\" does not exist");
+char* expanded = realpath(s.c_str(), NULL);
+if (expanded) {
+  std::string dir(expanded);
+  free(expanded);
+  if (dir.size() > PATH_MAX)
+    KEXCEPT(fs::Exception, "Directory path too large");
+  return dir;
+}
+KEXCEPT(fs::Exception, "Directory \"" + s + "\" does not exist");
 
 // }

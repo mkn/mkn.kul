@@ -29,27 +29,30 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-// This file is included by other files and is not in itself syntactically correct.
+// This file is included by other files and is not in itself syntactically
+// correct.
 
-// std::vector<kul::File> kul::Dir::files(bool recursive) const KTHROW(fs::Exception){
+// std::vector<kul::File> kul::Dir::files(bool recursive) const
+// KTHROW(fs::Exception){
 
-    if(!is()) KEXCEPT(fs::Exception, "Directory : \"" + path() + "\" does not exist");
+if (!is())
+  KEXCEPT(fs::Exception, "Directory : \"" + path() + "\" does not exist");
 
-    std::vector<File> fs;
-    DIR *dir = opendir(path().c_str());
-    struct dirent *entry = readdir(dir);
-    while (entry != NULL){
-        if(!kul::Dir(JOIN(real(), entry->d_name)).is())
-            fs.push_back(File(entry->d_name, *this));
-        entry = readdir(dir);
-    }
-    closedir(dir);
-    if(recursive){
-        for(const kul::Dir& d : dirs()){
-            const std::vector<kul::File>& tFs = d.files(true);
-            fs.insert(fs.end(), tFs.begin(), tFs.end());
-        }
-    }
-    return fs;
+std::vector<File> fs;
+DIR* dir = opendir(path().c_str());
+struct dirent* entry = readdir(dir);
+while (entry != NULL) {
+  if (!kul::Dir(JOIN(real(), entry->d_name)).is())
+    fs.push_back(File(entry->d_name, *this));
+  entry = readdir(dir);
+}
+closedir(dir);
+if (recursive) {
+  for (const kul::Dir& d : dirs()) {
+    const std::vector<kul::File>& tFs = d.files(true);
+    fs.insert(fs.end(), tFs.begin(), tFs.end());
+  }
+}
+return fs;
 
 // }

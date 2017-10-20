@@ -34,26 +34,26 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "kul/defs.hpp"
 
 #ifndef __KUL_OS__
-    #define __KUL_OS__ bsd
+#define __KUL_OS__ bsd
 #endif /*  __KUL_OS__ */
 
 #ifndef __KUL_THREAD_SPAWN_WAIT__
-    #define __KUL_THREAD_SPAWN_WAIT__ 5000000
+#define __KUL_THREAD_SPAWN_WAIT__ 5000000
 #endif /*  __KUL_THREAD_SPAWN_WAIT__ */
 
 #if defined(__APPLE__)
 
-    #ifndef _XOPEN_SOURCE
-        #define _XOPEN_SOURCE 700
-    #endif //_XOPEN_SOURCE
+#ifndef _XOPEN_SOURCE
+#define _XOPEN_SOURCE 700
+#endif //_XOPEN_SOURCE
 
-    #ifndef   _DARWIN_C_SOURCE
-        #define   _DARWIN_C_SOURCE
-        #include "sys/types.h"
-        #undef    _DARWIN_C_SOURCE
-    #else
-        #include "sys/types.h"
-    #endif // _DARWIN_C_SOURCE
+#ifndef _DARWIN_C_SOURCE
+#define _DARWIN_C_SOURCE
+#include "sys/types.h"
+#undef _DARWIN_C_SOURCE
+#else
+#include "sys/types.h"
+#endif // _DARWIN_C_SOURCE
 
 #endif /* __APPLE__ */
 

@@ -29,17 +29,19 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-// This file is included by other files and is not in itself syntactically correct.
+// This file is included by other files and is not in itself syntactically
+// correct.
 
 // std::string kul::Dir::REAL(const std::string& s) KTHROW(fs::Exception){
 
-    char* expanded = _fullpath(NULL, s.c_str(), _MAX_PATH);
-    if(expanded){
-        std::string dir(expanded);
-        delete expanded;
-        if(dir.size() && dir[dir.size() - 1] == '\\') dir.pop_back();
-        return dir;
-    }
-    KEXCEPT(fs::Exception, "Item: \"" + s + "\" does not exist");
+char* expanded = _fullpath(NULL, s.c_str(), _MAX_PATH);
+if (expanded) {
+  std::string dir(expanded);
+  delete expanded;
+  if (dir.size() && dir[dir.size() - 1] == '\\')
+    dir.pop_back();
+  return dir;
+}
+KEXCEPT(fs::Exception, "Item: \"" + s + "\" does not exist");
 
 // }

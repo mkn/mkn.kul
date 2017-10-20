@@ -29,107 +29,130 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-// This file is included by other files and is not in itself syntactically correct.
+// This file is included by other files and is not in itself syntactically
+// correct.
 
 // void kul::Process::run() KTHROW(kul::proc::Exception){
 
-    int16_t ret = 0;
+int16_t ret = 0;
 
-    if((ret = pipe(inFd)) < 0)  error(__LINE__, "Failed to pipe in");
-    if((ret = pipe(outFd)) < 0) error(__LINE__, "Failed to pipe out");
-    if((ret = pipe(errFd)) < 0) error(__LINE__, "Failed to pipe err");
+if ((ret = pipe(inFd)) < 0)
+  error(__LINE__, "Failed to pipe in");
+if ((ret = pipe(outFd)) < 0)
+  error(__LINE__, "Failed to pipe out");
+if ((ret = pipe(errFd)) < 0)
+  error(__LINE__, "Failed to pipe err");
 
-    this->preStart();
-    pid(fork());
-    if(pid() > 0){
-        if(this->waitForExit()){ // parent
-            popPip[0] = inFd[1];
-            popPip[1] = outFd[0];
-            popPip[2] = errFd[0];
+this->preStart();
+pid(fork());
+if (pid() > 0) {
+  if (this->waitForExit()) { // parent
+    popPip[0] = inFd[1];
+    popPip[1] = outFd[0];
+    popPip[2] = errFd[0];
 
 #ifdef __KUL_PROC_BLOCK_ERR__
-            if((ret = fcntl(popPip[1], F_SETFL, O_NONBLOCK)) < 0) error(__LINE__, "Failed nonblocking for popPip[1]");
-            if((ret = fcntl(popPip[2], F_SETFL, O_NONBLOCK)) < 0) error(__LINE__, "Failed nonblocking for popPip[2]");
+    if ((ret = fcntl(popPip[1], F_SETFL, O_NONBLOCK)) < 0)
+      error(__LINE__, "Failed nonblocking for popPip[1]");
+    if ((ret = fcntl(popPip[2], F_SETFL, O_NONBLOCK)) < 0)
+      error(__LINE__, "Failed nonblocking for popPip[2]");
 #else
-            fcntl(popPip[1], F_SETFL, O_NONBLOCK);
-            fcntl(popPip[2], F_SETFL, O_NONBLOCK);
+    fcntl(popPip[1], F_SETFL, O_NONBLOCK);
+    fcntl(popPip[2], F_SETFL, O_NONBLOCK);
 #endif
-            fd_set childOutFds;
-            FD_ZERO(&childOutFds);
-            FD_SET(popPip[1], &childOutFds);
-            FD_SET(popPip[2], &childOutFds);
-            close(inFd[1]);
-            bool alive = true;
+    fd_set childOutFds;
+    FD_ZERO(&childOutFds);
+    FD_SET(popPip[1], &childOutFds);
+    FD_SET(popPip[2], &childOutFds);
+    close(inFd[1]);
+    bool alive = true;
 
-            char cOut[30024] = {'\0'};
-            char cErr[30024] = {'\0'};
-            do {
+    char cOut[30024] = { '\0' };
+    char cErr[30024] = { '\0' };
+    do {
 #if defined(_KUL_PROC_LOOP_NSLEEP_) && (_KUL_PROC_LOOP_NSLEEP_ > 0)
-                kul::this_thread::nSleep(_KUL_PROC_LOOP_NSLEEP_);
+      kul::this_thread::nSleep(_KUL_PROC_LOOP_NSLEEP_);
 #endif
-                alive = ::kill(pid(), 0) == 0;
-                if(FD_ISSET(popPip[1], &childOutFds)) {
-                    bool b = 0;
-                    do {
-                        memset(cOut, 0, sizeof(cOut));
-                        ret = recall(read(popPip[1], cOut, sizeof(cOut)));
-                        cOut[ret > 0 ? ret : 0] = 0;
-                        if (ret < 0){
-                            if(b && ((errno != EAGAIN) || (errno != EWOULDBLOCK)))
-                                error(__LINE__, "read on childout failed");
-                            if(((errno != EAGAIN) || (errno != EWOULDBLOCK))) b = 1;
-                        }
-                        else if (ret) out(cOut);
-                        else waitForStatus();
-                    } while(ret > 0);
-                }
-                if(FD_ISSET(popPip[2], &childOutFds)) {
-                    bool b = 0;
-                    do {
-                        memset(cErr, 0, sizeof(cErr));
-                        ret = recall(read(popPip[2], cErr, sizeof(cErr)));
-                        cErr[ret > 0 ? ret : 0] = 0;
-                        if (ret < 0){
-                            if(b && ((errno != EAGAIN) || (errno != EWOULDBLOCK)))
-                                error(__LINE__, "read on childout failed");
-                            if(((errno != EAGAIN) || (errno != EWOULDBLOCK))) b = 1;
-                        }
-                        else if (ret) err(cErr);
-                        else waitForStatus();
-                    } while(ret > 0);
-                }
-                recall(waitpid(pid(), &cStat, WNOHANG));
-            }while(alive);
+      alive = ::kill(pid(), 0) == 0;
+      if (FD_ISSET(popPip[1], &childOutFds)) {
+        bool b = 0;
+        do {
+          memset(cOut, 0, sizeof(cOut));
+          ret = recall(read(popPip[1], cOut, sizeof(cOut)));
+          cOut[ret > 0 ? ret : 0] = 0;
+          if (ret < 0) {
+            if (b && ((errno != EAGAIN) || (errno != EWOULDBLOCK)))
+              error(__LINE__, "read on childout failed");
+            if (((errno != EAGAIN) || (errno != EWOULDBLOCK)))
+              b = 1;
+          } else if (ret)
+            out(cOut);
+          else
+            waitForStatus();
+        } while (ret > 0);
+      }
+      if (FD_ISSET(popPip[2], &childOutFds)) {
+        bool b = 0;
+        do {
+          memset(cErr, 0, sizeof(cErr));
+          ret = recall(read(popPip[2], cErr, sizeof(cErr)));
+          cErr[ret > 0 ? ret : 0] = 0;
+          if (ret < 0) {
+            if (b && ((errno != EAGAIN) || (errno != EWOULDBLOCK)))
+              error(__LINE__, "read on childout failed");
+            if (((errno != EAGAIN) || (errno != EWOULDBLOCK)))
+              b = 1;
+          } else if (ret)
+            err(cErr);
+          else
+            waitForStatus();
+        } while (ret > 0);
+      }
+      recall(waitpid(pid(), &cStat, WNOHANG));
+    } while (alive);
 
-            waitExit();
-        }
-    }else if(pid() == 0){ // child
-        close(inFd[1]);
-        close(outFd[0]);
-        close(errFd[0]);
+    waitExit();
+  }
+} else if (pid() == 0) { // child
+  close(inFd[1]);
+  close(outFd[0]);
+  close(errFd[0]);
 
-        int16_t ret = 0; //check rets
-        int8_t retry = __KUL_PROC_DUP_RETRY__;
-        if(retry < 1) retry = 1;
+  int16_t ret = 0; // check rets
+  int8_t retry = __KUL_PROC_DUP_RETRY__;
+  if (retry < 1)
+    retry = 1;
 
-        close(0);
-        for(uint8_t i = 0; i < retry; i++) if((ret = dup(inFd[0])) >= 0) break;
-        if(ret < 0) error(__LINE__, "dup in call failed");
+  close(0);
+  for (uint8_t i = 0; i < retry; i++)
+    if ((ret = dup(inFd[0])) >= 0)
+      break;
+  if (ret < 0)
+    error(__LINE__, "dup in call failed");
 
-        close(1);
-        for(uint8_t i = 0; i < retry; i++) if((ret = dup(outFd[1])) >= 0) break;
-        if(ret < 0) error(__LINE__, "dup out call failed");
-        
-        close(2);
-        for(uint8_t i = 0; i < retry; i++) if((ret = dup(errFd[1])) >= 0) break;
-        if(ret < 0) error(__LINE__, "dup err call failed");
+  close(1);
+  for (uint8_t i = 0; i < retry; i++)
+    if ((ret = dup(outFd[1])) >= 0)
+      break;
+  if (ret < 0)
+    error(__LINE__, "dup out call failed");
 
-        /* SETUP EnvVars */ // SET ENV, it's a forked process so it doesn't matter - it'll die soon, like you.
-        for(const std::pair<const std::string, const std::string>& ev : vars())
-            env::SET(ev.first.c_str(), ev.second.c_str());
+  close(2);
+  for (uint8_t i = 0; i < retry; i++)
+    if ((ret = dup(errFd[1])) >= 0)
+      break;
+  if (ret < 0)
+    error(__LINE__, "dup err call failed");
 
-        if(!this->directory().empty()) kul::env::CWD(this->directory());
-        exit(this->child());
-    }else error(__LINE__, "Unhandled process id for child: " + std::to_string(pid()));
+  /* SETUP EnvVars */ // SET ENV, it's a forked process so it doesn't matter -
+                      // it'll die soon, like you.
+  for (const std::pair<const std::string, const std::string>& ev : vars())
+    env::SET(ev.first.c_str(), ev.second.c_str());
+
+  if (!this->directory().empty())
+    kul::env::CWD(this->directory());
+  exit(this->child());
+} else
+  error(__LINE__, "Unhandled process id for child: " + std::to_string(pid()));
 
 // }

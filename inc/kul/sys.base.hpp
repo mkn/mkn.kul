@@ -33,15 +33,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "kul/os.hpp"
 
-namespace kul{
+namespace kul {
 
 namespace sys {
 
-class Exception : public kul::Exception{
-    public:
-        Exception(const char*f, const uint16_t& l, const std::string& s) : kul::Exception(f, l, s){}
+class Exception : public kul::Exception
+{
+public:
+  Exception(const char* f, const uint16_t& l, const std::string& s)
+    : kul::Exception(f, l, s)
+  {}
 };
-
 
 } // END NAMESPACE sys
 } // END NAMESPACE kul

@@ -29,18 +29,20 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-// This file is included by other files and is not in itself syntactically correct.
+// This file is included by other files and is not in itself syntactically
+// correct.
 
 // std::string kul::cli::hidden(const std::string& t){
 
-    if(!t.empty()) std::cout << t << std::endl;
-    HANDLE hStdin = GetStdHandle(STD_INPUT_HANDLE); 
-    DWORD mode = 0;
-    GetConsoleMode(hStdin, &mode);
-    SetConsoleMode(hStdin, mode & (~ENABLE_ECHO_INPUT));
-    std::string s;
-    std::getline(std::cin, s);
-    SetConsoleMode(hStdin, mode);
-    return s;
+if (!t.empty())
+  std::cout << t << std::endl;
+HANDLE hStdin = GetStdHandle(STD_INPUT_HANDLE);
+DWORD mode = 0;
+GetConsoleMode(hStdin, &mode);
+SetConsoleMode(hStdin, mode&(~ENABLE_ECHO_INPUT));
+std::string s;
+std::getline(std::cin, s);
+SetConsoleMode(hStdin, mode);
+return s;
 
 // }
