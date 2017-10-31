@@ -183,17 +183,21 @@ public:
                         const char& e = '\\')
   {
     std::string l = s, ds = std::string(1, d), es = std::string(1, e);
+    std::string tmp = l;
     size_t pos = 0, esc = 0;
-    while ((pos = l.find(d, esc)) != std::string::npos) {
-      if (pos > 0 && l.find(es + ds) == pos - 1) {
-        esc++;
+    while ((pos = l.find(d, esc)) != std::string::npos){
+      if (pos > 0 && tmp.find(es + ds) == pos - 1) {
+        esc = pos + 1;
+        tmp = tmp.substr(esc);
         continue;
       }
+      if(tmp.find(d, esc) == std::string::npos) break;
       std::string t = l.substr(0, pos);
       REPLACE_ALL(t, es, "");
       v.push_back(t);
       l = l.substr(pos + 1);
       esc = 0;
+      tmp = l;
     }
     REPLACE_ALL(l, es, "");
     v.push_back(l);
