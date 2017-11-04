@@ -247,8 +247,6 @@ public:
       lresult = strtoul(s, &end, 10);
       if ((errno == ERANGE) || lresult > UINT16_MAX)
         return IS_OVERFLOW;
-      if ((errno == ERANGE) || lresult < 0)
-        return IS_UNDERFLOW;
       if (*s == '\0' || *end != '\0')
         return IS_INCONVERTIBLE;
       return IS_SUCCESS;
@@ -298,8 +296,6 @@ public:
       lresult = strtoull(s, &end, 10);
       if ((errno == ERANGE) || lresult > UINT32_MAX)
         return IS_OVERFLOW;
-      if ((errno == ERANGE) || lresult < 0)
-        return IS_UNDERFLOW;
       if (*s == '\0' || *end != '\0')
         return IS_INCONVERTIBLE;
       return IS_SUCCESS;
@@ -349,8 +345,6 @@ public:
       lresult = strtoull(s, &end, 10);
       if ((errno == ERANGE) || lresult > UINT64_MAX)
         return IS_OVERFLOW;
-      if ((errno == ERANGE) || lresult < 0)
-        return IS_UNDERFLOW;
       if (*s == '\0' || *end != '\0')
         return IS_INCONVERTIBLE;
       return IS_SUCCESS;
