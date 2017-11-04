@@ -686,4 +686,30 @@ kul::Dir::files(bool recursive) const KTHROW(fs::Exception)
 
 #endif //_KUL_COMPILED_LIB_
 
+namespace kul{
+namespace os{
+
+class PushDir{
+private:
+  std::string cwd;
+  kul::Dir m_dir;
+public:
+  PushDir(const std::string& d) : m_dir(d){
+    if(!m_dir) KEXCEPTION("PushDir directory does not exist: ") << d;
+    cwd = kul::env::CWD();
+    kul::env::CWD(m_dir.real());
+  }
+  PushDir(const kul::Dir& d) : m_dir(d){
+    if(!m_dir) KEXCEPTION("PushDir directory does not exist: ") << d;
+    cwd = kul::env::CWD();
+    kul::env::CWD(m_dir.real());
+  }
+  ~PushDir(){
+    kul::env::CWD(cwd); 
+  }
+};
+
+} // namespace os
+} // namespace kul
+
 #endif /* _KUL_OS_HPP_ */
