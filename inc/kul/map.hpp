@@ -40,11 +40,50 @@ REQUIRES
  *       2 To
  *       S STRING
  *       T TEMPLATE
- *       V VECTOR
  **/
 
 #ifndef _KUL_MAP_HPP_
 #define _KUL_MAP_HPP_
+
+#ifndef _MKN_WITH_GOOGLE_SPARSEHASH_
+
+#include <unordered_map>
+#include <unordered_set>
+
+namespace kul {
+namespace hash {
+
+template<class K, class V>
+class Map : public std::unordered_map<K, V>{  
+public:
+  Map& insert(const K& k, const V& v){
+    this->insert(std::make_pair(k, v));
+    return *this;
+  }
+  Map& insert(const std::pair<K, V>& pair){
+    std::unordered_map<K, V>::insert(pair);
+    return *this;
+  }
+  void setDeletedKey(const K& key) {  }
+
+};
+
+namespace map {
+template<class T>
+using S2T = Map<std::string, T>;
+using S2S = S2T<std::string>;
+} // namespace map
+
+template<class T>
+using Set = std::unordered_set<T>;
+
+namespace set {
+using String = Set<std::string>;
+} // namespace set
+} // namespace hash
+} // namespace kul
+
+#else
 
 #include "sparsehash/sparse_hash_map"
 #include "sparsehash/sparse_hash_set"
@@ -52,8 +91,6 @@ REQUIRES
 #include "sparsehash/dense_hash_map"
 #include "sparsehash/dense_hash_set"
 
-#include <string>
-#include <vector>
 
 namespace kul {
 
@@ -98,7 +135,7 @@ public:
 };
 
 namespace set {
-typedef Set<std::string, std::hash<std::string>, StdStringComparator> String;
+using String = Set<std::string, std::hash<std::string>, StdStringComparator>;
 } // end namespace set
 
 template<class K,
@@ -183,7 +220,7 @@ public:
 };
 
 namespace set {
-typedef Set<std::string, std::hash<std::string>, StdStringComparator> String;
+using String = Set<std::string, std::hash<std::string>, StdStringComparator>;
 }
 
 template<class K,
@@ -237,4 +274,7 @@ using S2S = S2T<std::string>;
 } // end namespace hash
 } // end namespace dense
 } // end namespace kul
+
+#endif//_MKN_WITH_GOOGLE_SPARSEHASH_
+
 #endif /* _KUL_MAP_HPP_ */
