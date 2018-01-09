@@ -63,9 +63,12 @@ TEST(IO_Test, ReadBinaryFileLine) {
 }
 TEST(IO_Test, ReadBinaryFile) {
     char c[20] = {0};
+    bzero(c, 20);
     kul::io::BinaryReader r("LICENSE.md");
     r.read(c, 20);
     std::string s1 = c;
+    KLOG(INF) << s1.size();
+    KLOG(INF) << strlen(c);
     std::stringstream ss;
     while((r.read(c, 20))) { ss << c; break; }
     EXPECT_EQ("Copyright (c) 2017, ", s1);
