@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #include "openssl/sha.h"
+#include <iomanip>
 
 namespace kul {
 namespace hash {

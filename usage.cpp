@@ -252,9 +252,14 @@ public:
 
     kul::hash::map::S2S sparse;
     sparse.insert("LEFT", "RIGHT");
-    kul::dense::hash::map::S2S dense;
-    dense.setEmptyKey(""); // unique non occuring key
-    dense.insert("LEFT", "RIGHT");
+
+#if defined(_MKN_WITH_GOOGLE_SPARSEHASH_)
+    {
+      kul::dense::hash::map::S2S dense;
+      dense.setEmptyKey(""); // unique non occuring key
+      dense.insert("LEFT", "RIGHT");
+    }
+#endif
 
     kul::File file("./write_access");
     if (file && !file.rm())

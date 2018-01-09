@@ -55,11 +55,11 @@ auto tryCatch = [](std::vector<std::function<void()>> funcs, bool katch) {
     }
 };
 
-#include "cli.cpp.inc"
-#include "io.cpp.inc"
-#include "os.cpp.inc"
-#include "proc.cpp.inc"
-#include "string.cpp.inc"
+#include "test/cli.cpp.inc"
+#include "test/io.cpp.inc"
+#include "test/os.cpp.inc"
+#include "test/proc.cpp.inc"
+#include "test/string.cpp.inc"
 
 int
 main(int argc, char* argv[])
