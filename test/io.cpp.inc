@@ -52,7 +52,7 @@ TEST(IO_Test, ReadFile) {
 }
 
 // Travis has a tough time with this one
-#ifndef __APPLE__
+#if !defined(__APPLE__) && !defined(_WIN32)
 TEST(IO_Test, ReadBinaryFileLine) {
     kul::io::BinaryReader r("LICENSE.md");
     const char* c = r.readLine();

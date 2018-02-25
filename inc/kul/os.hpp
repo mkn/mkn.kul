@@ -471,9 +471,9 @@ public:
   std::string real() const { return Dir::JOIN(_d.real(), _n); }
   std::string mini() const { return Dir::MINI(real()); }
 
-  ulonglong size() const
+  uint64_t size() const
   {
-    ulonglong r = 0;
+    uint64_t r = 0;
 #ifdef _WIN32
     WIN32_FIND_DATA ffd;
     HANDLE h = FindFirstFile(TEXT(mini().c_str()), &ffd);

@@ -98,7 +98,7 @@ public:
   static const std::string AS(const std::string& epoch,
                               const std::string& f = "%Y-%m-%d-%H:%M:%S")
   {
-    ulong e = 0;
+    uint64_t e = 0;
     std::stringstream ss(epoch);
     ss >> e;
     if (!e)

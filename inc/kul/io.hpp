@@ -148,7 +148,11 @@ public:
   {}
   ~BinaryReader() { f.close(); }
   const char* readLine() { return AReader::readLine(f); }
+#ifdef _WIN32
+  size_t read(char* c, const uint16_t& s) { return AReader::read(c, f, s); }
+#else
   size_t read(char* c, const uint16_t& s) { return f.readsome(c, s); }
+#endif  
   void seek(const uint16_t& s) { AReader::seek(f, s); }
 };
 
