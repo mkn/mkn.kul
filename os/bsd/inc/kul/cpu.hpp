@@ -31,9 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _KUL_CPU_HPP_
 #define _KUL_CPU_HPP_
 
-#include <algorithm>
 #include <dirent.h>
-#include <fstream>
 #include <pwd.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -41,14 +39,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <sys/stat.h>
 #include <sys/sysctl.h>
 #include <sys/types.h>
-#include <thread>
 #include <unistd.h>
+#include <algorithm>
+#include <fstream>
+#include <thread>
 
 namespace kul {
 namespace cpu {
-inline uint32_t
-cores()
-{
+inline uint32_t cores() {
 #ifdef _SC_NPROCESSORS_ONLN
   uint16_t numCPU = sysconf(_SC_NPROCESSORS_ONLN);
 #else
@@ -68,17 +66,12 @@ cores()
   if (numCPU < 1) {
     mib[1] = HW_NCPU;
     sysctl(mib, 2, &numCPU, &len, NULL, 0);
-    if (numCPU < 1)
-      numCPU = 1;
+    if (numCPU < 1) numCPU = 1;
   }
   return numCPU;
 }
-inline uint16_t
-threads()
-{
-  return std::thread::hardware_concurrency();
-}
-} // END NAMESPACE cpu
-} // END NAMESPACE kul
+inline uint16_t threads() { return std::thread::hardware_concurrency(); }
+}  // END NAMESPACE cpu
+}  // END NAMESPACE kul
 
 #endif /* _KUL_CPU_HPP_ */

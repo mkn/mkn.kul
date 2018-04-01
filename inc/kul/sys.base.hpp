@@ -37,15 +37,13 @@ namespace kul {
 
 namespace sys {
 
-class Exception : public kul::Exception
-{
-public:
+class Exception : public kul::Exception {
+ public:
   Exception(const char* f, const uint16_t& l, const std::string& s)
-    : kul::Exception(f, l, s)
-  {}
+      : kul::Exception(f, l, s) {}
 };
 
-} // END NAMESPACE sys
-} // END NAMESPACE kul
+}  // END NAMESPACE sys
+}  // END NAMESPACE kul
 
 #endif /* _KUL_SYSBASE_HPP_ */

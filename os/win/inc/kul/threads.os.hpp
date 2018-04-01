@@ -38,40 +38,32 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace kul {
 namespace this_thread {
-inline const std::string
-id()
-{
+inline const std::string id() {
   std::ostringstream os;
   os << std::hex << std::hash<std::thread::id>()(std::this_thread::get_id());
   return os.str();
 }
 
 #ifndef _KUL_COMPILED_LIB_
-inline bool
-main()
-{
+inline bool main() {
 #include "kul/src/thread/main.cpp"
 }
 #else
-bool
-main();
+bool main();
 #endif
 
-inline void
-kill()
-{
+inline void kill() {
   HANDLE h = GetCurrentThread();
   TerminateThread(h, 0);
   CloseHandle(h);
 }
-} // END NAMESPACE this_thread
+}  // END NAMESPACE this_thread
 
-class Mutex
-{
-private:
+class Mutex {
+ private:
   CRITICAL_SECTION critSec;
 
-public:
+ public:
   Mutex() { InitializeCriticalSection(&critSec); }
   ~Mutex() { DeleteCriticalSection(&critSec); }
   void lock() { EnterCriticalSection(&critSec); }
@@ -79,18 +71,15 @@ public:
 };
 
 namespace threading {
-DWORD WINAPI
-threadFunction(LPVOID th);
+DWORD WINAPI threadFunction(LPVOID th);
 }
 
-class Thread : public threading::AThread
-{
-private:
+class Thread : public threading::AThread {
+ private:
   std::function<void()> func;
   HANDLE h;
   friend DWORD WINAPI threading::threadFunction(LPVOID);
-  void act()
-  {
+  void act() {
     try {
       func();
     } catch (const std::exception& e) {
@@ -99,41 +88,30 @@ private:
     f = 1;
   }
 
-public:
-  Thread(const std::function<void()>& func)
-    : func(func)
-  {}
-  template<class T>
-  Thread(const T& t)
-    : func(std::bind((void (T::*)()) & T::operator(), t))
-  {}
-  template<class T>
+ public:
+  Thread(const std::function<void()>& func) : func(func) {}
+  template <class T>
+  Thread(const T& t) : func(std::bind((void (T::*)()) & T::operator(), t)) {}
+  template <class T>
   Thread(const std::reference_wrapper<T>& r)
-    : func(std::bind((void (T::*)()) & T::operator(), r))
-  {}
-  template<class T>
+      : func(std::bind((void (T::*)()) & T::operator(), r)) {}
+  template <class T>
   Thread(const std::reference_wrapper<const T>& r)
-    : func(std::bind((void (T::*)() const) & T::operator(), r))
-  {}
+      : func(std::bind((void (T::*)() const) & T::operator(), r)) {}
   virtual ~Thread() {}
-  void join()
-  {
-    if (!s)
-      run();
+  void join() {
+    if (!s) run();
     WaitForSingleObject(h, INFINITE);
     CloseHandle(h);
     s = 0;
   }
   bool detach() { return CloseHandle(h); }
-  void interrupt() KTHROW(kul::threading::InterruptionException)
-  {
+  void interrupt() KTHROW(kul::threading::InterruptionException) {
     TerminateThread(h, 1);
     f = 1;
   }
-  void run() KTHROW(kul::threading::Exception)
-  {
-    if (s)
-      KEXCEPTION("Thread running");
+  void run() KTHROW(kul::threading::Exception) {
+    if (s) KEXCEPTION("Thread running");
     f = 0;
     s = 1;
     h = CreateThread(0, 5120000, threading::threadFunction, this, 0, 0);
@@ -141,13 +119,11 @@ public:
 };
 
 namespace threading {
-inline DWORD WINAPI
-threadFunction(LPVOID th)
-{
+inline DWORD WINAPI threadFunction(LPVOID th) {
   reinterpret_cast<Thread*>(th)->act();
   return 0;
 }
-}
+}  // namespace threading
 
-} // END NAMESPACE kul
+}  // END NAMESPACE kul
 #endif /* _KUL_THREADS_OS_HPP_ */

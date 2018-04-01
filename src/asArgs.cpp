@@ -30,8 +30,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "kul/cli.hpp"
 
-void
-kul::cli::asArgs(const std::string& cmd, std::vector<std::string>& args)
-{
+void kul::cli::asArgs(const std::string& cmd, std::vector<std::string>& args) {
 #include "kul/src/cli/asArgs.cpp"
 }

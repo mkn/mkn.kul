@@ -43,87 +43,65 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifndef __KUL_PROC_DUP_RETRY__
 #define __KUL_PROC_DUP_RETRY__ 3
-#endif //__KUL_PROC_DUP_RETRY__
+#endif  //__KUL_PROC_DUP_RETRY__
 
 namespace kul {
 
 namespace this_proc {
-inline int32_t
-id()
-{
-  return getpid();
-}
-inline void
-kill(const int32_t& e)
-{
-  ::kill(kul::this_proc::id(), e);
-}
-}
+inline int32_t id() { return getpid(); }
+inline void kill(const int32_t& e) { ::kill(kul::this_proc::id(), e); }
+}  // namespace this_proc
 
-class Process : public kul::AProcess
-{
-private:
+class Process : public kul::AProcess {
+ private:
   int inFd[2];
   int outFd[2];
   int errFd[2];
   int popPip[3];
-  int cStat; // child status
+  int cStat;  // child status
 
-  inline int16_t recall(const uint16_t& s)
-  {
+  inline int16_t recall(const uint16_t& s) {
     int ret;
     while ((ret = (s)) < 0x0 && (errno == EINTR)) {
     }
     return ret;
   }
 
-public:
+ public:
   Process(const std::string& cmd, const bool& wfe = true)
-    : kul::AProcess(cmd, wfe)
-  {}
-  Process(const std::string& cmd,
-          const std::string& path,
+      : kul::AProcess(cmd, wfe) {}
+  Process(const std::string& cmd, const std::string& path,
           const bool& wfe = true)
-    : kul::AProcess(cmd, path, wfe)
-  {}
+      : kul::AProcess(cmd, path, wfe) {}
   Process(const std::string& cmd, const kul::Dir& d, const bool& wfe = true)
-    : kul::AProcess(cmd, (d ? d.real() : d.path()), wfe)
-  {}
-  bool kill(int16_t k = 6)
-  {
+      : kul::AProcess(cmd, (d ? d.real() : d.path()), wfe) {}
+  bool kill(int16_t k = 6) {
     if (started()) {
       bool b = ::kill(pid(), k) == 0;
-      if (::kill(pid(), 0) == 0)
-        setFinished();
+      if (::kill(pid(), 0) == 0) setFinished();
       return b;
     }
     return 0;
   }
 
-protected:
+ protected:
 #ifndef _KUL_COMPILED_LIB_
-  int16_t child()
-  {
+  int16_t child() {
 #include "kul/src/proc/child.cpp"
   }
-  virtual void expand(std::string& s) const
-  {
+  virtual void expand(std::string& s) const {
 #include "kul/src/proc/expand.cpp"
   }
-  void waitForStatus()
-  {
+  void waitForStatus() {
 #include "kul/src/proc/waitForStatus.cpp"
   }
-  void waitExit() KTHROW(kul::proc::ExitException)
-  {
+  void waitExit() KTHROW(kul::proc::ExitException) {
 #include "kul/src/proc/waitExit.cpp"
   }
-  void tearDown()
-  {
+  void tearDown() {
 #include "kul/src/proc/tearDown.cpp"
   }
-  void run() KTHROW(kul::proc::Exception)
-  {
+  void run() KTHROW(kul::proc::Exception) {
 #include "kul/src/proc/run.cpp"
   }
 #else
@@ -137,5 +115,5 @@ protected:
   virtual void finish() {}
   virtual void preStart() {}
 };
-}
+}  // namespace kul
 #endif /* _KUL_PROC_HPP_ */

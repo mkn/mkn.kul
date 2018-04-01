@@ -44,74 +44,50 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace kul {
 namespace cli {
 
-inline const std::string
-receive(const std::string& t = "")
-{
-  if (!t.empty())
-    std::cout << t << std::endl;
+inline const std::string receive(const std::string& t = "") {
+  if (!t.empty()) std::cout << t << std::endl;
   std::string s;
   std::getline(std::cin, s);
   return s;
 }
 
-class Exception : public kul::Exception
-{
-public:
+class Exception : public kul::Exception {
+ public:
   Exception(const char* f, const uint16_t& l, const std::string& s)
-    : kul::Exception(f, l, s)
-  {}
+      : kul::Exception(f, l, s) {}
 };
 
-class ArgNotFoundException : public Exception
-{
-public:
+class ArgNotFoundException : public Exception {
+ public:
   ArgNotFoundException(const char* f, const uint16_t& l, const std::string& s)
-    : Exception(f, l, s)
-  {}
+      : Exception(f, l, s) {}
 };
 
-class Cmd
-{
-private:
+class Cmd {
+ private:
   const char* c;
 
-public:
-  Cmd(const char* c)
-    : c(c)
-  {}
+ public:
+  Cmd(const char* c) : c(c) {}
   const char* command() const { return c; }
 };
 
-enum EnvVarMode
-{
-  APPE = 0,
-  PREP,
-  REPL
-};
+enum EnvVarMode { APPE = 0, PREP, REPL };
 
-class EnvVar
-{
-private:
+class EnvVar {
+ private:
   std::string n;
   std::string v;
   EnvVarMode m;
 
-public:
+ public:
   EnvVar(const std::string n, const std::string v, const EnvVarMode m)
-    : n(n)
-    , v(v)
-    , m(m)
-  {}
-  EnvVar(const EnvVar& e)
-    : n(e.n)
-    , v(e.v)
-    , m(e.m)
-  {}
+      : n(n), v(v), m(m) {}
+  EnvVar(const EnvVar& e) : n(e.n), v(e.v), m(e.m) {}
   const char* name() const { return n.c_str(); }
   const char* value() const { return v.c_str(); }
   EnvVarMode mode() const { return m; }
-  const std::string toString() const
-  {
+  const std::string toString() const {
     std::string var(value());
     kul::String::REPLACE_ALL(var, kul::os::EOL(), "");
     kul::String::TRIM(var);
@@ -124,8 +100,7 @@ public:
     }
     return var;
   }
-  EnvVar& operator=(EnvVar&& e)
-  {
+  EnvVar& operator=(EnvVar&& e) {
     std::swap(m, e.m);
     std::swap(n, e.n);
     std::swap(v, e.v);
@@ -133,101 +108,73 @@ public:
   }
 };
 
-enum ArgType
-{
-  FLAG = 0,
-  STRING,
-  MAYBE
-};
+enum ArgType { FLAG = 0, STRING, MAYBE };
 
-class Arg : public Cmd
-{
-private:
+class Arg : public Cmd {
+ private:
   bool man;
   const char d;
   ArgType t;
 
-public:
+ public:
   Arg(const char d, const char* dd, ArgType t, bool m = false)
-    : Cmd(dd)
-    , man(m)
-    , d(d)
-    , t(t)
-  {}
+      : Cmd(dd), man(m), d(d), t(t) {}
   Arg(const char d, const char* dd, bool m = false)
-    : Cmd(dd)
-    , man(m)
-    , d(d)
-    , t(ArgType::FLAG)
-  {}
+      : Cmd(dd), man(m), d(d), t(ArgType::FLAG) {}
   bool mandatory() const { return man; }
   char dash() const { return d; }
   const char* dashdash() const { return command(); }
   const ArgType& type() const { return t; }
 };
 
-class Args
-{
+class Args {
   std::vector<Cmd> cmds;
   std::vector<Arg> args;
   hash::map::S2S vals;
 
-public:
+ public:
   Args() {}
   Args(const std::vector<Cmd>& cmds, const std::vector<Arg>& args)
-    : cmds(cmds)
-    , args(args)
-  {}
+      : cmds(cmds), args(args) {}
   void arg(const Arg& a) { args.push_back(a); }
   void cmd(const Cmd& c) { cmds.push_back(c); }
-  const Cmd& commands(const char* c) const
-  {
+  const Cmd& commands(const char* c) const {
     for (const Cmd& cmd : cmds)
-      if (strcmp(cmd.command(), c) == 0)
-        return cmd;
+      if (strcmp(cmd.command(), c) == 0) return cmd;
     KEXCEPT(ArgNotFoundException, "No command " + std::string(c) + " found");
   }
-  const Arg& dashes(const char c) const
-  {
+  const Arg& dashes(const char c) const {
     for (const Arg& a : arguments())
-      if (a.dash() == c)
-        return a;
+      if (a.dash() == c) return a;
     KEXCEPT(ArgNotFoundException,
             "No argument " + std::string(1, c) + " found");
   }
-  const Arg& doubleDashes(const char* c) const
-  {
+  const Arg& doubleDashes(const char* c) const {
     for (const Arg& a : arguments())
-      if (strcmp(a.command(), c) == 0)
-        return a;
+      if (strcmp(a.command(), c) == 0) return a;
     KEXCEPT(ArgNotFoundException, "No argument " + std::string(c) + " found");
   }
   const std::vector<Cmd>& commands() const { return cmds; }
   const std::vector<Arg>& arguments() const { return args; }
-  const std::string& get(const std::string& s) const
-  {
-    if (has(s))
-      return (*vals.find(s)).second;
+  const std::string& get(const std::string& s) const {
+    if (has(s)) return (*vals.find(s)).second;
     KEXCEPT(ArgNotFoundException, "No value " + s + " found");
   }
   bool empty() const { return vals.size() == 0; }
   bool has(const std::string& s) const { return vals.count(s); }
   size_t size() const { return vals.size(); }
   void process(const uint16_t& argc, char* argv[], uint16_t first = 1)
-    KTHROW(ArgNotFoundException)
-  {
+      KTHROW(ArgNotFoundException) {
     for (const Arg& a1 : arguments())
       for (const Arg& a2 : arguments()) {
-        if (&a1 == &a2)
-          continue;
+        if (&a1 == &a2) continue;
         if ((a1.dash() != ' ') && (a1.dash() == a2.dash() ||
                                    strcmp(a1.dashdash(), a2.dashdash()) == 0))
           KEXCEPT(Exception, "Duplicate argument detected");
       }
     for (const Cmd& c1 : commands())
       for (const Cmd& c2 : commands()) {
-        if (&c1 == &c2)
-          continue;
+        if (&c1 == &c2) continue;
         if (strcmp(c1.command(), c2.command()) == 0)
           KEXCEPT(Exception, "Duplicate argument detected");
       }
@@ -240,12 +187,9 @@ public:
       c = argv[j];
       t = c;
 
-      if (c.compare("---") == 0)
-        KEXCEPT(Exception, "Illegal argument ---");
-      if (c.compare("--") == 0)
-        KEXCEPT(Exception, "Illegal argument --");
-      if (c.compare("-") == 0)
-        KEXCEPT(Exception, "Illegal argument -");
+      if (c.compare("---") == 0) KEXCEPT(Exception, "Illegal argument ---");
+      if (c.compare("--") == 0) KEXCEPT(Exception, "Illegal argument --");
+      if (c.compare("-") == 0) KEXCEPT(Exception, "Illegal argument -");
       if (valExpected == 1 || (valExpected == 2 && c.find("-") != 0)) {
         valExpected = 0;
         vals[arg->dashdash()] = c;
@@ -260,17 +204,15 @@ public:
         if (c.find("=") == std::string::npos) {
           arg = const_cast<Arg*>(&doubleDashes(c.c_str()));
           valExpected = arg->type();
-          if (!valExpected)
-            vals[arg->dashdash()] = "";
+          if (!valExpected) vals[arg->dashdash()] = "";
           continue;
         }
         valExpectedFor = c.substr(0, c.find("="));
         arg = const_cast<Arg*>(&doubleDashes(valExpectedFor.c_str()));
         valExpected = arg->type();
         if (valExpected == 0)
-          KEXCEPT(Exception,
-                  "Found = when no value is expected for arg " +
-                    valExpectedFor);
+          KEXCEPT(Exception, "Found = when no value is expected for arg " +
+                                 valExpectedFor);
         c = c.substr(c.find("=") + 1);
         vals[arg->dashdash()] = c;
       } else if (c.find("-") == 0) {
@@ -291,8 +233,7 @@ public:
             else if (arg->type() == ArgType::STRING)
               KEXCEPT(Exception, "Cannot mix flag and non-flag arguments");
             vals[arg->dashdash()] = "";
-            if (a.length() > 1)
-              a = a.substr(1);
+            if (a.length() > 1) a = a.substr(1);
           }
         } else {
           arg = const_cast<Arg*>(&dashes(c.at(0)));
@@ -312,30 +253,24 @@ public:
       KEXCEPT(Exception,
               "Value expected for argument: \"" + valExpectedFor + "\"");
     for (const Arg& a : args)
-      if (a.mandatory())
-        get(a.dashdash());
+      if (a.mandatory()) get(a.dashdash());
   }
 };
 
 #ifndef _KUL_COMPILED_LIB_
-inline void
-asArgs(const std::string& cmd, std::vector<std::string>& args)
-{
+inline void asArgs(const std::string& cmd, std::vector<std::string>& args) {
 #include "kul/src/cli/asArgs.cpp"
 }
 #else
-void
-asArgs(const std::string& cmd, std::vector<std::string>& args);
+void asArgs(const std::string& cmd, std::vector<std::string>& args);
 #endif
 
-inline std::vector<std::string>
-asArgs(const std::string& cmd)
-{
+inline std::vector<std::string> asArgs(const std::string& cmd) {
   std::vector<std::string> args;
   asArgs(cmd, args);
   return args;
 }
 
-} // END NAMESPACE cli
-} // END NAMESPACE kul
+}  // END NAMESPACE cli
+}  // END NAMESPACE kul
 #endif /* _KUL_CLI_HPP_ */

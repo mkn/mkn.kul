@@ -47,12 +47,12 @@ for (const char c : cmd) {
   }
   switch (c) {
     case ' ':
-      if (!openQuotesD && !openQuotesS) { //     ||||| ||||| ||||| ||||| |||||
+      if (!openQuotesD && !openQuotesS) {  //     ||||| ||||| ||||| ||||| |||||
         if (arg.size() > 0)
-          args.push_back(arg); //     ||    || || || || ||    ||
-        arg.clear();           //     ||||| ||||| ||||| ||    |||||
-        continue;              //        || ||    || || ||    ||
-      }                        //     ||||| ||    || || ||||| |||||
+          args.push_back(arg);  //     ||    || || || || ||    ||
+        arg.clear();            //     ||||| ||||| ||||| ||    |||||
+        continue;               //        || ||    || || ||    ||
+      }                         //     ||||| ||    || || ||||| |||||
       break;
     case '"':
       if (openQuotesD && !openQuotesS) {
@@ -81,7 +81,6 @@ for (const char c : cmd) {
   }
   arg += c;
 }
-if (arg.size() > 0)
-  args.push_back(arg);
+if (arg.size() > 0) args.push_back(arg);
 
 // }

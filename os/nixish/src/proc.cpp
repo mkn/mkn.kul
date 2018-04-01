@@ -30,38 +30,26 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "kul/proc.hpp"
 
-int16_t
-kul::Process::child()
-{
+int16_t kul::Process::child() {
 #include "kul/src/proc/child.cpp"
 }
 
-void
-kul::Process::expand(std::string& s) const
-{
+void kul::Process::expand(std::string& s) const {
 #include "kul/src/proc/expand.cpp"
 }
 
-void
-kul::Process::waitForStatus()
-{
+void kul::Process::waitForStatus() {
 #include "kul/src/proc/waitForStatus.cpp"
 }
 
-void
-kul::Process::waitExit() KTHROW(kul::proc::ExitException)
-{
+void kul::Process::waitExit() KTHROW(kul::proc::ExitException) {
 #include "kul/src/proc/waitExit.cpp"
 }
 
-void
-kul::Process::tearDown()
-{
+void kul::Process::tearDown() {
 #include "kul/src/proc/tearDown.cpp"
 }
 
-void
-kul::Process::run() KTHROW(kul::proc::Exception)
-{
+void kul::Process::run() KTHROW(kul::proc::Exception) {
 #include "kul/src/proc/tearDown.cpp"
 }

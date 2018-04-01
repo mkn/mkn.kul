@@ -44,3 +44,12 @@ profile:
   - name: usage
     self: lib-compiled
     main: usage.cpp
+
+  - name: format
+    mod:
+    - name: clang.format
+      arg:
+        init:
+          style: google
+          types: cpp:cxx:cc:h:hpp
+          paths: .

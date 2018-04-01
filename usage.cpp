@@ -49,23 +49,20 @@ namespace kul {
 
 class Test;
 
-class TestThreadObject
-{
-private:
+class TestThreadObject {
+ private:
   int i = 0;
 
-public:
+ public:
   void print() { KLOG(INF) << "i = " << i; }
 
-protected:
-  void operator()()
-  {
+ protected:
+  void operator()() {
     KLOG(INF) << "THREAD RUNNING";
     i++;
     KLOG(INF) << "THREAD FINISHED";
   }
-  void operator()() const
-  {
+  void operator()() const {
     KLOG(INF) << "CONST THREAD RUNNING";
     KLOG(INF) << "CONST THREAD FINISHED";
   }
@@ -73,18 +70,14 @@ protected:
   friend class kul::Thread;
 };
 
-class TestThreadQueueObject
-{
-protected:
+class TestThreadQueueObject {
+ protected:
   int i = 0;
   Mutex& mutex;
 
-public:
-  TestThreadQueueObject(Mutex& mutex)
-    : mutex(mutex)
-  {}
-  void operator()()
-  {
+ public:
+  TestThreadQueueObject(Mutex& mutex) : mutex(mutex) {}
+  void operator()() {
     kul::ScopeLock lock(mutex);
     KLOG(INF) << "THREAD RUNNING";
     i++;
@@ -93,18 +86,14 @@ public:
   void print() { KLOG(INF) << "i = " << i; }
 };
 
-class TestThreadQueueQObject : public TestThreadQueueObject
-{
-private:
+class TestThreadQueueQObject : public TestThreadQueueObject {
+ private:
   std::queue<int>& q;
 
-public:
+ public:
   TestThreadQueueQObject(Mutex& mutex, std::queue<int>& q)
-    : TestThreadQueueObject(mutex)
-    , q(q)
-  {}
-  void operator()()
-  {
+      : TestThreadQueueObject(mutex), q(q) {}
+  void operator()() {
     kul::ScopeLock lock(mutex);
     KLOG(INF) << "THREAD RUNNING";
     i++;
@@ -114,32 +103,25 @@ public:
   void print() { KLOG(INF) << "i = " << i; }
 };
 
-class TestConcQueueQObject
-{
-public:
+class TestConcQueueQObject {
+ public:
   TestConcQueueQObject() {}
-  void operator()()
-  {
+  void operator()() {
     KLOG(INF) << "TestConcQueueQObject RUNNING";
     kul::this_thread::sleep(10);
   }
 };
 
-class TestIPCServer : public kul::ipc::Server
-{
-public:
-  TestIPCServer()
-    : kul::ipc::Server("uuid", 1)
-  {} // UUID     CHECKS ONCE
+class TestIPCServer : public kul::ipc::Server {
+ public:
+  TestIPCServer() : kul::ipc::Server("uuid", 1) {}  // UUID     CHECKS ONCE
   void handle(const std::string& s) { KLOG(INF) << "TestIPCServer " << s; }
   void operator()() { listen(); }
 };
 
-class TestIPC
-{
-public:
-  void run()
-  {
+class TestIPC {
+ public:
+  void run() {
     TestIPCServer ipc;
     kul::Thread t(std::ref(ipc));
     t.run();
@@ -149,35 +131,30 @@ public:
   }
 };
 
-class Catch
-{
-public:
-  void print(const int16_t& s)
-  {
+class Catch {
+ public:
+  void print(const int16_t& s) {
     KOUT(NON) << "SEGMENTATION FAULT INTERCEPTED";
     KOUT(NON) << "PRINT STACKTRACE";
   }
 };
 
-class Test
-{
-private:
+class Test {
+ private:
   const std::string s;
 
-public:
-  Test()
-    : s("LAMBDAS ALLOWED IN SIGNAL")
-  {
+ public:
+  Test() : s("LAMBDAS ALLOWED IN SIGNAL") {
     Catch c;
-    kul::Signal sig; // Windows: each thread requires own handler, static
-                     // singleton otherwise so only ever one.
-    sig.segv(std::bind(
-      &Catch::print, std::ref(c), std::placeholders::_1)); // Vector of
-                                                           // functions to call
-                                                           // before exiting -
-                                                           // CAUTION! KEEP
-                                                           // SIMPLE!
-    sig.segv([this](int16_t) { KOUT(NON) << s; }); // Allows lamda notation
+    kul::Signal sig;  // Windows: each thread requires own handler, static
+                      // singleton otherwise so only ever one.
+    sig.segv(std::bind(&Catch::print, std::ref(c),
+                       std::placeholders::_1));     // Vector of
+                                                    // functions to call
+                                                    // before exiting -
+                                                    // CAUTION! KEEP
+                                                    // SIMPLE!
+    sig.segv([this](int16_t) { KOUT(NON) << s; });  // Allows lamda notation
 
     KERR << "KERR";
     KOUT(NON) << "KOUT(NON)";
@@ -223,7 +200,7 @@ public:
 
     for (const kul::Dir& d : kul::Dir(kul::env::CWD()).dirs())
       for (const kul::File& f : d.files())
-        KOUT(NON) << d.join(f.name()); // or f.full()
+        KOUT(NON) << d.join(f.name());  // or f.full()
     try {
       kul::Process("echo").arg("Hello").arg("World").start();
 
@@ -236,7 +213,7 @@ public:
     }
 
     for (const std::string& arg : kul::cli::asArgs(
-           "/path/to \"words in quotes\" words\\ not\\ in\\ quotes end"))
+             "/path/to \"words in quotes\" words\\ not\\ in\\ quotes end"))
       KOUT(NON) << "ARG: " << arg;
 
     for (const std::string& arg :
@@ -247,7 +224,7 @@ public:
       KOUT(NON) << "BIT: " << arg;
 
     for (const std::string& arg : kul::String::ESC_SPLIT(
-           "split \\- by - char - dash with escape backslash", '-'))
+             "split \\- by - char - dash with escape backslash", '-'))
       KOUT(NON) << "BIT: " << arg;
 
     kul::hash::map::S2S sparse;
@@ -256,18 +233,15 @@ public:
 #if defined(_MKN_WITH_GOOGLE_SPARSEHASH_)
     {
       kul::dense::hash::map::S2S dense;
-      dense.setEmptyKey(""); // unique non occuring key
+      dense.setEmptyKey("");  // unique non occuring key
       dense.insert("LEFT", "RIGHT");
     }
 #endif
 
     kul::File file("./write_access");
-    if (file && !file.rm())
-      KERR << "CANNOT DELETE FILE " << file;
-    if (!file && !file.mk())
-      KERR << "CANNOT CREATE FILE " << file;
-    if (file && !file.rm())
-      KERR << "CANNOT DELETE FILE " << file;
+    if (file && !file.rm()) KERR << "CANNOT DELETE FILE " << file;
+    if (!file && !file.mk()) KERR << "CANNOT CREATE FILE " << file;
+    if (file && !file.rm()) KERR << "CANNOT DELETE FILE " << file;
 
     KOUT(NON) << "kul::Now::MILLIS(); " << kul::Now::MILLIS();
     KOUT(NON) << "kul::Now::MICROS(); " << kul::Now::MICROS();
@@ -304,9 +278,7 @@ public:
 
     kul::Mutex mutex;
     {
-      {
-        kul::ScopeLock lock(mutex);
-      }
+      { kul::ScopeLock lock(mutex); }
       kul::ScopeLock lock(mutex);
     }
     {
@@ -319,8 +291,7 @@ public:
       ttpo1.print();
 
       std::queue<int> q;
-      for (int i = 0; i < 10; i++)
-        q.push(i);
+      for (int i = 0; i < 10; i++) q.push(i);
       KOUT(NON) << "LAUNCHING PREDICATED THREAD POOL";
       TestThreadQueueQObject ttpo2(mutex, q);
       kul::PredicatedThreadQueue<std::queue<int>> tp2(std::ref(ttpo2), q);
@@ -380,14 +351,12 @@ public:
     KOUT(NON) << "\tWINDOWS cl: -Z7 / link: -DEBUG";
     KOUT(NON) << "\tLINUX  gcc: -g";
 
-    *(int*)0 = 0; // First seg fault always exits after handling
+    *(int*)0 = 0;  // First seg fault always exits after handling
   }
 };
-}
+}  // namespace kul
 
-int
-main(int argc, char* argv[])
-{
+int main(int argc, char* argv[]) {
   try {
     kul::Test();
   } catch (const kul::Exception& e) {

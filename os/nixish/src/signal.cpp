@@ -30,8 +30,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "kul/signal.hpp"
 
-void
-kul_sig_handler(int s, siginfo_t* info, void* v)
-{
+void kul_sig_handler(int s, siginfo_t* info, void* v) {
 #include "kul/src/signal/handler.cpp"
 }

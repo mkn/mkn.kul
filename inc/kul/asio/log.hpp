@@ -38,39 +38,33 @@ namespace kul {
 namespace asio {
 namespace log {
 
-class Exception : public kul::Exception
-{
-public:
+class Exception : public kul::Exception {
+ public:
   Exception(const char* f, const uint16_t& l, const std::string& s)
-    : kul::Exception(f, l, s)
-  {}
+      : kul::Exception(f, l, s) {}
 };
-} // END NAMESPACE log
+}  // END NAMESPACE log
 
 class LogMan;
-class Logger : public kul::Logger
-{
+class Logger : public kul::Logger {
   friend class LogMan;
 
-private:
+ private:
   kul::ChroncurrentThreadPool<> ctp;
   std::function<void(const std::string&)> defE, defO;
 
-public:
+ public:
   Logger()
-    : ctp(1, 1)
-    , defE([&](const std::string& s) { kul::Logger::err(s); })
-    , defO([&](const std::string& s) { kul::Logger::out(s); })
-  {}
-  void err(const std::string& s) override
-  {
+      : ctp(1, 1),
+        defE([&](const std::string& s) { kul::Logger::err(s); }),
+        defO([&](const std::string& s) { kul::Logger::out(s); }) {}
+  void err(const std::string& s) override {
     if (e)
       ctp.async(std::bind(e, s));
     else
       ctp.async(std::bind(defE, s));
   }
-  void out(const std::string& s) override
-  {
+  void out(const std::string& s) override {
     if (o)
       ctp.async(std::bind(o, s));
     else
@@ -78,82 +72,61 @@ public:
   }
 };
 
-class LogMan : public kul::ALogMan
-{
-protected:
-  LogMan()
-    : ALogMan(new kul::asio::Logger())
-  {}
+class LogMan : public kul::ALogMan {
+ protected:
+  LogMan() : ALogMan(new kul::asio::Logger()) {}
 
-public:
-  static LogMan& INSTANCE()
-  {
+ public:
+  static LogMan& INSTANCE() {
     static LogMan instance;
     return instance;
   };
 };
 
-class Message
-{
-protected:
+class Message {
+ protected:
   std::stringstream ss;
   const kul::log::mode& m;
 
-  Message(const kul::log::mode& m)
-    : m(m)
-  {}
+  Message(const kul::log::mode& m) : m(m) {}
 
-public:
-  template<class T>
-  Message& operator<<(const T& s)
-  {
+ public:
+  template <class T>
+  Message& operator<<(const T& s) {
     ss << s;
     return *this;
   }
 };
-class LogMessage : public Message
-{
-private:
+class LogMessage : public Message {
+ private:
   const char* f;
   const char* fn;
   const uint16_t& l;
 
-public:
+ public:
   ~LogMessage() { LogMan::INSTANCE().log(f, fn, l, m, ss.str()); }
-  LogMessage(const char* f,
-             const char* fn,
-             const uint16_t& l,
+  LogMessage(const char* f, const char* fn, const uint16_t& l,
              const kul::log::mode& m)
-    : Message(m)
-    , f(f)
-    , fn(fn)
-    , l(l)
-  {}
+      : Message(m), f(f), fn(fn), l(l) {}
 };
-class OutMessage : public Message
-{
-public:
+class OutMessage : public Message {
+ public:
   ~OutMessage() { LogMan::INSTANCE().out(m, ss.str()); }
-  OutMessage(const kul::log::mode& m = kul::log::mode::NON)
-    : Message(m)
-  {}
+  OutMessage(const kul::log::mode& m = kul::log::mode::NON) : Message(m) {}
 };
-class ErrMessage : public Message
-{
-public:
+class ErrMessage : public Message {
+ public:
   ~ErrMessage() { LogMan::INSTANCE().err(m, ss.str()); }
-  ErrMessage()
-    : Message(kul::log::mode::ERR)
-  {}
+  ErrMessage() : Message(kul::log::mode::ERR) {}
 };
 
-#define KASIO_LOG_INF                                                          \
+#define KASIO_LOG_INF \
   kul::asio::LogMessage(__FILE__, __func__, __LINE__, kul::log::mode::INF)
-#define KASIO_LOG_ERR                                                          \
+#define KASIO_LOG_ERR \
   kul::asio::LogMessage(__FILE__, __func__, __LINE__, kul::log::mode::ERR)
-#define KASIO_LOG_DBG                                                          \
+#define KASIO_LOG_DBG \
   kul::asio::LogMessage(__FILE__, __func__, __LINE__, kul::log::mode::DBG)
-#define KASIO_LOG_TRC                                                          \
+#define KASIO_LOG_TRC \
   kul::asio::LogMessage(__FILE__, __func__, __LINE__, kul::log::mode::TRC)
 #define KASIO_LOG(sev) KLOG_##sev
 
@@ -166,6 +139,6 @@ public:
 
 #define KASIO_ERR kul::ErrMessage()
 
-} // END NAMESPACE asio
-} // END NAMESPACE kul
+}  // END NAMESPACE asio
+}  // END NAMESPACE kul
 #endif /* _KUL_LOG_HPP_ */

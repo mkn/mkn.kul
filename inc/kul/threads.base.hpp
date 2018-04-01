@@ -43,67 +43,51 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace kul {
 namespace this_thread {
-inline void
-sleep(const unsigned long& millis)
-{
+inline void sleep(const unsigned long& millis) {
   std::this_thread::sleep_for(std::chrono::milliseconds(millis));
 }
-inline void
-uSleep(const unsigned long& micros)
-{
+inline void uSleep(const unsigned long& micros) {
   std::this_thread::sleep_for(std::chrono::microseconds(micros));
 }
-inline void
-nSleep(const unsigned long& nanos)
-{
+inline void nSleep(const unsigned long& nanos) {
   std::this_thread::sleep_for(std::chrono::nanoseconds(nanos));
 }
-} // END NAMESPACE this_thread
+}  // END NAMESPACE this_thread
 
 // class ThreadQueue;
 // template<class P> class PredicatedThreadQueue;
 
 namespace threading {
-class Exception : public kul::Exception
-{
-public:
+class Exception : public kul::Exception {
+ public:
   Exception(const char* f, const uint16_t& l, const std::string& s)
-    : kul::Exception(f, l, s)
-  {}
+      : kul::Exception(f, l, s) {}
 };
-class InterruptionException : public Exception
-{
-public:
+class InterruptionException : public Exception {
+ public:
   InterruptionException(const char* f, const uint16_t& l, const std::string& s)
-    : Exception(f, l, s)
-  {}
+      : Exception(f, l, s) {}
 };
 
-class AThread
-{
-protected:
+class AThread {
+ protected:
   std::atomic<bool> f, s;
   std::exception_ptr ep;
 
-  AThread()
-    : f(1)
-    , s(0)
-  {}
+  AThread() : f(1), s(0) {}
   virtual void run() KTHROW(kul::threading::Exception) = 0;
 
-public:
+ public:
   virtual ~AThread() {}
   virtual void join() = 0;
   bool started() const { return s; }
   bool finished() const { return f; }
   const std::exception_ptr& exception() { return ep; }
-  void rethrow()
-  {
-    if (ep)
-      std::rethrow_exception(ep);
+  void rethrow() {
+    if (ep) std::rethrow_exception(ep);
   }
 };
 
-} // END NAMESPACE threading
-} // END NAMESPACE kul
+}  // END NAMESPACE threading
+}  // END NAMESPACE kul
 #endif /* _KUL_THREADS_BASE_HPP_ */

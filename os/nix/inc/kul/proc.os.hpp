@@ -34,37 +34,33 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <assert.h>
 #include <fcntl.h>
 #include <signal.h>
-#include <stdexcept>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/wait.h>
 #include <unistd.h>
+#include <stdexcept>
 
 #include "kul/proc.base.hpp"
 
 namespace kul {
 namespace this_proc {
 
-class ProcParser
-{
-private:
+class ProcParser {
+ private:
 #ifndef _KUL_COMPILED_LIB_
-  static int PARSE_LINE(char* line)
-  {
+  static int PARSE_LINE(char* line) {
 #include "kul/src/proc/xparse_line.cpp"
   }
-  static void VIRTUAL(uint64_t& mem)
-  {
+  static void VIRTUAL(uint64_t& mem) {
 #include "kul/src/proc/xvirtual.cpp"
   }
-  static void PHYSICAL(uint64_t& mem)
-  { // Note: this value is in KB!
+  static void PHYSICAL(uint64_t& mem) {  // Note: this value is in KB!
 #include "kul/src/proc/xphysical.cpp"
   }
 #else
   static int PARSE_LINE(char* line);
   static void VIRTUAL(uint64_t& mem);
-  static void PHYSICAL(uint64_t& mem); // Note: this value is in KB!
+  static void PHYSICAL(uint64_t& mem);  // Note: this value is in KB!
 #endif
 
   friend uint64_t virtualMemory();
@@ -72,33 +68,23 @@ private:
   friend uint64_t totalMemory();
 };
 
-inline uint64_t
-virtualMemory()
-{
+inline uint64_t virtualMemory() {
   uint64_t v = 0;
   ProcParser::VIRTUAL(v);
   return v;
 }
-inline uint64_t
-physicalMemory()
-{
+inline uint64_t physicalMemory() {
   uint64_t v = 0;
   ProcParser::PHYSICAL(v);
   return v;
 }
-inline uint64_t
-totalMemory()
-{
+inline uint64_t totalMemory() {
   uint64_t v = 0;
   ProcParser::VIRTUAL(v);
   ProcParser::PHYSICAL(v);
   return v;
 }
-inline uint16_t
-cpuLoad()
-{
-  return 0;
-}
-}
-}
+inline uint16_t cpuLoad() { return 0; }
+}  // namespace this_proc
+}  // namespace kul
 #endif /* _KUL_PROC_OS_HPP_ */

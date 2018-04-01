@@ -51,17 +51,17 @@ typedef unsigned long long ulonglong;
 #ifdef __GNUC__
 #define KUL_PUBLISH __attribute__((dllexport))
 #else
-#define KUL_PUBLISH                                                            \
-  __declspec(                                                                  \
-    dllexport) // Note: actually gcc seems to also supports this syntax.
+#define KUL_PUBLISH \
+  __declspec(       \
+      dllexport)  // Note: actually gcc seems to also supports this syntax.
 #endif
 #else
 #ifdef __GNUC__
 #define KUL_PUBLISH __attribute__((dllimport))
 #else
-#define KUL_PUBLISH                                                            \
-  __declspec(                                                                  \
-    dllimport) // Note: actually gcc seems to also supports this syntax.
+#define KUL_PUBLISH \
+  __declspec(       \
+      dllimport)  // Note: actually gcc seems to also supports this syntax.
 #endif
 #endif
 #else

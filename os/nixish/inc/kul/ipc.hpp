@@ -50,60 +50,48 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace kul {
 namespace ipc {
 
-class Exception : public kul::Exception
-{
-public:
+class Exception : public kul::Exception {
+ public:
   Exception(const char* f, const uint16_t& l, const std::string& s)
-    : kul::Exception(f, l, s)
-  {}
+      : kul::Exception(f, l, s) {}
 };
 
-class IPCCall
-{
-
-protected:
+class IPCCall {
+ protected:
   int16_t fd;
-  void writePID() const
-  {
+  void writePID() const {
     std::string s = std::to_string(this_proc::id());
-    while (s.size() < 9)
-      s = "0" + s;
+    while (s.size() < 9) s = "0" + s;
     write(fd, s.c_str(), 9);
   }
-  void writeLength(const std::string& m) const
-  {
+  void writeLength(const std::string& m) const {
     std::string s = std::to_string(m.size());
-    while (s.size() < 3)
-      s = "0" + s;
+    while (s.size() < 3) s = "0" + s;
     write(fd, s.c_str(), 3);
   }
 };
-class Server : public IPCCall
-{
-private:
+class Server : public IPCCall {
+ private:
   int16_t lp;
   const kul::File uuid;
 
-  void start() KTHROW(Exception)
-  {
+  void start() KTHROW(Exception) {
     uuid.dir().mk();
     mkfifo(uuid.full().c_str(), 0666);
   }
 
-protected:
+ protected:
   virtual void handle(const std::string& s) { KLOG(INF) << s; }
   void respond(const std::string& s);
 
-public:
+ public:
   virtual ~Server() {}
-  void listen() KTHROW(Exception)
-  {
+  void listen() KTHROW(Exception) {
     char buff[BUFSIZE];
     while (lp) {
       memset(buff, 0, BUFSIZE);
       fd = open(uuid.full().c_str(), O_RDONLY);
-      if (fd == -1)
-        KEXCEPT(kul::ipc::Exception, "Cannot open FIFO for read");
+      if (fd == -1) KEXCEPT(kul::ipc::Exception, "Cannot open FIFO for read");
       int16_t l;
       read(fd, buff, 3);
       std::istringstream ssl(buff);
@@ -112,59 +100,49 @@ public:
       read(fd, buff, l);
       handle(buff);
       close(fd);
-      if (lp != -1)
-        lp--;
+      if (lp != -1) lp--;
     }
   }
   Server(const int16_t& lp = -1) KTHROW(Exception)
-    : lp(lp)
-    , uuid(std::to_string(kul::this_proc::id()),
-           Dir(_KUL_IPC_UUID_PREFIX_ + std::string("/pid/")))
-  {
+      : lp(lp),
+        uuid(std::to_string(kul::this_proc::id()),
+             Dir(_KUL_IPC_UUID_PREFIX_ + std::string("/pid/"))) {
     start();
   }
   Server(const std::string& ui, const int16_t& lp = -1) KTHROW(Exception)
-    : lp(lp)
-    , uuid(ui, Dir(_KUL_IPC_UUID_PREFIX_))
-  {
+      : lp(lp), uuid(ui, Dir(_KUL_IPC_UUID_PREFIX_)) {
     start();
   }
 };
 
-class Client : public IPCCall
-{
-private:
+class Client : public IPCCall {
+ private:
   const kul::File uuid;
 
-  void start() KTHROW(Exception)
-  {
+  void start() KTHROW(Exception) {
     fd = open(uuid.full().c_str(), O_WRONLY);
-    if (fd == -1)
-      KEXCEPT(kul::ipc::Exception, "Cannot contact server");
+    if (fd == -1) KEXCEPT(kul::ipc::Exception, "Cannot contact server");
   }
   void stop() const KTHROW(Exception) { close(fd); }
 
-public:
+ public:
   virtual ~Client() { stop(); }
   Client(const std::string& ui) KTHROW(Exception)
-    : uuid(ui, Dir(_KUL_IPC_UUID_PREFIX_))
-  {
+      : uuid(ui, Dir(_KUL_IPC_UUID_PREFIX_)) {
     start();
   }
   Client(const int16_t& pid) KTHROW(Exception)
-    : uuid(std::to_string(pid),
-           Dir(_KUL_IPC_UUID_PREFIX_ + std::string("/pid/")))
-  {
+      : uuid(std::to_string(pid),
+             Dir(_KUL_IPC_UUID_PREFIX_ + std::string("/pid/"))) {
     start();
   }
-  virtual void send(const std::string& m) const KTHROW(Exception)
-  {
+  virtual void send(const std::string& m) const KTHROW(Exception) {
     writeLength(m);
     write(fd, m.c_str(), m.size());
   }
 };
 
-} // END NAMESPACE ipc
-} // END NAMESPACE kul
+}  // END NAMESPACE ipc
+}  // END NAMESPACE kul
 
 #endif /* _KUL_IPC_HPP_ */

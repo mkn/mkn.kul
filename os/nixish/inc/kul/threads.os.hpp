@@ -44,18 +44,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace kul {
 namespace this_thread {
-inline const std::string
-id()
-{
+inline const std::string id() {
   std::ostringstream os;
   os << std::hex << pthread_self();
   return os.str();
 }
 
 // http://stackoverflow.com/questions/4867839/how-can-i-tell-if-pthread-self-is-the-main-first-thread-in-the-process
-inline bool
-main()
-{
+inline bool main() {
 #if defined(__FreeBSD__)
   return 0;
 #elif defined(__NetBSD__)
@@ -68,21 +64,15 @@ main()
   return getpid() == syscall(SYS_gettid);
 #endif
 }
-inline void
-kill()
-{
-  pthread_exit(0);
-}
-} // END NAMESPACE this_thread
+inline void kill() { pthread_exit(0); }
+}  // END NAMESPACE this_thread
 
-class Mutex
-{
-private:
+class Mutex {
+ private:
   pthread_mutex_t mute;
 
-public:
-  Mutex()
-  {
+ public:
+  Mutex() {
     pthread_mutexattr_t att;
     pthread_mutexattr_init(&att);
     pthread_mutexattr_settype(&att, PTHREAD_MUTEX_RECURSIVE);
@@ -95,18 +85,15 @@ public:
   void unlock() { pthread_mutex_unlock(&mute); }
 };
 
-class Thread : public threading::AThread
-{
-private:
+class Thread : public threading::AThread {
+ private:
   std::function<void()> func;
   pthread_t thr;
-  static void* threadFunction(void* th)
-  {
+  static void* threadFunction(void* th) {
     ((Thread*)th)->act();
     return 0;
   }
-  void act()
-  {
+  void act() {
     try {
       func();
     } catch (const std::exception& e) {
@@ -115,46 +102,35 @@ private:
     f = 1;
   }
 
-public:
-  Thread(const std::function<void()>& func)
-    : func(func)
-  {}
-  template<class T>
-  Thread(const T& t)
-    : func(std::bind((void (T::*)()) & T::operator(), t))
-  {}
-  template<class T>
+ public:
+  Thread(const std::function<void()>& func) : func(func) {}
+  template <class T>
+  Thread(const T& t) : func(std::bind((void (T::*)()) & T::operator(), t)) {}
+  template <class T>
   Thread(const std::reference_wrapper<T>& r)
-    : func(std::bind((void (T::*)()) & T::operator(), r))
-  {}
-  template<class T>
+      : func(std::bind((void (T::*)()) & T::operator(), r)) {}
+  template <class T>
   Thread(const std::reference_wrapper<const T>& r)
-    : func(std::bind((void (T::*)() const) & T::operator(), r))
-  {}
+      : func(std::bind((void (T::*)() const) & T::operator(), r)) {}
 
   virtual ~Thread() {}
   bool detach() { return pthread_detach(thr); }
-  void interrupt() KTHROW(kul::threading::InterruptionException)
-  {
+  void interrupt() KTHROW(kul::threading::InterruptionException) {
     pthread_cancel(thr);
     f = 1;
   }
-  void join()
-  {
-    if (!s)
-      run();
+  void join() {
+    if (!s) run();
     pthread_join(thr, 0);
     s = 0;
   }
-  void run() KTHROW(kul::threading::Exception)
-  {
-    if (s)
-      KEXCEPTION("Thread running");
+  void run() KTHROW(kul::threading::Exception) {
+    if (s) KEXCEPTION("Thread running");
     f = 0;
     s = 1;
     pthread_create(&thr, NULL, Thread::threadFunction, this);
   }
 };
 
-} // END NAMESPACE kul
+}  // END NAMESPACE kul
 #endif /* _KUL_THREADS_OS_HPP_ */

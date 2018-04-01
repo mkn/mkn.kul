@@ -30,8 +30,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "kul/threads.os.hpp"
 
-bool
-kul::this_thread::main()
-{
+bool kul::this_thread::main() {
 #include "kul/src/thread/main.cpp"
 }

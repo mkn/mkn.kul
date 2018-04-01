@@ -35,8 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // std::string kul::AProcess::toString() KTHROW(kul::Exception){
 
 std::string s;
-for (const std::string& a : args())
-  s += a + " ";
+for (const std::string& a : args()) s += a + " ";
 s.pop_back();
 return s;
 

@@ -35,17 +35,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * REQUIRES libcrypto
  */
 
-#include "openssl/sha.h"
 #include <iomanip>
+#include "openssl/sha.h"
 
 namespace kul {
 namespace hash {
 
-class SHA
-{
-public:
-  static void _256(const std::string& str, std::string& ret)
-  {
+class SHA {
+ public:
+  static void _256(const std::string& str, std::string& ret) {
     unsigned char h[SHA256_DIGEST_LENGTH];
     SHA256_CTX sha;
     SHA256_Init(&sha);
@@ -57,6 +55,6 @@ public:
     ret = ss.str();
   }
 };
-}
-}
+}  // namespace hash
+}  // namespace kul
 #endif /* _KUL_HASH_HPP_ */

@@ -38,28 +38,25 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifndef __KUL_SYS_DLOPEN__
 #define __KUL_SYS_DLOPEN__ RTLD_NOW | RTLD_GLOBAL
-#endif //__KUL_SYS_DLOPEN__
+#endif  //__KUL_SYS_DLOPEN__
 
 namespace kul {
 namespace sys {
 
-template<class F>
+template <class F>
 class SharedFunctionp;
 
-class SharedLibrary
-{
-  template<class F>
+class SharedLibrary {
+  template <class F>
   friend class SharedFunction;
 
-private:
+ private:
   bool _loaded = 0;
   void* _handle;
   const kul::File _f;
 
-public:
-  SharedLibrary(const kul::File& f) KTHROW(Exception)
-    : _f(f)
-  {
+ public:
+  SharedLibrary(const kul::File& f) KTHROW(Exception) : _f(f) {
     if (!_f)
       KEXCEPSTREAM << "Library attempted to be loaded does not exist: "
                    << _f.full();
@@ -68,25 +65,21 @@ public:
       KEXCEPSTREAM << "Cannot load library: " << f << " - Error: " << dlerror();
     _loaded = 1;
   }
-  ~SharedLibrary()
-  {
-    if (_loaded)
-      dlclose(_handle);
+  ~SharedLibrary() {
+    if (_loaded) dlclose(_handle);
     dlerror();
   }
 };
 
-template<class F>
-class SharedFunction
-{
-private:
+template <class F>
+class SharedFunction {
+ private:
   F* _funcP;
   SharedLibrary& _lib;
 
-public:
+ public:
   SharedFunction(SharedLibrary& lib, const std::string& f) KTHROW(Exception)
-    : _lib(lib)
-  {
+      : _lib(lib) {
     _funcP = (F*)dlsym(_lib._handle, f.c_str());
     const char* dlsym_error = dlerror();
     if (dlsym_error)
@@ -96,43 +89,35 @@ public:
   F* pointer() { return _funcP; }
 };
 
-template<class T>
-class SharedClass
-{
+template <class T>
+class SharedClass {
   typedef T* construct_t();
   typedef void destruct_t(T* t);
 
-private:
+ private:
   SharedLibrary _lib;
   SharedFunction<construct_t> _c;
   SharedFunction<destruct_t> _d;
 
-public:
+ public:
   SharedClass(const kul::File& f, const std::string& c, const std::string& d)
-    KTHROW(Exception)
-    : _lib(f)
-    , _c(_lib, c)
-    , _d(_lib, d)
-  {}
+      KTHROW(Exception)
+      : _lib(f), _c(_lib, c), _d(_lib, d) {}
   virtual ~SharedClass() {}
 
-protected:
-  void construct(T*& t) KTHROW(Exception)
-  {
+ protected:
+  void construct(T*& t) KTHROW(Exception) {
     t = _c.pointer()();
-    if (!t)
-      KEXCEPSTREAM << "Dynamically loaded class was not created";
+    if (!t) KEXCEPSTREAM << "Dynamically loaded class was not created";
   }
-  void destruct(T*& t)
-  {
+  void destruct(T*& t) {
     _d.pointer()(t);
     t = nullptr;
-    if (t)
-      KEXCEPSTREAM << "Dynamically loaded class was not destroyed";
+    if (t) KEXCEPSTREAM << "Dynamically loaded class was not destroyed";
   }
 };
 
-} // END NAMESPACE sys
-} // END NAMESPACE kul
+}  // END NAMESPACE sys
+}  // END NAMESPACE kul
 
 #endif /* _KUL_SYS_HPP_ */

@@ -53,35 +53,34 @@ REQUIRES
 namespace kul {
 namespace hash {
 
-template<class K, class V>
-class Map : public std::unordered_map<K, V>{  
-public:
-  Map& insert(const K& k, const V& v){
+template <class K, class V>
+class Map : public std::unordered_map<K, V> {
+ public:
+  Map& insert(const K& k, const V& v) {
     this->insert(std::make_pair(k, v));
     return *this;
   }
-  Map& insert(const std::pair<K, V>& pair){
+  Map& insert(const std::pair<K, V>& pair) {
     std::unordered_map<K, V>::insert(pair);
     return *this;
   }
-  void setDeletedKey(const K& key) {  }
-
+  void setDeletedKey(const K& key) {}
 };
 
 namespace map {
-template<class T>
+template <class T>
 using S2T = Map<std::string, T>;
 using S2S = S2T<std::string>;
-} // namespace map
+}  // namespace map
 
-template<class T>
+template <class T>
 using Set = std::unordered_set<T>;
 
 namespace set {
 using String = Set<std::string>;
-} // namespace set
-} // namespace hash
-} // namespace kul
+}  // namespace set
+}  // namespace hash
+}  // namespace kul
 
 #else
 
@@ -91,14 +90,11 @@ using String = Set<std::string>;
 #include "sparsehash/dense_hash_map"
 #include "sparsehash/dense_hash_set"
 
-
 namespace kul {
 
-struct StdStringComparator
-{
-public:
-  bool operator()(const std::string& s1, const std::string& s2) const
-  {
+struct StdStringComparator {
+ public:
+  bool operator()(const std::string& s1, const std::string& s2) const {
     return (s1.compare(s2) == 0);
   }
 };
@@ -106,13 +102,10 @@ public:
 namespace hash {
 using namespace google;
 
-template<class T,
-         class HashFcn,
-         class EqualKey,
-         class Alloc = libc_allocator_with_realloc<T>>
-class Set : google::sparse_hash_set<T, HashFcn, EqualKey>
-{
-public:
+template <class T, class HashFcn, class EqualKey,
+          class Alloc = libc_allocator_with_realloc<T> >
+class Set : google::sparse_hash_set<T, HashFcn, EqualKey> {
+ public:
   typedef typename google::sparse_hash_set<T, HashFcn, EqualKey, Alloc> Hash;
   typedef typename Hash::size_type size_type;
   typedef typename Hash::key_type key_type;
@@ -136,16 +129,12 @@ public:
 
 namespace set {
 using String = Set<std::string, std::hash<std::string>, StdStringComparator>;
-} // end namespace set
+}  // end namespace set
 
-template<class K,
-         class V,
-         class HashFcn,
-         class EqualKey,
-         class Alloc = libc_allocator_with_realloc<std::pair<K, V>>>
-class Map : google::sparse_hash_map<K, V, HashFcn, EqualKey>
-{
-public:
+template <class K, class V, class HashFcn, class EqualKey,
+          class Alloc = libc_allocator_with_realloc<std::pair<K, V> > >
+class Map : google::sparse_hash_map<K, V, HashFcn, EqualKey> {
+ public:
   typedef typename google::sparse_hash_map<K, V, HashFcn, EqualKey> map;
   typedef typename map::size_type size_type;
   typedef typename map::key_type key_type;
@@ -155,12 +144,10 @@ public:
   void setDeletedKey(const key_type& key) { map::set_deleted_key(key); }
   void setEmptyKey(const key_type& key) { map::set_empty_key(key); }
   void clear() { map::clear(); }
-  std::pair<iterator, bool> insert(const std::pair<K, V>& obj)
-  {
+  std::pair<iterator, bool> insert(const std::pair<K, V>& obj) {
     return map::insert(obj);
   }
-  std::pair<iterator, bool> insert(const K k, V v)
-  {
+  std::pair<iterator, bool> insert(const K k, V v) {
     return insert(std::pair<K, V>(k, v));
   }
   V& operator[](const key_type& key) { return map::operator[](key); }
@@ -177,27 +164,21 @@ public:
 };
 
 namespace map {
-template<class T>
-using S2T = Map<std::string,
-                T,
-                std::hash<std::string>,
-                StdStringComparator,
-                libc_allocator_with_realloc<std::pair<const std::string, T>>>;
+template <class T>
+using S2T = Map<std::string, T, std::hash<std::string>, StdStringComparator,
+                libc_allocator_with_realloc<std::pair<const std::string, T> > >;
 using S2S = S2T<std::string>;
-} // end namespace map
-} // end namespace hash
+}  // end namespace map
+}  // end namespace hash
 
 namespace dense {
 namespace hash {
 using namespace google;
 
-template<class T,
-         class HashFcn,
-         class EqualKey,
-         class Alloc = libc_allocator_with_realloc<T>>
-class Set : google::dense_hash_set<T, HashFcn, EqualKey>
-{
-public:
+template <class T, class HashFcn, class EqualKey,
+          class Alloc = libc_allocator_with_realloc<T> >
+class Set : google::dense_hash_set<T, HashFcn, EqualKey> {
+ public:
   typedef typename google::dense_hash_set<T, HashFcn, EqualKey, Alloc> Hash;
   typedef typename Hash::size_type size_type;
   typedef typename Hash::key_type key_type;
@@ -223,14 +204,10 @@ namespace set {
 using String = Set<std::string, std::hash<std::string>, StdStringComparator>;
 }
 
-template<class K,
-         class V,
-         class HashFcn,
-         class EqualKey,
-         class Alloc = libc_allocator_with_realloc<std::pair<K, V>>>
-class Map : google::dense_hash_map<K, V, HashFcn, EqualKey>
-{
-public:
+template <class K, class V, class HashFcn, class EqualKey,
+          class Alloc = libc_allocator_with_realloc<std::pair<K, V> > >
+class Map : google::dense_hash_map<K, V, HashFcn, EqualKey> {
+ public:
   typedef typename google::dense_hash_map<K, V, HashFcn, EqualKey> map;
   typedef typename map::size_type size_type;
   typedef typename map::key_type key_type;
@@ -240,12 +217,10 @@ public:
   void setDeletedKey(const key_type& key) { map::set_deleted_key(key); }
   void setEmptyKey(const key_type& key) { map::set_empty_key(key); }
   void clear() { map::clear(); }
-  std::pair<iterator, bool> insert(const std::pair<K, V>& obj)
-  {
+  std::pair<iterator, bool> insert(const std::pair<K, V>& obj) {
     return map::insert(obj);
   }
-  std::pair<iterator, bool> insert(const K k, V v)
-  {
+  std::pair<iterator, bool> insert(const K k, V v) {
     return insert(std::pair<K, V>(k, v));
   }
   V& operator[](const key_type& key) { return map::operator[](key); }
@@ -262,19 +237,16 @@ public:
 };
 
 namespace map {
-template<class T>
-using S2T = Map<std::string,
-                T,
-                std::hash<std::string>,
-                StdStringComparator,
-                libc_allocator_with_realloc<std::pair<const std::string, T>>>;
+template <class T>
+using S2T = Map<std::string, T, std::hash<std::string>, StdStringComparator,
+                libc_allocator_with_realloc<std::pair<const std::string, T> > >;
 using S2S = S2T<std::string>;
 
-} // end namespace map
-} // end namespace hash
-} // end namespace dense
-} // end namespace kul
+}  // end namespace map
+}  // end namespace hash
+}  // end namespace dense
+}  // end namespace kul
 
-#endif//_MKN_WITH_GOOGLE_SPARSEHASH_
+#endif  //_MKN_WITH_GOOGLE_SPARSEHASH_
 
 #endif /* _KUL_MAP_HPP_ */

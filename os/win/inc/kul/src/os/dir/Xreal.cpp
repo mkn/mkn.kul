@@ -38,8 +38,7 @@ char* expanded = _fullpath(NULL, s.c_str(), _MAX_PATH);
 if (expanded) {
   std::string dir(expanded);
   delete expanded;
-  if (dir.size() && dir[dir.size() - 1] == '\\')
-    dir.pop_back();
+  if (dir.size() && dir[dir.size() - 1] == '\\') dir.pop_back();
   return dir;
 }
 KEXCEPT(fs::Exception, "Item: \"" + s + "\" does not exist");

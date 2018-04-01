@@ -38,11 +38,9 @@ namespace scm {
 
 // "make_unique is not yet ubiquitous"
 
-class Manager
-{
-private:
-  Manager()
-  {
+class Manager {
+ private:
+  Manager() {
     git.reset(new Git());
     svn.reset(new Svn());
     SCMs.insert(std::pair<std::string, SCM*>("git", git.get()));
@@ -52,21 +50,18 @@ private:
   std::unique_ptr<SCM> git;
   std::unique_ptr<SCM> svn;
 
-public:
-  static Manager& INSTANCE()
-  {
+ public:
+  static Manager& INSTANCE() {
     static Manager instance;
     return instance;
   }
-  const SCM& get(const std::string& s) KTHROW(NotFoundException)
-  {
-    if (SCMs.count(s) > 0)
-      return *(*SCMs.find(s)).second;
+  const SCM& get(const std::string& s) KTHROW(NotFoundException) {
+    if (SCMs.count(s) > 0) return *(*SCMs.find(s)).second;
     KEXCEPT(NotFoundException,
             "Source Control Management for " + s + " is not implemented");
   }
 };
 
-} // END NAMESPACE scm
-} // END NAMESPACE kul
+}  // END NAMESPACE scm
+}  // END NAMESPACE kul
 #endif /* _KUL_SCM_MAN_HPP_ */

@@ -31,8 +31,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _KUL_SIGNAL_HPP_
 #define _KUL_SIGNAL_HPP_
 
-#include "kul/proc.hpp"
 #include <kul/log.hpp>
+#include "kul/proc.hpp"
 
 #include <signal.h>
 
@@ -61,85 +61,69 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif /* __NetBSD__ */
 #endif /* REG_EIP */
 
-void
-kul_sig_handler(int s, siginfo_t* info, void* v);
+void kul_sig_handler(int s, siginfo_t* info, void* v);
 
 namespace kul {
 
 class Signal;
-class SignalStatic
-{
-private:
+class SignalStatic {
+ private:
   bool addr = 0, q = 0;
   struct sigaction sigHandler;
   std::vector<std::function<void(int)>> ab, in, se;
-  SignalStatic()
-  {
+  SignalStatic() {
     addr = kul::env::WHICH("addr2line");
     sigemptyset(&sigHandler.sa_mask);
     sigHandler.sa_flags = SA_SIGINFO;
     sigHandler.sa_sigaction = kul_sig_handler;
     sigaction(SIGSEGV, &sigHandler, NULL);
   }
-  static SignalStatic& INSTANCE()
-  {
+  static SignalStatic& INSTANCE() {
     static SignalStatic ss;
     return ss;
   }
-  void abrt(const std::function<void(int)>& f)
-  {
-    if (ab.size() == 0)
-      sigaction(SIGABRT, &sigHandler, NULL);
+  void abrt(const std::function<void(int)>& f) {
+    if (ab.size() == 0) sigaction(SIGABRT, &sigHandler, NULL);
     ab.push_back(f);
   }
-  void intr(const std::function<void(int)>& f)
-  {
-    if (in.size() == 0)
-      sigaction(SIGINT, &sigHandler, NULL);
+  void intr(const std::function<void(int)>& f) {
+    if (in.size() == 0) sigaction(SIGINT, &sigHandler, NULL);
     in.push_back(f);
   }
 
-public:
+ public:
   void quiet() { q = 1; }
   friend class Signal;
   friend void ::kul_sig_handler(int s, siginfo_t* i, void* v);
 };
 
-class Signal
-{
-public:
+class Signal {
+ public:
   Signal() { kul::SignalStatic::INSTANCE(); }
-  Signal& abrt(const std::function<void(int16_t)>& f)
-  {
+  Signal& abrt(const std::function<void(int16_t)>& f) {
     kul::SignalStatic::INSTANCE().abrt(f);
     return *this;
   }
-  Signal& intr(const std::function<void(int16_t)>& f)
-  {
+  Signal& intr(const std::function<void(int16_t)>& f) {
     kul::SignalStatic::INSTANCE().intr(f);
     return *this;
   }
-  Signal& segv(const std::function<void(int16_t)>& f)
-  {
+  Signal& segv(const std::function<void(int16_t)>& f) {
     kul::SignalStatic::INSTANCE().se.push_back(f);
     return *this;
   }
 
   void quiet() { kul::SignalStatic::INSTANCE().q = 1; }
 };
-}
+}  // namespace kul
 
 #ifndef _KUL_COMPILED_LIB_
-void
-kul_sig_handler(int s, siginfo_t* info, void* v)
-{
+void kul_sig_handler(int s, siginfo_t* info, void* v) {
 #include "kul/src/signal/handler.cpp"
 }
 #endif
 
-namespace kul {
-
-} // END NAMESPACE kul
+namespace kul {}  // END NAMESPACE kul
 
 // kul::Signals sig;
 

@@ -52,9 +52,9 @@ do {
     if (fdFile.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
       if (!incHidden &&
           std::string(sPath)
-              .substr(std::string(sPath).rfind(kul::Dir::SEP()) + 1)
-              .substr(0, 1)
-              .compare(".") == 0)
+                  .substr(std::string(sPath).rfind(kul::Dir::SEP()) + 1)
+                  .substr(0, 1)
+                  .compare(".") == 0)
         continue;
       dirs.push_back(Dir(sPath));
     }
