@@ -3,7 +3,7 @@
 # mkn.kul - Kommon Usage Library
 #   Cross platform wrapper for systems operations / IO / threads / processes
 #   Default profile "lib" is header only, use "-compiled" profiles for library linking
-#   
+#
 
 name: mkn.kul
 
@@ -27,7 +27,7 @@ profile:
         nix: ./os/nixish/src
     arg: -D_KUL_COMPILED_LIB_
 
-  - name: test 
+  - name: test
     parent: lib
     inc: .
     main: test.cpp
@@ -35,7 +35,7 @@ profile:
     dep:
     - name: google.test # https://github.com/mkn/google.test
 
-  - name: bench 
+  - name: bench
     parent: lib
     main: bench.cpp
     dep:
@@ -48,8 +48,7 @@ profile:
   - name: format
     mod:
     - name: clang.format
-      arg:
-        init:
-          style: google
-          types: cpp:cxx:cc:h:hpp
-          paths: .
+      init:
+        style: google
+        types: cpp:cxx:cc:h:hpp
+        paths: .
