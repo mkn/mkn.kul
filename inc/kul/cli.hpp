@@ -41,6 +41,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "kul/os.hpp"
 #include "kul/string.hpp"
 
+#include "kul/serial.hpp"
+
 namespace kul {
 namespace cli {
 
@@ -128,6 +130,10 @@ class Arg : public Cmd {
 };
 
 class Args {
+#if defined(_MKN_WITH_IO_CEREAL_)
+  friend class cereal::access;
+#endif  //  _MKN_WITH_IO_CEREAL_
+ private:
   std::vector<Cmd> cmds;
   std::vector<Arg> args;
   hash::map::S2S vals;
@@ -136,6 +142,12 @@ class Args {
   Args() {}
   Args(const std::vector<Cmd>& cmds, const std::vector<Arg>& args)
       : cmds(cmds), args(args) {}
+
+  // Args(const Args &) = default;
+  // Args(const Args &&) = default;
+  // Args &operator=(const Args &) = default;
+  // Args &operator=(const Args &&) = default;
+
   void arg(const Arg& a) { args.push_back(a); }
   void cmd(const Cmd& c) { cmds.push_back(c); }
   const Cmd& commands(const char* c) const {
@@ -255,6 +267,7 @@ class Args {
     for (const Arg& a : args)
       if (a.mandatory()) get(a.dashdash());
   }
+#include "kul/serial/cli.arg.end.hpp"
 };
 
 #ifndef _KUL_COMPILED_LIB_
@@ -273,4 +286,8 @@ inline std::vector<std::string> asArgs(const std::string& cmd) {
 
 }  // END NAMESPACE cli
 }  // END NAMESPACE kul
+
+
+#include "kul/serial/cli.bottom.hpp"
+
 #endif /* _KUL_CLI_HPP_ */
