@@ -194,7 +194,10 @@ class BinaryWriter : public AWriter {
     f.unsetf(std::ios_base::skipws);
   }
   BinaryWriter(const File& c) : BinaryWriter(c.full().c_str()) {}
-  ~BinaryWriter() {}
+  ~BinaryWriter() {
+    f << std::flush;
+    f.close();
+  }
 };
 }  // namespace io
 }  // namespace kul
