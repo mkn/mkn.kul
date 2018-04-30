@@ -29,11 +29,12 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 /*
-REQUIRES
+REQUIRES in mkn.yaml
     dep:
       - name: parse.yaml
-        version: master
-        scm: http://github.com/mkn/parse.yaml
+
+or via cli
+    mkn build -w parse.yaml
 */
 
 #ifndef _KUL_YAML_HPP_

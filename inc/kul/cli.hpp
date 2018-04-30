@@ -39,6 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "kul/except.hpp"
 #include "kul/map.hpp"
 #include "kul/os.hpp"
+#include "kul/log.hpp"
 #include "kul/string.hpp"
 
 #include "kul/serial.hpp"
@@ -175,6 +176,7 @@ class Args {
   bool empty() const { return vals.size() == 0; }
   bool has(const std::string& s) const { return vals.count(s); }
   size_t size() const { return vals.size(); }
+  bool erase(const std::string& key) { return vals.erase(key); }
   void process(const uint16_t& argc, char* argv[], uint16_t first = 1)
       KTHROW(ArgNotFoundException) {
     for (const Arg& a1 : arguments())

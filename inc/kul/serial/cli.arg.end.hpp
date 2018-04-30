@@ -35,63 +35,26 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template <class Archive>
 void save(Archive& ar) const {
-  // ar(dr, f, q, s, sh, st, u);
-
-  // ar(de, dl, op, ts, wa);
-  // ar(aa, al, la, ra, wi, wo);
-  // ar(dep);
-  // ar(no);
-
-  // auto convert_to_std_set =
-  //     [](const kul::hash::set::String& s) -> std::unordered_set<std::string> {
-  //   std::unordered_set<std::string> ret;
-  //   for (const auto& p : s) ret.emplace(p);
-  //   return ret;
-  // };
-  // auto convert_to_std_map = [](const kul::hash::map::S2S& s)
-  //     -> std::unordered_map<std::string, std::string> {
-  //       std::unordered_map<std::string, std::string> ret;
-  //       for (const auto& p : s) ret.emplace(p.first, p.second);
-  //       return ret;
-  //     };
-
-  // ar(convert_to_std_set(cmds), convert_to_std_set(wop));
-  // ar(convert_to_std_map(evs), convert_to_std_map(jas),
-  //    convert_to_std_map(pks));
+  auto convert_to_std_map = [](const kul::hash::map::S2S& s)
+      -> std::unordered_map<std::string, std::string> {
+        std::unordered_map<std::string, std::string> ret;
+        for (const auto& p : s) ret.emplace(p.first, p.second);
+        return ret;
+      };
+  ar(convert_to_std_map(vals));
 }
 template <class Archive>
 void load(Archive& ar) {
-  // ar(dr, f, q, s, sh, st, u);
-
-  // ar(de, dl, op, ts, wa);
-  // ar(aa, al, la, ra, wi, wo);
-  // ar(dep);
-  // ar(no);
-
-  // auto convert_to_kul_set =
-  //     [](const std::unordered_set<std::string>& s) -> kul::hash::set::String {
-  //   kul::hash::set::String ret;
-  //   for (const auto& p : s) ret.insert(p);
-  //   return ret;
-  // };
-  // auto convert_to_kul_map =
-  //     [](const std::unordered_map<std::string, std::string>& s)
-  //     -> kul::hash::map::S2S {
-  //       kul::hash::map::S2S ret;
-  //       for (const auto& p : s) ret.insert(p.first, p.second);
-  //       return ret;
-  //     };
-  // std::unordered_set<std::string> _cmds, _wop;
-  // ar(cmds, _wop);
-  // cmds = convert_to_kul_set(_cmds);
-  // wop = convert_to_kul_set(_wop);
-
-  // std::unordered_map<std::string, std::string> _evs, _jas, _pks;
-  // ar(_evs, _jas, _pks);
-
-  // evs = convert_to_kul_map(_evs);
-  // jas = convert_to_kul_map(_jas);
-  // pks = convert_to_kul_map(_pks);
+  auto convert_to_kul_map =
+      [](const std::unordered_map<std::string, std::string>& s)
+      -> kul::hash::map::S2S {
+        kul::hash::map::S2S ret;
+        for (const auto& p : s) ret.insert(p.first, p.second);
+        return ret;
+      };
+  std::unordered_map<std::string, std::string> _vals;
+  ar(_vals);
+  vals = convert_to_kul_map(_vals);
 }
 
 #endif  //  _MKN_WITH_IO_CEREAL_

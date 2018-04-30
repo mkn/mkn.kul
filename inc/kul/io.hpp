@@ -47,7 +47,7 @@ namespace io {
 
 class Exception : public kul::Exception {
  public:
-  Exception(const char* f, const uint16_t& l, const std::string& s)
+  Exception(const char* f, const size_t& l, const std::string& s)
       : kul::Exception(f, l, s) {}
 };
 
@@ -81,13 +81,13 @@ class AReader {
     }
     return 0;
   }
-  size_t read(char* c, std::ifstream& f, const uint16_t& l) {
+  size_t read(char* c, std::ifstream& f, const size_t& l) {
     s1.clear();
     if (f.good()) {
       std::vector<char> v;
       v.resize(l);
       f.read(&v[0], l);
-      v.resize((uint16_t)f.gcount());
+      v.resize((size_t)f.gcount());
       s1 = std::string(v.begin(), v.end());
       std::strcpy(c, s1.c_str());
       return s1.size();
@@ -98,9 +98,9 @@ class AReader {
  public:
   virtual ~AReader() {}
   virtual const char* readLine() = 0;
-  virtual size_t read(char* c, const uint16_t& l) = 0;
-  virtual void seek(const uint16_t& l) = 0;
-  virtual void seek(std::ifstream& f, const uint16_t& l) { f.seekg(l); }
+  virtual size_t read(char* c, const size_t& l) = 0;
+  virtual void seek(const size_t& l) = 0;
+  virtual void seek(std::ifstream& f, const size_t& l) { f.seekg(l); }
 };
 class Reader : public AReader {
  private:
@@ -115,8 +115,8 @@ class Reader : public AReader {
   Reader(const File& c) : Reader(c.full().c_str()) {}
   ~Reader() { f.close(); }
   const char* readLine() { return AReader::readLine(f); }
-  size_t read(char* c, const uint16_t& s) { return AReader::read(c, f, s); }
-  void seek(const uint16_t& l) { AReader::seek(f, l); }
+  size_t read(char* c, const size_t& s) { return AReader::read(c, f, s); }
+  void seek(const size_t& l) { AReader::seek(f, l); }
 };
 class BinaryReader : public AReader {
  private:
@@ -127,16 +127,36 @@ class BinaryReader : public AReader {
     if (!f)
       KEXCEPT(Exception,
               "FileException : file \"" + std::string(c) + "\" not found");
+    f.exceptions(std::ifstream::badbit | std::ifstream::failbit);
   }
   BinaryReader(const File& c) : BinaryReader(c.full().c_str()) {}
   ~BinaryReader() { f.close(); }
   const char* readLine() { return AReader::readLine(f); }
 #ifdef _WIN32
-  size_t read(char* c, const uint16_t& s) { return AReader::read(c, f, s); }
+  size_t read(char* c, const size_t& s) { return AReader::read(c, f, s); }
 #else
-  size_t read(char* c, const uint16_t& s) { return f.readsome(c, s); }
+  size_t read(char* c, const size_t& s) {
+    size_t red = 0;
+    try {
+        red = f.readsome(c, s);
+        KLOG(INF) << red;
+    } catch (const std::ios_base::failure &e) {
+        KLOG(ERR) << e.what();
+    }
+    return red;
+  }
+  size_t read(uint8_t* c, const size_t& s) {
+    size_t red = 0;
+    try {
+        red = f.readsome((char*)c, s);
+        KLOG(INF) << red;
+    } catch (const std::ios_base::failure &e) {
+        KLOG(ERR) << e.what();
+    }
+    return red;
+  }
 #endif
-  void seek(const uint16_t& s) { AReader::seek(f, s); }
+  void seek(const size_t& s) { AReader::seek(f, s); }
 };
 
 class AWriter {

@@ -50,7 +50,7 @@ class SHA {
     SHA256_Update(&sha, str.c_str(), str.size());
     SHA256_Final(h, &sha);
     std::stringstream ss;
-    for (uint16_t i = 0; i < SHA256_DIGEST_LENGTH; i++)
+    for (size_t i = 0; i < SHA256_DIGEST_LENGTH; i++)
       ss << std::hex << std::setw(2) << std::setfill('0') << (int16_t)h[i];
     ret = ss.str();
   }
