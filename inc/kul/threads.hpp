@@ -36,22 +36,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace kul {
 
-// class TryScopeLock{
-//     private:
-//         bool m_locked = 0;
-//         Mutex& m_m;
-//     public:
-//         TryScopeLock(Mutex& m) : m_m(m) {
-//             m_locked = this->m_m.tryLock();
-//         }
-//         ~TryScopeLock(){
-//             if(m_locked) this->m_m.unlock();
-//         }
-//         bool locked(){
-//             return m_locked;
-//         }
-// };
-
 class ScopeLock {
  private:
   Mutex& m;
@@ -177,7 +161,7 @@ class ConcurrentThreadQueue {
   size_t _cur = 0, _max = 1;
   const uint64_t m_nWait;
   std::atomic<bool> _block, _detatched, _up;
-  std::queue<std::pair<std::function<F>, std::function<void(const E&)>>> _q;
+  std::queue<std::unique_ptr<std::pair<std::function<F>, std::function<void(const E&)>>>> _q;
   kul::hash::map::S2T<std::shared_ptr<kul::Thread>> _k;
   kul::hash::map::S2T<std::function<void(const E&)>> _e;
 
@@ -202,7 +186,8 @@ class ConcurrentThreadQueue {
 
       for (; _cur < _max; _cur++) {
         kul::ScopeLock l(_qmutex);
-        auto& f(_q.front());
+        auto &f_ptr(_q.front());
+        auto &f(*f_ptr.get());
         std::stringstream ss;
         ss << &f;
         auto k(ss.str());
@@ -230,6 +215,10 @@ class ConcurrentThreadQueue {
     }
   }
 
+  ConcurrentThreadQueue(const ConcurrentThreadQueue &) = delete;
+  ConcurrentThreadQueue(const ConcurrentThreadQueue &&) = delete;
+  ConcurrentThreadQueue &operator=(const ConcurrentThreadQueue &) = delete;
+  ConcurrentThreadQueue &operator=(const ConcurrentThreadQueue &&) = delete;
  public:
   ConcurrentThreadQueue(const size_t& max = 1, bool strt = 0,
                         const uint64_t& nWait = 1000000)
@@ -243,6 +232,7 @@ class ConcurrentThreadQueue {
     _e.setDeletedKey("");
     if (strt) start();
   }
+  virtual ~ConcurrentThreadQueue(){}
 
   virtual ConcurrentThreadQueue& detach() {
     _detatched = 1;
@@ -288,13 +278,18 @@ class ConcurrentThreadQueue {
     return *this;
   }
 
-  bool async(const std::function<F>& function,
-             const std::function<void(const E&)>& exception =
+  bool async(std::function<F> &&function,
+             std::function<void(const E&)> &&exception =
                  std::function<void(const E&)>()) {
     if (_block) return false;
     {
+      auto pair = std::unique_ptr<std::pair<std::function<F>, std::function<void(const E&)>>>(
+        new std::pair<std::function<F>, std::function<void(const E&)>>(function, exception)
+      );
+      KLOG(INF) << &function;
+      KLOG(INF) << &pair->first;
       kul::ScopeLock l(_qmutex);
-      _q.push(std::make_pair(function, exception));
+      _q.push(std::move(pair));
     }
     return true;
   }
@@ -366,7 +361,8 @@ class ConcurrentThreadPool : public ConcurrentThreadQueue<void()> {
       kul::ScopeLock l(_qmutex);
       for (size_t i = 0; i < _max; i++) {
         const auto n = std::to_string(i);
-        auto& f(_q.front());
+        auto &f_ptr(_q.front());
+        auto &f(*f_ptr.get());
         if (!_p[n]->if_ready_set(f.first)) continue;
         _e[n] = f.second;
         _q.pop();
@@ -413,6 +409,10 @@ class ConcurrentThreadPool : public ConcurrentThreadQueue<void()> {
     }
   }
 
+  ConcurrentThreadPool(const ConcurrentThreadPool &) = delete;
+  ConcurrentThreadPool(const ConcurrentThreadPool &&) = delete;
+  ConcurrentThreadPool &operator=(const ConcurrentThreadPool &) = delete;
+  ConcurrentThreadPool &operator=(const ConcurrentThreadPool &&) = delete;
  public:
   ConcurrentThreadPool(const size_t& max = 1, bool strt = 0,
                        const uint64_t& nWait = 1000000)
@@ -516,6 +516,10 @@ class ChroncurrentThreadPool
  protected:
   uint64_t m_scale = 0;
 
+  ChroncurrentThreadPool(const ChroncurrentThreadPool &) = delete;
+  ChroncurrentThreadPool(const ChroncurrentThreadPool &&) = delete;
+  ChroncurrentThreadPool &operator=(const ChroncurrentThreadPool &) = delete;
+  ChroncurrentThreadPool &operator=(const ChroncurrentThreadPool &&) = delete;
  public:
   ChroncurrentThreadPool(const size_t& max = 1, bool strt = 0,
                          const uint64_t& nWait = 1000000,
