@@ -286,8 +286,6 @@ class ConcurrentThreadQueue {
       auto pair = std::unique_ptr<std::pair<std::function<F>, std::function<void(const E&)>>>(
         new std::pair<std::function<F>, std::function<void(const E&)>>(function, exception)
       );
-      KLOG(INF) << &function;
-      KLOG(INF) << &pair->first;
       kul::ScopeLock l(_qmutex);
       _q.push(std::move(pair));
     }
