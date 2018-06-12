@@ -37,6 +37,6 @@ build_script:
 
   # doesnt exist for somereason?
   - mkdir -p "C:\Program Files (x86)\Windows Kits\10\include\10.0.16299.0\cppwinrt"
-  - ./mkn clean build run -dtKOg -p test
+  - bash -c "PATH=\"$PWD:/c/Python36-x64/:/c/Program Files/Git/usr/bin:$PATH\"; ./mkn clean build run -dtKOg -p test"  
   - C:\Python36-x64\Scripts\pip install flawfinder
   - C:\Python36-x64\python C:\Python36-x64\Scripts\flawfinder .
