@@ -271,6 +271,31 @@ class Dir : public fs::Item {
     return path().compare(d.path()) == 0;
   }
   explicit operator bool() const { return is(); }
+
+  std::string relative(const kul::Dir &r) const {
+    const auto &l(*this);
+    std::string left = l.real(), right = r.real();
+    auto l_p = l, r_p = r;
+    while(!l_p.root()) l_p = l_p.parent().real();
+    while(!r_p.root()) r_p = r_p.parent().real();
+    if(l_p.path() != r_p.path()) return right;
+    l_p = l;
+    r_p = r;
+    size_t upsies = 0, pos = 0;
+    while(true){
+      left = l_p.real();
+      if((pos = right.find(left)) != std::string::npos) break;
+      l_p = kul::Dir(l_p.real()).parent();
+      upsies++;
+    }
+    std::string rel = "";
+    for(uint16_t i = 0; i < upsies; i++)
+      rel += ".." + Dir::SEP();
+    right = right.substr(left.size());
+    if(right[0] == Dir::SEP().c_str()[0]) right = right.substr(1);
+    rel += right;
+    return rel;
+  }
 };
 
 inline std::ostream& operator<<(std::ostream& s, const Dir& d) {
@@ -402,28 +427,13 @@ class File : public fs::Item {
   }
   explicit operator bool() const { return is(); }
 
-  std::string relative(const kul::File &r){
-    const auto &l(*this);
-    std::string left = l.real(), right = r.real();
-    auto l_p = l.dir(), r_p = r.dir();
-    while(!l_p.root()) l_p = l_p.parent().real();
-    while(!r_p.root()) r_p = r_p.parent().real();
-    if(l_p.path() != r_p.path()) return right;
-    l_p = l.dir();
-    r_p = r.dir();
-    size_t upsies = 0, pos = 0;
-    while(true){
-      left = l_p.real();
-      if((pos = right.find(left)) != std::string::npos) break;
-      l_p = kul::Dir(l_p.real()).parent();
-      upsies++;
-    }
-    std::string rel = "";
-    for(uint16_t i = 0; i < upsies; i++)
-      rel += ".." + Dir::SEP();
-    right = right.substr(left.size());
-    if(right[0] == Dir::SEP().c_str()[0]) right = right.substr(1);
-    rel += right;
+  std::string relative(const kul::Dir &r) const {
+    return this->dir().relative(r);
+  }
+
+  std::string relative(const kul::File &r) const {
+    std::string rel = this->dir().relative(r.dir());
+    rel += Dir::SEP() + r.name();
     return rel;
   }
 };

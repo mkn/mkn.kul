@@ -193,6 +193,8 @@ class Test {
       kul::File os_hpp("os.hpp", kul::Dir("inc/kul"));
       if(!os_hpp || !os_inc) KEXCEPTION("UH OH!");
       KLOG(INF) << os_inc.relative(os_hpp);
+      KLOG(INF) << os_inc.relative(os_hpp.dir());
+      KLOG(INF) << os_inc.dir().relative(os_hpp.dir());
     }
 
 
