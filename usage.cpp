@@ -172,7 +172,6 @@ class Test {
 
     kul::File fo("TEST_WRITE_OUT");
     kul::File fe("TEST_WRITE_ERR");
-
     {
       kul::io::Writer wo(fo);
       kul::io::Writer we(fe);
@@ -180,16 +179,22 @@ class Test {
       auto le = [&](const std::string& s) { we << s; };
       kul::LogMan::INSTANCE().setOut(lo);
       kul::LogMan::INSTANCE().setErr(le);
-
       KOUT(INF) << "KOUT(INF)";
       KERR << "KOUT(ERR)";
       // scoped for autoflush - segfault later drops stream
     }
     fo.rm();
     fe.rm();
-
     kul::LogMan::INSTANCE().setOut(nullptr);
     kul::LogMan::INSTANCE().setErr(nullptr);
+
+    {
+      kul::File os_inc("os.cpp.inc", kul::Dir("test"));
+      kul::File os_hpp("os.hpp", kul::Dir("inc/kul"));
+      if(!os_hpp || !os_inc) KEXCEPTION("UH OH!");
+      KLOG(INF) << os_inc.relative(os_hpp);
+    }
+
 
     // {
     //     kul::asio::Logger logger;
