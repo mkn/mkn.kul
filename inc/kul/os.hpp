@@ -103,7 +103,16 @@ bool CWD(const Dir& d);
 // inline const char* GET(const char* c){
 //  return getenv(c);
 // }
-inline const std::string GET(const char* c) {
+inline bool IS_SET(const char* c) {
+  bool set = 0;
+  char* r;
+  size_t len;
+  _dupenv_s(&r, &len, c);
+  set = r;
+  if (len) free(r);
+  return set;
+}
+inline std::string GET(const char* c) {
   char* r;
   size_t len;
   _dupenv_s(&r, &len, c);
@@ -119,6 +128,9 @@ inline void SET(const char* var, const char* val) {
 }
 inline char SEP() { return ';'; }
 #else
+inline bool IS_SET(const char* c) {
+  return getenv(c);
+}
 inline std::string GET(const char* c) {
   const char* r = getenv(c);
   return std::string(r ? r : "");
