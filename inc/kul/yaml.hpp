@@ -146,7 +146,7 @@ class String : public Item {
     try {
       r = YAML::Load(s);
     } catch (const std::exception& e) {
-      KEXCEPTION("YAML failed to parse\nString: " + s);
+      KEXCEPTION("YAML failed to parse\nError/String: " + std::string(e.what())) << "\n" << s;
     }
   }
   const YAML::Node& validate(const Validator&& v) KTHROW(Exception) {
