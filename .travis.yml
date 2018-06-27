@@ -6,6 +6,7 @@ compiler:
   - clang
 
 script:
+  - export KUL_GIT_CO="--depth 3"
   - git clone https://github.com/Dekken/maiken -b master --depth 1 maiken
   - make bsd CXX=clang++ -C maiken
   - mv maiken/mkn .
