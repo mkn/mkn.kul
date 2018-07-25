@@ -31,17 +31,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _KUL_DEFS_HPP_
 #define _KUL_DEFS_HPP_
 
-#ifndef uint
-typedef unsigned int uint;
-#endif /*  uint */
-
-#ifndef ulong
-typedef unsigned long ulong;
-#endif /*  ulong */
-#ifndef ulonglong
-typedef unsigned long long ulonglong;
-#endif /*  ulonglong */
-
 #define KSTRINGIFY(x) #x
 #define KTOSTRING(x) KSTRINGIFY(x)
 
