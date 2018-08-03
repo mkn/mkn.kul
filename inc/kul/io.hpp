@@ -151,7 +151,6 @@ public:
     size_t red = 0;
     try {
       red = f.readsome((char *)c, s);
-      KLOG(INF) << red;
     } catch (const std::ios_base::failure &e) {
       KLOG(ERR) << e.what();
     }
