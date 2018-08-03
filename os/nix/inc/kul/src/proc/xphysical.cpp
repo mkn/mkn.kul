@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // void kul::this_proc::PHYSICAL(uint64_t& mem){
 
-FILE* file = fopen("/proc/self/status", "r");
+FILE *file = fopen("/proc/self/status", "r");
 char line[128];
 while (fgets(line, 128, file) != NULL) {
   if (strncmp(line, "VmRSS:", 6) == 0) {

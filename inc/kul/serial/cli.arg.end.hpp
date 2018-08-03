@@ -33,23 +33,23 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #if defined(_MKN_WITH_IO_CEREAL_)
 
-template <class Archive>
-void save(Archive& ar) const {
-  auto convert_to_std_map = [](const kul::hash::map::S2S& s)
+template <class Archive> void save(Archive &ar) const {
+  auto convert_to_std_map = [](const kul::hash::map::S2S &s)
       -> std::unordered_map<std::string, std::string> {
         std::unordered_map<std::string, std::string> ret;
-        for (const auto& p : s) ret.emplace(p.first, p.second);
+        for (const auto &p : s)
+          ret.emplace(p.first, p.second);
         return ret;
       };
   ar(convert_to_std_map(vals));
 }
-template <class Archive>
-void load(Archive& ar) {
+template <class Archive> void load(Archive &ar) {
   auto convert_to_kul_map =
-      [](const std::unordered_map<std::string, std::string>& s)
+      [](const std::unordered_map<std::string, std::string> &s)
       -> kul::hash::map::S2S {
         kul::hash::map::S2S ret;
-        for (const auto& p : s) ret.insert(p.first, p.second);
+        for (const auto &p : s)
+          ret.insert(p.first, p.second);
         return ret;
       };
   std::unordered_map<std::string, std::string> _vals;
@@ -57,6 +57,6 @@ void load(Archive& ar) {
   vals = convert_to_kul_map(_vals);
 }
 
-#endif  //  _MKN_WITH_IO_CEREAL_
+#endif //  _MKN_WITH_IO_CEREAL_
 
-#endif  // _KUL_SERIAL_CLI_ARG_END_HPP_
+#endif // _KUL_SERIAL_CLI_ARG_END_HPP_

@@ -46,41 +46,42 @@ for (const char c : cmd) {
     continue;
   }
   switch (c) {
-    case ' ':
-      if (!openQuotesD && !openQuotesS) {  //     ||||| ||||| ||||| ||||| |||||
-        if (arg.size() > 0)
-          args.push_back(arg);  //     ||    || || || || ||    ||
-        arg.clear();            //     ||||| ||||| ||||| ||    |||||
-        continue;               //        || ||    || || ||    ||
-      }                         //     ||||| ||    || || ||||| |||||
-      break;
-    case '"':
-      if (openQuotesD && !openQuotesS) {
-        openQuotesD = false;
-        args.push_back(arg);
-        arg.clear();
-      } else {
-        openQuotesD = true;
-      }
+  case ' ':
+    if (!openQuotesD && !openQuotesS) { //     ||||| ||||| ||||| ||||| |||||
+      if (arg.size() > 0)
+        args.push_back(arg); //     ||    || || || || ||    ||
+      arg.clear();           //     ||||| ||||| ||||| ||    |||||
+      continue;              //        || ||    || || ||    ||
+    }                        //     ||||| ||    || || ||||| |||||
+    break;
+  case '"':
+    if (openQuotesD && !openQuotesS) {
+      openQuotesD = false;
+      args.push_back(arg);
+      arg.clear();
+    } else {
+      openQuotesD = true;
+    }
+    continue;
+  case '\'':
+    if (openQuotesS && !openQuotesD) {
+      openQuotesS = false;
+      args.push_back(arg);
+      arg.clear();
+    } else {
+      openQuotesS = true;
+    }
+    continue;
+  case '\\':
+    if (!openQuotesS && !openQuotesD) {
+      backSlashed = true;
       continue;
-    case '\'':
-      if (openQuotesS && !openQuotesD) {
-        openQuotesS = false;
-        args.push_back(arg);
-        arg.clear();
-      } else {
-        openQuotesS = true;
-      }
-      continue;
-    case '\\':
-      if (!openQuotesS && !openQuotesD) {
-        backSlashed = true;
-        continue;
-      }
-      break;
+    }
+    break;
   }
   arg += c;
 }
-if (arg.size() > 0) args.push_back(arg);
+if (arg.size() > 0)
+  args.push_back(arg);
 
 // }

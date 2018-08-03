@@ -35,7 +35,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // int kul::this_proc::PARSE_LINE(char* line){
 
 int i = strlen(line);
-while (*line < '0' || *line > '9') line++;
+while (*line < '0' || *line > '9')
+  line++;
 line[i - 3] = '\0';
 i = atoi(line);
 return i;

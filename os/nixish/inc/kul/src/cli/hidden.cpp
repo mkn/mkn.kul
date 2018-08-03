@@ -34,7 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // std::string kul::cli::hidden(const std::string& t){
 
-if (!t.empty()) std::cout << t << std::endl;
+if (!t.empty())
+  std::cout << t << std::endl;
 termios oldt;
 tcgetattr(STDIN_FILENO, &oldt);
 termios newt = oldt;

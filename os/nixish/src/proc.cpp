@@ -34,7 +34,7 @@ int16_t kul::Process::child() {
 #include "kul/src/proc/child.cpp"
 }
 
-void kul::Process::expand(std::string& s) const {
+void kul::Process::expand(std::string &s) const {
 #include "kul/src/proc/expand.cpp"
 }
 

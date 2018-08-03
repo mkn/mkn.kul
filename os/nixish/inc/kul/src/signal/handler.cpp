@@ -37,30 +37,32 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 if (info->si_pid == 0 || info->si_pid == kul::this_proc::id()) {
   // if(s == SIGABRT) for(auto& f : kul::SignalStatic::INSTANCE().ab ) f(s);
   if (s == SIGINT)
-    for (auto& f : kul::SignalStatic::INSTANCE().in) f(s);
+    for (auto &f : kul::SignalStatic::INSTANCE().in)
+      f(s);
   if (s == SIGSEGV)
-    for (auto& f : kul::SignalStatic::INSTANCE().se) f(s);
+    for (auto &f : kul::SignalStatic::INSTANCE().se)
+      f(s);
 #ifdef HAVE_EXECINFO_H
   if (s == SIGSEGV && !kul::SignalStatic::INSTANCE().q) {
-    ucontext_t* uc = (ucontext_t*)v;
-    void* trace[16];
-    char** messages = (char**)NULL;
+    ucontext_t *uc = (ucontext_t *)v;
+    void *trace[16];
+    char **messages = (char **)NULL;
     int16_t i, trace_size = 0;
     trace_size = backtrace(trace, 16);
 #if defined(__arm__)
-    trace[1] = (void*)uc->uc_mcontext.arm_r0;
+    trace[1] = (void *)uc->uc_mcontext.arm_r0;
 #elif defined(__APPLE__)
-    trace[1] = (void*)uc->uc_mcontext->__ss.__rip;
+    trace[1] = (void *)uc->uc_mcontext->__ss.__rip;
 #elif defined(__NetBSD__)
-    trace[1] = (void*)uc->uc_mcontext.__gregs[REG_EIP];
+    trace[1] = (void *)uc->uc_mcontext.__gregs[REG_EIP];
 #elif defined(__FreeBSD__)
 #if (__x86_64__)
-    trace[1] = (void*)uc->uc_mcontext.mc_rip;
+    trace[1] = (void *)uc->uc_mcontext.mc_rip;
 #else
-    trace[1] = (void*)uc->uc_mcontext.mc_eip;
+    trace[1] = (void *)uc->uc_mcontext.mc_eip;
 #endif /* __x86_64__ */
 #else
-    trace[1] = (void*)uc->uc_mcontext.gregs[REG_EIP];
+    trace[1] = (void *)uc->uc_mcontext.gregs[REG_EIP];
 #endif
     messages = backtrace_symbols(trace, trace_size);
     printf("[bt] Stacktrace:\n");

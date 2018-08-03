@@ -39,8 +39,8 @@ if (!is())
   KEXCEPT(fs::Exception, "Directory : \"" + path() + "\" does not exist");
 
 std::vector<File> fs;
-DIR* dir = opendir(path().c_str());
-struct dirent* entry = readdir(dir);
+DIR *dir = opendir(path().c_str());
+struct dirent *entry = readdir(dir);
 while (entry != NULL) {
   if (!kul::Dir(JOIN(real(), entry->d_name)).is())
     fs.push_back(File(entry->d_name, *this));
@@ -48,8 +48,8 @@ while (entry != NULL) {
 }
 closedir(dir);
 if (recursive) {
-  for (const kul::Dir& d : dirs()) {
-    const std::vector<kul::File>& tFs = d.files(true);
+  for (const kul::Dir &d : dirs()) {
+    const std::vector<kul::File> &tFs = d.files(true);
     fs.insert(fs.end(), tFs.begin(), tFs.end());
   }
 }

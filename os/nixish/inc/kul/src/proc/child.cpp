@@ -37,8 +37,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 std::string s(toString());
 expand(s);
 std::vector<std::string> cli(kul::cli::asArgs(s));
-std::vector<char*> argV;
-for (auto& a : cli) argV.push_back(&a[0]);
+std::vector<char *> argV;
+for (auto &a : cli)
+  argV.push_back(&a[0]);
 argV.push_back(NULL);
 return execvp(cli[0].c_str(), &argV[0]);
 

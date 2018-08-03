@@ -30,7 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "kul/proc.hpp"
 
-void kul::Process::expand(std::string& s) const {
+void kul::Process::expand(std::string &s) const {
 #include "kul/src/proc/expand.cpp"
 }
 

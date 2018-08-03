@@ -58,7 +58,7 @@ do {
 } while (FindNextFile(hFind, &fdFile));
 FindClose(hFind);
 if (recursive) {
-  for (const Dir& d : dirs()) {
+  for (const Dir &d : dirs()) {
     std::vector<File> tFiles = d.files(true);
     fs.insert(fs.end(), tFiles.begin(), tFiles.end());
   }

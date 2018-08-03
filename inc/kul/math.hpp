@@ -40,34 +40,32 @@ namespace kul {
 namespace math {
 
 class Exception : public kul::Exception {
- public:
-  Exception(const char* f, const uint16_t& l, const std::string& s)
+public:
+  Exception(const char *f, const uint16_t &l, const std::string &s)
       : kul::Exception(f, l, s) {}
 };
 
-template <class T>
-T abs(const T& f) {
-  return f < 0 ? f * -1 : f;
-}
+template <class T> T abs(const T &f) { return f < 0 ? f * -1 : f; }
 
-template <class T = float>
-T pow(const float& f, const int16_t& e = 2) {
+template <class T = float> T pow(const float &f, const int16_t &e = 2) {
   T r = f < 0 ? -1 : 1;
-  for (uint16_t i = 0; i < abs(e); i++) r *= f;
+  for (uint16_t i = 0; i < abs(e); i++)
+    r *= f;
   return e < 0 ? 1 / r : r;
 }
 
 template <class T = float>
-T root(const float& f, const int16_t& r = 2, const uint16_t& it = 6, T g = 0) {
+T root(const float &f, const int16_t &r = 2, const uint16_t &it = 6, T g = 0) {
   if (r < 1)
     KEXCEPT(Exception, "Invalid root quotient, must be greater than abs(1)");
-  if (g == 0) g = r >= f || r + r >= f ? 1 : (int)f / (r + r);
+  if (g == 0)
+    g = r >= f || r + r >= f ? 1 : (int)f / (r + r);
   for (uint16_t i = 0; i < it; i++)
     g = ((float)1 / r) * (((r - 1) * g) + (f / pow<T>(g, r - 1)));
   return g;
 }
 
-}  // END NAMESPACE math
-}  // END NAMESPACE kul
+} // END NAMESPACE math
+} // END NAMESPACE kul
 
 #endif /* _KUL_MATH_HPP_ */

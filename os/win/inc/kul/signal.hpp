@@ -37,7 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <Windows.h>
 #pragma comment(lib, "Dbghelp.lib")
 
-void kul_real_se_handler(EXCEPTION_POINTERS* pExceptionInfo);
+void kul_real_se_handler(EXCEPTION_POINTERS *pExceptionInfo);
 
 LONG WINAPI
 kul_top_level_exception_handler(PEXCEPTION_POINTERS pExceptionInfo) {
@@ -46,22 +46,22 @@ kul_top_level_exception_handler(PEXCEPTION_POINTERS pExceptionInfo) {
 }
 
 void kul_se_translator_function(unsigned int sig,
-                                EXCEPTION_POINTERS* pExceptionInfo) {
+                                EXCEPTION_POINTERS *pExceptionInfo) {
   kul_real_se_handler(pExceptionInfo);
 }
 
-void kul_sig_function_handler(const uint16_t& s);
+void kul_sig_function_handler(const uint16_t &s);
 
 BOOL WINAPI kul_sigint_function(DWORD d) {
   switch (d) {
-    case CTRL_C_EVENT:
-      kul_sig_function_handler(2);
-      break;
-    // case CTRL_BREAK_EVENT:
-    //     printf("break\n");
-    //     break;
-    default:
-      break;
+  case CTRL_C_EVENT:
+    kul_sig_function_handler(2);
+    break;
+  // case CTRL_BREAK_EVENT:
+  //     printf("break\n");
+  //     break;
+  default:
+    break;
   }
   return TRUE;
 }
@@ -70,17 +70,17 @@ namespace kul {
 class Signal;
 
 class SignalStatic {
- private:
+private:
   bool q = 0;
   std::vector<std::function<void(int)>> ab, in, se;
   friend class Signal;
-  friend void ::kul_real_se_handler(EXCEPTION_POINTERS* pExceptionInfo);
-  friend void ::kul_sig_function_handler(const uint16_t& s);
-  static SignalStatic& INSTANCE() {
+  friend void ::kul_real_se_handler(EXCEPTION_POINTERS *pExceptionInfo);
+  friend void ::kul_sig_function_handler(const uint16_t &s);
+  static SignalStatic &INSTANCE() {
     static SignalStatic ss;
     return ss;
   }
-  void intr(const std::function<void(int)>& f) {
+  void intr(const std::function<void(int)> &f) {
     if (in.size() == 0)
       if (!SetConsoleCtrlHandler((PHANDLER_ROUTINE)kul_sigint_function, TRUE))
         KEXCEPTION("Unable to install signal handler!");
@@ -89,46 +89,48 @@ class SignalStatic {
 };
 
 class Signal {
- private:
+private:
   bool q = 0;
   std::vector<std::function<void(int)>> ab, in, se;
   friend class Signal;
 
- public:
+public:
   Signal() {
     _set_se_translator(kul_se_translator_function);
     SetUnhandledExceptionFilter(kul_top_level_exception_handler);
   }
-  Signal& abrt(const std::function<void(int16_t)>& f) {
+  Signal &abrt(const std::function<void(int16_t)> &f) {
     kul::SignalStatic::INSTANCE().ab.push_back(f);
     return *this;
   }
-  Signal& intr(const std::function<void(int16_t)>& f) {
+  Signal &intr(const std::function<void(int16_t)> &f) {
     kul::SignalStatic::INSTANCE().intr(f);
     return *this;
   }
-  Signal& segv(const std::function<void(int16_t)>& f) {
+  Signal &segv(const std::function<void(int16_t)> &f) {
     kul::SignalStatic::INSTANCE().se.push_back(f);
     return *this;
   }
 
   void quiet() { kul::SignalStatic::INSTANCE().q = 1; }
 };
-}  // namespace kul
+} // namespace kul
 
-void kul_sig_function_handler(const uint16_t& s) {
+void kul_sig_function_handler(const uint16_t &s) {
   if (s == 2)
-    for (auto& f : kul::SignalStatic::INSTANCE().in) f(s);
+    for (auto &f : kul::SignalStatic::INSTANCE().in)
+      f(s);
   if (s == 11)
-    for (auto& f : kul::SignalStatic::INSTANCE().se) f(s);
+    for (auto &f : kul::SignalStatic::INSTANCE().se)
+      f(s);
 }
 
 #ifndef _KUL_COMPILED_LIB_
-void kul_real_se_handler(EXCEPTION_POINTERS* pExceptionInfo) {
+void kul_real_se_handler(EXCEPTION_POINTERS *pExceptionInfo) {
 #include "kul/src/signal/se_handler.cpp"
 }
 #else
-void kul_real_se_handler(EXCEPTION_POINTERS* pExceptionInfo);
+void kul_real_se_handler(EXCEPTION_POINTERS *pExceptionInfo);
 #endif
 
 #endif /* _KUL_SIGNAL_HPP_ */

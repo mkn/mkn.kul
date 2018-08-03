@@ -31,22 +31,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _KUL_CPU_HPP_
 #define _KUL_CPU_HPP_
 
+#include <algorithm>
 #include <dirent.h>
+#include <fstream>
 #include <pwd.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <unistd.h>
-#include <algorithm>
-#include <fstream>
 #include <thread>
+#include <unistd.h>
 
 namespace kul {
 namespace cpu {
 inline uint32_t cores() { return sysconf(_SC_NPROCESSORS_ONLN); }
 inline uint16_t threads() { return std::thread::hardware_concurrency(); }
-}  // END NAMESPACE cpu
-}  // END NAMESPACE kul
+} // END NAMESPACE cpu
+} // END NAMESPACE kul
 
 #endif /* _KUL_CPU_HPP_ */

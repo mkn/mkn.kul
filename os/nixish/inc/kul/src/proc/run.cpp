@@ -36,14 +36,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 int16_t ret = 0;
 
-if ((ret = pipe(inFd)) < 0) error(__LINE__, "Failed to pipe in");
-if ((ret = pipe(outFd)) < 0) error(__LINE__, "Failed to pipe out");
-if ((ret = pipe(errFd)) < 0) error(__LINE__, "Failed to pipe err");
+if ((ret = pipe(inFd)) < 0)
+  error(__LINE__, "Failed to pipe in");
+if ((ret = pipe(outFd)) < 0)
+  error(__LINE__, "Failed to pipe out");
+if ((ret = pipe(errFd)) < 0)
+  error(__LINE__, "Failed to pipe err");
 
 this->preStart();
 pid(fork());
 if (pid() > 0) {
-  if (this->waitForExit()) {  // parent
+  if (this->waitForExit()) { // parent
     popPip[0] = inFd[1];
     popPip[1] = outFd[0];
     popPip[2] = errFd[0];
@@ -80,7 +83,8 @@ if (pid() > 0) {
           if (ret < 0) {
             if (b && ((errno != EAGAIN) || (errno != EWOULDBLOCK)))
               error(__LINE__, "read on childout failed");
-            if (((errno != EAGAIN) || (errno != EWOULDBLOCK))) b = 1;
+            if (((errno != EAGAIN) || (errno != EWOULDBLOCK)))
+              b = 1;
           } else if (ret)
             out(cOut);
           else
@@ -96,7 +100,8 @@ if (pid() > 0) {
           if (ret < 0) {
             if (b && ((errno != EAGAIN) || (errno != EWOULDBLOCK)))
               error(__LINE__, "read on childout failed");
-            if (((errno != EAGAIN) || (errno != EWOULDBLOCK))) b = 1;
+            if (((errno != EAGAIN) || (errno != EWOULDBLOCK)))
+              b = 1;
           } else if (ret)
             err(cErr);
           else
@@ -108,36 +113,44 @@ if (pid() > 0) {
 
     waitExit();
   }
-} else if (pid() == 0) {  // child
+} else if (pid() == 0) { // child
   close(inFd[1]);
   close(outFd[0]);
   close(errFd[0]);
 
-  int16_t ret = 0;  // check rets
+  int16_t ret = 0; // check rets
   int8_t retry = __KUL_PROC_DUP_RETRY__;
-  if (retry < 1) retry = 1;
+  if (retry < 1)
+    retry = 1;
 
   close(0);
   for (uint8_t i = 0; i < retry; i++)
-    if ((ret = dup(inFd[0])) >= 0) break;
-  if (ret < 0) error(__LINE__, "dup in call failed");
+    if ((ret = dup(inFd[0])) >= 0)
+      break;
+  if (ret < 0)
+    error(__LINE__, "dup in call failed");
 
   close(1);
   for (uint8_t i = 0; i < retry; i++)
-    if ((ret = dup(outFd[1])) >= 0) break;
-  if (ret < 0) error(__LINE__, "dup out call failed");
+    if ((ret = dup(outFd[1])) >= 0)
+      break;
+  if (ret < 0)
+    error(__LINE__, "dup out call failed");
 
   close(2);
   for (uint8_t i = 0; i < retry; i++)
-    if ((ret = dup(errFd[1])) >= 0) break;
-  if (ret < 0) error(__LINE__, "dup err call failed");
+    if ((ret = dup(errFd[1])) >= 0)
+      break;
+  if (ret < 0)
+    error(__LINE__, "dup err call failed");
 
-  /* SETUP EnvVars */  // SET ENV, it's a forked process so it doesn't matter -
-                       // it'll die soon, like you.
-  for (const std::pair<const std::string, const std::string>& ev : vars())
+  /* SETUP EnvVars */ // SET ENV, it's a forked process so it doesn't matter -
+                      // it'll die soon, like you.
+  for (const std::pair<const std::string, const std::string> &ev : vars())
     env::SET(ev.first.c_str(), ev.second.c_str());
 
-  if (!this->directory().empty()) kul::env::CWD(this->directory());
+  if (!this->directory().empty())
+    kul::env::CWD(this->directory());
   exit(this->child());
 } else
   error(__LINE__, "Unhandled process id for child: " + std::to_string(pid()));

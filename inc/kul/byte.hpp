@@ -38,28 +38,28 @@ namespace byte {
 
 inline bool isBigEndian() {
   const int one = 1;
-  return (*(char*)&one) == 0;
+  return (*(char *)&one) == 0;
 }
 
 class LittleEndian {
- public:
+public:
   static uint16_t UINT16(uint16_t i) {
     uint16_t n = 42;
-    if (*(char*)&n != 42) {
+    if (*(char *)&n != 42) {
       return (i << 8) | (i >> 8);
     }
     return i;
   }
   static int16_t INT16(int16_t i) {
     int16_t n = 42;
-    if (*(char*)&n != 42) {
+    if (*(char *)&n != 42) {
       return (i << 8) | ((i >> 8) & 0xFF);
     }
     return i;
   }
   static uint32_t UINT32(uint32_t i) {
     uint32_t n = 42;
-    if (*(char*)&n != 42) {
+    if (*(char *)&n != 42) {
       i = ((i << 8) & 0xFF00FF00) | ((i >> 8) & 0xFF00FF);
       return (i << 16) | (i >> 16);
     }
@@ -67,7 +67,7 @@ class LittleEndian {
   }
   static int32_t INT32(int32_t i) {
     int32_t n = 42;
-    if (*(char*)&n != 42) {
+    if (*(char *)&n != 42) {
       i = ((i << 8) & 0xFF00FF00) | ((i >> 8) & 0xFF00FF);
       return (i << 16) | ((i >> 16) & 0xFFFF);
     }
@@ -75,7 +75,7 @@ class LittleEndian {
   }
   static uint64_t UINT64(uint64_t i) {
     uint64_t n = 42;
-    if (*(char*)&n != 42) {
+    if (*(char *)&n != 42) {
       i = ((i << 8) & 0xFF00FF00FF00FF00ULL) |
           ((i >> 8) & 0x00FF00FF00FF00FFULL);
       i = ((i << 16) & 0xFFFF0000FFFF0000ULL) |
@@ -86,7 +86,7 @@ class LittleEndian {
   }
   static int64_t INT64(int64_t i) {
     int64_t n = 42;
-    if (*(char*)&n != 42) {
+    if (*(char *)&n != 42) {
       i = ((i << 8) & 0xFF00FF00FF00FF00ULL) |
           ((i >> 8) & 0x00FF00FF00FF00FFULL);
       i = ((i << 16) & 0xFFFF0000FFFF0000ULL) |
@@ -96,7 +96,7 @@ class LittleEndian {
     return i;
   }
 };
-}  // namespace byte
-}  // namespace kul
+} // namespace byte
+} // namespace kul
 
 #endif /* _KUL_BYTE_HPP_ */

@@ -40,17 +40,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace kul {
 namespace cli {
 #ifndef _KUL_COMPILED_LIB_
-inline std::string hidden(const std::string& t) {
+inline std::string hidden(const std::string &t) {
 #include "kul/src/cli/hidden.cpp"
 }
 inline void show() {
 #include "kul/src/cli/show.cpp"
 }
 #else
-std::string hidden(const std::string& t);
+std::string hidden(const std::string &t);
 void show();
 #endif
-}  // END NAMESPACE cli
-}  // END NAMESPACE kul
+} // END NAMESPACE cli
+} // END NAMESPACE kul
 
 #endif /* _KUL_CLI_OS_HPP_ */

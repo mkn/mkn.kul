@@ -30,13 +30,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "kul/proc.os.hpp"
 
-int kul::this_proc::ProcParser::PARSE_LINE(char* line) {
+int kul::this_proc::ProcParser::PARSE_LINE(char *line) {
 #include "kul/src/proc/xparse_line.cpp"
 }
-void kul::this_proc::ProcParser::VIRTUAL(uint64_t& mem) {
+void kul::this_proc::ProcParser::VIRTUAL(uint64_t &mem) {
 #include "kul/src/proc/xvirtual.cpp"
 }
 void kul::this_proc::ProcParser::PHYSICAL(
-    uint64_t& mem) {  // Note: this value is in KB!
+    uint64_t &mem) { // Note: this value is in KB!
 #include "kul/src/proc/xphysical.cpp"
 }

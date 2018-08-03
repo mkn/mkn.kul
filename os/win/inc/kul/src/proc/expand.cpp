@@ -41,14 +41,16 @@ while ((lb - clb + 1) == 0) {
   lb = r.find("$(", clb + 3);
   clb = r.find("\\$(", clb + 3);
 }
-if (lb == std::string::npos) return;
+if (lb == std::string::npos)
+  return;
 auto rb = s.find(")");
 auto crb = s.find("\\)");
 while ((rb - crb + 1) == 0) {
   rb = r.find(")", crb + 2);
   crb = r.find("\\)", crb + 2);
 }
-if (rb == std::string::npos) return;
+if (rb == std::string::npos)
+  return;
 
 std::string k(r.substr(lb + 2, rb - 2 - lb));
 std::vector<std::string> cli(kul::cli::asArgs(k));
@@ -56,10 +58,12 @@ std::stringstream ss;
 if (cli.size() > 1) {
   kul::Process p(cli[0]);
   kul::ProcessCapture pc(p);
-  for (size_t i = 1; i < cli.size(); i++) p.arg(cli[i]);
+  for (size_t i = 1; i < cli.size(); i++)
+    p.arg(cli[i]);
   p.start();
   std::string out(pc.outs());
-  if (*out.rbegin() == '\n') out.pop_back();
+  if (*out.rbegin() == '\n')
+    out.pop_back();
   std::string t(r.substr(0, lb) + out + r.substr(rb + 1));
   ss << r.substr(0, lb) << out << r.substr(rb + 1);
 } else
