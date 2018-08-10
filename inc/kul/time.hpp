@@ -40,14 +40,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace kul {
 namespace time {
 class Exception : public kul::Exception {
-public:
-  Exception(const char *f, const int l, const std::string &s)
-      : kul::Exception(f, l, s) {}
+ public:
+  Exception(const char *f, const int l, const std::string &s) : kul::Exception(f, l, s) {}
 };
-} // namespace time
+}  // namespace time
 
 class Now {
-public:
+ public:
   static uint64_t MILLIS() {
     return std::chrono::duration_cast<std::chrono::milliseconds>(
                std::chrono::system_clock::now().time_since_epoch())
@@ -66,15 +65,14 @@ public:
 };
 
 class DateTime {
-private:
+ private:
   static const std::string MILLIS() {
     std::string s(std::to_string(Now::MILLIS()));
     return s.substr(s.length() - 3);
   }
 
-public:
-  static const std::string AS(const std::time_t t,
-                              std::string f = "%Y-%m-%d-%H:%M:%S") {
+ public:
+  static const std::string AS(const std::time_t t, std::string f = "%Y-%m-%d-%H:%M:%S") {
     kul::String::REPLACE(f, "%i", MILLIS());
     char buffer[80];
     struct tm ti;
@@ -91,13 +89,12 @@ public:
     uint64_t e = 0;
     std::stringstream ss(epoch);
     ss >> e;
-    if (!e)
-      KEXCEPT(time::Exception, "Invalid time used :" + epoch);
+    if (!e) KEXCEPT(time::Exception, "Invalid time used :" + epoch);
     return AS(e, f);
   }
   static const std::string NOW(const std::string &f = "%Y-%m-%d-%H:%M:%S") {
     return AS(std::time(NULL), f);
   }
 };
-} // namespace kul
+}  // namespace kul
 #endif /* _KUL_TIME_HPP_ */

@@ -31,9 +31,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _KUL_CLI_OS_HPP_
 #define _KUL_CLI_OS_HPP_
 
-#include <string>
 #include <termios.h>
 #include <unistd.h>
+#include <string>
 
 namespace kul {
 namespace cli {
@@ -48,7 +48,7 @@ inline void show() {
 std::string hidden(const std::string &t);
 void show();
 #endif
-} // END NAMESPACE cli
-} // END NAMESPACE kul
+}  // END NAMESPACE cli
+}  // END NAMESPACE kul
 
 #endif /* _KUL_CLI_OS_HPP_ */

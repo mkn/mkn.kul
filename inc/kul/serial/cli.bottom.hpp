@@ -32,8 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _KUL_SERIAL_CLI_BOTTOM_HPP_
 
 #if defined(_MKN_WITH_IO_CEREAL_)
-CEREAL_SPECIALIZE_FOR_ALL_ARCHIVES(kul::cli::Args,
-                                   cereal::specialization::member_load_save)
-#endif //  _MKN_WITH_IO_CEREAL_
+CEREAL_SPECIALIZE_FOR_ALL_ARCHIVES(kul::cli::Args, cereal::specialization::member_load_save)
+#endif  //  _MKN_WITH_IO_CEREAL_
 
-#endif // _KUL_SERIAL_CLI_BOTTOM_HPP_
+#endif  // _KUL_SERIAL_CLI_BOTTOM_HPP_

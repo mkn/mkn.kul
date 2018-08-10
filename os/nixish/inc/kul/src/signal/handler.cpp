@@ -37,11 +37,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 if (info->si_pid == 0 || info->si_pid == kul::this_proc::id()) {
   // if(s == SIGABRT) for(auto& f : kul::SignalStatic::INSTANCE().ab ) f(s);
   if (s == SIGINT)
-    for (auto &f : kul::SignalStatic::INSTANCE().in)
-      f(s);
+    for (auto &f : kul::SignalStatic::INSTANCE().in) f(s);
   if (s == SIGSEGV)
-    for (auto &f : kul::SignalStatic::INSTANCE().se)
-      f(s);
+    for (auto &f : kul::SignalStatic::INSTANCE().se) f(s);
 #ifdef HAVE_EXECINFO_H
   if (s == SIGSEGV && !kul::SignalStatic::INSTANCE().q) {
     ucontext_t *uc = (ucontext_t *)v;
@@ -69,9 +67,7 @@ if (info->si_pid == 0 || info->si_pid == kul::this_proc::id()) {
     for (i = 2; i < trace_size; ++i) {
       printf("[bt] %s : ", messages[i]);
       size_t p = 0;
-      while (messages[i][p] != '(' && messages[i][p] != ' ' &&
-             messages[i][p] != 0)
-        ++p;
+      while (messages[i][p] != '(' && messages[i][p] != ' ' && messages[i][p] != 0) ++p;
       std::string str(messages[i]);
       str = str.substr(0, p);
       if (kul::SignalStatic::INSTANCE().addr) {

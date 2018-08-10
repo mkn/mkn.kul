@@ -53,7 +53,7 @@ mach_port_t pthread_mach_thread_np(pthread_t);
 
 #ifndef _XOPEN_SOURCE
 #define _XOPEN_SOURCE 700
-#endif //_XOPEN_SOURCE
+#endif  //_XOPEN_SOURCE
 
 #ifndef _DARWIN_C_SOURCE
 #define _DARWIN_C_SOURCE
@@ -61,7 +61,7 @@ mach_port_t pthread_mach_thread_np(pthread_t);
 #undef _DARWIN_C_SOURCE
 #else
 #include "sys/types.h"
-#endif // _DARWIN_C_SOURCE
+#endif  // _DARWIN_C_SOURCE
 
 #endif /* __APPLE__ */
 

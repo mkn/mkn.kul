@@ -35,15 +35,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // std::vector<kul::File> kul::Dir::files(bool recursive) const
 // KTHROW(fs::Exception){
 
-if (!is())
-  KEXCEPT(fs::Exception, "Directory : \"" + path() + "\" does not exist");
+if (!is()) KEXCEPT(fs::Exception, "Directory : \"" + path() + "\" does not exist");
 
 std::vector<File> fs;
 DIR *dir = opendir(path().c_str());
 struct dirent *entry = readdir(dir);
 while (entry != NULL) {
-  if (!kul::Dir(JOIN(real(), entry->d_name)).is())
-    fs.push_back(File(entry->d_name, *this));
+  if (!kul::Dir(JOIN(real(), entry->d_name)).is()) fs.push_back(File(entry->d_name, *this));
   entry = readdir(dir);
 }
 closedir(dir);

@@ -35,8 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // std::vector<kul::Dir> kul::Dir::dirs(bool incHidden) const
 // KTHROW(fs::Exception){
 
-if (!is())
-  KEXCEPT(fs::Exception, "Directory : \"" + path() + "\" does not exist");
+if (!is()) KEXCEPT(fs::Exception, "Directory : \"" + path() + "\" does not exist");
 std::vector<Dir> dirs;
 
 WIN32_FIND_DATA fdFile;
@@ -46,15 +45,13 @@ sprintf_s(sPath, "%s\\*.*", path().c_str());
 if ((hFind = FindFirstFile(sPath, &fdFile)) == INVALID_HANDLE_VALUE)
   KEXCEPT(fs::Exception, "Directory : \"" + path() + "\" does not exist");
 do {
-  if (strcmp(fdFile.cFileName, ".") != 0 &&
-      strcmp(fdFile.cFileName, "..") != 0) {
+  if (strcmp(fdFile.cFileName, ".") != 0 && strcmp(fdFile.cFileName, "..") != 0) {
     sprintf_s(sPath, "%s\\%s", path().c_str(), fdFile.cFileName);
     if (fdFile.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
-      if (!incHidden &&
-          std::string(sPath)
-                  .substr(std::string(sPath).rfind(kul::Dir::SEP()) + 1)
-                  .substr(0, 1)
-                  .compare(".") == 0)
+      if (!incHidden && std::string(sPath)
+                                .substr(std::string(sPath).rfind(kul::Dir::SEP()) + 1)
+                                .substr(0, 1)
+                                .compare(".") == 0)
         continue;
       dirs.push_back(Dir(sPath));
     }

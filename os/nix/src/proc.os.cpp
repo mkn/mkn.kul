@@ -36,7 +36,6 @@ int kul::this_proc::ProcParser::PARSE_LINE(char *line) {
 void kul::this_proc::ProcParser::VIRTUAL(uint64_t &mem) {
 #include "kul/src/proc/xvirtual.cpp"
 }
-void kul::this_proc::ProcParser::PHYSICAL(
-    uint64_t &mem) { // Note: this value is in KB!
+void kul::this_proc::ProcParser::PHYSICAL(uint64_t &mem) {  // Note: this value is in KB!
 #include "kul/src/proc/xphysical.cpp"
 }

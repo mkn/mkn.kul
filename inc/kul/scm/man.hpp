@@ -36,33 +36,31 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace kul {
 namespace scm {
 
-// "make_unique is not yet ubiquitous"
+// "make_unique is not yet ubiquitous (C++14)"
 
 class Manager {
-private:
-  Manager() {
-    git.reset(new Git());
-    svn.reset(new Svn());
-    SCMs.insert(std::pair<std::string, SCM *>("git", git.get()));
-    SCMs.insert(std::pair<std::string, SCM *>("svn", svn.get()));
-  }
-  hash::map::S2T<SCM *> SCMs;
-  std::unique_ptr<SCM> git;
-  std::unique_ptr<SCM> svn;
-
-public:
+ public:
   static Manager &INSTANCE() {
     static Manager instance;
     return instance;
   }
   const SCM &get(const std::string &s) KTHROW(NotFoundException) {
-    if (SCMs.count(s) > 0)
-      return *(*SCMs.find(s)).second;
-    KEXCEPT(NotFoundException,
-            "Source Control Management for " + s + " is not implemented");
+    if (SCMs.count(s) > 0) return *(*SCMs.find(s)).second;
+    KEXCEPT(NotFoundException, "Source Control Management for " + s + " is not implemented");
   }
+
+ private:
+  Manager() {
+    git.reset(new Git());
+    // svn.reset(new Svn());
+    SCMs.insert(std::pair<std::string, SCM *>("git", git.get()));
+    // SCMs.insert(std::pair<std::string, SCM *>("svn", svn.get()));
+  }
+  hash::map::S2T<SCM *> SCMs;
+  std::unique_ptr<SCM> git;
+  // std::unique_ptr<SCM> svn;
 };
 
-} // END NAMESPACE scm
-} // END NAMESPACE kul
+}  // END NAMESPACE scm
+}  // END NAMESPACE kul
 #endif /* _KUL_SCM_MAN_HPP_ */

@@ -42,6 +42,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cereal/types/vector.hpp>
 
 #include <cereal/archives/portable_binary.hpp>
-#endif //  _MKN_WITH_IO_CEREAL_
+#endif  //  _MKN_WITH_IO_CEREAL_
 
-#endif // _KUL_SERIAL_HPP_
+#endif  // _KUL_SERIAL_HPP_

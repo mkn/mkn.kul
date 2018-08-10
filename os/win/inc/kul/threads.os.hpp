@@ -57,13 +57,13 @@ inline void kill() {
   TerminateThread(h, 0);
   CloseHandle(h);
 }
-} // END NAMESPACE this_thread
+}  // END NAMESPACE this_thread
 
 class Mutex {
-private:
+ private:
   CRITICAL_SECTION critSec;
 
-public:
+ public:
   Mutex() { InitializeCriticalSection(&critSec); }
   ~Mutex() { DeleteCriticalSection(&critSec); }
   void lock() { EnterCriticalSection(&critSec); }
@@ -75,7 +75,7 @@ DWORD WINAPI threadFunction(LPVOID th);
 }
 
 class Thread : public threading::AThread {
-private:
+ private:
   std::function<void()> func;
   HANDLE h;
   friend DWORD WINAPI threading::threadFunction(LPVOID);
@@ -88,7 +88,7 @@ private:
     f = 1;
   }
 
-public:
+ public:
   Thread(const std::function<void()> &func) : func(func) {}
   template <class T>
   Thread(const T &t) : func(std::bind((void (T::*)()) & T::operator(), t)) {}
@@ -100,8 +100,7 @@ public:
       : func(std::bind((void (T::*)() const) & T::operator(), r)) {}
   virtual ~Thread() {}
   void join() {
-    if (!s)
-      run();
+    if (!s) run();
     WaitForSingleObject(h, INFINITE);
     CloseHandle(h);
     s = 0;
@@ -112,8 +111,7 @@ public:
     f = 1;
   }
   void run() KTHROW(kul::threading::Exception) {
-    if (s)
-      KEXCEPTION("Thread running");
+    if (s) KEXCEPTION("Thread running");
     f = 0;
     s = 1;
     h = CreateThread(0, 5120000, threading::threadFunction, this, 0, 0);
@@ -125,7 +123,7 @@ inline DWORD WINAPI threadFunction(LPVOID th) {
   reinterpret_cast<Thread *>(th)->act();
   return 0;
 }
-} // namespace threading
+}  // namespace threading
 
-} // END NAMESPACE kul
+}  // END NAMESPACE kul
 #endif /* _KUL_THREADS_OS_HPP_ */

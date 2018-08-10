@@ -30,13 +30,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "kul/os.hpp"
 
-std::vector<kul::Dir> kul::Dir::dirs(bool incHidden) const
-    KTHROW(kul::fs::Exception) {
+std::vector<kul::Dir> kul::Dir::dirs(bool incHidden) const KTHROW(kul::fs::Exception){
 #include "kul/src/os/dir/dirs.cpp"
 }
 
-std::vector<kul::File> kul::Dir::files(bool recursive) const
-    KTHROW(kul::fs::Exception) {
+std::vector<kul::File> kul::Dir::files(bool recursive) const KTHROW(kul::fs::Exception){
 #include "kul/src/os/dir/files.cpp"
 }
 

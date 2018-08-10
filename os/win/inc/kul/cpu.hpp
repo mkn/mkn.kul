@@ -43,7 +43,7 @@ inline uint32_t cores() {
   return sysinfo.dwNumberOfProcessors;
 }
 inline uint16_t threads() { return std::thread::hardware_concurrency(); }
-} // END NAMESPACE cpu
-} // END NAMESPACE kul
+}  // END NAMESPACE cpu
+}  // END NAMESPACE kul
 
 #endif /* _KUL_CPU_HPP_ */

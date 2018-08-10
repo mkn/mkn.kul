@@ -36,8 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 const std::string &tid(kul::this_thread::id());
 uint16_t sig = pExceptionInfo->ExceptionRecord->ExceptionCode;
-if (pExceptionInfo->ExceptionRecord->ExceptionCode ==
-    EXCEPTION_ACCESS_VIOLATION)
+if (pExceptionInfo->ExceptionRecord->ExceptionCode == EXCEPTION_ACCESS_VIOLATION)
   kul_sig_function_handler(sig = 11);
 
 if (!kul::SignalStatic::INSTANCE().q) {
@@ -55,7 +54,7 @@ if (!kul::SignalStatic::INSTANCE().q) {
   stack_frame.AddrFrame.Offset = context_record.Sp;
   stack_frame.AddrStack.Offset = context_record.R11;
 #elif defined(_ARM64)
-  int mach = 0; // IMAGE_FILE_MACHINE_ARM64;
+  int mach = 0;  // IMAGE_FILE_MACHINE_ARM64;
 #elif defined(_WIN64)
   int mach = IMAGE_FILE_MACHINE_AMD64;
   stack_frame.AddrPC.Offset = context_record.Rip;
@@ -81,12 +80,10 @@ if (!kul::SignalStatic::INSTANCE().q) {
   symbol->MaxNameLen = 255;
   symbol->SizeOfStruct = sizeof(SYMBOL_INFO);
   std::cout << "[bt] Stacktrace:" << std::endl;
-  while (StackWalk64(mach, GetCurrentProcess(), GetCurrentThread(),
-                     &stack_frame, &context_record, NULL,
-                     &SymFunctionTableAccess64, &SymGetModuleBase64, NULL)) {
+  while (StackWalk64(mach, GetCurrentProcess(), GetCurrentThread(), &stack_frame, &context_record,
+                     NULL, &SymFunctionTableAccess64, &SymGetModuleBase64, NULL)) {
     DWORD64 displacement = 0;
-    if (SymFromAddr(process, (DWORD64)stack_frame.AddrPC.Offset, &displacement,
-                    symbol)) {
+    if (SymFromAddr(process, (DWORD64)stack_frame.AddrPC.Offset, &displacement, symbol)) {
       DWORD dwDisplacement;
       IMAGEHLP_LINE64 line;
       IMAGEHLP_MODULE64 moduleInfo;
@@ -99,10 +96,8 @@ if (!kul::SignalStatic::INSTANCE().q) {
 
       std::cout << symbol->Name << " + [0x" << std::hex << displacement << "]";
 
-      if (SymGetLineFromAddr64(process, (DWORD64)stack_frame.AddrPC.Offset,
-                               &dwDisplacement, &line))
-        std::cout << " - " << line.FileName << ": "
-                  << std::to_string(line.LineNumber);
+      if (SymGetLineFromAddr64(process, (DWORD64)stack_frame.AddrPC.Offset, &dwDisplacement, &line))
+        std::cout << " - " << line.FileName << ": " << std::to_string(line.LineNumber);
       else
         std::cout << " - ??:";
       std::cout << std::endl;

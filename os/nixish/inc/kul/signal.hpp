@@ -31,8 +31,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _KUL_SIGNAL_HPP_
 #define _KUL_SIGNAL_HPP_
 
-#include "kul/proc.hpp"
 #include <kul/log.hpp>
+#include "kul/proc.hpp"
 
 #include <signal.h>
 
@@ -67,7 +67,7 @@ namespace kul {
 
 class Signal;
 class SignalStatic {
-private:
+ private:
   bool addr = 0, q = 0;
   struct sigaction sigHandler;
   std::vector<std::function<void(int)>> ab, in, se;
@@ -83,24 +83,22 @@ private:
     return ss;
   }
   void abrt(const std::function<void(int)> &f) {
-    if (ab.size() == 0)
-      sigaction(SIGABRT, &sigHandler, NULL);
+    if (ab.size() == 0) sigaction(SIGABRT, &sigHandler, NULL);
     ab.push_back(f);
   }
   void intr(const std::function<void(int)> &f) {
-    if (in.size() == 0)
-      sigaction(SIGINT, &sigHandler, NULL);
+    if (in.size() == 0) sigaction(SIGINT, &sigHandler, NULL);
     in.push_back(f);
   }
 
-public:
+ public:
   void quiet() { q = 1; }
   friend class Signal;
   friend void ::kul_sig_handler(int s, siginfo_t *i, void *v);
 };
 
 class Signal {
-public:
+ public:
   Signal() { kul::SignalStatic::INSTANCE(); }
   Signal &abrt(const std::function<void(int16_t)> &f) {
     kul::SignalStatic::INSTANCE().abrt(f);
@@ -117,7 +115,7 @@ public:
 
   void quiet() { kul::SignalStatic::INSTANCE().q = 1; }
 };
-} // namespace kul
+}  // namespace kul
 
 #ifndef _KUL_COMPILED_LIB_
 void kul_sig_handler(int s, siginfo_t *info, void *v) {
@@ -125,7 +123,7 @@ void kul_sig_handler(int s, siginfo_t *info, void *v) {
 }
 #endif
 
-namespace kul {} // END NAMESPACE kul
+namespace kul {}  // END NAMESPACE kul
 
 // kul::Signals sig;
 

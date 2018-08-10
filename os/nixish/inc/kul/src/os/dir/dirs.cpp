@@ -35,8 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // std::vector<kul::Dir> kul::Dir::dirs(bool incHidden) const
 // KTHROW(fs::Exception){
 
-if (!is())
-  KEXCEPT(fs::Exception, "Directory : \"" + path() + "\" does not exist");
+if (!is()) KEXCEPT(fs::Exception, "Directory : \"" + path() + "\" does not exist");
 std::vector<Dir> dirs;
 
 DIR *dir = opendir(real().c_str());

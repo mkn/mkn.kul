@@ -31,9 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _KUL_OS_OS_HPP_
 #define _KUL_OS_OS_HPP_
 
-#include <algorithm>
 #include <direct.h>
-#include <fstream>
 #include <io.h>
 #include <process.h>
 #include <stdio.h>
@@ -41,6 +39,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <windows.h>
+#include <algorithm>
+#include <fstream>
 
 #include "kul/def.hpp"
 
@@ -50,7 +50,7 @@ class Dir;
 namespace fs {
 
 class KulTimeStampsResolver {
-private:
+ private:
   static uint64_t FileTimeToPOSIX(FILETIME &ft) {
     LARGE_INTEGER date, adjust;
     date.HighPart = ft.dwHighDateTime;
@@ -71,8 +71,8 @@ private:
   }
   friend class kul::Dir;
 };
-} // END NAMESPACE fs
+}  // END NAMESPACE fs
 
-} // END NAMESPACE kul
+}  // END NAMESPACE kul
 
 #endif /* _KUL_OS_OS_HPP_ */

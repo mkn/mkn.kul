@@ -43,42 +43,40 @@ namespace kul {
 #if __cplusplus > 199711L
 #ifndef KNOTHROW
 #define KNOTHROW noexcept(true)
-#endif // KNOTHROW
+#endif  // KNOTHROW
 #ifndef KTHROW
 #define KTHROW(x) noexcept(false)
-#endif // KTHROW
-#endif //__cplusplus
+#endif  // KTHROW
+#endif  //__cplusplus
 
 #ifndef KNOTHROW
 #define KNOTHROW
-#endif // KNOTHROW
+#endif  // KNOTHROW
 #ifndef KTHROW
 #define KTHROW(x)
-#endif // KTHROW
+#endif  // KTHROW
 
 class Exception : public std::runtime_error {
   friend std::ostream &operator<<(std::ostream &, const Exception &);
 
-protected:
+ protected:
   const char *_f = nullptr;
   const uint16_t _l = 0;
   const std::exception_ptr _ep;
   std::stringstream msg;
 
-public:
+ public:
   ~Exception() KNOTHROW {}
   Exception(const char *f, const uint16_t &l, const std::string &s = "")
       : std::runtime_error(s), _f(f), _l(l), _ep(std::current_exception()) {}
-  Exception(const Exception &e)
-      : std::runtime_error(e), _f(e.file()), _l(e.line()), _ep(e._ep) {
+  Exception(const Exception &e) : std::runtime_error(e), _f(e.file()), _l(e.line()), _ep(e._ep) {
     msg << e.msg.str();
   }
   Exception &operator=(const Exception &e) = default;
 
   std::string debug() const {
     std::stringstream ss;
-    ss << (_f ? _f : "<UNKNOWN FILE>") << " : " << _l << " : " << what()
-       << msg.str();
+    ss << (_f ? _f : "<UNKNOWN FILE>") << " : " << _l << " : " << what() << msg.str();
     return ss.str();
   }
   std::string message() const {
@@ -106,30 +104,29 @@ public:
     ss << debug();
     return ss.str();
   }
-  template <class T> Exception &operator<<(const T &s) {
+  template <class T>
+  Exception &operator<<(const T &s) {
     msg << s;
     return *this;
   }
 };
 
-inline std::ostream &operator<<(std::ostream &s, const Exception &e) {
-  return s << e.message();
-}
+inline std::ostream &operator<<(std::ostream &s, const Exception &e) { return s << e.message(); }
 
 class Exit : public Exception {
-private:
+ private:
   const uint16_t _e;
 
-public:
-  Exit(const char *f, const uint16_t &l, const std::string &s,
-       const uint16_t &e)
+ public:
+  Exit(const char *f, const uint16_t &l, const std::string &s, const uint16_t &e)
       : Exception(f, l, s), _e(e) {}
   Exit(const Exit &e) : Exception(e), _e(e._e) {}
   Exit &operator=(const Exit &e) = default;
 
   const uint16_t &code() const { return _e; }
 
-  template <class T> Exit &operator<<(const T &s) {
+  template <class T>
+  Exit &operator<<(const T &s) {
     msg << s;
     return *this;
   }
@@ -142,5 +139,5 @@ public:
 
 #define KEXIT(e, m) throw kul::Exit(__FILE__, __LINE__, m, e)
 
-} // end namespace kul
+}  // end namespace kul
 #endif /* _KUL_EXCEPT_HPP_ */

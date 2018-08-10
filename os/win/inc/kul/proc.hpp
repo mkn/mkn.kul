@@ -33,11 +33,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <Windows.h>
 #include <psapi.h>
-#include <sstream>
 #include <stdio.h>
-#include <string>
 #include <strsafe.h>
 #include <tchar.h>
+#include <sstream>
+#include <string>
 
 #include "kul/def.hpp"
 #include "kul/log.hpp"
@@ -52,11 +52,10 @@ namespace kul {
 
 namespace this_proc {
 class MemGetter {
-private:
+ private:
   PROCESS_MEMORY_COUNTERS_EX pmc;
   MemGetter() {
-    GetProcessMemoryInfo(GetCurrentProcess(), (PROCESS_MEMORY_COUNTERS *)&pmc,
-                         sizeof(pmc));
+    GetProcessMemoryInfo(GetCurrentProcess(), (PROCESS_MEMORY_COUNTERS *)&pmc, sizeof(pmc));
   }
   void virtula(uint64_t &v) { v += pmc.PrivateUsage; }
   void physical(uint64_t &v) { v += pmc.WorkingSetSize; }
@@ -86,13 +85,12 @@ inline uint16_t cpuLoad() { return 0; }
 
 inline int32_t id() { return GetCurrentProcessId(); }
 inline void kill(const int32_t &e) {
-  TerminateProcess(OpenProcess(PROCESS_TERMINATE, 0, kul::this_proc::id()),
-                   128 + e);
+  TerminateProcess(OpenProcess(PROCESS_TERMINATE, 0, kul::this_proc::id()), 128 + e);
 }
-} // end namespace this_proc
+}  // end namespace this_proc
 
 class Process : public kul::AProcess {
-private:
+ private:
   static ULONG PIPE_ID() {
     static ULONG p = 999;
     p++;
@@ -105,30 +103,26 @@ private:
 
   HANDLE revent = CreateEvent(0, 1, 0, 0);
 
-public:
-  Process(const std::string &cmd, const bool &wfe = true)
-      : kul::AProcess(cmd, wfe) {}
-  Process(const std::string &cmd, const std::string &path,
-          const bool &wfe = true)
+ public:
+  Process(const std::string &cmd, const bool &wfe = true) : kul::AProcess(cmd, wfe) {}
+  Process(const std::string &cmd, const std::string &path, const bool &wfe = true)
       : kul::AProcess(cmd, path, wfe) {}
   Process(const std::string &cmd, const kul::Dir &d, const bool &wfe = true)
       : kul::AProcess(cmd, d ? d.real() : d.path(), wfe) {}
   ~Process() { tearDown(); }
   bool kill(int16_t k = 6) {
-    if (!started())
-      return 0;
+    if (!started()) return 0;
     DWORD dwDesiredAccess = PROCESS_TERMINATE;
     bool bInheritHandle = 0;
     HANDLE hProcess = OpenProcess(dwDesiredAccess, bInheritHandle, pid());
-    if (hProcess == NULL)
-      return 0;
+    if (hProcess == NULL) return 0;
     bool r = TerminateProcess(hProcess, 128 + k);
     CloseHandle(hProcess);
     setFinished();
     return r;
   }
 
-protected:
+ protected:
 #ifndef _KUL_COMPILED_LIB_
   void tearDown() {
 #include "kul/src/proc/tearDown.cpp"
@@ -145,6 +139,6 @@ protected:
   void run() KTHROW(kul::Exception);
 #endif
 };
-} // namespace kul
+}  // namespace kul
 
 #endif /* _KUL_PROC_HPP_ */

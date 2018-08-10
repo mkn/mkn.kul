@@ -65,13 +65,13 @@ inline bool main() {
 #endif
 }
 inline void kill() { pthread_exit(0); }
-} // END NAMESPACE this_thread
+}  // END NAMESPACE this_thread
 
 class Mutex {
-private:
+ private:
   pthread_mutex_t mute;
 
-public:
+ public:
   Mutex() {
     pthread_mutexattr_t att;
     pthread_mutexattr_init(&att);
@@ -86,7 +86,7 @@ public:
 };
 
 class Thread : public threading::AThread {
-private:
+ private:
   std::function<void()> func;
   pthread_t thr;
   static void *threadFunction(void *th) {
@@ -102,7 +102,7 @@ private:
     f = 1;
   }
 
-public:
+ public:
   Thread(const std::function<void()> &func) : func(func) {}
   template <class T>
   Thread(const T &t) : func(std::bind((void (T::*)()) & T::operator(), t)) {}
@@ -120,19 +120,17 @@ public:
     f = 1;
   }
   void join() {
-    if (!s)
-      run();
+    if (!s) run();
     pthread_join(thr, 0);
     s = 0;
   }
   void run() KTHROW(kul::threading::Exception) {
-    if (s)
-      KEXCEPTION("Thread running");
+    if (s) KEXCEPTION("Thread running");
     f = 0;
     s = 1;
     pthread_create(&thr, NULL, Thread::threadFunction, this);
   }
 };
 
-} // END NAMESPACE kul
+}  // END NAMESPACE kul
 #endif /* _KUL_THREADS_OS_HPP_ */

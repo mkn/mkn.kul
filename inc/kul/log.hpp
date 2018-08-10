@@ -31,8 +31,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _KUL_LOG_HPP_
 #define _KUL_LOG_HPP_
 
-#include <memory>
 #include <string.h>
+#include <memory>
 #include <string>
 
 #include "kul/def.hpp"
@@ -56,17 +56,16 @@ namespace log {
 enum mode { OFF = -1, NON = 0, INF, ERR, DBG, OTH, TRC };
 
 class Exception : public kul::Exception {
-public:
-  Exception(const char *f, const uint16_t &l, const std::string &s)
-      : kul::Exception(f, l, s) {}
+ public:
+  Exception(const char *f, const uint16_t &l, const std::string &s) : kul::Exception(f, l, s) {}
 };
-} // END NAMESPACE log
+}  // END NAMESPACE log
 
 class ALogMan;
 class Logger {
   friend class ALogMan;
 
-protected:
+ protected:
   std::function<void(const std::string &)> e, o;
   const std::string modeTxt(const log::mode &m) const {
     std::string s("NON");
@@ -83,9 +82,10 @@ protected:
     return s;
   }
 
-public:
-  void str(const char *f, const char *fn, const uint16_t &l,
-           const std::string &s, const log::mode &m, std::string &str) {
+ public:
+  virtual ~Logger() {}
+  void str(const char *f, const char *fn, const uint16_t &l, const std::string &s,
+           const log::mode &m, std::string &str) {
     kul::String::REPLACE(str, "%M", modeTxt(m));
     kul::String::REPLACE(str, "%T", kul::this_thread::id());
     kul::String::REPLACE(str, "%D", kul::DateTime::NOW(__KUL_LOG_TIME_FRMT__));
@@ -106,8 +106,8 @@ public:
     else
       printf("%s", s.c_str());
   }
-  void log(const char *f, const char *fn, const uint16_t &l,
-           const std::string &s, const log::mode &m) {
+  void log(const char *f, const char *fn, const uint16_t &l, const std::string &s,
+           const log::mode &m) {
     std::string st(__KUL_LOG_FRMT__);
     str(f, fn, l, s, m, st);
     out(st + kul::os::EOL());
@@ -117,7 +117,7 @@ public:
 };
 
 class ALogMan {
-protected:
+ protected:
   log::mode m;
   mutable std::unique_ptr<Logger> logger;
   ALogMan(Logger *_logger) : m(kul::log::mode::NON), logger(_logger) {
@@ -145,7 +145,7 @@ protected:
     }
   }
 
-public:
+ public:
   virtual ~ALogMan() {}
   void setMode(const log::mode &m1) { m = m1; }
   bool inf() { return m >= log::INF; }
@@ -153,19 +153,14 @@ public:
   bool dbg() { return m >= log::DBG; }
   void log(const char *f, const char *fn, const uint16_t &l, const log::mode &m,
            const std::string &s) {
-    if (this->m >= m)
-      logger->log(f, fn, l, s, m);
+    if (this->m >= m) logger->log(f, fn, l, s, m);
   }
   void out(const log::mode &m, const std::string &s) {
-    if (this->m >= m)
-      logger->out(s + kul::os::EOL());
+    if (this->m >= m) logger->out(s + kul::os::EOL());
   }
-  void err(const log::mode &m, const std::string &s) {
-    logger->err(s + kul::os::EOL());
-  }
-  std::string str(const char *f, const char *fn, const uint16_t &l,
-                  const log::mode &m, const std::string &s = "",
-                  const std::string fmt = __KUL_LOG_FRMT__) {
+  void err(const std::string &s) { logger->err(s + kul::os::EOL()); }
+  std::string str(const char *f, const char *fn, const uint16_t &l, const log::mode &m,
+                  const std::string &s = "", const std::string fmt = __KUL_LOG_FRMT__) {
     std::string st(fmt);
     logger->str(f, fn, l, s, m, st);
     return st;
@@ -175,10 +170,10 @@ public:
 };
 
 class LogMan : public ALogMan {
-protected:
+ protected:
   LogMan() : ALogMan(new Logger()) {}
 
-public:
+ public:
   static LogMan &INSTANCE() {
     static LogMan instance;
     return instance;
@@ -186,49 +181,45 @@ public:
 };
 
 class Message {
-protected:
+ protected:
   std::stringstream ss;
   const log::mode &m;
 
   Message(const log::mode &m) : m(m) {}
 
-public:
-  template <class T> Message &operator<<(const T &s) {
+ public:
+  template <class T>
+  Message &operator<<(const T &s) {
     ss << s;
     return *this;
   }
 };
 class LogMessage : public Message {
-private:
+ private:
   const char *f;
   const char *fn;
   const uint16_t &l;
 
-public:
+ public:
   ~LogMessage() { LogMan::INSTANCE().log(f, fn, l, m, ss.str()); }
-  LogMessage(const char *f, const char *fn, const uint16_t &l,
-             const log::mode &m)
+  LogMessage(const char *f, const char *fn, const uint16_t &l, const log::mode &m)
       : Message(m), f(f), fn(fn), l(l) {}
 };
 class OutMessage : public Message {
-public:
+ public:
   ~OutMessage() { LogMan::INSTANCE().out(m, ss.str()); }
   OutMessage(const log::mode &m = kul::log::mode::NON) : Message(m) {}
 };
 class ErrMessage : public Message {
-public:
-  ~ErrMessage() { LogMan::INSTANCE().err(m, ss.str()); }
+ public:
+  ~ErrMessage() { LogMan::INSTANCE().err(ss.str()); }
   ErrMessage() : Message(log::mode::ERR) {}
 };
 
-#define KLOG_INF                                                               \
-  kul::LogMessage(__FILE__, __func__, __LINE__, kul::log::mode::INF)
-#define KLOG_ERR                                                               \
-  kul::LogMessage(__FILE__, __func__, __LINE__, kul::log::mode::ERR)
-#define KLOG_DBG                                                               \
-  kul::LogMessage(__FILE__, __func__, __LINE__, kul::log::mode::DBG)
-#define KLOG_TRC                                                               \
-  kul::LogMessage(__FILE__, __func__, __LINE__, kul::log::mode::TRC)
+#define KLOG_INF kul::LogMessage(__FILE__, __func__, __LINE__, kul::log::mode::INF)
+#define KLOG_ERR kul::LogMessage(__FILE__, __func__, __LINE__, kul::log::mode::ERR)
+#define KLOG_DBG kul::LogMessage(__FILE__, __func__, __LINE__, kul::log::mode::DBG)
+#define KLOG_TRC kul::LogMessage(__FILE__, __func__, __LINE__, kul::log::mode::TRC)
 #define KLOG(sev) KLOG_##sev
 
 #define KOUT_NON kul::OutMessage()
@@ -240,5 +231,5 @@ public:
 
 #define KERR kul::ErrMessage()
 
-} // END NAMESPACE kul
+}  // END NAMESPACE kul
 #endif /* _KUL_LOG_HPP_ */

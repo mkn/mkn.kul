@@ -34,8 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // void kul::AProcess::start() KTHROW(kul::Exception){
 
-if (this->s)
-  KEXCEPT(kul::proc::Exception, "Process is already started");
+if (this->s) KEXCEPT(kul::proc::Exception, "Process is already started");
 this->s = true;
 if (this->o || this->e)
   this->run();
@@ -44,8 +43,8 @@ else
 if (pec != 0)
   kul::LogMan::INSTANCE().err()
       ? throw proc::ExitException(__FILE__, __LINE__, pec,
-                                  "Process exit code: " + std::to_string(pec) +
-                                      kul::os::EOL() + toString())
+                                  "Process exit code: " + std::to_string(pec) + kul::os::EOL() +
+                                      toString())
       : throw proc::ExitException(__FILE__, __LINE__, pec,
                                   "Process exit code: " + std::to_string(pec));
 

@@ -50,29 +50,27 @@ uint64_t virtualMemory();
 uint64_t physicalMemory();
 uint64_t totalMemory();
 uint16_t cpuLoad();
-} // namespace this_proc
+}  // namespace this_proc
 
 namespace proc {
 
 class Exception : public kul::Exception {
-public:
-  Exception(const char *f, const uint16_t &l, const std::string &s)
-      : kul::Exception(f, l, s) {}
+ public:
+  Exception(const char *f, const uint16_t &l, const std::string &s) : kul::Exception(f, l, s) {}
 };
 
 class ExitException : public kul::proc::Exception {
-private:
+ private:
   const short ec;
 
-public:
-  ExitException(const char *f, const uint16_t &l, const short ec,
-                const std::string &s)
+ public:
+  ExitException(const char *f, const uint16_t &l, const short ec, const std::string &s)
       : Exception(f, l, s), ec(ec) {}
   const short &code() const { return ec; }
 };
 
 class Call {
-private:
+ private:
   std::string cwd;
   const std::string d;
   const std::string &s;
@@ -80,38 +78,32 @@ private:
   void setCWD() {
     if (d.size()) {
       cwd = kul::env::CWD();
-      if (!kul::env::CWD(d))
-        KEXCEPTION("FAILED TO SET DIRECTORY: " + d);
+      if (!kul::env::CWD(d)) KEXCEPTION("FAILED TO SET DIRECTORY: " + d);
     }
   }
 
-public:
+ public:
   ~Call() {
-    if (d.size())
-      kul::env::CWD(cwd);
+    if (d.size()) kul::env::CWD(cwd);
     for (const std::pair<std::string, std::string> &oldEv : oldEvs)
       kul::env::SET(oldEv.first.c_str(), oldEv.second.c_str());
   }
-  Call(const std::string &s, const std::string &d = "") : d(d), s(s) {
-    setCWD();
-  }
-  Call(const std::string &s, const kul::hash::map::S2S &evs,
-       const std::string &d = "")
+  Call(const std::string &s, const std::string &d = "") : d(d), s(s) { setCWD(); }
+  Call(const std::string &s, const kul::hash::map::S2S &evs, const std::string &d = "")
       : d(d), s(s) {
     setCWD();
     for (const auto &ev : evs) {
       const std::string &v = kul::env::GET(ev.first.c_str());
-      if (v.size())
-        oldEvs.insert(ev.first, v);
+      if (v.size()) oldEvs.insert(ev.first, v);
       kul::env::SET(ev.first.c_str(), ev.second.c_str());
     }
   }
   int run() { return s.size() ? kul::os::exec(s) : 1; }
 };
-} // end namespace proc
+}  // end namespace proc
 
 class AProcess {
-private:
+ private:
   bool f = 0, s = 0;
   const bool wfe = 1;
   int32_t pec = -1, pi = 0;
@@ -121,12 +113,9 @@ private:
   kul::hash::map::S2S evs;
   friend std::ostream &operator<<(std::ostream &, const AProcess &);
 
-protected:
-  AProcess(const std::string &cmd, const bool &wfe) : wfe(wfe) {
-    argv.push_back(cmd);
-  }
-  AProcess(const std::string &cmd, const std::string &d, const bool &wfe)
-      : wfe(wfe), d(d) {
+ protected:
+  AProcess(const std::string &cmd, const bool &wfe) : wfe(wfe) { argv.push_back(cmd); }
+  AProcess(const std::string &cmd, const std::string &d, const bool &wfe) : wfe(wfe), d(d) {
     argv.push_back(cmd);
   }
   virtual ~AProcess() {}
@@ -161,12 +150,12 @@ protected:
   }
   void exitCode(const int32_t &e) { pec = e; }
 
-public:
-  template <class T> AProcess &arg(const T &a) {
+ public:
+  template <class T>
+  AProcess &arg(const T &a) {
     std::stringstream ss;
     ss << a;
-    if (ss.str().size())
-      argv.push_back(ss.str());
+    if (ss.str().size()) argv.push_back(ss.str());
     return *this;
   }
   AProcess &arg(const std::string &a) {
@@ -175,8 +164,7 @@ public:
   }
   AProcess &args(const std::string &a) {
     if (a.size())
-      for (const auto &c : kul::cli::asArgs(a))
-        argv.push_back(c);
+      for (const auto &c : kul::cli::asArgs(a)) argv.push_back(c);
     return *this;
   }
   AProcess &var(const std::string &n, const std::string &v) {
@@ -208,32 +196,28 @@ public:
   void setErr(std::function<void(const std::string &)> e) { this->e = e; }
 };
 
-inline std::ostream &operator<<(std::ostream &s, const AProcess &p) {
-  return s << p.toString();
-}
+inline std::ostream &operator<<(std::ostream &s, const AProcess &p) { return s << p.toString(); }
 
 class ProcessCapture {
-private:
+ private:
   std::stringstream so;
   std::stringstream se;
 
-protected:
+ protected:
   ProcessCapture() {}
   ProcessCapture(const ProcessCapture &pc) : so(pc.so.str()), se(pc.se.str()) {}
   virtual void out(const std::string &s) { so << s; }
   virtual void err(const std::string &s) { se << s; }
 
-public:
+ public:
   ProcessCapture(AProcess &p) { setProcess(p); }
   virtual ~ProcessCapture() {}
   const std::string outs() const { return so.str(); }
   const std::string errs() const { return se.str(); }
   void setProcess(AProcess &p) {
-    p.setOut(std::bind(&ProcessCapture::out, std::ref(*this),
-                       std::placeholders::_1));
-    p.setErr(std::bind(&ProcessCapture::err, std::ref(*this),
-                       std::placeholders::_1));
+    p.setOut(std::bind(&ProcessCapture::out, std::ref(*this), std::placeholders::_1));
+    p.setErr(std::bind(&ProcessCapture::err, std::ref(*this), std::placeholders::_1));
   }
 };
-} // namespace kul
+}  // namespace kul
 #endif /* _KUL_PROC_BASE_HPP_ */

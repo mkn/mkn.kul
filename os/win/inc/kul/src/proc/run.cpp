@@ -45,43 +45,32 @@ std::stringstream ss;
 ss << this;
 
 const ULONG &pipeID = PIPE_ID();
-std::string pipeOut = "\\\\.\\Pipe\\kul_proc_out." +
-                      std::to_string(this_proc::id()) + "." + ss.str() + "." +
-                      std::to_string(pipeID);
-std::string pipeErr = "\\\\.\\Pipe\\kul_proc_err." +
-                      std::to_string(this_proc::id()) + "." + ss.str() + "." +
-                      std::to_string(pipeID);
-std::string pipeIn = "\\\\.\\Pipe\\kul_proc_in." +
-                     std::to_string(this_proc::id()) + "." + ss.str() + "." +
-                     std::to_string(pipeID);
+std::string pipeOut = "\\\\.\\Pipe\\kul_proc_out." + std::to_string(this_proc::id()) + "." +
+                      ss.str() + "." + std::to_string(pipeID);
+std::string pipeErr = "\\\\.\\Pipe\\kul_proc_err." + std::to_string(this_proc::id()) + "." +
+                      ss.str() + "." + std::to_string(pipeID);
+std::string pipeIn = "\\\\.\\Pipe\\kul_proc_in." + std::to_string(this_proc::id()) + "." +
+                     ss.str() + "." + std::to_string(pipeID);
 
 LPSTR lPipeOut = _strdup(pipeOut.c_str());
-g_hChildStd_OUT_Wr =
-    ::CreateNamedPipeA(lPipeOut, PIPE_ACCESS_OUTBOUND | FILE_FLAG_OVERLAPPED,
-                       PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE | PIPE_WAIT, 1,
-                       __KUL_PROCESS_BUFFER__, __KUL_PROCESS_BUFFER__, 0, &sa);
-if (!g_hChildStd_OUT_Wr)
-  error(__LINE__, "CreatePipe failed");
-g_hChildStd_OUT_Rd =
-    ::CreateFileA(lPipeOut, GENERIC_READ, 0, &sa, OPEN_EXISTING,
-                  FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED, 0);
-if (!g_hChildStd_OUT_Rd)
-  error(__LINE__, "CreatePipe failed");
+g_hChildStd_OUT_Wr = ::CreateNamedPipeA(lPipeOut, PIPE_ACCESS_OUTBOUND | FILE_FLAG_OVERLAPPED,
+                                        PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE | PIPE_WAIT, 1,
+                                        __KUL_PROCESS_BUFFER__, __KUL_PROCESS_BUFFER__, 0, &sa);
+if (!g_hChildStd_OUT_Wr) error(__LINE__, "CreatePipe failed");
+g_hChildStd_OUT_Rd = ::CreateFileA(lPipeOut, GENERIC_READ, 0, &sa, OPEN_EXISTING,
+                                   FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED, 0);
+if (!g_hChildStd_OUT_Rd) error(__LINE__, "CreatePipe failed");
 if (!SetHandleInformation(g_hChildStd_OUT_Rd, HANDLE_FLAG_INHERIT, 0))
   error(__LINE__, "SetHandleInformation failed");
 
 LPSTR lPipeErr = _strdup(pipeErr.c_str());
-g_hChildStd_ERR_Wr =
-    ::CreateNamedPipeA(lPipeErr, PIPE_ACCESS_OUTBOUND | FILE_FLAG_OVERLAPPED,
-                       PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE | PIPE_WAIT, 1,
-                       __KUL_PROCESS_BUFFER__, __KUL_PROCESS_BUFFER__, 0, &sa);
-if (!g_hChildStd_ERR_Wr)
-  error(__LINE__, "CreatePipe failed");
-g_hChildStd_ERR_Rd =
-    ::CreateFileA(lPipeErr, GENERIC_READ, 0, &sa, OPEN_EXISTING,
-                  FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED, 0);
-if (!g_hChildStd_ERR_Rd)
-  error(__LINE__, "CreatePipe failed");
+g_hChildStd_ERR_Wr = ::CreateNamedPipeA(lPipeErr, PIPE_ACCESS_OUTBOUND | FILE_FLAG_OVERLAPPED,
+                                        PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE | PIPE_WAIT, 1,
+                                        __KUL_PROCESS_BUFFER__, __KUL_PROCESS_BUFFER__, 0, &sa);
+if (!g_hChildStd_ERR_Wr) error(__LINE__, "CreatePipe failed");
+g_hChildStd_ERR_Rd = ::CreateFileA(lPipeErr, GENERIC_READ, 0, &sa, OPEN_EXISTING,
+                                   FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED, 0);
+if (!g_hChildStd_ERR_Rd) error(__LINE__, "CreatePipe failed");
 if (!SetHandleInformation(g_hChildStd_ERR_Rd, HANDLE_FLAG_INHERIT, 0))
   error(__LINE__, "SetHandleInformation failed");
 
@@ -105,8 +94,8 @@ siStartInfo.cbReserved2 = 0;
 siStartInfo.lpReserved2 = NULL;
 
 unsigned flags = CREATE_UNICODE_ENVIRONMENT;
-HANDLE cons = CreateFile("CONOUT$", GENERIC_WRITE, FILE_SHARE_WRITE, NULL,
-                         OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+HANDLE cons = CreateFile("CONOUT$", GENERIC_WRITE, FILE_SHARE_WRITE, NULL, OPEN_EXISTING,
+                         FILE_ATTRIBUTE_NORMAL, NULL);
 if (cons == INVALID_HANDLE_VALUE) {
   flags |= DETACHED_PROCESS;
 } else {
@@ -118,21 +107,18 @@ preStart();
 LPTSTR lpszVariable;
 LPCH lpvEnv;
 lpvEnv = GetEnvironmentStrings();
-if (lpvEnv == NULL)
-  error(__LINE__, "GetEnvironmentStrings() failed.");
+if (lpvEnv == NULL) error(__LINE__, "GetEnvironmentStrings() failed.");
 kul::hash::map::S2S env;
 for (lpszVariable = (LPTSTR)lpvEnv; *lpszVariable; lpszVariable++) {
   std::stringstream ss;
-  while (*lpszVariable)
-    ss << *lpszVariable++;
+  while (*lpszVariable) ss << *lpszVariable++;
   std::string var = ss.str();
   if (var.find(":") != std::string::npos)
     env.insert(var.substr(0, var.find(":")), var.substr(var.find(":") + 1));
   else
     env.insert(var, "");
 }
-if (FreeEnvironmentStrings(lpvEnv) == 0)
-  error(__LINE__, "FreeEnvironmentStrings() failed");
+if (FreeEnvironmentStrings(lpvEnv) == 0) error(__LINE__, "FreeEnvironmentStrings() failed");
 
 const char *dir = directory().empty() ? 0 : directory().c_str();
 std::string cmd(toString());
@@ -150,8 +136,7 @@ if (vars().size()) {
     lpszCurrentVariable += wcslen(lpszCurrentVariable) + 1;
   }
   for (auto &evs : env) {
-    if (vars().count(evs.first))
-      continue;
+    if (vars().count(evs.first)) continue;
     std::string var(evs.first + "=" + evs.second);
     if (FAILED(StringCchCopyW(lpszCurrentVariable, __KUL_PROCESS_ENV_BUFFER__,
                               (std::wstring(var.begin(), var.end()).c_str()))))
@@ -159,14 +144,13 @@ if (vars().size()) {
     lpszCurrentVariable += wcslen(lpszCurrentVariable) + 1;
   }
   *lpszCurrentVariable = (TCHAR)0;
-  bSuccess = CreateProcess(NULL, szCmdline, NULL, NULL, TRUE, flags, chNewEnv,
-                           dir, &siStartInfo, &piProcInfo);
+  bSuccess = CreateProcess(NULL, szCmdline, NULL, NULL, TRUE, flags, chNewEnv, dir, &siStartInfo,
+                           &piProcInfo);
 } else
-  bSuccess = CreateProcess(NULL, szCmdline, NULL, NULL, TRUE, flags, NULL, dir,
-                           &siStartInfo, &piProcInfo);
+  bSuccess =
+      CreateProcess(NULL, szCmdline, NULL, NULL, TRUE, flags, NULL, dir, &siStartInfo, &piProcInfo);
 
-if (!bSuccess)
-  error(__LINE__, "CreateProcess failed with last error: " + GetLastError());
+if (!bSuccess) error(__LINE__, "CreateProcess failed with last error: " + GetLastError());
 
 pid(piProcInfo.dwProcessId);
 
@@ -195,28 +179,24 @@ if (this->waitForExit()) {
     alive = WaitForSingleObject(piProcInfo.hProcess, 11) == WAIT_TIMEOUT;
     for (;;) {
       dwRead = 0;
-      bSuccess = ::ReadFile(g_hChildStd_OUT_Rd, chBuf, __KUL_PROCESS_BUFFER__,
-                            &dwRead, &ol);
-      while (!bSuccess && (GetLastError() == ERROR_IO_PENDING ||
-                           GetLastError() == ERROR_IO_INCOMPLETE)) {
+      bSuccess = ::ReadFile(g_hChildStd_OUT_Rd, chBuf, __KUL_PROCESS_BUFFER__, &dwRead, &ol);
+      while (!bSuccess &&
+             (GetLastError() == ERROR_IO_PENDING || GetLastError() == ERROR_IO_INCOMPLETE)) {
         WaitForSingleObject(ol.hEvent, 11);
         bSuccess = GetOverlappedResult(g_hChildStd_OUT_Rd, &ol, &dwRead, 0);
       }
-      if (!bSuccess || dwRead == 0)
-        break;
+      if (!bSuccess || dwRead == 0) break;
       chBuf[dwRead] = '\0';
       out(std::string(chBuf, dwRead));
     }
     for (;;) {
       dwRead = 0;
-      bSuccess = ::ReadFile(g_hChildStd_ERR_Rd, chBuf, __KUL_PROCESS_BUFFER__,
-                            &dwRead, &el);
+      bSuccess = ::ReadFile(g_hChildStd_ERR_Rd, chBuf, __KUL_PROCESS_BUFFER__, &dwRead, &el);
       if (GetLastError() == ERROR_IO_PENDING) {
         WaitForSingleObject(el.hEvent, 11);
         bSuccess = GetOverlappedResult(g_hChildStd_OUT_Rd, &el, &dwRead, 0);
       }
-      if (!bSuccess || dwRead == 0)
-        break;
+      if (!bSuccess || dwRead == 0) break;
       chBuf[dwRead] = '\0';
       err(std::string(chBuf, dwRead));
     }

@@ -38,8 +38,7 @@ char *expanded = realpath(s.c_str(), NULL);
 if (expanded) {
   std::string dir(expanded);
   free(expanded);
-  if (dir.size() > PATH_MAX)
-    KEXCEPT(fs::Exception, "Directory path too large");
+  if (dir.size() > PATH_MAX) KEXCEPT(fs::Exception, "Directory path too large");
   return dir;
 }
 KEXCEPT(fs::Exception, "Directory \"" + s + "\" does not exist");
