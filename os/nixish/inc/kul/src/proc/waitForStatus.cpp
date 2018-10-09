@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 int16_t ret = 0;
 ret = recall(waitpid(pid(), &cStat, 0));
+(void) ret;
 assert(ret);
 
 // }
