@@ -64,16 +64,18 @@ namespace dbg {
 
 class FunctionScope {
  private:
-  uint64_t m_start = 0;
-  const char *m_fi;
-  const char *m_fu;
-  const uint16_t m_li;
-
+#ifndef NDEBUG
+  uint64_t m_start = 0, m_li = 0;
+  const char *m_fi = nullptr, *m_fu = nullptr;
+#endif  // NDEBUG
  public:
+  FunctionScope(){}
+#ifndef NDEBUG
   FunctionScope(const char *fi, const char *fu, const uint16_t &li)
-      : m_start(kul::Now::MICROS()), m_fi(fi), m_fu(fu), m_li(li) {
+      : m_start(kul::Now::MICROS()), m_li(li), m_fi(fi), m_fu(fu) {
     KUL_DBG_FUNC_ON_ENTER
   }
+#endif  // NDEBUG
   ~FunctionScope() { KUL_DBG_FUNC_ON_EXIT }
 };
 }  // namespace dbg
