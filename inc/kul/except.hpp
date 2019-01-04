@@ -60,8 +60,8 @@ class Exception : public std::runtime_error {
   friend std::ostream &operator<<(std::ostream &, const Exception &);
 
  protected:
-  const char *_f = nullptr;
-  const uint16_t _l = 0;
+  const char *_f;
+  const uint16_t _l;
   const std::exception_ptr _ep;
   std::stringstream msg;
 
@@ -72,7 +72,11 @@ class Exception : public std::runtime_error {
   Exception(const Exception &e) : std::runtime_error(e), _f(e.file()), _l(e.line()), _ep(e._ep) {
     msg << e.msg.str();
   }
-  Exception &operator=(const Exception &e) = default;
+
+  Exception &operator=(Exception &e) = delete;
+  Exception &operator=(Exception &&e) = delete;
+  Exception &operator=(const Exception &e) = delete;
+  Exception &operator=(const Exception &&e) = delete;
 
   std::string debug() const {
     std::stringstream ss;
@@ -121,7 +125,11 @@ class Exit : public Exception {
   Exit(const char *f, const uint16_t &l, const std::string &s, const uint16_t &e)
       : Exception(f, l, s), _e(e) {}
   Exit(const Exit &e) : Exception(e), _e(e._e) {}
-  Exit &operator=(const Exit &e) = default;
+
+  Exit &operator=(Exit &e) = delete;
+  Exit &operator=(Exit &&e) = delete;
+  Exit &operator=(const Exit &e) = delete;
+  Exit &operator=(const Exit &&e) = delete;
 
   const uint16_t &code() const { return _e; }
 
