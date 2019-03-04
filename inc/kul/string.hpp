@@ -96,6 +96,10 @@ class String {
     if (s.size() == 0) return;
     while (s.rfind(' ') == s.size() - 1 || s.rfind('\t') == s.size() - 1) s.pop_back();
   }
+
+  template <typename V>
+  static void TRIM(V &strs) { for(auto &v : strs) TRIM(v); }
+
   static void PAD(std::string &s, const uint16_t &p) {
     while (s.size() < p) s += " ";
   }
