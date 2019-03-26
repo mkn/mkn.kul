@@ -3,7 +3,7 @@ set -ex
 PY="${PY:-python3}"; PYGET="get_data.py"; PYSER="ser_data.py"
 
 export PATH="$PWD:/c/Python36-x64/:/c/Program Files/Git/usr/bin:$PATH"
-export PATH=MKN_CL_PREFERRED=1
+export MKN_CL_PREFERRED=1
 
 curl -L https://github.com/Dekken/maiken/raw/binaries/win10_x64/mkn.exe -o mkn.exe
 
