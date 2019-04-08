@@ -81,7 +81,7 @@ class ob{
       std::function<YAML::Node(YAML::Node, size_t)>
        get_with_keys_for_node = [&](YAML::Node n, size_t i){
         if(i < keys.size())
-          return get_with_keys_for_node(n[keys[i]], i++);
+          return get_with_keys_for_node(n[keys[i]], i+1);
         return n;
       };
       auto get_with_keys = [&](){

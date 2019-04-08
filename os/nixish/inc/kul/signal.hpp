@@ -119,6 +119,7 @@ class Signal {
 
 #ifndef _KUL_COMPILED_LIB_
 void kul_sig_handler(int s, siginfo_t *info, void *v) {
+(void) v;
 #include "kul/src/signal/handler.cpp"
 }
 #endif
