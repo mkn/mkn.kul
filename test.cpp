@@ -35,6 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "kul/cli.hpp"
 #include "kul/io.hpp"
 #include "kul/log.hpp"
+#include "kul/math.hpp"
 #include "kul/os.hpp"
 #include "kul/proc.hpp"
 #include "kul/threads.hpp"
@@ -55,6 +56,7 @@ auto tryCatch = [](std::vector<std::function<void()>> funcs, bool katch) {
 
 #include "test/cli.cpp.inc"
 #include "test/io.cpp.inc"
+#include "test/math.cpp.inc"
 #include "test/os.cpp.inc"
 #include "test/proc.cpp.inc"
 #include "test/string.cpp.inc"

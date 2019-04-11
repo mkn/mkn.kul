@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // bool kul::this_thread::main(){
 
 const std::shared_ptr<void> hThreadSnapshot(CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0),
-                                                 CloseHandle);
+                                            CloseHandle);
 if (hThreadSnapshot.get() == INVALID_HANDLE_VALUE)
   KEXCEPT(kul::threading::Exception, "GetMainThreadId failed");
 THREADENTRY32 tEntry;

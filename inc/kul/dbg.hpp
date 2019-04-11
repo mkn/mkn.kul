@@ -33,7 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <kul/log.hpp>
 
-namespace kul { namespace dbg {
+namespace kul {
+namespace dbg {
 
 #if defined(KUL_FORCE_TRACE) || !defined(NDEBUG)
 
@@ -68,7 +69,7 @@ class FunctionScope {
   const char *m_fi = nullptr, *m_fu = nullptr;
 #endif  // defined(KUL_FORCE_TRACE) || !defined(NDEBUG)
  public:
-  FunctionScope(){}
+  FunctionScope() {}
 #if defined(KUL_FORCE_TRACE) || !defined(NDEBUG)
   FunctionScope(const char *fi, const char *fu, const uint16_t &li)
       : m_start(kul::Now::MICROS()), m_li(li), m_fi(fi), m_fu(fu) {

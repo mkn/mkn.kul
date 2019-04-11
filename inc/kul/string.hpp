@@ -98,7 +98,9 @@ class String {
   }
 
   template <typename V>
-  static void TRIM(V &strs) { for(auto &v : strs) TRIM(v); }
+  static void TRIM(V &strs) {
+    for (auto &v : strs) TRIM(v);
+  }
 
   static void PAD(std::string &s, const uint16_t &p) {
     while (s.size() < p) s += " ";

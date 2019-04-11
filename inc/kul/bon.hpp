@@ -35,7 +35,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "kul/yaml.hpp"
 // #include <vector>
 
-
 namespace kul {
 namespace bon {
 class Exception : public kul::Exception {
@@ -45,111 +44,111 @@ class Exception : public kul::Exception {
 
 enum class TYPE { OBJ = 0, STR, INT };
 
-class ob{
-  private:
-    static void BUILD(std::stringstream *tree, size_t size, ob &o){
-      o.v = tree[0].str();
-      if(size == 1) return;
-      if(size == 2) o.a = tree[1].str();
-      else{
-        o.c.emplace_back();
-        BUILD(tree, size - 1, o.c.back());
-      }
+class ob {
+ private:
+  static void BUILD(std::stringstream *tree, size_t size, ob &o) {
+    o.v = tree[0].str();
+    if (size == 1) return;
+    if (size == 2)
+      o.a = tree[1].str();
+    else {
+      o.c.emplace_back();
+      BUILD(tree, size - 1, o.c.back());
     }
-    static ob BUILD(std::stringstream *tree, size_t size){
-      ob o;
-      BUILD(tree, size, o);
-      return o;
-    }
-  public:
-    std::string v, a;
-    std::vector<ob> c;
-    static ob BUILD(std::vector<std::stringstream> &tree){ return BUILD(tree.data(), tree.size()); }
-    std::string to_string() const {
-      std::stringstream ss;
-      ss << v;
-      std::function<void(const ob &)> recurse = [&](const ob &o) {
-        if(o.c.empty()) ss << " : " << o.a;
-        for(const auto & oc : o.c) recurse(oc);
-      };
-      recurse(*this);
-      return ss.str();
-    }
-    YAML::Node to_yaml() const {
-      YAML::Node node;
-      std::vector<std::string> keys;
-      std::function<YAML::Node(YAML::Node, size_t)>
-       get_with_keys_for_node = [&](YAML::Node n, size_t i){
-        if(i < keys.size())
-          return get_with_keys_for_node(n[keys[i]], i+1);
-        return n;
-      };
-      auto get_with_keys = [&]() {
-        if(keys.empty()) return node;
-        return get_with_keys_for_node(node[keys.back()], 1);
-      };
-      std::function<void(const ob &)> recurse = [&](const ob &o) {
-        if(o.a.empty() && o.v.empty() && o.c.empty()) return;
+  }
+  static ob BUILD(std::stringstream *tree, size_t size) {
+    ob o;
+    BUILD(tree, size, o);
+    return o;
+  }
 
-        if(o.a.empty()) {
-          auto p = kul::String::ESC_SPLIT(o.v, ':');
-          if(p.size() == 2) keys.emplace_back(p[0]);
-          auto val = get_with_keys();
-          val = p[1];
+ public:
+  std::string v, a;
+  std::vector<ob> c;
+  static ob BUILD(std::vector<std::stringstream> &tree) { return BUILD(tree.data(), tree.size()); }
+  std::string to_string() const {
+    std::stringstream ss;
+    ss << v;
+    std::function<void(const ob &)> recurse = [&](const ob &o) {
+      if (o.c.empty()) ss << " : " << o.a;
+      for (const auto &oc : o.c) recurse(oc);
+    };
+    recurse(*this);
+    return ss.str();
+  }
+  YAML::Node to_yaml() const {
+    YAML::Node node;
+    std::vector<std::string> keys;
+    std::function<YAML::Node(YAML::Node, size_t)> get_with_keys_for_node = [&](YAML::Node n,
+                                                                               size_t i) {
+      if (i < keys.size()) return get_with_keys_for_node(n[keys[i]], i + 1);
+      return n;
+    };
+    auto get_with_keys = [&]() {
+      if (keys.empty()) return node;
+      return get_with_keys_for_node(node[keys.back()], 1);
+    };
+    std::function<void(const ob &)> recurse = [&](const ob &o) {
+      if (o.a.empty() && o.v.empty() && o.c.empty()) return;
+
+      if (o.a.empty()) {
+        auto p = kul::String::ESC_SPLIT(o.v, ':');
+        if (p.size() == 2) keys.emplace_back(p[0]);
+        auto val = get_with_keys();
+        val = p[1];
+      } else if (o.c.empty()) {
+        keys.emplace_back(o.v);
+        auto val = get_with_keys();
+        auto vals = kul::String::ESC_SPLIT(o.a, ',');
+        if (vals.empty()) val = o.a;
+        for (const auto &v : vals) {
+          auto p = kul::String::ESC_SPLIT(v, ':');
+          if (p.size() == 2) {
+            kul::String::TRIM(p);
+            val[p[0]] = p[1];
+          } else
+            KEXCEPTION("FAIL");
         }
-        else
-        if(o.c.empty()) {
-          keys.emplace_back(o.v);
-          auto val = get_with_keys();
-          auto vals = kul::String::ESC_SPLIT(o.a, ',');
-          if(vals.empty()) val = o.a;
-          for(const auto & v : vals){
-            auto p = kul::String::ESC_SPLIT(v, ':');
-            if(p.size() == 2){
-              kul::String::TRIM(p);
-              val[p[0]] = p[1];
-            }
-            else KEXCEPTION("FAIL");
-          }
-        }
-        for(const auto & oc : o.c) recurse(oc);
-      };
-      recurse(*this);
-      YAML::Emitter out;
-      out << node;
-      return node;
-    }
+      }
+      for (const auto &oc : o.c) recurse(oc);
+    };
+    recurse(*this);
+    YAML::Emitter out;
+    out << node;
+    return node;
+  }
 };
 
 YAML::Node from(std::string s) {
-  if(s[0] != '{' || s[s.size() - 1] != '}') KEXCEPTION("FAIL");
+  if (s[0] != '{' || s[s.size() - 1] != '}') KEXCEPTION("FAIL");
   std::string r = s;
   size_t tri = -1;
   std::vector<ob> obs;
   std::vector<std::stringstream> tree(0);
-  auto subtree = [&](){
+  auto subtree = [&]() {
     tree.emplace_back();
     tri++;
     return true;
   };
-  auto c_check = [&](){
+  auto c_check = [&]() {
     obs.emplace_back(ob::BUILD(tree));
-    tree.clear(); tri = -1;
+    tree.clear();
+    tri = -1;
     subtree();
     return true;
   };
-  for(size_t i = 0; i < r.size(); i++){
-    if(r[i] == '}' && c_check()) continue;
-    if(r[i] == '{' && subtree()) continue;
+  for (size_t i = 0; i < r.size(); i++) {
+    if (r[i] == '}' && c_check()) continue;
+    if (r[i] == '{' && subtree()) continue;
     tree[tri] << r[i];
   }
-  if(tri > 1) c_check();
+  if (tri > 1) c_check();
   std::vector<YAML::Node> nodes;
-  for(const auto &o : obs) nodes.emplace_back(o.to_yaml());
+  for (const auto &o : obs) nodes.emplace_back(o.to_yaml());
   return YAML::Node(nodes);
 }
 
-}
-}
+}  // namespace bon
+}  // namespace kul
 
 #endif  // _KUL_BON_HPP_
