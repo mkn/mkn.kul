@@ -56,7 +56,7 @@ auto tryCatch = [](std::vector<std::function<void()>> funcs, bool katch) {
 
 #include "test/cli.cpp.inc"
 #include "test/io.cpp.inc"
-#include "test/math.cpp.inc"
+#include "test/math.ipp"
 #include "test/os.cpp.inc"
 #include "test/proc.cpp.inc"
 #include "test/string.cpp.inc"

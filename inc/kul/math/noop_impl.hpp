@@ -3,18 +3,18 @@
 #define KUL_MATH_NOOP_IMPL_H_
 
 // This macro ensures that the corresponding optimized blas function is used if available
-#if !defined(NDEBUG) && defined(TICK_USE_CBLAS)
+#if !defined(NDEBUG) && defined(_KUL_USE_CBLAS)
 // x and y are two pointers
 #define CHECK_BLAS_OPTIMIZATION_PP(x, y, func_name)                               \
   if (typeid(*x) == typeid(*y) &&                                                 \
       (typeid(*x) == typeid(double) || typeid(*x) == typeid(float))) /* NOLINT */ \
-    TICK_ERROR("" << func_name << " should use blas optimized version");
+    KEXCEPT(kul::math::Exception, func_name) << " should use blas optimized version";
 
 // x is a pointer, y is a scalar
 #define CHECK_BLAS_OPTIMIZATION_PS(x, y, func_name)                               \
   if (typeid(*x) == typeid(y) &&                                                  \
       (typeid(*x) == typeid(double) || typeid(*x) == typeid(float))) /* NOLINT */ \
-    TICK_ERROR("" << func_name << " should use blas optimized version");
+    KEXCEPT(kul::math::Exception, func_name) << " should use blas optimized version";
 #else
 #define CHECK_BLAS_OPTIMIZATION_PP(x, y, func_name)
 #define CHECK_BLAS_OPTIMIZATION_PS(x, y, func_name)
@@ -26,8 +26,8 @@ namespace detail {
 
 template <typename T>
 template <typename K>
-typename std::enable_if<std::is_same<T, std::atomic<K>>::value, T>::type noop<T>::dot(
-    const ulong n, const T *x, const K *y) const {
+typename std::enable_if<std::is_same<T, std::atomic<K>>::value, T>::type
+noop<T>::dot(const ulong n, const T *x, const K *y) {
   T result{0};
   for (uint64_t i = 0; i < n; ++i) {
     result += x[i].load() * y[i];
@@ -36,8 +36,8 @@ typename std::enable_if<std::is_same<T, std::atomic<K>>::value, T>::type noop<T>
 }
 template <typename T>
 template <typename K>
-typename std::enable_if<std::is_same<T, std::atomic<K>>::value, K>::type noop<T>::dot(
-    const ulong n, const K *x, const T *y) const {
+typename std::enable_if<std::is_same<T, std::atomic<K>>::value, K>::type
+noop<T>::dot(const ulong n, const K *x, const T *y) {
   K result{0};
   for (uint64_t i = 0; i < n; ++i) {
     result += x[i] * y[i].load();
@@ -47,13 +47,11 @@ typename std::enable_if<std::is_same<T, std::atomic<K>>::value, K>::type noop<T>
 
 template <typename T>
 template <typename K>
-typename std::enable_if<!std::is_same<T, std::atomic<K>>::value, T>::type noop<T>::dot(
-    const ulong n, const T *x, const K *y) const {
+typename std::enable_if<!std::is_same<T, std::atomic<K>>::value, T>::type
+noop<T>::dot(const ulong n, const T *x, const K *y) {
   CHECK_BLAS_OPTIMIZATION_PP(x, y, "dot prod");
   T result{0};
-  for (uint64_t i = 0; i < n; ++i) {
-    result += x[i] * y[i];
-  }
+  for (uint64_t i = 0; i < n; ++i) result += x[i] * y[i];
   return result;
 }
 
@@ -61,7 +59,7 @@ template <typename T>
 template <typename K, typename Y>
 typename std::enable_if<std::is_same<T, std::atomic<K>>::value &&
                         !std::is_same<Y, std::atomic<K>>::value>::type
-noop<T>::mult_incr(const uint64_t n, const K alpha, const Y *x, T *y) const {
+noop<T>::mult_incr(const uint64_t n, const K alpha, const Y *x, T *y) {
   for (uint64_t i = 0; i < n; ++i) {
     K y_i = y[i].load();
     y_i += alpha * x[i];
@@ -73,7 +71,7 @@ template <typename T>
 template <typename K, typename Y>
 typename std::enable_if<std::is_same<Y, std::atomic<K>>::value &&
                         !std::is_same<T, std::atomic<K>>::value>::type
-noop<T>::mult_incr(const uint64_t n, const K alpha, const Y *x, T *y) const {
+noop<T>::mult_incr(const uint64_t n, const K alpha, const Y *x, T *y) {
   for (uint64_t i = 0; i < n; ++i) {
     K y_i = y[i];
     y_i += alpha * x[i].load();
@@ -84,7 +82,7 @@ template <typename T>
 template <typename K, typename Y>
 typename std::enable_if<std::is_same<T, std::atomic<K>>::value &&
                         std::is_same<Y, std::atomic<K>>::value>::type
-noop<T>::mult_incr(const uint64_t n, const K alpha, const Y *x, T *y) const {
+noop<T>::mult_incr(const uint64_t n, const K alpha, const Y *x, T *y) {
   for (uint64_t i = 0; i < n; ++i) {
     K y_i = y[i].load();
     y_i += alpha * x[i].load();
@@ -94,7 +92,7 @@ noop<T>::mult_incr(const uint64_t n, const K alpha, const Y *x, T *y) const {
 template <typename T>
 template <typename K, typename Y>
 typename std::enable_if<std::is_same<T, K>::value && std::is_same<Y, K>::value>::type
-noop<T>::mult_incr(const uint64_t n, const K alpha, const Y *x, T *y) const {
+noop<T>::mult_incr(const uint64_t n, const K alpha, const Y *x, T *y) {
   CHECK_BLAS_OPTIMIZATION_PP(x, y, "mult_incr");
   for (uint64_t i = 0; i < n; ++i) {
     K y_i = y[i];
@@ -105,17 +103,15 @@ noop<T>::mult_incr(const uint64_t n, const K alpha, const Y *x, T *y) const {
 
 template <typename T>
 template <typename K>
-typename std::enable_if<std::is_same<T, std::atomic<K>>::value>::type noop<T>::set(const ulong n,
-                                                                                   const K alpha,
-                                                                                   T *x) const {
+typename std::enable_if<std::is_same<T, std::atomic<K>>::value>::type
+noop<T>::set(const ulong n, const K alpha, T *x) {
   for (uint64_t i = 0; i < n; ++i) x[i].store(alpha);
 }
 template <typename T>
 template <typename K>
-typename std::enable_if<!std::is_same<T, std::atomic<K>>::value>::type noop<T>::set(const ulong n,
-                                                                                    const K alpha,
-                                                                                    T *x) const {
-#if !defined(NDEBUG) && defined(TICK_USE_CBLAS) && defined(TICK_USE_CATLAS_)
+typename std::enable_if<!std::is_same<T, std::atomic<K>>::value>::type
+noop<T>::set(const ulong n, const K alpha, T *x) {
+#if !defined(NDEBUG) && defined(_KUL_USE_CBLAS) && defined(_KUL_USE_CATLAS)
   CHECK_BLAS_OPTIMIZATION_PS(x, alpha, "set");
 #endif
   for (uint64_t i = 0; i < n; ++i) x[i] = alpha;
@@ -123,15 +119,14 @@ typename std::enable_if<!std::is_same<T, std::atomic<K>>::value>::type noop<T>::
 
 template <typename T>
 template <typename K>
-K noop<T>::sum(const ulong n, const T *x) const {
+K noop<T>::sum(const ulong n, const T *x) {
   return std::accumulate(x, x + n, K{0});
 }
 
 template <typename T>
 template <typename K>
-typename std::enable_if<std::is_same<T, std::atomic<K>>::value>::type noop<T>::scale(const ulong n,
-                                                                                     const K alpha,
-                                                                                     T *x) const {
+typename std::enable_if<std::is_same<T, std::atomic<K>>::value>::type
+noop<T>::scale(const ulong n, const K alpha, T *x) {
   for (uint64_t i = 0; i < n; ++i) {
     K x_i = x[i].load();
     x_i *= alpha;
@@ -140,9 +135,8 @@ typename std::enable_if<std::is_same<T, std::atomic<K>>::value>::type noop<T>::s
 }
 template <typename T>
 template <typename K>
-typename std::enable_if<!std::is_same<T, std::atomic<K>>::value>::type noop<T>::scale(const ulong n,
-                                                                                      const K alpha,
-                                                                                      T *x) const {
+typename std::enable_if<!std::is_same<T, std::atomic<K>>::value>::type
+noop<T>::scale(const ulong n, const K alpha, T *x) {
   CHECK_BLAS_OPTIMIZATION_PS(x, alpha, "scale");
   for (uint64_t i = 0; i < n; ++i) x[i] *= alpha;
 }
@@ -151,7 +145,7 @@ template <typename T>
 template <typename K>
 typename std::enable_if<std::is_same<T, std::atomic<K>>::value>::type
 noop<T>::dot_matrix_vector_incr(const ulong m, const ulong n, const K alpha, const T *a, const T *x,
-                                const T beta, T *y) const {
+                                const T beta, T *y) {
   for (ulong i = 0; i < m; ++i) {
     K y_i = beta * y[i];
     for (ulong j = 0; j < n; ++j) {
@@ -165,7 +159,7 @@ template <typename T>
 template <typename K>
 typename std::enable_if<!std::is_same<T, std::atomic<K>>::value>::type
 noop<T>::dot_matrix_vector_incr(const ulong m, const ulong n, const K alpha, const T *a, const T *x,
-                                const T beta, T *y) const {
+                                const T beta, T *y) {
   for (ulong i = 0; i < m; ++i) {
     y[i] = beta * y[i];
     for (ulong j = 0; j < n; ++j) {
@@ -176,8 +170,8 @@ noop<T>::dot_matrix_vector_incr(const ulong m, const ulong n, const K alpha, con
 
 template <typename T>
 template <typename K>
-typename std::enable_if<std::is_same<T, std::atomic<K>>::value>::type noop<T>::dot_matrix_vector(
-    const ulong m, const ulong n, const K alpha, const T *a, const T *x, T *y) const {
+typename std::enable_if<std::is_same<T, std::atomic<K>>::value>::type
+noop<T>::dot_matrix_vector(const ulong m, const ulong n, const K alpha, const T *a, const T *x, T *y) {
   for (ulong i = 0; i < m; ++i) {
     K y_i = 0;
     for (ulong j = 0; j < n; ++j) {
@@ -189,8 +183,8 @@ typename std::enable_if<std::is_same<T, std::atomic<K>>::value>::type noop<T>::d
 
 template <typename T>
 template <typename K>
-typename std::enable_if<!std::is_same<T, std::atomic<K>>::value>::type noop<T>::dot_matrix_vector(
-    const ulong m, const ulong n, const K alpha, const T *a, const T *x, T *y) const {
+typename std::enable_if<!std::is_same<T, std::atomic<K>>::value>::type
+noop<T>::dot_matrix_vector(    const ulong m, const ulong n, const K alpha, const T *a, const T *x, T *y) {
   for (ulong i = 0; i < m; ++i) {
     y[i] = 0;
     for (ulong j = 0; j < n; ++j) {

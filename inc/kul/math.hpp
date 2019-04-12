@@ -33,8 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <math.h>
 
-#include "kul/except.hpp"
-#include "kul/log.hpp"
+#include "kul/dbg.hpp"
 
 namespace kul {
 namespace math {
@@ -67,8 +66,6 @@ T root(const float &f, const int16_t &r = 2, const uint16_t &it = 6, T g = 0) {
 }  // END NAMESPACE math
 }  // END NAMESPACE kul
 
-// #include <atomic>
-// #include <vector>
 #include <algorithm>
 #include <numeric>
 #include <type_traits>

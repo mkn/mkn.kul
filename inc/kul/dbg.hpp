@@ -36,7 +36,32 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace kul {
 namespace dbg {
 
+class StackTrace{
+ private:
+   std::vector<std::string> _stk;
+ public:
+   StackTrace() = delete;
+   StackTrace(const StackTrace &) = delete;
+   StackTrace &operator=(const StackTrace &) = delete;
+   StackTrace &operator=(const StackTrace &&) = delete;
+   StackTrace(const std::string &s) { _stk.emplace_back(s); }
+   StackTrace(const StackTrace &&that) {
+     if(this != &that) this->_stk = that._stk;
+   }
+   const std::vector<std::string> &stack() const { return _stk; }
+};
+
 #if defined(KUL_FORCE_TRACE) || !defined(NDEBUG)
+
+#define __KUL_TRACE__ 1
+
+#ifndef KUL_TRACE_OR_VOID
+#define KUL_TRACE_OR_VOID kul::dbg::StackTrace
+#endif  // KUL_TRACE_OR_VOID
+
+#ifndef KUL_STACK_TRACE
+#define KUL_STACK_TRACE return kul::dbg::StackTrace(__PRETTY_FUNCTION__);
+#endif  // KUL_STACK_TRACE
 
 #ifndef KUL_DBG_FUNC_ENTER
 #define KUL_DBG_FUNC_ENTER \
@@ -56,6 +81,9 @@ namespace dbg {
 
 #else  //
 
+#define __KUL_TRACE__ 0
+#define KUL_TRACE_OR_VOID void
+#define KUL_STACK_TRACE
 #define KUL_DBG_FUNC_ENTER
 #define KUL_DBG_FUNC_ON_ENTER
 #define KUL_DBG_FUNC_ON_EXIT
