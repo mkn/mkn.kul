@@ -51,7 +51,7 @@ class StackTrace{
    const std::vector<std::string> &stack() const { return _stk; }
 };
 
-#if defined(KUL_FORCE_TRACE) || !defined(NDEBUG)
+#if !defined(NDEBUG) || defined(KUL_FORCE_TRACE)
 
 #define __KUL_TRACE__ 1
 

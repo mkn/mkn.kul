@@ -71,10 +71,10 @@ T root(const float &f, const int16_t &r = 2, const uint16_t &it = 6, T g = 0) {
 #include <type_traits>
 
 #include "kul/math/noop.hpp"
+
 #if defined(_KUL_USE_MKL)
 #include "mkl.h"
 #elif defined(_KUL_USE_CBLAS)
-
 #if defined(__APPLE__)
 #include <Accelerate/Accelerate.h>
 #else
@@ -82,22 +82,10 @@ extern "C" {
 #include <cblas.h>
 }
 #endif  // defined(__APPLE__)
-#else
-namespace kul {
-namespace math {
-template <typename T>
-using ops = detail::noop<T>;
-}  // namespace math
-}  // namespace kul
 #endif
 #if defined(_KUL_USE_MKL) || defined(_KUL_USE_CBLAS)
 #include "kul/math/blas.hpp"
-namespace kul {
-namespace math {
-template <typename T>
-using ops = detail::cblas<T>;
-}  // namespace math
-}  // namespace kul
+#else
+#include "kul/math/noblas.hpp"
 #endif
-#include "kul/math/noop_impl.hpp"
 #endif  // _KUL_MATH_HPP_

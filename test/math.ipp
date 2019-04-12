@@ -29,25 +29,35 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-template <typename T>
+template <typename T, typename K = T>
 void do_math(){
+  T beta = 2;
   T a[2] = {1 , 2}, b[2] = {3, 4};
-  kul::math::ops<T>::template dot<T>(2, &a[0], &b[0]);
-  kul::math::ops<T>::scale(2, 2, &a[0]);
-  kul::math::ops<T>::dot_matrix_vector_incr(2, 2,2, &a[0], &b[0], 2, &b[0]);
-#if __KUL_TRACE__ == 1
-  auto trace =
-#endif
-  kul::math::ops<T>::mult_incr(2, 2, &a[0], &b[0]);
-#if __KUL_TRACE__ == 1
-  for(auto s : trace.stack()) KLOG(INF) << s;
-#endif
+  kul::math::dot_matrix_vector_incr(2, 2, 2, &a[0], &b[0], beta, &b[0]);
 }
 
-TEST(Math, sum) {
+template <typename T, typename K = T>
+void do_math_has_atomics(){
+  T a[2] = {1 , 2}, b[2] = {3, 4};
+  kul::math::template dot<T>(2, &a[0], &b[0]);
+  kul::math::scale(2u, 2u, &a[0]);
+  kul::math::mult_incr(2u, 2u, &a[0], &b[0]);
+}
+
+TEST(Math, double) {
   do_math<double>();
+}
+TEST(Math, atomic_double) {
+  do_math_has_atomics<double, std::atomic<double>>();
+}
+TEST(Math, float) {
   do_math<float>();
+}
+TEST(Math, atomic_float) {
+  do_math_has_atomics<float, std::atomic<float>>();
+}
+
+TEST(Math, more) {
   do_math<uint32_t>();
   do_math<int32_t>();
-
 }

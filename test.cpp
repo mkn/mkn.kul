@@ -54,12 +54,12 @@ auto tryCatch = [](std::vector<std::function<void()>> funcs, bool katch) {
     }
 };
 
-#include "test/cli.cpp.inc"
-#include "test/io.cpp.inc"
+#include "test/cli.ipp"
+#include "test/io.ipp"
 #include "test/math.ipp"
-#include "test/os.cpp.inc"
-#include "test/proc.cpp.inc"
-#include "test/string.cpp.inc"
+#include "test/os.ipp"
+#include "test/proc.ipp"
+#include "test/string.ipp"
 
 int main(int argc, char *argv[]) {
   ::testing::InitGoogleMock(&argc, argv);
