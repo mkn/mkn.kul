@@ -11,21 +11,18 @@ parent: lib
 
 profile:
   - name: base
-    inc: ./inc ./os/${OS}/inc
-    if_inc:
-        bsd: ./os/nixish/inc
-        nix: ./os/nixish/inc
+    inc: ./inc
 
   - name: lib
     parent: base
 
-  - name: lib-compiled
-    parent: base
-    src: ./src ./os/${OS}/src
-    if_src:
-        bsd: ./os/nixish/src
-        nix: ./os/nixish/src
-    arg: -D_KUL_COMPILED_LIB_
+  # - name: lib-compiled
+  #   parent: base
+  #   src: ./src ./os/${OS}/src
+  #   if_src:
+  #       bsd: ./os/nixish/src
+  #       nix: ./os/nixish/src
+  #   arg: -D_KUL_COMPILED_LIB_
 
   - name: test
     parent: lib
@@ -42,7 +39,7 @@ profile:
     - name: google.benchmark # https://github.com/mkn/google.benchmark
 
   - name: usage
-    self: lib-compiled
+    self: lib
     main: usage.cpp
 
   - name: format

@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string>
 #include <vector>
 
-#include "kul/cli.os.hpp"
+#include "kul/os/cli.hpp"
 #include "kul/except.hpp"
 #include "kul/log.hpp"
 #include "kul/map.hpp"

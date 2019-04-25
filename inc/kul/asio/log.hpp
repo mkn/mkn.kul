@@ -114,7 +114,7 @@ class OutMessage : public Message {
 };
 class ErrMessage : public Message {
  public:
-  ~ErrMessage() { LogMan::INSTANCE().err(m, ss.str()); }
+  ~ErrMessage() { LogMan::INSTANCE().err(ss.str()); }
   ErrMessage() : Message(kul::log::mode::ERR) {}
 };
 

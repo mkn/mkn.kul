@@ -35,11 +35,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <memory>
 #include <string>
 
-#include "kul/def.hpp"
+#include "kul/defs.hpp"
 #include "kul/except.hpp"
 #include "kul/os.hpp"
 #include "kul/string.hpp"
-#include "kul/threads.os.hpp"
+#include "kul/os/threads.hpp"
 #include "kul/time.hpp"
 
 #ifndef __KUL_LOG_TIME_FRMT__

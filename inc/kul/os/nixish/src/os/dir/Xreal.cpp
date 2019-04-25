@@ -28,21 +28,19 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#ifndef _KUL_SYS_BASE_HPP_
-#define _KUL_SYS_BASE_HPP_
 
-#include "kul/os.hpp"
+// This file is included by other files and is not in itself syntactically
+// correct.
 
-namespace kul {
+// std::string kul::Dir::REAL(const std::string& s) KTHROW(fs::Exception){
 
-namespace sys {
+char *expanded = realpath(s.c_str(), NULL);
+if (expanded) {
+  std::string dir(expanded);
+  free(expanded);
+  if (dir.size() > PATH_MAX) KEXCEPT(fs::Exception, "Directory path too large");
+  return dir;
+}
+KEXCEPT(fs::Exception, "Directory \"" + s + "\" does not exist");
 
-class Exception : public kul::Exception {
- public:
-  Exception(const char *f, const uint16_t &l, const std::string &s) : kul::Exception(f, l, s) {}
-};
-
-}  // END NAMESPACE sys
-}  // END NAMESPACE kul
-
-#endif /* _KUL_SYS_BASE_HPP_ */
+// }

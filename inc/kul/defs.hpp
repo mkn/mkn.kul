@@ -40,13 +40,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef __GNUC__
 #define KUL_PUBLISH __attribute__((dllexport))
 #else
-#define KUL_PUBLISH __declspec(dllexport)  // Note: actually gcc seems to also supports this syntax.
+#define KUL_PUBLISH __declspec(dllexport)
 #endif
 #else
 #ifdef __GNUC__
 #define KUL_PUBLISH __attribute__((dllimport))
 #else
-#define KUL_PUBLISH __declspec(dllimport)  // Note: actually gcc seems to also supports this syntax.
+#define KUL_PUBLISH __declspec(dllimport)
 #endif
 #endif
 #else
@@ -64,5 +64,31 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef KUL_PRIVATE
 #define KUL_PRIVATE
 #endif
+
+#if defined(__APPLE__) ||  defined(__NetBSD__) || defined(__FreeBSD__)
+#define KUL_IS_BSD 1
+#endif
+
+#if defined(_WIN32)
+#define KUL_IS_WIN 1
+#endif
+
+#ifndef KUL_IS_WIN
+#define KUL_IS_WIN 0
+#endif
+
+#ifndef KUL_IS_BSD
+#define KUL_IS_BSD 0
+#endif
+
+#if !KUL_IS_WIN && !KUL_IS_BSD
+#define KUL_IS_NIX 1
+#endif
+
+#ifndef KUL_IS_NIX
+#define KUL_IS_NIX 0
+#endif
+
+#include "kul/os/def.hpp"
 
 #endif /* _KUL_DEFS_HPP_ */

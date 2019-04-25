@@ -188,7 +188,7 @@ class Test {
     kul::LogMan::INSTANCE().setErr(nullptr);
 
     {
-      kul::File os_inc("os.cpp.inc", kul::Dir("test"));
+      kul::File os_inc("os.ipp", kul::Dir("test"));
       kul::File os_hpp("os.hpp", kul::Dir("inc/kul"));
       if (!os_hpp || !os_inc) KEXCEPTION("UH OH!");
       KLOG(INF) << os_inc.relative(os_hpp);
@@ -312,9 +312,9 @@ class Test {
 
     {
       kul::ConcurrentThreadPool<> ctp(5, 1);
-      auto lambda = [](uint a, uint b) { KLOG(INF) << (a + b); };
+      auto lambda = [](unsigned int a, unsigned int b) { KLOG(INF) << (a + b); };
       ctp.async(std::bind(lambda, 2, 4));
-      auto lambdb = [](uint a, uint b) {
+      auto lambdb = [](unsigned int a, unsigned int b) {
         KLOG(INF) << (a + b);
         KEXCEPTION("Exceptional!");
       };
@@ -326,9 +326,9 @@ class Test {
 
     {
       kul::ChroncurrentThreadPool<> ctp(5, 1);
-      auto lambda = [](uint a, uint b) { KLOG(INF) << (a + b); };
+      auto lambda = [](unsigned int a, unsigned int b) { KLOG(INF) << (a + b); };
       ctp.async(std::bind(lambda, 2, 4));
-      auto lambdb = [](uint a, uint b) {
+      auto lambdb = [](unsigned int a, unsigned int b) {
         KLOG(INF) << (a + b);
         KEXCEPT(kul::Exception, "Exceptional!");
       };

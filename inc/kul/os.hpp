@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "kul/cpu.hpp"
 #include "kul/except.hpp"
-#include "kul/os.os.hpp"
+#include "kul/os/os.hpp"
 #include "kul/string.hpp"
 
 #include <fstream>
@@ -248,7 +248,7 @@ class Dir : public fs::Item {
 
 #ifndef _KUL_COMPILED_LIB_
   static std::string REAL(const std::string &s) KTHROW(fs::Exception) {
-#include "kul/src/os/dir/Xreal.cpp"
+#include "kul/os/src/xreal.ipp"
   }
 #else
   static std::string REAL(const std::string &s) KTHROW(fs::Exception);
@@ -529,11 +529,11 @@ inline void kul::Dir::rm() const {
 #ifndef _KUL_COMPILED_LIB_
 
 inline std::vector<kul::Dir> kul::Dir::dirs(bool incHidden) const KTHROW(fs::Exception) {
-#include "kul/src/os/dir/dirs.cpp"
+#include "kul/os/src/dirs.ipp"
 }
 
 inline std::vector<kul::File> kul::Dir::files(bool recursive) const KTHROW(fs::Exception) {
-#include "kul/src/os/dir/files.cpp"
+#include "kul/os/src/files.ipp"
 }
 
 #endif  //_KUL_COMPILED_LIB_

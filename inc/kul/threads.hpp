@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _KUL_THREADS_HPP_
 
 #include "kul/map.hpp"
-#include "kul/threads.os.hpp"
+#include "kul/os/threads.hpp"
 
 namespace kul {
 
