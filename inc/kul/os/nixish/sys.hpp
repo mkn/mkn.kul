@@ -65,6 +65,7 @@ class SharedLibrary {
     if (_loaded) dlclose(_handle);
     dlerror();
   }
+  const kul::File file() const { return _f; }
 };
 
 template <class F>

@@ -62,6 +62,7 @@ class SharedLibrary {
   ~SharedLibrary() {
     if (_loaded) FreeLibrary(_handle);
   }
+  const kul::File file() const { return _f; }
 };
 
 template <class F>
