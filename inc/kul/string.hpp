@@ -145,9 +145,9 @@ class String {
     std::string tmp = l;
     size_t pos = 0, esc = 0;
     while ((pos = l.find(d, esc)) != std::string::npos) {
-      if (pos > 0 && tmp.find(es + ds) == pos - 1) {
+      if (pos && l[pos - 1] == e) {
         esc = pos + 1;
-        tmp = tmp.substr(esc);
+        tmp = l.substr(esc);
         continue;
       }
       if (tmp.find(d, esc) == std::string::npos) break;
