@@ -103,7 +103,7 @@ namespace hash {
 using namespace google;
 
 template <class T, class HashFcn, class EqualKey, class Alloc = libc_allocator_with_realloc<T> >
-class Set : google::sparse_hash_set<T, HashFcn, EqualKey> {
+class Set : public google::sparse_hash_set<T, HashFcn, EqualKey> {
  public:
   typedef typename google::sparse_hash_set<T, HashFcn, EqualKey, Alloc> Hash;
   typedef typename Hash::size_type size_type;
@@ -132,7 +132,7 @@ using String = Set<std::string, std::hash<std::string>, StdStringComparator>;
 
 template <class K, class V, class HashFcn, class EqualKey,
           class Alloc = libc_allocator_with_realloc<std::pair<K, V> > >
-class Map : google::sparse_hash_map<K, V, HashFcn, EqualKey> {
+class Map : public google::sparse_hash_map<K, V, HashFcn, EqualKey> {
  public:
   typedef typename google::sparse_hash_map<K, V, HashFcn, EqualKey> map;
   typedef typename map::size_type size_type;
@@ -171,7 +171,7 @@ namespace hash {
 using namespace google;
 
 template <class T, class HashFcn, class EqualKey, class Alloc = libc_allocator_with_realloc<T> >
-class Set : google::dense_hash_set<T, HashFcn, EqualKey> {
+class Set : public google::dense_hash_set<T, HashFcn, EqualKey> {
  public:
   typedef typename google::dense_hash_set<T, HashFcn, EqualKey, Alloc> Hash;
   typedef typename Hash::size_type size_type;
@@ -200,7 +200,7 @@ using String = Set<std::string, std::hash<std::string>, StdStringComparator>;
 
 template <class K, class V, class HashFcn, class EqualKey,
           class Alloc = libc_allocator_with_realloc<std::pair<K, V> > >
-class Map : google::dense_hash_map<K, V, HashFcn, EqualKey> {
+class Map : public google::dense_hash_map<K, V, HashFcn, EqualKey> {
  public:
   typedef typename google::dense_hash_map<K, V, HashFcn, EqualKey> map;
   typedef typename map::size_type size_type;
