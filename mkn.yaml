@@ -16,27 +16,27 @@ profile:
   - name: lib
     parent: base
 
-  # - name: lib-compiled
-  #   parent: base
-  #   src: ./src ./os/${OS}/src
-  #   if_src:
-  #       bsd: ./os/nixish/src
-  #       nix: ./os/nixish/src
-  #   arg: -D_KUL_COMPILED_LIB_
+  - name: lib-compiled
+    parent: base
+    src: |
+      ./src/all
+      ./src/os/${OS}
+    if_src:
+        bsd: ./src/os/nixish
+        nix: ./src/os/nixish
+    arg: -D_KUL_COMPILED_LIB_
 
   - name: test
     parent: lib
     inc: .
     main: test.cpp
     mode: none
-    dep:
-    - name: google.test # https://github.com/mkn/google.test
+    dep: google.test # https://github.com/mkn/google.test
 
   - name: bench
     parent: lib
     main: bench.cpp
-    dep:
-    - name: google.benchmark # https://github.com/mkn/google.benchmark
+    dep: google.benchmark # https://github.com/mkn/google.benchmark
 
   - name: usage
     self: lib

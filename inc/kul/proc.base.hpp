@@ -174,10 +174,10 @@ class AProcess {
 
 #ifndef _KUL_COMPILED_LIB_
   virtual void start() KTHROW(kul::Exception) {
-#include "kul/src/proc.base/start.cpp"
+#include "kul/src/proc.base/start.ipp"
   }
   virtual std::string toString() const {
-#include "kul/src/proc.base/toString.cpp"
+#include "kul/src/proc.base/toString.ipp"
   }
 #else
   virtual void start() KTHROW(kul::Exception);

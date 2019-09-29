@@ -28,51 +28,16 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#ifndef _KUL_OS_OS_HPP_
-#define _KUL_OS_OS_HPP_
+#include "kul/os.hpp"
 
-#include <direct.h>
-#include <io.h>
-#include <process.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <windows.h>
-#include <algorithm>
-#include <fstream>
+std::vector<kul::Dir> kul::Dir::dirs(bool incHidden) const KTHROW(kul::fs::Exception){
+#include "kul/os/win/src/os/dir/dirs.cpp"
+}
 
-#include "kul/def.hpp"
+std::vector<kul::File> kul::Dir::files(bool recursive) const KTHROW(kul::fs::Exception){
+#include "kul/os/win/src/os/dir/files.cpp"
+}
 
-namespace kul {
-
-class Dir;
-namespace fs {
-
-class KulTimeStampsResolver {
- private:
-  static uint64_t FileTimeToPOSIX(FILETIME &ft) {
-    LARGE_INTEGER date, adjust;
-    date.HighPart = ft.dwHighDateTime;
-    date.LowPart = ft.dwLowDateTime;
-    adjust.QuadPart = 11644473600000 * 10000;
-    date.QuadPart -= adjust.QuadPart;
-    return (uint64_t)date.QuadPart / 10000000;
-  }
-  static void GET(const char *const p, uint64_t &a, uint64_t &c, uint64_t &m) {
-    WIN32_FIND_DATA ffd;
-    HANDLE h = FindFirstFile(TEXT(p), &ffd);
-    if (h) {
-      a = FileTimeToPOSIX(ffd.ftLastAccessTime);
-      c = FileTimeToPOSIX(ffd.ftCreationTime);
-      m = FileTimeToPOSIX(ffd.ftLastWriteTime);
-      FindClose(h);
-    }
-  }
-  friend class kul::Dir;
-};
-}  // END NAMESPACE fs
-
-}  // END NAMESPACE kul
-
-#endif /* _KUL_OS_OS_HPP_ */
+std::string kul::Dir::REAL(const std::string &s) KTHROW(fs::Exception) {
+#include "kul/os/win/src/os/dir/Xreal.cpp"
+}

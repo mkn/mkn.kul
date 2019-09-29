@@ -28,8 +28,14 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#include "kul/signal.hpp"
+#include "kul/proc.hpp"
 
-void kul_sig_handler(int s, siginfo_t *info, void *v) {
-#include "kul/src/signal/handler.cpp"
+int kul::this_proc::ProcParser::PARSE_LINE(char *line) {
+#include "kul/os/nix/src/proc/xparse_line.ipp"
+}
+void kul::this_proc::ProcParser::VIRTUAL(uint64_t &mem) {
+#include "kul/os/nix/src/proc/xvirtual.ipp"
+}
+void kul::this_proc::ProcParser::PHYSICAL(uint64_t &mem) {  // Note: this value is in KB!
+#include "kul/os/nix/src/proc/xphysical.ipp"
 }

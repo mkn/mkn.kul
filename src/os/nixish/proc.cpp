@@ -28,19 +28,28 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+#include "kul/proc.hpp"
 
-// This file is included by other files and is not in itself syntactically
-// correct.
-
-// std::string kul::Dir::REAL(const std::string& s) KTHROW(fs::Exception){
-
-char *expanded = realpath(s.c_str(), NULL);
-if (expanded) {
-  std::string dir(expanded);
-  free(expanded);
-  if (dir.size() > PATH_MAX) KEXCEPT(fs::Exception, "Directory path too large");
-  return dir;
+int16_t kul::Process::child() {
+#include "kul/os/nixish/src/proc/child.cpp"
 }
-KEXCEPT(fs::Exception, "Directory \"" + s + "\" does not exist");
 
-// }
+void kul::Process::expand(std::string &s) const {
+#include "kul/os/nixish/src/proc/expand.cpp"
+}
+
+void kul::Process::waitForStatus() {
+#include "kul/os/nixish/src/proc/waitForStatus.cpp"
+}
+
+void kul::Process::waitExit() KTHROW(kul::proc::ExitException) {
+#include "kul/os/nixish/src/proc/waitExit.cpp"
+}
+
+void kul::Process::tearDown() {
+#include "kul/os/nixish/src/proc/tearDown.cpp"
+}
+
+void kul::Process::run() KTHROW(kul::proc::Exception) {
+#include "kul/os/nixish/src/proc/tearDown.cpp"
+}

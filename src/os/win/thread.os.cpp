@@ -28,15 +28,8 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+#include "kul/threads.hpp"
 
-// This file is included by other files and is not in itself syntactically
-// correct.
-
-// void kul::cli::show(){
-
-termios tty;
-tcgetattr(STDIN_FILENO, &tty);
-tty.c_lflag |= ECHO;
-tcsetattr(STDIN_FILENO, TCSANOW, &tty);
-
-// }
+bool kul::this_thread::main() {
+#include "kul/os/win/src/thread/main.cpp"
+}

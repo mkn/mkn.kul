@@ -69,7 +69,10 @@ class StackTrace{
 #endif  // KUL_DBG_FUNC_ENTER
 
 #ifndef KUL_DBG_FUNC_ON_ENTER
-#define KUL_DBG_FUNC_ON_ENTER
+#define KUL_DBG_FUNC_ON_ENTER                                                          \
+  KOUT(TRC) << kul::LogMan::INSTANCE().str(m_fi, m_fu, m_li, kul::log::mode::TRC, "", \
+                                           "[%M]: %T - %D : %F:%L fn(%N)")            \
+                                            << " - ENTERED";
 #endif  // KUL_DBG_FUNC_ON_ENTER
 
 #ifndef KUL_DBG_FUNC_ON_EXIT
@@ -97,7 +100,6 @@ class FunctionScope {
   const char *m_fi = nullptr, *m_fu = nullptr;
 #endif  // defined(KUL_FORCE_TRACE) || !defined(NDEBUG)
  public:
-  FunctionScope() {}
 #if defined(KUL_FORCE_TRACE) || !defined(NDEBUG)
   FunctionScope(const char *fi, const char *fu, const uint16_t &li)
       : m_start(kul::Now::MICROS()), m_li(li), m_fi(fi), m_fu(fu) {

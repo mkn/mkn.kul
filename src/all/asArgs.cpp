@@ -28,39 +28,8 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#ifndef _KUL_OS_OS_HPP_
-#define _KUL_OS_OS_HPP_
+#include "kul/cli.hpp"
 
-#include <dirent.h>
-#include <pwd.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <unistd.h>
-#include <algorithm>
-#include <fstream>
-#include <thread>
-
-namespace kul {
-
-class Dir;
-namespace fs {
-
-class KulTimeStampsResolver {
- private:
-  static void GET(const char *const p, uint64_t &a, uint64_t &c, uint64_t &m) {
-    struct stat att;
-    if (stat(p, &att) != -1) {
-      a = att.st_atime;
-      m = att.st_mtime;
-      c = 0;  // doesn't exist on this platform
-    }
-  }
-  friend class kul::Dir;
-};
-
-}  // END NAMESPACE fs
-}  // END NAMESPACE kul
-
-#endif /* _KUL_OS_OS_HPP_ */
+void kul::cli::asArgs(const std::string &cmd, std::vector<std::string> &args) {
+#include "kul/src/cli/asArgs.ipp"
+}

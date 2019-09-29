@@ -28,41 +28,13 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#ifndef _KUL_DEF_HPP_
-#define _KUL_DEF_HPP_
+#include "kul/proc.base.hpp"
+#include "kul/log.hpp"
 
-#include "kul/defs.hpp"
+void kul::AProcess::start() KTHROW(kul::Exception){
+#include "kul/src/proc.base/start.ipp"
+}
 
-#ifndef __KUL_OS__
-#define __KUL_OS__ bsd
-#endif /*  __KUL_OS__ */
-
-#ifndef __KUL_THREAD_SPAWN_WAIT__
-#define __KUL_THREAD_SPAWN_WAIT__ 5000000
-#endif /*  __KUL_THREAD_SPAWN_WAIT__ */
-
-#if defined(__APPLE__)
-
-#ifndef _MACH_PORT_T
-#define _MACH_PORT_T
-#include <sys/_types.h> /* __darwin_mach_port_t */
-typedef __darwin_mach_port_t mach_port_t;
-#include <pthread.h>
-mach_port_t pthread_mach_thread_np(pthread_t);
-#endif /* _MACH_PORT_T */
-
-#ifndef _XOPEN_SOURCE
-#define _XOPEN_SOURCE 700
-#endif  //_XOPEN_SOURCE
-
-#ifndef _DARWIN_C_SOURCE
-#define _DARWIN_C_SOURCE
-#include "sys/types.h"
-#undef _DARWIN_C_SOURCE
-#else
-#include "sys/types.h"
-#endif  // _DARWIN_C_SOURCE
-
-#endif /* __APPLE__ */
-
-#endif /* _KUL_DEF_HPP_ */
+std::string kul::AProcess::toString() const {
+#include "kul/src/proc.base/toString.ipp"
+}

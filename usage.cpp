@@ -28,8 +28,10 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#include "kul/cli.hpp"
+#define KUL_FORCE_TRACE
 #include "kul/io.hpp"
+#include "kul/dbg.hpp"
+#include "kul/cli.hpp"
 #include "kul/ipc.hpp"
 #include "kul/log.hpp"
 #include "kul/math.hpp"
@@ -133,6 +135,7 @@ class TestIPC {
 class Catch {
  public:
   void print(const int16_t &s) {
+    (void)s;
     KOUT(NON) << "SEGMENTATION FAULT INTERCEPTED";
     KOUT(NON) << "PRINT STACKTRACE";
   }
@@ -143,26 +146,30 @@ class Test {
   const std::string s;
 
  public:
-  Test() : s("LAMBDAS ALLOWED IN SIGNAL") {
+  Test(int argc, char *argv[]) : s("LAMBDAS ALLOWED IN SIGNAL") {
+    KUL_DBG_FUNC_ENTER;
     Catch c;
     kul::Signal sig;  // Windows: each thread requires own handler, static
                       // singleton otherwise so only ever one.
     sig.segv(std::bind(&Catch::print, std::ref(c),
-                       std::placeholders::_1));     // Vector of
-                                                    // functions to call
-                                                    // before exiting -
-                                                    // CAUTION! KEEP
-                                                    // SIMPLE!
-    sig.segv([this](int16_t) { KOUT(NON) << s; });  // Allows lamda notation
+                       std::placeholders::_1));  // Vector of
+                                                 // functions to call
+                                                 // before exiting -
+                                                 // CAUTION! KEEP
+                                                 // SIMPLE!
+    sig.segv([this](int16_t) {
+      KOUT(NON) << s;
+      exit(0);
+    });  // Allows lamda notation
 
-    KERR << "KERR";
-    KOUT(NON) << "KOUT(NON)";
-    KOUT(INF) << "KOUT(INF)";
-    KOUT(ERR) << "KOUT(ERR)";
-    KOUT(DBG) << "KOUT(DBG)";
-    KLOG(INF) << "KLOG(INF)";
-    KLOG(ERR) << "KLOG(ERR)";
-    KLOG(DBG) << "KLOG(DBG)";
+    KERR << "KERR";            // KOUT/KLOG are controlled via env/var KLOG
+    KOUT(NON) << "KOUT(NON)";  // KLOG=0 / or unset
+    KOUT(INF) << "KOUT(INF)";  // KLOG=1
+    KOUT(ERR) << "KOUT(ERR)";  // KLOG=2
+    KOUT(DBG) << "KOUT(DBG)";  // KLOG=3
+    KLOG(INF) << "KLOG(INF)";  // KLOG=1
+    KLOG(ERR) << "KLOG(ERR)";  // KLOG=2
+    KLOG(DBG) << "KLOG(DBG)";  // KLOG=3
     KOUT(NON) << kul::Dir::SEP();
     KOUT(NON) << kul::env::SEP();
     KOUT(NON) << kul::env::CWD();
@@ -196,13 +203,6 @@ class Test {
       KLOG(INF) << os_inc.dir().relative(os_hpp.dir());
     }
 
-    // {
-    //     kul::asio::Logger logger;
-    //     logger.out("ASYNCHRONOUS QUEUED LOGGING");
-    // }
-
-    KASIO_OUT(NON) << "ASYNCHRONOUS QUEUED LOGGING";
-
     for (const kul::Dir &d : kul::Dir(kul::env::CWD()).dirs())
       for (const kul::File &f : d.files()) KOUT(NON) << d.join(f.name());  // or f.full()
     try {
@@ -214,6 +214,20 @@ class Test {
     } catch (const kul::proc::Exception &e) {
       KERR << e.debug() << " : " << typeid(e).name();
       KERR << "Error expected on windows without echo on path";
+    }
+
+    {
+      std::vector<kul::cli::Arg> argV{{kul::cli::Arg('f', "flag"),
+                                       kul::cli::Arg('m', "maybe_value", kul::cli::ArgType::MAYBE),
+                                       kul::cli::Arg('o', "option", kul::cli::ArgType::STRING)}};
+      std::vector<kul::cli::Cmd> cmdV{{"COMMAND"}};
+
+      kul::cli::Args args(cmdV, argV);
+      try {
+        args.process(argc, argv);
+      } catch (const kul::cli::Exception &e) {
+        KEXIT(1, e.what());
+      }
     }
 
     for (const std::string &arg :
@@ -358,7 +372,7 @@ class Test {
 
 int main(int argc, char *argv[]) {
   try {
-    kul::Test();
+    kul::Test(argc, argv);
   } catch (const kul::Exception &e) {
     KERR << e.stack();
   } catch (const std::exception &e) {

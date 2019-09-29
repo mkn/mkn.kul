@@ -266,7 +266,7 @@ class Args {
 
 #ifndef _KUL_COMPILED_LIB_
 inline void asArgs(const std::string &cmd, std::vector<std::string> &args) {
-#include "kul/src/cli/asArgs.cpp"
+#include "kul/src/cli/asArgs.ipp"
 }
 #else
 void asArgs(const std::string &cmd, std::vector<std::string> &args);

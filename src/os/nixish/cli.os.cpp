@@ -28,21 +28,13 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+#include "kul/cli.hpp"
+#include <iostream>
 
-// This file is included by other files and is not in itself syntactically
-// correct.
+std::string kul::cli::hidden(const std::string &t) {
+#include "kul/os/nixish/src/cli/hidden.cpp"
+}
 
-// std::string kul::cli::hidden(const std::string& t){
-
-if (!t.empty()) std::cout << t << std::endl;
-termios oldt;
-tcgetattr(STDIN_FILENO, &oldt);
-termios newt = oldt;
-newt.c_lflag &= ~ECHO;
-tcsetattr(STDIN_FILENO, TCSANOW, &newt);
-std::string s;
-std::getline(std::cin, s);
-tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
-return s;
-
-// }
+void kul::cli::show() {
+#include "kul/os/nixish/src/cli/show.cpp"
+}

@@ -31,8 +31,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _KUL_OS_WIN_THREADS_OS_HPP_
 #define _KUL_OS_WIN_THREADS_OS_HPP_
 
-
-
 #include <TlHelp32.h>
 #include <Windows.h>
 
@@ -44,14 +42,9 @@ inline const std::string id() {
   return os.str();
 }
 
-#ifndef _KUL_COMPILED_LIB_
 inline bool main() {
 #include "kul/os/win/src/thread/main.cpp"
-
 }
-#else
-bool main();
-#endif
 
 inline void kill() {
   HANDLE h = GetCurrentThread();
@@ -94,11 +87,9 @@ class Thread : public threading::AThread {
   template <class T>
   Thread(const T &t) : func(std::bind((void (T::*)()) & T::operator(), t)) {}
   template <class T>
-  Thread(const std::reference_wrapper<T> &r)
-      : func(std::bind((void (T::*)()) & T::operator(), r)) {}
+  Thread(const std::reference_wrapper<T> &r) : func(std::bind((void (T::*)()) & T::operator(), r)) {}
   template <class T>
-  Thread(const std::reference_wrapper<const T> &r)
-      : func(std::bind((void (T::*)() const) & T::operator(), r)) {}
+  Thread(const std::reference_wrapper<const T> &r) : func(std::bind((void (T::*)() const) & T::operator(), r)) {}
   virtual ~Thread() {}
   void join() {
     if (!s) run();
