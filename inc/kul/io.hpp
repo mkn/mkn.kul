@@ -51,8 +51,18 @@ class Exception : public kul::Exception {
 };
 
 class AReader {
- private:
-  std::string s1;
+ public:
+  std::ifstream const &buffer() const { return f; }
+  std::ifstream &buffer() { return f; }
+
+  AReader(char const *const path, std::ios_base::openmode const flags) : f(path, flags) {
+    if (!f) KEXCEPT(Exception, "FileException : file \"" + std::string(path) + "\" not found");
+  }
+  virtual ~AReader() {}
+  virtual const char *readLine() = 0;
+  virtual size_t read(char *c, const size_t &l) = 0;
+  virtual void seek(const size_t &l) = 0;
+  virtual void seek(std::ifstream &f, const size_t &l) { f.seekg(l); }
 
  protected:
   const char *readLine(std::ifstream &f) {
@@ -93,22 +103,14 @@ class AReader {
     }
     return 0;
   }
-
- public:
-  virtual ~AReader() {}
-  virtual const char *readLine() = 0;
-  virtual size_t read(char *c, const size_t &l) = 0;
-  virtual void seek(const size_t &l) = 0;
-  virtual void seek(std::ifstream &f, const size_t &l) { f.seekg(l); }
-};
-class Reader : public AReader {
- private:
   std::ifstream f;
 
+ private:
+  std::string s1;
+};
+class Reader : public AReader {
  public:
-  Reader(const char *c) : f(c, std::ios::in) {
-    if (!f) KEXCEPT(Exception, "FileException : file \"" + std::string(c) + "\" not found");
-  }
+  Reader(const char *c) : AReader(c, std::ios::in) {}
   Reader(const File &c) : Reader(c.full().c_str()) {}
   ~Reader() { f.close(); }
   const char *readLine() { return AReader::readLine(f); }
@@ -117,11 +119,8 @@ class Reader : public AReader {
 };
 class BinaryReader : public AReader {
  private:
-  std::ifstream f;
-
  public:
-  BinaryReader(const char *c) : f(c, std::ios::in | std::ios::binary) {
-    if (!f) KEXCEPT(Exception, "FileException : file \"" + std::string(c) + "\" not found");
+  BinaryReader(const char *c) : AReader(c, std::ios::in | std::ios::binary) {
     f.exceptions(std::ifstream::badbit | std::ifstream::failbit);
   }
   BinaryReader(const File &c) : BinaryReader(c.full().c_str()) {}
@@ -154,9 +153,6 @@ class BinaryReader : public AReader {
 };
 
 class AWriter {
- protected:
-  std::ofstream f;
-
  public:
   virtual ~AWriter() {
     if (f.is_open()) f.close();
@@ -192,6 +188,9 @@ class AWriter {
     f << std::flush;
     return *this;
   }
+
+ protected:
+  std::ofstream f;
 };
 class Writer : public AWriter {
  public:
