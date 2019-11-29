@@ -57,36 +57,27 @@ namespace kul {
 #endif  // KTHROW
 
 class Exception : public std::runtime_error {
-  friend std::ostream &operator<<(std::ostream &, const Exception &);
-
- protected:
-  const char *_f;
-  const uint16_t _l;
-  const std::exception_ptr _ep;
-  std::stringstream msg;
-
  public:
-  ~Exception() KNOTHROW {}
   Exception(const char *f, const uint16_t &l, const std::string &s = "")
       : std::runtime_error(s), _f(f), _l(l), _ep(std::current_exception()) {}
-  Exception(const Exception &e) : std::runtime_error(e), _f(e.file()), _l(e.line()), _ep(e._ep) {
-    msg << e.msg.str();
+  Exception(Exception const &e) : std::runtime_error(e), _f(e.file()), _l(e.line()), _ep(e._ep) {
+    msg << std::runtime_error::what() << e.msg.str();
+    err = msg.str();
   }
-
-  Exception &operator=(Exception &e) = delete;
-  Exception &operator=(Exception &&e) = delete;
-  Exception &operator=(const Exception &e) = delete;
-  Exception &operator=(const Exception &&e) = delete;
+  Exception(Exception const &&e) : std::runtime_error(e), _f(e.file()), _l(e.line()), _ep(e._ep) {
+    msg << std::runtime_error::what() << e.msg.str();
+    err = msg.str();
+  }
+  ~Exception() KNOTHROW {}
 
   std::string debug() const {
     std::stringstream ss;
     ss << (_f ? _f : "<UNKNOWN FILE>") << " : " << _l << " : " << what() << msg.str();
     return ss.str();
   }
-  std::string message() const {
-    std::stringstream ss;
-    ss << what() << msg.str();
-    return ss.str();
+
+  const char* what() const noexcept  override  {
+    return err.c_str();
   }
 
   const char *file() const { return _f; }
@@ -111,11 +102,27 @@ class Exception : public std::runtime_error {
   template <class T>
   Exception &operator<<(const T &s) {
     msg << s;
+    err = msg.str();
     return *this;
   }
+ protected:
+  const char *_f;
+  const uint16_t _l;
+  std::string err;
+  std::stringstream msg;
+  const std::exception_ptr _ep;
+
+  Exception &operator=(Exception &e) = delete;
+  Exception &operator=(Exception &&e) = delete;
+  Exception &operator=(const Exception &e) = delete;
+  Exception &operator=(const Exception &&e) = delete;
+
+  friend std::ostream &operator<<(std::ostream &, const Exception &);
 };
 
-inline std::ostream &operator<<(std::ostream &s, const Exception &e) { return s << e.message(); }
+inline std::ostream &operator<<(std::ostream &s, const Exception &e) {
+  return s << e.what();
+}
 
 class Exit : public Exception {
  private:

@@ -29,40 +29,12 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
-
-#include "kul/cli.hpp"
-#include "kul/io.hpp"
-#include "kul/log.hpp"
-#include "kul/math.hpp"
-#include "kul/os.hpp"
-#include "kul/proc.hpp"
-#include "kul/threads.hpp"
-
-#ifdef _WIN32
-#define bzero ZeroMemory
-#endif
-
-auto tryCatch = [](std::vector<std::function<void()>> funcs, bool katch) {
-  for (const auto &func : funcs) try {
-      func();
-      ASSERT_TRUE(!katch);
-    } catch (const kul::Exception &e) {
-      if (!katch) KOUT(NON) << e.debug();
-      ASSERT_TRUE(katch);
+TEST(Exception, String) {
+    std::string full = "FAILURE";
+    try{
+      KEXCEPT(kul::Exception, "FAIL") << "URE";
     }
-};
-
-#include "test/cli.ipp"
-#include "test/io.ipp"
-#include "test/math.ipp"
-#include "test/os.ipp"
-#include "test/proc.ipp"
-#include "test/except.ipp"
-#include "test/string.ipp"
-
-int main(int argc, char *argv[]) {
-  ::testing::InitGoogleMock(&argc, argv);
-  return RUN_ALL_TESTS();
+    catch(kul::Exception const & e){
+      EXPECT_EQ(e.what(), full);
+    }
 }
