@@ -59,25 +59,26 @@ namespace kul {
 class Exception : public std::runtime_error {
  public:
   Exception(const char *f, const uint16_t &l, const std::string &s = "")
-      : std::runtime_error(s), _f(f), _l(l), _ep(std::current_exception()) {}
-  Exception(Exception const &e) : std::runtime_error(e), _f(e.file()), _l(e.line()), _ep(e._ep) {
-    msg << std::runtime_error::what() << e.msg.str();
-    err = msg.str();
+      : std::runtime_error(s), _f(f), _l(l), _ep(std::current_exception()), err(s) {}
+  Exception(Exception const &e)
+    : std::runtime_error(e), _f(e.file()), _l(e.line()), _ep(e._ep), err(e.err) {
   }
-  Exception(Exception const &&e) : std::runtime_error(e), _f(e.file()), _l(e.line()), _ep(e._ep) {
-    msg << std::runtime_error::what() << e.msg.str();
-    err = msg.str();
+  Exception(Exception const &&e)
+    : std::runtime_error(e), _f(e.file()), _l(e.line()), _ep(e._ep), err(e.err) {
   }
   ~Exception() KNOTHROW {}
 
   std::string debug() const {
     std::stringstream ss;
-    ss << (_f ? _f : "<UNKNOWN FILE>") << " : " << _l << " : " << what() << msg.str();
+    ss << (_f ? _f : "<UNKNOWN FILE>") << " : " << _l << " : " << err;
     return ss.str();
   }
 
-  const char* what() const noexcept  override  {
+  const char* what() const noexcept override {
     return err.c_str();
+  }
+  std::string str() const noexcept {
+    return err;
   }
 
   const char *file() const { return _f; }
@@ -101,15 +102,15 @@ class Exception : public std::runtime_error {
   }
   template <class T>
   Exception &operator<<(const T &s) {
+    std::stringstream msg;
     msg << s;
-    err = msg.str();
+    err += msg.str();
     return *this;
   }
  protected:
   const char *_f;
   const uint16_t _l;
   std::string err;
-  std::stringstream msg;
   const std::exception_ptr _ep;
 
   Exception &operator=(Exception &e) = delete;
@@ -121,7 +122,8 @@ class Exception : public std::runtime_error {
 };
 
 inline std::ostream &operator<<(std::ostream &s, const Exception &e) {
-  return s << e.what();
+  std::cout << __FILE__ << " " << __LINE__ << " " << e.str();
+  return s << e.str();
 }
 
 class Exit : public Exception {
@@ -140,11 +142,11 @@ class Exit : public Exception {
 
   const uint16_t &code() const { return _e; }
 
-  template <class T>
-  Exit &operator<<(const T &s) {
-    msg << s;
-    return *this;
-  }
+  // template <class T>
+  // Exit &operator<<(const T &s) {
+  //   msg << s;
+  //   return *this;
+  // }
 };
 
 #define KEXCEPT(e, m) throw e(__FILE__, __LINE__, m)

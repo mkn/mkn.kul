@@ -34,7 +34,7 @@ TEST(Exception, String) {
     try{
       KEXCEPT(kul::Exception, "FAIL") << "URE";
     }
-    catch(kul::Exception const & e){
+    catch(std::exception const & e){
       EXPECT_EQ(e.what(), full);
     }
 }
