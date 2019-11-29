@@ -110,8 +110,8 @@ class Exception : public std::runtime_error {
  protected:
   const char *_f;
   const uint16_t _l;
-  std::string err;
   const std::exception_ptr _ep;
+  std::string err;
 
   Exception &operator=(Exception &e) = delete;
   Exception &operator=(Exception &&e) = delete;
@@ -127,26 +127,20 @@ inline std::ostream &operator<<(std::ostream &s, const Exception &e) {
 }
 
 class Exit : public Exception {
- private:
-  const uint16_t _e;
-
  public:
   Exit(const char *f, const uint16_t &l, const std::string &s, const uint16_t &e)
       : Exception(f, l, s), _e(e) {}
   Exit(const Exit &e) : Exception(e), _e(e._e) {}
 
+  const uint16_t &code() const { return _e; }
+
+ private:
+  const uint16_t _e;
+
   Exit &operator=(Exit &e) = delete;
   Exit &operator=(Exit &&e) = delete;
   Exit &operator=(const Exit &e) = delete;
   Exit &operator=(const Exit &&e) = delete;
-
-  const uint16_t &code() const { return _e; }
-
-  // template <class T>
-  // Exit &operator<<(const T &s) {
-  //   msg << s;
-  //   return *this;
-  // }
 };
 
 #define KEXCEPT(e, m) throw e(__FILE__, __LINE__, m)
