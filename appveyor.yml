@@ -13,7 +13,7 @@ cache:
 build_script:
   - SET PATH=C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.23.28105\bin\Hostx64\x64;C:\Program Files\Git\usr\bin;%PATH%
   - call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars64.bat"
-  - curl -Lo mkn.exe https://bintray.com/dekken/maiken/download_file?file_path=win%2Fmaster%2Fmkn.exe
+  - curl -Lo mkn.exe https://github.com/Dekken/maiken/raw/binaries/win10_x64/mkn.exe
   - SET MKN_CL_PREFERRED=1
   - rm "C:\Program Files\Git\usr\bin\link.exe" # messes with msvc link.exe
   - bash -c "PATH=\"$PWD:/c/Python36-x64/:/c/Program Files/Git/usr/bin:$PATH\"; ./res/ci/appveyor.sh"

@@ -27,12 +27,12 @@ script:
     export MKN_LIB_LINK_LIB="1" KUL_GIT_CO="--depth 3" KLOG="3"
     git clone https://github.com/Dekken/maiken -b master --depth 1 maiken
     if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
-      make bsd -C maiken CXX=clang++
+      make bsd -C maiken CXX=clang++ && cp maiken/mkn .
       ./mkn build -dtKa "-O2 -std=c++14" -l "-pthread -ldl" -p test run
     fi
     if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
       eval "${MATRIX_EVAL}"
       export CC CXX
-      make nix -C maiken
+      make nix -C maiken && cp maiken/mkn .
       ./mkn build -dtKa "-D_KUL_USE_CBLAS -O2 -std=c++14" -l "-pthread -ldl -lblas" -p test run
     fi
