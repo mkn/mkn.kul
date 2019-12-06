@@ -81,7 +81,7 @@ class Item {
   friend class Validator;
 
  protected:
-  YAML::Node r;
+  YAML::Node r; // root
 
   Item() {}
   Item(const YAML::Node &r) : r(r) {}
@@ -149,20 +149,6 @@ class String : public Item {
 };
 
 class File : public Item {
- private:
-  const std::string f;
-
- protected:
-  void reload() KTHROW(Exception) {
-    try {
-      r = YAML::LoadFile(f);
-    } catch (const std::exception &e) {
-      KEXCEPTION("YAML failed to parse\nFile: " + f);
-    }
-  }
-  File(const File &f) : Item(f.r), f(f.f) {}
-  File(const std::string &f) KTHROW(Exception) : f(f) { reload(); }
-
  public:
   template <class T>
   static T CREATE(const std::string &f) KTHROW(Exception) {
@@ -177,6 +163,22 @@ class File : public Item {
   virtual ~File() {}
   const std::string &file() const { return f; }
   const virtual Validator validator() const = 0;
+
+ protected:
+  void reload() KTHROW(Exception) {
+    try {
+      r = YAML::LoadFile(f);
+    } catch (const std::exception &e) {
+      KEXCEPTION("YAML failed to parse\nFile: " + f);
+    }
+  }
+  File(const File &f) : Item(f.r), f(f.f) {}
+  File(const kul::File &f) KTHROW(Exception) : f(f.real()) { reload(); }
+  File(const std::string &f) KTHROW(Exception) : f(f) { reload(); }
+
+ private:
+  const std::string f; // file
+
 };
 }  // namespace yaml
 }  // namespace kul
