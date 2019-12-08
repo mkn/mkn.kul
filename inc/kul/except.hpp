@@ -66,7 +66,7 @@ class Exception : public std::runtime_error {
   Exception(Exception const &&e)
     : std::runtime_error(e), _f(e.file()), _l(e.line()), _ep(e._ep), err(e.err) {
   }
-  ~Exception() KNOTHROW {}
+  virtual ~Exception() KNOTHROW {}
 
   std::string debug() const {
     std::stringstream ss;

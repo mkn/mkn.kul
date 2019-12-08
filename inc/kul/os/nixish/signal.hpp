@@ -37,9 +37,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <signal.h>
 
-#ifdef HAVE_EXECINFO_H
 #include <execinfo.h>
-#endif /* HAVE_EXECINFO_H */
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <execinfo.h>
+#include <cxxabi.h>
+
+// #define UNW_LOCAL_ONLY
+// #include <libunwind.h>
+
 
 #ifndef __USE_GNU
 #define __USE_GNU
@@ -65,15 +72,26 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 void kul_sig_handler(int s, siginfo_t *info, void *v);
 
 namespace kul {
+namespace this_thread{
+std::vector<std::string> stacktrace(ucontext_t *uc = nullptr, int start = 2){
+#include "kul/os/nixish/src/signal/stacktrace.ipp"
+}
+
+void print_stacktrace(){
+  for(auto const& s : stacktrace()) std::cout << s << std::endl;
+}
+}
+
 
 class Signal;
 class SignalStatic {
  private:
-  bool addr = 0, q = 0;
+  bool addr = 0, euaddr = 0, q = 0;
   struct sigaction sigHandler;
   std::vector<std::function<void(int)>> ab, in, se;
   SignalStatic() {
     addr = kul::env::WHICH("addr2line");
+    euaddr = kul::env::WHICH("eu-addr2line");
     sigemptyset(&sigHandler.sa_mask);
     sigHandler.sa_flags = SA_SIGINFO;
     sigHandler.sa_sigaction = kul_sig_handler;
@@ -120,8 +138,7 @@ class Signal {
 
 #ifndef _KUL_COMPILED_LIB_
 void kul_sig_handler(int s, siginfo_t *info, void *v) {
-  (void)v;
-#include "kul/os/nixish/src/signal/handler.cpp"
+#include "kul/os/nixish/src/signal/handler.ipp"
 }
 #endif
 

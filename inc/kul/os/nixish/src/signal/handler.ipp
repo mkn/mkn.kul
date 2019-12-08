@@ -35,50 +35,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // void kul_sig_handler(int s, siginfo_t* info, void* v) {
 
 if (info->si_pid == 0 || info->si_pid == kul::this_proc::id()) {
-  // if(s == SIGABRT) for(auto& f : kul::SignalStatic::INSTANCE().ab ) f(s);
-  if (s == SIGINT)
-    for (auto &f : kul::SignalStatic::INSTANCE().in) f(s);
-  if (s == SIGSEGV)
-    for (auto &f : kul::SignalStatic::INSTANCE().se) f(s);
-#ifdef HAVE_EXECINFO_H
-  if (s == SIGSEGV && !kul::SignalStatic::INSTANCE().q) {
+  if(s == SIGABRT) for(auto &f : kul::SignalStatic::INSTANCE().ab ) f(s);
+  if(s == SIGINT)  for(auto &f : kul::SignalStatic::INSTANCE().in) f(s);
+  if(s == SIGSEGV) for(auto &f : kul::SignalStatic::INSTANCE().se) f(s);
+  if(s == SIGSEGV && !kul::SignalStatic::INSTANCE().q) {
+    auto tid = kul::this_thread::id();
     ucontext_t *uc = (ucontext_t *)v;
-    void *trace[16];
-    char **messages = (char **)NULL;
-    int16_t i, trace_size = 0;
-    trace_size = backtrace(trace, 16);
-#if defined(__arm__)
-    trace[1] = (void *)uc->uc_mcontext.arm_r0;
-#elif defined(__APPLE__)
-    trace[1] = (void *)uc->uc_mcontext->__ss.__rip;
-#elif defined(__NetBSD__)
-    trace[1] = (void *)uc->uc_mcontext.__gregs[REG_EIP];
-#elif defined(__FreeBSD__)
-#if (__x86_64__)
-    trace[1] = (void *)uc->uc_mcontext.mc_rip;
-#else
-    trace[1] = (void *)uc->uc_mcontext.mc_eip;
-#endif /* __x86_64__ */
-#else
-    trace[1] = (void *)uc->uc_mcontext.gregs[REG_EIP];
-#endif
-    messages = backtrace_symbols(trace, trace_size);
     printf("[bt] Stacktrace:\n");
-    for (i = 2; i < trace_size; ++i) {
-      printf("[bt] %s : ", messages[i]);
-      size_t p = 0;
-      while (messages[i][p] != '(' && messages[i][p] != ' ' && messages[i][p] != 0) ++p;
-      std::string str(messages[i]);
-      str = str.substr(0, p);
-      if (kul::SignalStatic::INSTANCE().addr) {
-        kul::Process p("addr2line");
-        kul::ProcessCapture pc(p);
-        p.arg(trace[i]).arg("-e").arg(str).start();
-        printf("%s", pc.outs().c_str());
-      }
-    }
+    for(auto const& s : kul::this_thread::stacktrace(uc)) KOUT(NON) << tid << " : " << s;
   }
-#endif /* HAVE_EXECINFO_H */
   exit(s);
 }
 

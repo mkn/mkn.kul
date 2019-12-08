@@ -28,8 +28,36 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+#ifndef _KUL_ASSERT_HPP_
+#define _KUL_ASSERT_HPP_
+
 #include "kul/signal.hpp"
 
-void kul_sig_handler(int s, siginfo_t *info, void *v) {
-#include "kul/os/nixish/src/signal/handler.ipp"
+namespace kul{
+struct Assert{
+  template <typename T>
+  constexpr Assert(T t) {
+#if !defined(NDEBUG)
+    if(!(t)) {
+      auto tid = kul::this_thread::id();
+      KOUT(NON) << tid << " : Stacktrace:";
+      for(auto const& s : kul::this_thread::stacktrace()) KOUT(NON) << tid << " : " << s;
+      exit(111);
+    }
+#endif
+  }
+};
 }
+
+#if !defined(KASSERT)
+#define KASSERT(b) kul::Assert{(b)}
+#endif
+
+#if defined(KASSERT_REPLACE_ASSERT)
+  #ifdef assert
+    #undef assert
+  #endif
+  #define assert(b)  KASSERT(b)
+#endif
+
+#endif /* _KUL_ASSERT_HPP_ */
