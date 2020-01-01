@@ -353,7 +353,8 @@ class File : public fs::Item {
   bool is() const {
     if (name().empty()) return false;
     struct stat buffer;
-    return (stat(_d.join(_n).c_str(), &buffer) == 0);
+    if(stat(_d.join(_n).c_str(), &buffer) == 0) return S_ISREG(buffer.st_mode);
+    return 0;
   }
   bool rm() const {
     if (is()) {
