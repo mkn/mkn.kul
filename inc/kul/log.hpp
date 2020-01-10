@@ -112,8 +112,8 @@ class Logger {
     str(f, fn, l, s, m, st);
     out(st + kul::os::EOL());
   }
-  void setOut(std::function<void(const std::string &)> o) { this->o = o; }
-  void setErr(std::function<void(const std::string &)> e) { this->e = e; }
+  void setOut(std::function<void(const std::string &)> _o) { this->o = _o; }
+  void setErr(std::function<void(const std::string &)> _e) { this->e = _e; }
 };
 
 class ALogMan {
@@ -151,18 +151,18 @@ class ALogMan {
   bool inf() { return m >= log::INF; }
   bool err() { return m >= log::ERR; }
   bool dbg() { return m >= log::DBG; }
-  void log(const char *f, const char *fn, const uint16_t &l, const log::mode &m,
+  void log(const char *f, const char *fn, const uint16_t &l, const log::mode &_m,
            const std::string &s) {
-    if (this->m >= m) logger->log(f, fn, l, s, m);
+    if (this->m >= _m) logger->log(f, fn, l, s, _m);
   }
-  void out(const log::mode &m, const std::string &s) {
-    if (this->m >= m) logger->out(s + kul::os::EOL());
+  void out(const log::mode &_m, const std::string &s) {
+    if (this->m >= _m) logger->out(s + kul::os::EOL());
   }
   void err(const std::string &s) { logger->err(s + kul::os::EOL()); }
-  std::string str(const char *f, const char *fn, const uint16_t &l, const log::mode &m,
+  std::string str(const char *f, const char *fn, const uint16_t &l, const log::mode &_m,
                   const std::string &s = "", const std::string fmt = __KUL_LOG_FRMT__) {
     std::string st(fmt);
-    logger->str(f, fn, l, s, m, st);
+    logger->str(f, fn, l, s, _m, st);
     return st;
   }
   void setOut(std::function<void(const std::string &)> o) { logger->setOut(o); }
@@ -185,7 +185,7 @@ class Message {
   std::stringstream ss;
   const log::mode &m;
 
-  Message(const log::mode &m) : m(m) {}
+  Message(const log::mode &_m) : m(_m) {}
 
  public:
   template <class T>
@@ -202,13 +202,13 @@ class LogMessage : public Message {
 
  public:
   ~LogMessage() { LogMan::INSTANCE().log(f, fn, l, m, ss.str()); }
-  LogMessage(const char *f, const char *fn, const uint16_t &l, const log::mode &m)
-      : Message(m), f(f), fn(fn), l(l) {}
+  LogMessage(const char *_f, const char *_fn, const uint16_t &_l, const log::mode &_m)
+      : Message(_m), f(_f), fn(_fn), l(_l) {}
 };
 class OutMessage : public Message {
  public:
   ~OutMessage() { LogMan::INSTANCE().out(m, ss.str()); }
-  OutMessage(const log::mode &m = kul::log::mode::NON) : Message(m) {}
+  OutMessage(const log::mode &_m = kul::log::mode::NON) : Message(_m) {}
 };
 class ErrMessage : public Message {
  public:

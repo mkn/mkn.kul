@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace kul{
 struct Assert{
   template <typename T>
-  constexpr Assert(T t) {
+  Assert(T t) {
 #if !defined(NDEBUG)
     if(!(t)) {
       auto tid = kul::this_thread::id();

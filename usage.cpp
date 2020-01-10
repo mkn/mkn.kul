@@ -364,7 +364,7 @@ class Test {
     KOUT(NON) << "\tWINDOWS cl: -Z7 / link: -DEBUG";
     KOUT(NON) << "\tLINUX  gcc: -g";
 
-    *(int *)0 = 0;  // First seg fault always exits after handling
+    //*(int *)0 = 0;  // First seg fault always exits after handling
   }
 };
 }  // namespace kul

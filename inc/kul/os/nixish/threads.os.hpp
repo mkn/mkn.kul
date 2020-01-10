@@ -103,7 +103,7 @@ class Thread : public threading::AThread {
   }
 
  public:
-  Thread(const std::function<void()> &func) : func(func) {}
+  Thread(const std::function<void()> &_func) : func(_func) {}
   template <class T>
   Thread(const T &t) : func(std::bind((void (T::*)()) & T::operator(), t)) {}
   template <class T>

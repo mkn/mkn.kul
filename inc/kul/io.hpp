@@ -62,15 +62,15 @@ class AReader {
   virtual const char *readLine() = 0;
   virtual size_t read(char *c, const size_t &l) = 0;
   virtual void seek(const size_t &l) = 0;
-  virtual void seek(std::ifstream &f, const size_t &l) { f.seekg(l); }
+  static void seek(std::ifstream &_f, const size_t &_l) { _f.seekg(_l); }
 
  protected:
-  const char *readLine(std::ifstream &f) {
+  const char *readLine(std::ifstream &_f) {
     s1.clear();
-    if (f.good()) {
+    if (_f.good()) {
       std::stringstream ss;
-      std::istream::sentry sen(f, true);
-      std::streambuf *sb = f.rdbuf();
+      std::istream::sentry sen(_f, true);
+      std::streambuf *sb = _f.rdbuf();
       for (;;) {
         int c = sb->sbumpc();
         switch (c) {
@@ -81,7 +81,7 @@ class AReader {
             return (s1 = ss.str()).c_str();
           case EOF:
             s1 = ss.str();
-            if (s1.empty()) f.setstate(std::ios::eofbit);
+            if (s1.empty()) _f.setstate(std::ios::eofbit);
             return s1.empty() ? 0 : s1.c_str();
           default:
             ss << (char)c;
@@ -90,13 +90,13 @@ class AReader {
     }
     return 0;
   }
-  size_t read(char *c, std::ifstream &f, const size_t &l) {
+  size_t read(char *c, std::ifstream &_f, const size_t &l) {
     s1.clear();
-    if (f.good()) {
+    if (_f.good()) {
       std::vector<char> v;
       v.resize(l);
-      f.read(&v[0], l);
-      v.resize((size_t)f.gcount());
+      _f.read(&v[0], l);
+      v.resize((size_t) _f.gcount());
       s1 = std::string(v.begin(), v.end());
       std::strcpy(c, s1.c_str());
       return s1.size();
