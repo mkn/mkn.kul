@@ -29,14 +29,15 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-// This file is included by other files and is not in itself syntactically
-// correct.
-
-// void kul::cli::show(){
-
-termios tty;
-tcgetattr(STDIN_FILENO, &tty);
-tty.c_lflag |= ECHO;
-tcsetattr(STDIN_FILENO, TCSANOW, &tty);
-
-// }
+std::string kul::cli::hidden(const std::string& t){
+  if (!t.empty()) std::cout << t << std::endl;
+  termios oldt;
+  tcgetattr(STDIN_FILENO, &oldt);
+  termios newt = oldt;
+  newt.c_lflag &= ~ECHO;
+  tcsetattr(STDIN_FILENO, TCSANOW, &newt);
+  std::string s;
+  std::getline(std::cin, s);
+  tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
+  return s;
+}

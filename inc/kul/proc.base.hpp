@@ -172,17 +172,8 @@ class AProcess {
     return *this;
   }
 
-#ifndef _KUL_COMPILED_LIB_
-  virtual void start() KTHROW(kul::Exception) {
-#include "kul/src/proc.base/start.ipp"
-  }
-  virtual std::string toString() const {
-#include "kul/src/proc.base/toString.ipp"
-  }
-#else
-  virtual void start() KTHROW(kul::Exception);
-  virtual std::string toString() const;
-#endif
+  virtual inline void start() KTHROW(kul::Exception);
+  virtual inline std::string toString() const;
 
   const int32_t &pid() const { return pi; }
   bool started() const { return pi > 0; }
@@ -220,4 +211,12 @@ class ProcessCapture {
   }
 };
 }  // namespace kul
+
+
+#ifndef _KUL_COMPILED_LIB_
+#include "kul/src/proc.base/start.ipp"
+#include "kul/src/proc.base/toString.ipp"
+#endif
+
+
 #endif /* _KUL_PROC_BASE_HPP_ */

@@ -37,18 +37,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace kul {
 namespace cli {
-#ifndef _KUL_COMPILED_LIB_
-inline std::string hidden(const std::string &t) {
-#include "kul/os/nixish/src/cli/hidden.cpp"
-}
-inline void show() {
-#include "kul/os/nixish/src/cli/show.cpp"
-}
-#else
-std::string hidden(const std::string &t);
-void show();
-#endif
+
+inline std::string hidden(const std::string &t);
+inline void show();
+
 }  // END NAMESPACE cli
 }  // END NAMESPACE kul
+
+#ifndef _KUL_COMPILED_LIB_
+#include "kul/os/nixish/src/cli/hidden.ipp"
+#include "kul/os/nixish/src/cli/show.ipp"
+#endif
 
 #endif /* _KUL_OS_NIXISH_CLI_OS_HPP_ */

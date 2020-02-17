@@ -29,23 +29,20 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-// This file is included by other files and is not in itself syntactically
-// correct.
+void kul::AProcess::start() KTHROW(kul::Exception){
 
-// void kul::AProcess::start() KTHROW(kul::Exception){
+  if (this->s) KEXCEPT(kul::proc::Exception, "Process is already started");
+  this->s = true;
+  if (this->o || this->e)
+    this->run();
+  else
+    pec = proc::Call(toString(), evs, d).run();
+  if (pec != 0)
+    kul::LogMan::INSTANCE().err()
+        ? throw proc::ExitException(__FILE__, __LINE__, pec,
+                                    "Process exit code: " + std::to_string(pec) + kul::os::EOL() +
+                                        toString())
+        : throw proc::ExitException(__FILE__, __LINE__, pec,
+                                    "Process exit code: " + std::to_string(pec));
 
-if (this->s) KEXCEPT(kul::proc::Exception, "Process is already started");
-this->s = true;
-if (this->o || this->e)
-  this->run();
-else
-  pec = proc::Call(toString(), evs, d).run();
-if (pec != 0)
-  kul::LogMan::INSTANCE().err()
-      ? throw proc::ExitException(__FILE__, __LINE__, pec,
-                                  "Process exit code: " + std::to_string(pec) + kul::os::EOL() +
-                                      toString())
-      : throw proc::ExitException(__FILE__, __LINE__, pec,
-                                  "Process exit code: " + std::to_string(pec));
-
-// }
+}

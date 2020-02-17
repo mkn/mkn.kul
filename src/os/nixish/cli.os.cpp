@@ -32,9 +32,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 
 std::string kul::cli::hidden(const std::string &t) {
-#include "kul/os/nixish/src/cli/hidden.cpp"
+#include "kul/os/nixish/src/cli/hidden.ipp"
 }
 
 void kul::cli::show() {
-#include "kul/os/nixish/src/cli/show.cpp"
+#include "kul/os/nixish/src/cli/show.ipp"
 }

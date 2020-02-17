@@ -39,98 +39,117 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
     std::vector<std::string> v;
 
-    void* trace[128];
+//     void* trace[128];
 
-    int addrlen = backtrace(trace, sizeof(trace) / sizeof(void*));
+//     int addrlen = backtrace(trace, sizeof(trace) / sizeof(void*));
 
-    if (addrlen == 0) {
-      v.emplace_back("backtrace failed");
+//     if (addrlen == 0) {
+//       v.emplace_back("backtrace failed");
+//       return v;
+//     }
+
+//     if(uc){
+// #if defined(__arm__)
+//     trace[1] = (void *)uc->uc_mcontext.arm_r0;
+// #elif defined(__APPLE__)
+//     trace[1] = (void *)uc->uc_mcontext->__ss.__rip;
+// #elif defined(__NetBSD__)
+//     trace[1] = (void *)uc->uc_mcontext.__gregs[REG_EIP];
+// #elif defined(__FreeBSD__)
+// #if (__x86_64__)
+//     trace[1] = (void *)uc->uc_mcontext.mc_rip;
+// #else
+//     trace[1] = (void *)uc->uc_mcontext.mc_eip;
+// #endif /* __x86_64__ */
+// #else
+//     trace[1] = (void *)uc->uc_mcontext.gregs[REG_EIP];
+// #endif
+//     }
+
+//     char** symbollist = backtrace_symbols(trace, addrlen);
+//     std::string str{symbollist[0]};
+
+//     size_t funcnamesize = 256;
+//     char* funcname = (char*)malloc(funcnamesize);
+
+//     for (int i = start; i < addrlen; i++)
+//     {
+//       std::string li{symbollist[i]};
+
+//       char *begin_name = 0, *begin_offset = 0, *end_offset = 0;
+
+//       for (char *p = symbollist[i]; *p; ++p)
+//       {
+//           if (*p == '(')      begin_name = p;
+//           else if (*p == '+') begin_offset = p;
+//           else if (*p == ')' && begin_offset) { end_offset = p; break; }
+//       }
+
+//       if (begin_name && begin_offset && end_offset && begin_name < begin_offset)
+//       {
+//           std::string binf, line;
+//           *begin_name++ = '\0';
+//           *begin_offset++ = '\0';
+//           *end_offset = '\0';
+
+//           int status = 0;
+//           char* ret = abi::__cxa_demangle(begin_name, funcname, &funcnamesize, &status);
+//           if (status == 0) {
+//             funcname = ret; // use possibly realloc()-ed string
+//             binf = std::string(symbollist[i]) + ": " + std::string(funcname) + "()";
+//           }
+//           else { // demangling failed. Output function name as a C function with no arguments
+//             binf = std::string(symbollist[i]) + ": " + std::string(begin_name) + "()";
+//           }
+//           std::string address;
+//           {
+//             std::stringstream ss;
+//             ss << std::hex << (((int64_t)(trace[i])));
+//             address = ss.str();
+//           }
+//           if (euaddr) {
+//             kul::Process p("eu-addr2line");
+//             kul::ProcessCapture pc(p);
+//             p.arg("-e").arg(symbollist[i]).arg(address).start();
+//             std::string out = pc.outs();
+//             KLOG(INF) << p.toString();
+//             KLOG(INF) << out;
+//             if(out.size() > 3) out = out.substr(0, 4);
+//             if(pc.errs().empty() && out != invalid) line = pc.outs();
+//           }
+
+//           if(line.size()) line.pop_back();
+//           kul::String::TRIM(line);
+//           if(line.empty()) v.emplace_back(li);
+//           else             v.emplace_back(line);
+//       }
+//       else
+//       {
+//           v.emplace_back("symbolizing failed");
+//       }
+//     }
+
+//     free(funcname);
+//     free(symbollist);
+
+    if(!euaddr) {
+      v.emplace_back("eu-addr2line not found, install elfutils");
       return v;
     }
-
-    if(uc){
-#if defined(__arm__)
-    trace[1] = (void *)uc->uc_mcontext.arm_r0;
-#elif defined(__APPLE__)
-    trace[1] = (void *)uc->uc_mcontext->__ss.__rip;
-#elif defined(__NetBSD__)
-    trace[1] = (void *)uc->uc_mcontext.__gregs[REG_EIP];
-#elif defined(__FreeBSD__)
-#if (__x86_64__)
-    trace[1] = (void *)uc->uc_mcontext.mc_rip;
-#else
-    trace[1] = (void *)uc->uc_mcontext.mc_eip;
-#endif /* __x86_64__ */
-#else
-    trace[1] = (void *)uc->uc_mcontext.gregs[REG_EIP];
-#endif
-    }
-
-    char** symbollist = backtrace_symbols(trace, addrlen);
-    std::string str{symbollist[0]};
-
-    size_t funcnamesize = 256;
-    char* funcname = (char*)malloc(funcnamesize);
-
-    for (int i = start; i < addrlen; i++)
     {
-      std::string li{symbollist[i]};
+      int i;
+      #define SIZE 100
+      void *buffer[100];
 
-      char *begin_name = 0, *begin_offset = 0, *end_offset = 0;
+      int nptrs = backtrace(buffer, SIZE);
 
-      for (char *p = symbollist[i]; *p; ++p)
-      {
-          if (*p == '(')      begin_name = p;
-          else if (*p == '+') begin_offset = p;
-          else if (*p == ')' && begin_offset) { end_offset = p; break; }
-      }
-
-      if (begin_name && begin_offset && end_offset && begin_name < begin_offset)
-      {
-          std::string binf, line;
-          *begin_name++ = '\0';
-          *begin_offset++ = '\0';
-          *end_offset = '\0';
-
-          int status = 0;
-          char* ret = abi::__cxa_demangle(begin_name, funcname, &funcnamesize, &status);
-          if (status == 0) {
-            funcname = ret; // use possibly realloc()-ed string
-            binf = std::string(symbollist[i]) + ": " + std::string(funcname) + "()";
-          }
-          else { // demangling failed. Output function name as a C function with no arguments
-            binf = std::string(symbollist[i]) + ": " + std::string(begin_name) + "()";
-          }
-          std::string address;
-          {
-            std::stringstream ss;
-            ss << std::hex << (((int64_t)(trace[i])));
-            address = ss.str();
-          }
-          if (euaddr) {
-            kul::Process p("eu-addr2line");
-            kul::ProcessCapture pc(p);
-            p.arg("-e").arg(symbollist[i]).arg(address).start();
-            std::string out = pc.outs();
-            if(out.size() > 3) out = out.substr(0, 4);
-            if(pc.errs().empty() && out != invalid) line = pc.outs();
-          }
-
-          if(line.size()) line.pop_back();
-          kul::String::TRIM(line);
-          if(line.empty()) v.emplace_back(li);
-          else             v.emplace_back(line);
-      }
-      else
-      {
-          v.emplace_back("symbolizing failed");
+      for (i = 1; i < nptrs; ++i) {
+          char syscom[1024];
+          syscom[0] = '\0';
+          snprintf(syscom, 1024, "eu-addr2line '%p' --pid=%d > /dev/stderr\n", buffer[i], getpid());
+          if (system(syscom) != 0)
+              fprintf(stderr, "eu-addr2line failed\n");
       }
     }
-
-    free(funcname);
-    free(symbollist);
-
-    if(!euaddr) v.emplace_back("eu-addr2line not found, install elfutils");
-
     return v;
 // }

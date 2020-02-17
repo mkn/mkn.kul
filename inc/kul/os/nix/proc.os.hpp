@@ -47,21 +47,9 @@ namespace this_proc {
 
 class ProcParser {
  private:
-#ifndef _KUL_COMPILED_LIB_
-  static int PARSE_LINE(char *line) {
-#include "kul/os/nix/src/proc//xparse_line.ipp"
-  }
-  static void VIRTUAL(uint64_t &mem) {
-#include "kul/os/nix/src/proc//xvirtual.ipp"
-  }
-  static void PHYSICAL(uint64_t &mem) {  // Note: this value is in KB!
-#include "kul/os/nix/src/proc//xphysical.ipp"
-  }
-#else
-  static int PARSE_LINE(char *line);
-  static void VIRTUAL(uint64_t &mem);
-  static void PHYSICAL(uint64_t &mem);  // Note: this value is in KB!
-#endif
+  static inline int PARSE_LINE(char *line);
+  static inline void VIRTUAL(uint64_t &mem);
+  static inline void PHYSICAL(uint64_t &mem);  // Note: this value is in KB!
 
   friend uint64_t virtualMemory();
   friend uint64_t physicalMemory();
@@ -87,4 +75,11 @@ inline uint64_t totalMemory() {
 inline uint16_t cpuLoad() { return 0; }
 }  // namespace this_proc
 }  // namespace kul
+
+#ifndef _KUL_COMPILED_LIB_
+#include "kul/os/nix/src/proc//xparse_line.ipp"
+#include "kul/os/nix/src/proc//xvirtual.ipp"
+#include "kul/os/nix/src/proc//xphysical.ipp"
+#endif
+
 #endif /* _KUL_OS_NIX_PROC_OS_HPP_ */

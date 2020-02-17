@@ -29,15 +29,10 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-// This file is included by other files and is not in itself syntactically
-// correct.
-
-// int kul::this_proc::PARSE_LINE(char* line){
-
-int i = strlen(line);
-while (*line < '0' || *line > '9') line++;
-line[i - 3] = '\0';
-i = atoi(line);
-return i;
-
-// }
+int kul::this_proc::ProcParser::PARSE_LINE(char* line){
+  int i = strlen(line);
+  while (*line < '0' || *line > '9') line++;
+  line[i - 3] = '\0';
+  i = atoi(line);
+  return i;
+}

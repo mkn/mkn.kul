@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
+#include "kul/assert.hpp"
 #include "kul/cli.hpp"
 #include "kul/io.hpp"
 #include "kul/log.hpp"

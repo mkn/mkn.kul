@@ -264,13 +264,7 @@ class Args {
 #include "kul/serial/cli.arg.end.hpp"
 };
 
-#ifndef _KUL_COMPILED_LIB_
-inline void asArgs(const std::string &cmd, std::vector<std::string> &args) {
-#include "kul/src/cli/asArgs.ipp"
-}
-#else
-void asArgs(const std::string &cmd, std::vector<std::string> &args);
-#endif
+inline void asArgs(const std::string &cmd, std::vector<std::string> &args);
 
 inline std::vector<std::string> asArgs(const std::string &cmd) {
   std::vector<std::string> args;
@@ -280,6 +274,10 @@ inline std::vector<std::string> asArgs(const std::string &cmd) {
 
 }  // END NAMESPACE cli
 }  // END NAMESPACE kul
+
+#ifndef _KUL_COMPILED_LIB_
+#include "kul/src/cli/asArgs.ipp"
+#endif
 
 #include "kul/serial/cli.bottom.hpp"
 
