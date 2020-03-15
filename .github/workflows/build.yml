@@ -1,0 +1,24 @@
+name: C/C++ CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: get mkn
+      run: git clone https://github.com/dekken/maiken -b master --depth 10 --recursive
+
+    - name: build mkn
+      run: cd maiken && make nix && cp mkn .. && cd ..
+
+    - name: mkn
+      run: KLOG=3 ./mkn
+
