@@ -1,8 +1,8 @@
-#! clean build -dtKp usage
+#! clean build -dtOp usage
 
 # mkn.kul - Kommon Usage Library
 #   Cross platform wrapper for systems operations / IO / threads / processes
-#   Default profile "lib" is header only, use "-compiled" profiles for library linking
+#   Default profile "lib" is header only, use "-compiled" for library options
 #
 
 name: mkn.kul
@@ -15,6 +15,8 @@ profile:
 
   - name: lib
     parent: base
+    if_link:
+      nix: -pthread
 
   - name: lib-compiled
     parent: base
@@ -39,7 +41,7 @@ profile:
     dep: google.benchmark # https://github.com/mkn/google.benchmark
 
   - name: usage
-    self: lib
+    parent: lib
     main: usage.cpp
 
   - name: format

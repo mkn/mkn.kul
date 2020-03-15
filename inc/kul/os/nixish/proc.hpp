@@ -48,7 +48,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 
-
 #ifndef __KUL_PROC_DUP_RETRY__
 #define __KUL_PROC_DUP_RETRY__ 3
 #endif  //__KUL_PROC_DUP_RETRY__
@@ -62,10 +61,7 @@ inline void kill(const int32_t &e) { ::kill(kul::this_proc::id(), e); }
 
 class Process : public kul::AProcess {
  private:
-  int inFd[2];
-  int outFd[2];
-  int errFd[2];
-  int popPip[3];
+  int inFd[2], outFd[2], errFd[2], popPip[3];
   int cStat;  // child status
 
   inline int16_t recall(const uint16_t &s) {
@@ -91,35 +87,26 @@ class Process : public kul::AProcess {
   }
 
  protected:
-#ifndef _KUL_COMPILED_LIB_
-  int16_t child() {
-#include "kul/os/nixish/src/proc/child.cpp"
-  }
-  virtual void expand(std::string &s) const {
-#include "kul/os/nixish/src/proc/expand.cpp"
-  }
-  void waitForStatus() {
-#include "kul/os/nixish/src/proc/waitForStatus.cpp"
-  }
-  void waitExit() KTHROW(kul::proc::ExitException) {
-#include "kul/os/nixish/src/proc/waitExit.cpp"
-  }
-  void tearDown() {
-#include "kul/os/nixish/src/proc/tearDown.cpp"
-  }
-  void run() KTHROW(kul::proc::Exception) {
-#include "kul/os/nixish/src/proc/run.cpp"
-  }
-#else
-  int16_t child();
-  virtual void expand(std::string &s) const;
-  void waitForStatus();
-  void waitExit() KTHROW(kul::proc::ExitException);
-  void tearDown();
-  void run() KTHROW(kul::proc::Exception);
-#endif
+  int16_t inline child();
+  virtual void inline expand(std::string &s) const;
+  void inline waitForStatus();
+  void inline waitExit() KTHROW(kul::proc::ExitException);
+  void inline tearDown();
+  void inline run() KTHROW(kul::proc::Exception);
+
   virtual void finish() {}
   virtual void preStart() {}
 };
 }  // namespace kul
+
+
+#ifndef _KUL_COMPILED_LIB_
+#include "kul/os/nixish/src/proc/child.ipp"
+#include "kul/os/nixish/src/proc/expand.ipp"
+#include "kul/os/nixish/src/proc/waitForStatus.ipp"
+#include "kul/os/nixish/src/proc/waitExit.ipp"
+#include "kul/os/nixish/src/proc/tearDown.ipp"
+#include "kul/os/nixish/src/proc/run.ipp"
+#endif
+
 #endif /* _KUL_OS_NIXISH_PROC_HPP_ */

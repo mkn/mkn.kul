@@ -31,6 +31,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // This file is included by other files and is not in itself syntactically correct.
 
+std::vector<std::string> stacktrace(ucontext_t *uc = nullptr/*, int start = 2*/){
+  (void) uc;
 // std::vector<std::string> stacktrace(ucontext_t *uc, int start) {
     // constexpr size_t max_trace = 128;
     std::string const invalid = "??:0";
@@ -152,4 +154,4 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       }
     }
     return v;
-// }
+}

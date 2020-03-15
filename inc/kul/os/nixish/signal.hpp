@@ -73,9 +73,7 @@ void kul_sig_handler(int s, siginfo_t *info, void *v);
 
 namespace kul {
 namespace this_thread{
-std::vector<std::string> stacktrace(ucontext_t *uc = nullptr, int start = 2){
 #include "kul/os/nixish/src/signal/stacktrace.ipp"
-}
 
 void print_stacktrace(){
   for(auto const& s : stacktrace()) std::cout << s << std::endl;

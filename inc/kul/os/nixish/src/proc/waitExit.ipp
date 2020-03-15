@@ -29,14 +29,9 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-// This file is included by other files and is not in itself syntactically
-// correct.
-
-// void kul::Process::waitForStatus(){
-
-int16_t ret = 0;
-ret = recall(waitpid(pid(), &cStat, 0));
-(void)ret;
-assert(ret);
-
-// }
+void kul::Process::waitExit() KTHROW(kul::proc::ExitException){
+  tearDown();
+  exitCode(WEXITSTATUS(cStat));
+  finish();
+  setFinished();
+}

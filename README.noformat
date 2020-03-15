@@ -110,6 +110,16 @@ Description
 Nanosecond sleep while reading running processes pipe output, if defined and greater than 0
 
 
+Key             _KUL_COMPILED_LIB_
+Type            flag
+Default         disabled
+OS              all
+Description
+Utilized in the mkn.yaml file for this project, optionally puts some functions in source files rather than headers
+
+
+
+
 With options
 
 1. google.sparsehash

@@ -29,14 +29,14 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-// This file is included by other files and is not in itself syntactically
-// correct.
-
-// void kul::Process::waitExit() KTHROW(kul::proc::ExitException){
-
-tearDown();
-exitCode(WEXITSTATUS(cStat));
-finish();
-setFinished();
-
-// }
+void kul::Process::tearDown(){
+  recall(close(popPip[0]));
+  recall(close(popPip[1]));
+  recall(close(popPip[2]));
+  recall(close(errFd[1]));
+  recall(close(errFd[0]));
+  recall(close(outFd[1]));
+  recall(close(outFd[0]));
+  recall(close(inFd[1]));
+  recall(close(inFd[0]));
+}
