@@ -68,7 +68,7 @@ class SCM {
       KTHROW(Exception) = 0;
 
   virtual bool hasChanges(const std::string &d) const = 0;
-  virtual void status(const std::string &d) const = 0;
+  virtual void status(const std::string &d, bool full = 1) const = 0;
   virtual void diff(const std::string &d) const = 0;
 };
 
@@ -166,10 +166,12 @@ class Git : public SCM {
     }
     return kul::String::LINES(pc.outs()).size() > 1;
   }
-  void status(const std::string &d) const {
+  void status(const std::string &d, bool full = 1) const override {
     kul::Process p("git", d);
     try {
-      p.arg("status").start();
+      p << "status";
+      if(!full) p << "--short";
+      p.start();
     } catch (const kul::proc::ExitException &e) {
       KEXCEPT(Exception, "SCM ERROR " + std::string(e.what()));
     }
@@ -227,7 +229,7 @@ class Svn : public SCM {
   bool hasChanges(const std::string &d) const {
     KEXCEPT(Exception, "SCM ERROR - SVN NOT IMPLEMENTED");
   }
-  void status(const std::string &d) const { KEXCEPT(Exception, "SCM ERROR - SVN NOT IMPLEMENTED"); }
+  void status(const std::string &d, bool full) const { KEXCEPT(Exception, "SCM ERROR - SVN NOT IMPLEMENTED"); }
   void diff(const std::string &d) const { KEXCEPT(Exception, "SCM ERROR - SVN NOT IMPLEMENTED"); }
 };
 */

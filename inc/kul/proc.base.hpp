@@ -171,6 +171,10 @@ class AProcess {
     evs[n] = v;
     return *this;
   }
+  AProcess &set(std::vector<kul::cli::EnvVar> const& in) {
+    for(auto const& ev: in) evs[ev.name()] = ev.toString();
+    return *this;
+  }
 
   virtual inline void start() KTHROW(kul::Exception);
   virtual inline std::string toString() const;
@@ -191,8 +195,7 @@ inline std::ostream &operator<<(std::ostream &s, const AProcess &p) { return s <
 
 class ProcessCapture {
  private:
-  std::stringstream so;
-  std::stringstream se;
+  std::stringstream so, se;
 
  protected:
   ProcessCapture() {}
