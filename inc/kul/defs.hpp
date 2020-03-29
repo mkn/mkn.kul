@@ -89,14 +89,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define KUL_IS_NIX 0
 #endif
 
-namespace kul::def {
-
-constexpr bool is_win = KUL_IS_WIN;
-constexpr bool is_nix = KUL_IS_BSD;
-constexpr bool is_bsd = KUL_IS_BSD;
-
-}
-
 #include "kul/os/def.hpp"
 
 #endif /* _KUL_DEFS_HPP_ */
