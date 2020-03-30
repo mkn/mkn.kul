@@ -77,7 +77,7 @@ namespace scm {
 class Git : public SCM {
  public:
   const std::string co(const std::string &d, const std::string &r, const std::string &v) const
-      KTHROW(Exception) {
+      KTHROW(Exception) override {
     Dir dr(d, true);
     kul::Process p("git");
     p << "clone" << kul::env::GET("KUL_GIT_CO") << r;
@@ -91,7 +91,7 @@ class Git : public SCM {
     return p.toString();
   }
   void up(const std::string &d, const std::string &r, const std::string &v) const
-      KTHROW(Exception) {
+      KTHROW(Exception) override {
     if (!Dir(d).is())
       co(d, r, v);
     else {
@@ -106,7 +106,7 @@ class Git : public SCM {
       }
     }
   }
-  const std::string origin(const std::string &d) const {
+  const std::string origin(const std::string &d) const override {
     kul::Process p("git", d);
     kul::ProcessCapture pc(p);
     try {
@@ -124,7 +124,7 @@ class Git : public SCM {
     if (lines.size()) return kul::String::SPLIT(lines[0], ' ')[1];
     KEXCEPT(Exception, "SCM ERROR - Check remote dependency location / version");
   }
-  const std::string localVersion(const std::string &d, const std::string &b) const {
+  const std::string localVersion(const std::string &d, const std::string &b) const override {
     kul::Process p("git", d);
     kul::ProcessCapture pc(p);
     try {
@@ -139,7 +139,7 @@ class Git : public SCM {
   }
 
   const std::string remoteVersion(const std::string &url, const std::string &b) const
-      KTHROW(Exception) {
+      KTHROW(Exception) override {
     kul::Process p("git");
     kul::ProcessCapture pc(p);
     try {
@@ -155,7 +155,7 @@ class Git : public SCM {
     return s.substr(0, s.find('\t'));
   }
 
-  bool hasChanges(const std::string &d) const {
+  bool hasChanges(const std::string &d) const override {
     kul::Process p("git", d);
     kul::ProcessCapture pc(p);
     try {
@@ -176,7 +176,7 @@ class Git : public SCM {
       KEXCEPT(Exception, "SCM ERROR " + std::string(e.what()));
     }
   }
-  void diff(const std::string &d) const {
+  void diff(const std::string &d) const override {
     kul::Process p("git", d);
     try {
       p.arg("diff").start();
