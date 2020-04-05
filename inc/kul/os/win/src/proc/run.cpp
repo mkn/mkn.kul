@@ -34,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // void kul::Process::run() KTHROW(kul::proc::Exception){
 
+
 SECURITY_ATTRIBUTES sa;
 ZeroMemory(&sa, sizeof(SECURITY_ATTRIBUTES));
 // Set the bInheritHandle flag so pipe handles are inherited.
@@ -105,46 +106,37 @@ if (cons == INVALID_HANDLE_VALUE) {
 preStart();
 
 LPTSTR lpszVariable;
-LPCH lpvEnv;
-lpvEnv = GetEnvironmentStrings();
+LPCH lpvEnv = GetEnvironmentStrings();
 if (lpvEnv == NULL) error(__LINE__, "GetEnvironmentStrings() failed.");
 kul::hash::map::S2S env;
 for (lpszVariable = (LPTSTR)lpvEnv; *lpszVariable; lpszVariable++) {
   std::stringstream ss;
   while (*lpszVariable) ss << *lpszVariable++;
   std::string var = ss.str();
-  if (var.find(":") != std::string::npos)
-    env.insert(var.substr(0, var.find(":")), var.substr(var.find(":") + 1));
-  else
-    env.insert(var, "");
+  if (var.find("=") != std::string::npos)
+    env.insert(var.substr(0, var.find("=")), var.substr(var.find("=") + 1));
 }
 if (FreeEnvironmentStrings(lpvEnv) == 0) error(__LINE__, "FreeEnvironmentStrings() failed");
 
 const char *dir = directory().empty() ? 0 : directory().c_str();
 std::string cmd(toString());
+
 expand(cmd);
 LPSTR szCmdline = _strdup(cmd.c_str());
+
 if (vars().size()) {
-  WCHAR chNewEnv[__KUL_PROCESS_ENV_BUFFER__];
-  LPWSTR lpszCurrentVariable;
-  lpszCurrentVariable = (LPWSTR)chNewEnv;
-  for (auto &evs : vars()) {
-    std::string var(evs.first + "=" + evs.second);
-    if (FAILED(StringCchCopyW(lpszCurrentVariable, __KUL_PROCESS_ENV_BUFFER__,
-                              (std::wstring(var.begin(), var.end()).c_str()))))
-      error(__LINE__, "String copy failed");
-    lpszCurrentVariable += wcslen(lpszCurrentVariable) + 1;
-  }
+  std::wstring newEnv;
+
+  for (auto &evs : vars()) env[evs.first] = evs.second;
+
   for (auto &evs : env) {
-    if (vars().count(evs.first)) continue;
-    std::string var(evs.first + "=" + evs.second);
-    if (FAILED(StringCchCopyW(lpszCurrentVariable, __KUL_PROCESS_ENV_BUFFER__,
-                              (std::wstring(var.begin(), var.end()).c_str()))))
-      error(__LINE__, "String copy failed");
-    lpszCurrentVariable += wcslen(lpszCurrentVariable) + 1;
+    std::string name = evs.first;
+    std::string var(name + "=" + evs.second);
+    newEnv += std::wstring(var.begin(), var.end());
+    newEnv.push_back('\0');
   }
-  *lpszCurrentVariable = (TCHAR)0;
-  bSuccess = CreateProcess(NULL, szCmdline, NULL, NULL, TRUE, flags, chNewEnv, dir, &siStartInfo,
+  // may not work
+  bSuccess = CreateProcess(NULL, szCmdline, NULL, NULL, TRUE, flags, (LPVOID) newEnv.c_str(), dir, &siStartInfo,
                            &piProcInfo);
 } else
   bSuccess =
@@ -213,5 +205,6 @@ if (this->waitForExit()) {
 }
 CloseHandle(piProcInfo.hThread);
 CloseHandle(piProcInfo.hProcess);
+
 
 // }

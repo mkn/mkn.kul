@@ -139,11 +139,6 @@ class Args {
   Args() {}
   Args(const std::vector<Cmd> &cmds, const std::vector<Arg> &args) : cmds(cmds), args(args) {}
 
-  // Args(const Args &) = default;
-  // Args(const Args &&) = default;
-  // Args &operator=(const Args &) = default;
-  // Args &operator=(const Args &&) = default;
-
   void arg(const Arg &a) { args.push_back(a); }
   void cmd(const Cmd &c) { cmds.push_back(c); }
   const Cmd &commands(const char *c) const {
