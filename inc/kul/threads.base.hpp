@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // inline void nSleep(const unsigned long &nanos) {
 //   std::this_thread::sleep_for(std::chrono::nanoseconds(nanos));
 // }
-// }  // END NAMESPACE this_thread
+// }  // namespace this_thread
 
 // // class ThreadQueue;
 // // template<class P> class PredicatedThreadQueue;
@@ -87,6 +87,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //   }
 // };
 
-// }  // END NAMESPACE threading
-// }  // END NAMESPACE kul
+// }  // namespace threading
+// }  // namespace kul
 #endif /* _KUL_THREADS_BASE_HPP_ */

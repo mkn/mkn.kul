@@ -28,8 +28,8 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#ifndef _KUL_OS_WIN_OS_OS_HPP_
-#define _KUL_OS_WIN_OS_OS_HPP_
+#ifndef _KUL_OS_WIN_OS_TOP_HPP_
+#define _KUL_OS_WIN_OS_TOP_HPP_
 
 #include <direct.h>
 #include <io.h>
@@ -71,8 +71,8 @@ class KulTimeStampsResolver {
   }
   friend class kul::Dir;
 };
-}  // END NAMESPACE fs
+}  // namespace fs
 
-}  // END NAMESPACE kul
+}  // namespace kul
 
-#endif /* _KUL_OS_WIN_OS_OS_HPP_ */
+#endif /* _KUL_OS_WIN_OS_TOP_HPP_ */

@@ -71,7 +71,7 @@ inline uint32_t cores() {
   return numCPU;
 }
 inline uint16_t threads() { return std::thread::hardware_concurrency(); }
-}  // END NAMESPACE cpu
-}  // END NAMESPACE kul
+}  // namespace cpu
+}  // namespace kul
 
 #endif /* _KUL_OS_BSD_CPU_HPP_ */

@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "kul/defs.hpp"
 
-#if defined(_WIN32)
+#if KUL_IS_WIN
 #include "kul/os/win/signal.hpp"
 #else
 #include "kul/os/nixish/signal.hpp"

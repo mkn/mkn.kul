@@ -48,6 +48,13 @@ Description - Add string to svn checkout as arguments
 
 Switches - OSX is considered BSD for swiches unless otherwise noted
 
+Key             _KUL_MAX_PATH_
+Type            size_t
+Default         MAX_PATH/PATH_MAX - or 1024 if not found
+OS              all
+Description     Max array length for filesystem interactions
+
+
 Key             __KUL_LOG_FRMT__
 Type            string
 Default         "[%M]: %T - %D : %F fn(%N)#%L - %S"
@@ -116,6 +123,12 @@ Default         disabled
 OS              all
 Description
 Utilized in the mkn.yaml file for this project, optionally puts some functions in source files rather than headers
+
+Key             KASSERT_REPLACE_ASSERT
+Type            flag
+Default         disabled
+OS              all
+Description     replace "assert" with KASSERT, for assert stacktracing (in theory) //
 
 
 

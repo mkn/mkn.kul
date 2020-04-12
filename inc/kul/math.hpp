@@ -63,8 +63,8 @@ T root(const float &f, const int16_t &r = 2, const uint16_t &it = 6, T g = 0) {
   return g;
 }
 
-}  // END NAMESPACE math
-}  // END NAMESPACE kul
+}  // namespace math
+}  // namespace kul
 
 #include <algorithm>
 #include <numeric>

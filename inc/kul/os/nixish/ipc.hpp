@@ -139,7 +139,7 @@ class Client : public IPCCall {
   }
 };
 
-}  // END NAMESPACE ipc
-}  // END NAMESPACE kul
+}  // namespace ipc
+}  // namespace kul
 
 #endif /* _KUL_OS_NIXISH_IPC_HPP_ */

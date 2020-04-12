@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // This file is included by other files and is not in itself syntactically correct.
 
-std::vector<std::string> stacktrace(ucontext_t *uc = nullptr/*, int start = 2*/){
+std::vector<std::string> stacktrace(ucontext_t *uc = nullptr, int start = 2){
   (void) uc;
 // std::vector<std::string> stacktrace(ucontext_t *uc, int start) {
     // constexpr size_t max_trace = 128;
@@ -137,11 +137,11 @@ std::vector<std::string> stacktrace(ucontext_t *uc = nullptr/*, int start = 2*/)
     if(!euaddr) {
       v.emplace_back("eu-addr2line not found, install elfutils");
       return v;
-    }
     {
+    }
+      constexpr size_t SIZE = 256;
       int i;
-      #define SIZE 100
-      void *buffer[100];
+      void *buffer[SIZE];
 
       int nptrs = backtrace(buffer, SIZE);
 

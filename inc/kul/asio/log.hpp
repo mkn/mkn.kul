@@ -42,7 +42,7 @@ class Exception : public kul::Exception {
  public:
   Exception(const char *f, const uint16_t &l, const std::string &s) : kul::Exception(f, l, s) {}
 };
-}  // END NAMESPACE log
+}  // namespace log
 
 class LogMan;
 class Logger : public kul::Logger {
@@ -133,6 +133,6 @@ class ErrMessage : public Message {
 
 #define KASIO_ERR kul::ErrMessage()
 
-}  // END NAMESPACE asio
-}  // END NAMESPACE kul
+}  // namespace asio
+}  // namespace kul
 #endif /* _KUL_LOG_HPP_ */

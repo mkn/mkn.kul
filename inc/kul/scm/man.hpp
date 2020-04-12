@@ -61,6 +61,6 @@ class Manager {
   // std::unique_ptr<SCM> svn;
 };
 
-}  // END NAMESPACE scm
-}  // END NAMESPACE kul
+}  // namespace scm
+}  // namespace kul
 #endif /* _KUL_SCM_MAN_HPP_ */

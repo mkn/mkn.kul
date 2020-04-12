@@ -100,7 +100,7 @@ class Call {
   }
   int run() { return s.size() ? kul::os::exec(s) : 1; }
 };
-}  // end namespace proc
+}  // namespace proc
 
 class AProcess {
  private:

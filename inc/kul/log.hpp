@@ -35,10 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <memory>
 #include <string>
 
-#include "kul/defs.hpp"
-#include "kul/except.hpp"
 #include "kul/os.hpp"
-#include "kul/string.hpp"
 #include "kul/os/threads.hpp"
 #include "kul/time.hpp"
 
@@ -59,7 +56,7 @@ class Exception : public kul::Exception {
  public:
   Exception(const char *f, const uint16_t &l, const std::string &s) : kul::Exception(f, l, s) {}
 };
-}  // END NAMESPACE log
+}  // namespace log
 
 class ALogMan;
 class Logger {
@@ -231,5 +228,5 @@ class ErrMessage : public Message {
 
 #define KERR kul::ErrMessage()
 
-}  // END NAMESPACE kul
+}  // namespace kul
 #endif /* _KUL_LOG_HPP_ */

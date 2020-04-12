@@ -169,7 +169,7 @@ class Client {
   }
 };
 
-}  // END NAMESPACE ipc
-}  // END NAMESPACE kul
+}  // namespace ipc
+}  // namespace kul
 
 #endif /* _KUL_OS_WIN_IPC_HPP_ */

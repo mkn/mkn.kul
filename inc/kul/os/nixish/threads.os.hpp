@@ -65,7 +65,7 @@ inline bool main() {
 #endif
 }
 inline void kill() { pthread_exit(0); }
-}  // END NAMESPACE this_thread
+}  // namespace this_thread
 
 class Mutex {
  private:
@@ -132,5 +132,5 @@ class Thread : public threading::AThread {
   }
 };
 
-}  // END NAMESPACE kul
+}  // namespace kul
 #endif /* _KUL_OS_NIXISH_THREADS_OS_HPP_ */

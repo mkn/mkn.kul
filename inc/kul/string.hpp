@@ -31,13 +31,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _KUL_STRING_HPP_
 #define _KUL_STRING_HPP_
 
-#include <string.h>
-#include <algorithm>
 #include <cmath>
-#include <iostream>
 #include <string>
-#include <unordered_map>
 #include <vector>
+#include <string.h>
+#include <iostream>
+#include <algorithm>
+#include <unordered_map>
 
 #include "kul/except.hpp"
 

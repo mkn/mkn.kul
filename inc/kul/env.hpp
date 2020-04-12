@@ -28,19 +28,56 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+#ifndef _KUL_ENV_HPP_
+#define _KUL_ENV_HPP_
 
-// This file is included by other files and is not in itself syntactically
-// correct.
+#include "kul/string.hpp"
 
-// std::string kul::Dir::REAL(const std::string& s) KTHROW(fs::Exception){
+#if KUL_IS_WIN
+#include "kul/os/win/env.hpp"
+#else
+#include "kul/os/nixish/env.hpp"
+#endif /*KUL_IS_WIN*/
 
-char *expanded = realpath(s.c_str(), NULL);
-if (expanded) {
-  std::string dir(expanded);
-  free(expanded);
-  if (dir.size() > PATH_MAX) KEXCEPT(fs::Exception, "Directory path too large");
-  return dir;
-}
-KEXCEPT(fs::Exception, "Directory \"" + s + "\" does not exist");
+namespace kul {
+namespace env {
 
-// }
+class  Var {
+ public:
+  enum Mode { APPE = 0, PREP, REPL };
+
+  Var(const std::string n, const std::string v, const Mode m) : n(n), v(v), m(m) {}
+  Var(const Var &e) : n(e.n), v(e.v), m(e.m) {}
+  const char *name() const { return n.c_str(); }
+  const char *value() const { return v.c_str(); }
+  Mode mode() const { return m; }
+  const std::string toString() const {
+    std::string var(value());
+    kul::String::REPLACE_ALL(var, EOL(), "");
+    kul::String::TRIM(var);
+    const std::string ev(env::GET(name()));
+    if (!ev.empty()) {
+      if (mode() == Mode::PREP)
+        var = var + kul::env::SEP() + ev;
+      else if (mode() == Mode::APPE)
+        var = ev + kul::env::SEP() + var;
+    }
+    return var;
+  }
+  Var &operator=(Var &&e) {
+    std::swap(m, e.m);
+    std::swap(n, e.n);
+    std::swap(v, e.v);
+    return *this;
+  }
+
+ private:
+  std::string n;
+  std::string v;
+  Mode m;
+};
+
+}  // namespace env
+}  // namespace kul
+
+#endif /* _KUL_ENV_HPP_ */

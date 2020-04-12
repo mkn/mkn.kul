@@ -29,27 +29,15 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-// This file is included by other files and is not in itself syntactically
-// correct.
+std::string kul::Dir::REAL(const std::string& s) KTHROW(fs::Exception){
 
-// std::vector<kul::Dir> kul::Dir::dirs(bool incHidden) const
-// KTHROW(fs::Exception){
+  char *expanded = realpath(s.c_str(), NULL);
+  if (expanded) {
+  std::string dir(expanded);
+  free(expanded);
+  if (dir.size() > PATH_MAX) KEXCEPT(fs::Exception, "Directory path too large");
+  return dir;
+  }
+  KEXCEPT(fs::Exception, "Directory \"" + s + "\" does not exist");
 
-if (!is()) KEXCEPT(fs::Exception, "Directory : \"" + path() + "\" does not exist");
-std::vector<Dir> dirs;
-
-DIR *dir = opendir(real().c_str());
-struct dirent *entry = readdir(dir);
-while (entry != NULL) {
-  std::string d(entry->d_name);
-  kul::Dir dd(JOIN(real(), entry->d_name));
-  if (d.compare(".") != 0 && d.compare("..") != 0 &&
-      !(d.substr(0, 1).compare(".") == 0 && !incHidden) && dd.is())
-    dirs.push_back(dd);
-  entry = readdir(dir);
 }
-closedir(dir);
-
-return dirs;
-
-// }

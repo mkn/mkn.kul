@@ -28,22 +28,33 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#ifndef _KUL_OS_WIN_CPU_HPP_
-#define _KUL_OS_WIN_CPU_HPP_
 
-#include <windows.h>
+std::vector<kul::Dir> kul::Dir::dirs(bool incHidden) const KTHROW(fs::Exception){
 
-#include <thread>
+  if (!is()) KEXCEPT(fs::Exception, "Directory : \"" + path() + "\" does not exist");
+  std::vector<Dir> dirs;
 
-namespace kul {
-namespace cpu {
-inline uint32_t cores() {
-  SYSTEM_INFO sysinfo;
-  GetSystemInfo(&sysinfo);
-  return sysinfo.dwNumberOfProcessors;
+  WIN32_FIND_DATA fdFile;
+  HANDLE hFind = NULL;
+  char sPath[2048];
+  sprintf_s(sPath, "%s\\*.*", path().c_str());
+  if ((hFind = FindFirstFile(sPath, &fdFile)) == INVALID_HANDLE_VALUE)
+    KEXCEPT(fs::Exception, "Directory : \"" + path() + "\" does not exist");
+  do {
+    if (strcmp(fdFile.cFileName, ".") != 0 && strcmp(fdFile.cFileName, "..") != 0) {
+      sprintf_s(sPath, "%s\\%s", path().c_str(), fdFile.cFileName);
+      if (fdFile.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+        if (!incHidden && std::string(sPath)
+                                  .substr(std::string(sPath).rfind(kul::Dir::SEP()) + 1)
+                                  .substr(0, 1)
+                                  .compare(".") == 0)
+          continue;
+        dirs.push_back(Dir(sPath));
+      }
+    }
+  } while (FindNextFile(hFind, &fdFile));
+  FindClose(hFind);
+
+  return dirs;
+
 }
-inline uint16_t threads() { return std::thread::hardware_concurrency(); }
-}  // namespace cpu
-}  // namespace kul
-
-#endif /* _KUL_OS_WIN_CPU_HPP_ */

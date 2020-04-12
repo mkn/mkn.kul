@@ -40,7 +40,7 @@ namespace kul {
 namespace sys {
 
 template <class F>
-class SharedFunctionp;
+class SharedFunction;
 
 class SharedLibrary {
   template <class F>
@@ -108,7 +108,7 @@ class SharedClass {
   }
 };
 
-}  // END NAMESPACE sys
-}  // END NAMESPACE kul
+}  // namespace sys
+}  // namespace kul
 
 #endif /* _KUL_OS_WIN_SYS_HPP_ */

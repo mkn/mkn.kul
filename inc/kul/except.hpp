@@ -31,8 +31,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _KUL_EXCEPT_HPP_
 #define _KUL_EXCEPT_HPP_
 
-#include <iostream>
 #include <sstream>
+#include <iostream>
 #include <stdexcept>
 
 #include "kul/defs.hpp"
@@ -150,5 +150,5 @@ class Exit : public Exception {
 
 #define KEXIT(e, m) throw kul::Exit(__FILE__, __LINE__, m, e)
 
-}  // end namespace kul
+}  // namespace kul
 #endif /* _KUL_EXCEPT_HPP_ */

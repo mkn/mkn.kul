@@ -28,22 +28,15 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#ifndef _KUL_OS_WIN_CPU_HPP_
-#define _KUL_OS_WIN_CPU_HPP_
+#ifndef _KUL_OS_TOP_HPP_
+#define _KUL_OS_TOP_HPP_
 
-#include <windows.h>
+#include "kul/defs.hpp"
 
-#include <thread>
+#if KUL_IS_WIN
+#include "kul/os/win/os.top.hpp"
+#else
+#include "kul/os/nixish/os.top.hpp"
+#endif
 
-namespace kul {
-namespace cpu {
-inline uint32_t cores() {
-  SYSTEM_INFO sysinfo;
-  GetSystemInfo(&sysinfo);
-  return sysinfo.dwNumberOfProcessors;
-}
-inline uint16_t threads() { return std::thread::hardware_concurrency(); }
-}  // namespace cpu
-}  // namespace kul
-
-#endif /* _KUL_OS_WIN_CPU_HPP_ */
+#endif  // _KUL_OS_TOP_HPP_
