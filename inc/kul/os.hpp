@@ -33,16 +33,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vector>
 
+#include "kul/env.hpp"
+#include "kul/cpu.hpp"
+#include "kul/except.hpp"
+#include "kul/string.hpp"
+
 #if KUL_IS_WIN
 #include "kul/os/win/os.top.hpp"
 #else
 #include "kul/os/nixish/os.top.hpp"
 #endif
-
-#include "kul/env.hpp"
-#include "kul/cpu.hpp"
-#include "kul/except.hpp"
-#include "kul/string.hpp"
 
 namespace kul {
 
