@@ -28,15 +28,25 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#ifndef _KUL_OS_OS_HPP_
-#define _KUL_OS_OS_HPP_
 
-#include "kul/defs.hpp"
+std::vector<kul::File> kul::Dir::files(bool recursive) const KTHROW(fs::Exception){
 
-#if defined(_WIN32)
-#include "kul/os/win/os.os.hpp"
-#else
-#include "kul/os/nixish/os.os.hpp"
-#endif
+  if (!is()) KEXCEPT(fs::Exception, "Directory : \"" + path() + "\" does not exist");
 
-#endif  // _KUL_OS_OS_HPP_
+  std::vector<File> fs;
+  DIR *dir = opendir(path().c_str());
+  struct dirent *entry = readdir(dir);
+  while (entry != NULL) {
+    if (!kul::Dir(JOIN(real(), entry->d_name)).is()) fs.push_back(File(entry->d_name, *this));
+    entry = readdir(dir);
+  }
+  closedir(dir);
+  if (recursive) {
+    for (const kul::Dir &d : dirs()) {
+      const std::vector<kul::File> &tFs = d.files(true);
+      fs.insert(fs.end(), tFs.begin(), tFs.end());
+    }
+  }
+  return fs;
+
+}

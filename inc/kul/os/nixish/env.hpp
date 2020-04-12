@@ -28,29 +28,56 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+#ifndef _KUL_OS_NIXISH_ENV_HPP_
+#define _KUL_OS_NIXISH_ENV_HPP_
 
-// This file is included by other files and is not in itself syntactically
-// correct.
+#include <dirent.h>
+#include <pwd.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <algorithm>
+#include <fstream>
+#include <thread>
 
-// std::vector<kul::File> kul::Dir::files(bool recursive) const
-// KTHROW(fs::Exception){
+#include <limits.h>
 
-if (!is()) KEXCEPT(fs::Exception, "Directory : \"" + path() + "\" does not exist");
+namespace kul {
+namespace env {
 
-std::vector<File> fs;
-DIR *dir = opendir(path().c_str());
-struct dirent *entry = readdir(dir);
-while (entry != NULL) {
-  if (!kul::Dir(JOIN(real(), entry->d_name)).is()) fs.push_back(File(entry->d_name, *this));
-  entry = readdir(dir);
+inline std::string EOL() {
+  return "\r\n";
 }
-closedir(dir);
-if (recursive) {
-  for (const kul::Dir &d : dirs()) {
-    const std::vector<kul::File> &tFs = d.files(true);
-    fs.insert(fs.end(), tFs.begin(), tFs.end());
-  }
-}
-return fs;
 
-// }
+#if   defined(_KUL_MAX_PATH_)
+constexpr size_t KUL_MAX_PATH = _KUL_MAX_PATH_;
+#elif defined(PATH_MAX)
+constexpr size_t KUL_MAX_PATH = PATH_MAX;
+#else
+#error // could not set KUL_MAX_PATH
+#endif /*_KUL_MAX_PATH_*/
+
+inline bool EXISTS(const char *c) { return getenv(c); }
+inline std::string GET(const char *c) {
+  const char *r = getenv(c);
+  return std::string(r ? r : "");
+}
+inline void SET(const char *var, const char *val) { setenv(var, val, 1); }
+inline char SEP() { return ':'; }
+
+inline std::string CWD() {
+  char c[KUL_MAX_PATH];
+  auto r = getcwd(c, KUL_MAX_PATH);
+  (void)r;
+  std::string str(c);
+  return str;
+}
+
+inline bool CWD(const std::string &c) { return chdir(c.c_str()) != -1; }
+
+}  // namespace env
+}  // namespace kul
+
+#endif /* _KUL_OS_NIXISH_ENV_HPP_ */

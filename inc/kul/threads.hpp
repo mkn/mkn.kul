@@ -500,9 +500,9 @@ class ChroncurrentThreadPool : public ConcurrentThreadPool<void(), AutoChronPool
   uint64_t m_scale = 0;
 
   ChroncurrentThreadPool(const ChroncurrentThreadPool &) = delete;
-  ChroncurrentThreadPool(const ChroncurrentThreadPool &&) = delete;
+  ChroncurrentThreadPool(ChroncurrentThreadPool &&) = delete;
   ChroncurrentThreadPool &operator=(const ChroncurrentThreadPool &) = delete;
-  ChroncurrentThreadPool &operator=(const ChroncurrentThreadPool &&) = delete;
+  ChroncurrentThreadPool &operator=(ChroncurrentThreadPool &&) = delete;
 
  public:
   ChroncurrentThreadPool(const size_t &max = 1, bool strt = 0, const uint64_t &nWait = 1000000,
@@ -524,6 +524,6 @@ class ChroncurrentThreadPool : public ConcurrentThreadPool<void(), AutoChronPool
   }
 };
 
-}  // END NAMESPACE kul
+}  // namespace kul
 
 #endif /* _KUL_THREADS_HPP_ */

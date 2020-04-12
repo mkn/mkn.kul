@@ -46,7 +46,7 @@ namespace kul {
 namespace cpu {
 inline uint32_t cores() { return sysconf(_SC_NPROCESSORS_ONLN); }
 inline uint16_t threads() { return std::thread::hardware_concurrency(); }
-}  // END NAMESPACE cpu
-}  // END NAMESPACE kul
+}  // namespace cpu
+}  // namespace kul
 
 #endif /* _KUL_OS_NIX_CPU_HPP_ */

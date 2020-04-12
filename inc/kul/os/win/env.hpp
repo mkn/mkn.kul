@@ -28,22 +28,78 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#ifndef _KUL_OS_WIN_CPU_HPP_
-#define _KUL_OS_WIN_CPU_HPP_
+#ifndef _KUL_OS_WIN_ENV_HPP_
+#define _KUL_OS_WIN_ENV_HPP_
 
+#include <direct.h>
+#include <io.h>
+#include <process.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 #include <windows.h>
+#include <algorithm>
+#include <fstream>
 
-#include <thread>
 
 namespace kul {
-namespace cpu {
-inline uint32_t cores() {
-  SYSTEM_INFO sysinfo;
-  GetSystemInfo(&sysinfo);
-  return sysinfo.dwNumberOfProcessors;
+namespace env {
+
+#if   defined(_KUL_MAX_PATH_)
+constexpr size_t KUL_MAX_PATH = _KUL_MAX_PATH_;
+#elif defined(_MAX_PATH)
+constexpr size_t KUL_MAX_PATH = _MAX_PATH;
+#else
+#error // could not set KUL_MAX_PATH
+#endif /*_KUL_MAX_PATH_*/
+
+inline std::string EOL() {
+#if (_MSC_VER >= 1800)
+  return "\n";
+#else
+  return "\r\n";
+#endif
 }
-inline uint16_t threads() { return std::thread::hardware_concurrency(); }
-}  // namespace cpu
+
+inline bool EXISTS(const char *c) {
+  bool set = 0;
+  char *r = 0;
+  size_t len;
+  _dupenv_s(&r, &len, c);
+  set = r;
+  if (len) free(r);
+  return set;
+}
+inline std::string GET(const char *c) {
+  char *r;
+  size_t len;
+  _dupenv_s(&r, &len, c);
+  if (len) {
+    std::string s(r);
+    free(r);
+    return s;
+  }
+  return "";
+}
+
+inline void SET(const char *var, const char *val) {
+  _putenv(std::string(std::string(var) + "=" + std::string(val)).c_str());
+}
+
+inline char SEP() { return ';'; }
+
+
+inline std::string CWD() {
+  char c[KUL_MAX_PATH];
+  _getcwd(c, KUL_MAX_PATH);
+  std::string str(c);
+  return str;
+}
+
+inline bool CWD(const std::string &c) { return _chdir(c.c_str()) != -1; }
+
+}  // namespace env
 }  // namespace kul
 
-#endif /* _KUL_OS_WIN_CPU_HPP_ */
+#endif /* _KUL_OS_WIN_ENV_HPP_ */

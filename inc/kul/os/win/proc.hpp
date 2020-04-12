@@ -87,7 +87,7 @@ inline int32_t id() { return GetCurrentProcessId(); }
 inline void kill(const int32_t &e) {
   TerminateProcess(OpenProcess(PROCESS_TERMINATE, 0, kul::this_proc::id()), 128 + e);
 }
-}  // end namespace this_proc
+}  // namespace this_proc
 
 class Process : public kul::AProcess {
  private:

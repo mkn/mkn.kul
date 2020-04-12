@@ -111,7 +111,7 @@ class SharedClass {
   }
 };
 
-}  // END NAMESPACE sys
-}  // END NAMESPACE kul
+}  // namespace sys
+}  // namespace kul
 
 #endif /* _KUL_OS_NIXISH_SYS_HPP_ */

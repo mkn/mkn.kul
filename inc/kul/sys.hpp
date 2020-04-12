@@ -41,8 +41,8 @@ class Exception : public kul::Exception {
   Exception(const char *f, const uint16_t &l, const std::string &s) : kul::Exception(f, l, s) {}
 };
 
-}  // END NAMESPACE sys
-}  // END NAMESPACE kul
+}  // namespace sys
+}  // namespace kul
 
 #if defined(_WIN32)
 #include "kul/os/win/sys.hpp"

@@ -128,7 +128,7 @@ class Set : public google::sparse_hash_set<T, HashFcn, EqualKey> {
 
 namespace set {
 using String = Set<std::string, std::hash<std::string>, StdStringComparator>;
-}  // end namespace set
+}  // namespace set
 
 template <class K, class V, class HashFcn, class EqualKey,
           class Alloc = libc_allocator_with_realloc<std::pair<K, V> > >
@@ -163,8 +163,8 @@ template <class T>
 using S2T = Map<std::string, T, std::hash<std::string>, StdStringComparator,
                 libc_allocator_with_realloc<std::pair<const std::string, T> > >;
 using S2S = S2T<std::string>;
-}  // end namespace map
-}  // end namespace hash
+}  // namespace map
+}  // namespace hash
 
 namespace dense {
 namespace hash {
@@ -232,10 +232,10 @@ using S2T = Map<std::string, T, std::hash<std::string>, StdStringComparator,
                 libc_allocator_with_realloc<std::pair<const std::string, T> > >;
 using S2S = S2T<std::string>;
 
-}  // end namespace map
-}  // end namespace hash
-}  // end namespace dense
-}  // end namespace kul
+}  // namespace map
+}  // namespace hash
+}  // namespace dense
+}  // namespace kul
 
 #endif  //_MKN_WITH_GOOGLE_SPARSEHASH_
 

@@ -234,6 +234,6 @@ class Svn : public SCM {
 };
 */
 
-}  // END NAMESPACE scm
-}  // END NAMESPACE kul
+}  // namespace scm
+}  // namespace kul
 #endif /* _KUL_SCM_HPP_ */

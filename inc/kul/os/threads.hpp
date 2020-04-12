@@ -54,7 +54,7 @@ inline void uSleep(const unsigned long &micros) {
 inline void nSleep(const unsigned long &nanos) {
   std::this_thread::sleep_for(std::chrono::nanoseconds(nanos));
 }
-}  // END NAMESPACE this_thread
+}  // namespace this_thread
 
 // class ThreadQueue;
 // template<class P> class PredicatedThreadQueue;
@@ -89,8 +89,8 @@ class AThread {
   }
 };
 
-}  // END NAMESPACE threading
-}  // END NAMESPACE kul
+}  // namespace threading
+}  // namespace kul
 
 
 #if defined(_WIN32)

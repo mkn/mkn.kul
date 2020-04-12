@@ -44,9 +44,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <execinfo.h>
 #include <cxxabi.h>
 
-// #define UNW_LOCAL_ONLY
-// #include <libunwind.h>
-
 
 #ifndef __USE_GNU
 #define __USE_GNU
@@ -69,7 +66,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif /* __NetBSD__ */
 #endif /* REG_EIP */
 
-void kul_sig_handler(int s, siginfo_t *info, void *v);
+inline void kul_sig_handler(int s, siginfo_t *info, void *v);
 
 namespace kul {
 namespace this_thread{
@@ -135,13 +132,7 @@ class Signal {
 }  // namespace kul
 
 #ifndef _KUL_COMPILED_LIB_
-void kul_sig_handler(int s, siginfo_t *info, void *v) {
 #include "kul/os/nixish/src/signal/handler.ipp"
-}
 #endif
-
-namespace kul {}  // END NAMESPACE kul
-
-// kul::Signals sig;
 
 #endif /* _KUL_OS_NIXISH_SIGNAL_HPP_ */

@@ -29,38 +29,15 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-// This file is included by other files and is not in itself syntactically
-// correct.
+std::string kul::Dir::REAL(const std::string& s) KTHROW(fs::Exception){
 
-// std::vector<kul::File> kul::Dir::files(bool recursive) const
-// KTHROW(fs::Exception){
-
-if (!is()) KEXCEPT(fs::Exception, "Directory : \"" + path() + "\" does not exist");
-
-std::vector<File> fs;
-WIN32_FIND_DATA fdFile;
-HANDLE hFind = NULL;
-char sPath[2048];
-sprintf_s(sPath, "%s\\*.*", path().c_str());
-if ((hFind = FindFirstFile(sPath, &fdFile)) == INVALID_HANDLE_VALUE)
-  KEXCEPT(fs::Exception, "Directory : \"" + path() + "\" does not exist");
-
-do {
-  if (strcmp(fdFile.cFileName, ".") != 0 && strcmp(fdFile.cFileName, "..") != 0) {
-    sprintf_s(sPath, "%s\\%s", path().c_str(), fdFile.cFileName);
-    if (!(fdFile.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
-      std::string f(sPath);
-      fs.push_back(File(f.substr(f.rfind(kul::Dir::SEP()) + 1), *this));
-    }
+  char *expanded = _fullpath(NULL, s.c_str(), _MAX_PATH);
+  if (expanded) {
+    std::string dir(expanded);
+    delete expanded;
+    if (dir.size() && dir[dir.size() - 1] == '\\') dir.pop_back();
+    return dir;
   }
-} while (FindNextFile(hFind, &fdFile));
-FindClose(hFind);
-if (recursive) {
-  for (const Dir &d : dirs()) {
-    std::vector<File> tFiles = d.files(true);
-    fs.insert(fs.end(), tFiles.begin(), tFiles.end());
-  }
+  KEXCEPT(fs::Exception, "Item: \"" + s + "\" does not exist");
+
 }
-return fs;
-
-// }

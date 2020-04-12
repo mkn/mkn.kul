@@ -28,19 +28,39 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+#ifndef _KUL_OS_NIXISH_OS_TOP_HPP_
+#define _KUL_OS_NIXISH_OS_TOP_HPP_
 
-// This file is included by other files and is not in itself syntactically
-// correct.
+#include <dirent.h>
+#include <pwd.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <algorithm>
+#include <fstream>
+#include <thread>
 
-// std::string kul::Dir::REAL(const std::string& s) KTHROW(fs::Exception){
+namespace kul {
 
-char *expanded = _fullpath(NULL, s.c_str(), _MAX_PATH);
-if (expanded) {
-  std::string dir(expanded);
-  delete expanded;
-  if (dir.size() && dir[dir.size() - 1] == '\\') dir.pop_back();
-  return dir;
-}
-KEXCEPT(fs::Exception, "Item: \"" + s + "\" does not exist");
+class Dir;
+namespace fs {
 
-// }
+class KulTimeStampsResolver {
+ private:
+  static void GET(const char *const p, uint64_t &a, uint64_t &c, uint64_t &m) {
+    struct stat att;
+    if (stat(p, &att) != -1) {
+      a = att.st_atime;
+      m = att.st_mtime;
+      c = 0;  // doesn't exist on this platform
+    }
+  }
+  friend class kul::Dir;
+};
+
+}  // namespace fs
+}  // namespace kul
+
+#endif /* _KUL_OS_NIXISH_OS_TOP_HPP_ */

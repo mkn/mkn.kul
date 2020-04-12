@@ -50,7 +50,7 @@ inline void show() {
 std::string hidden(const std::string &t);
 void show();
 #endif
-}  // END NAMESPACE cli
-}  // END NAMESPACE kul
+}  // namespace cli
+}  // namespace kul
 
 #endif /* _KUL_OS_WIN_CLI_OS_HPP_ */

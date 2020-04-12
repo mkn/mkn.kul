@@ -55,7 +55,7 @@ T dot(const size_t n, const T *x, const std::atomic<T> *y) {
   for (uint64_t i = 0; i < n; ++i) result += x[i] * y[i].load();
   return result;
 }
-}  // end namespace detail
+}  // namespace detail
 template <typename T, typename K>
 typename std::enable_if<
   (!std::is_same<T, double>::value && !std::is_same<T, float>::value) &&

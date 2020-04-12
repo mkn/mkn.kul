@@ -41,8 +41,8 @@ namespace cli {
 inline std::string hidden(const std::string &t);
 inline void show();
 
-}  // END NAMESPACE cli
-}  // END NAMESPACE kul
+}  // namespace cli
+}  // namespace kul
 
 #ifndef _KUL_COMPILED_LIB_
 #include "kul/os/nixish/src/cli/hidden.ipp"

@@ -28,39 +28,35 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#ifndef _KUL_OS_NIXISH_OS_HPP_
-#define _KUL_OS_NIXISH_OS_HPP_
 
-#include <dirent.h>
-#include <pwd.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <unistd.h>
-#include <algorithm>
-#include <fstream>
-#include <thread>
+std::vector<kul::File> kul::Dir::files(bool recursive) const KTHROW(fs::Exception){
 
-namespace kul {
+  if (!is()) KEXCEPT(fs::Exception, "Directory : \"" + path() + "\" does not exist");
 
-class Dir;
-namespace fs {
+  std::vector<File> fs;
+  WIN32_FIND_DATA fdFile;
+  HANDLE hFind = NULL;
+  char sPath[2048];
+  sprintf_s(sPath, "%s\\*.*", path().c_str());
+  if ((hFind = FindFirstFile(sPath, &fdFile)) == INVALID_HANDLE_VALUE)
+    KEXCEPT(fs::Exception, "Directory : \"" + path() + "\" does not exist");
 
-class KulTimeStampsResolver {
- private:
-  static void GET(const char *const p, uint64_t &a, uint64_t &c, uint64_t &m) {
-    struct stat att;
-    if (stat(p, &att) != -1) {
-      a = att.st_atime;
-      m = att.st_mtime;
-      c = 0;  // doesn't exist on this platform
+  do {
+    if (strcmp(fdFile.cFileName, ".") != 0 && strcmp(fdFile.cFileName, "..") != 0) {
+      sprintf_s(sPath, "%s\\%s", path().c_str(), fdFile.cFileName);
+      if (!(fdFile.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
+        std::string f(sPath);
+        fs.push_back(File(f.substr(f.rfind(kul::Dir::SEP()) + 1), *this));
+      }
+    }
+  } while (FindNextFile(hFind, &fdFile));
+  FindClose(hFind);
+  if (recursive) {
+    for (const Dir &d : dirs()) {
+      std::vector<File> tFiles = d.files(true);
+      fs.insert(fs.end(), tFiles.begin(), tFiles.end());
     }
   }
-  friend class kul::Dir;
-};
+  return fs;
 
-}  // END NAMESPACE fs
-}  // END NAMESPACE kul
-
-#endif /* _KUL_OS_NIXISH_OS_HPP_ */
+}

@@ -51,7 +51,7 @@ inline void kill() {
   TerminateThread(h, 0);
   CloseHandle(h);
 }
-}  // END NAMESPACE this_thread
+}  // namespace this_thread
 
 class Mutex {
  private:
@@ -117,5 +117,5 @@ inline DWORD WINAPI threadFunction(LPVOID th) {
 }
 }  // namespace threading
 
-}  // END NAMESPACE kul
+}  // namespace kul
 #endif /* _KUL_OS_WIN_THREADS_OS_HPP_ */
