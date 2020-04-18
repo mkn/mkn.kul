@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _KUL_DBG_HPP_
 #define _KUL_DBG_HPP_
 
-#include <kul/log.hpp>
+#include "kul/log.hpp"
 
 namespace kul {
 namespace dbg {
