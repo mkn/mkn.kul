@@ -33,12 +33,12 @@ profile:
     inc: .
     main: test.cpp
     mode: none
-    dep: google.test # https://github.com/mkn/google.test
+    dep: google.test
 
   - name: bench
     parent: lib
     main: bench.cpp
-    dep: google.benchmark # https://github.com/mkn/google.benchmark
+    dep: google.benchmark
 
   - name: usage
     parent: lib

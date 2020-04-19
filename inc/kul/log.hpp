@@ -216,6 +216,7 @@ class ErrMessage : public Message {
 #define KLOG_INF kul::LogMessage(__FILE__, __func__, __LINE__, kul::log::mode::INF)
 #define KLOG_ERR kul::LogMessage(__FILE__, __func__, __LINE__, kul::log::mode::ERR)
 #define KLOG_DBG kul::LogMessage(__FILE__, __func__, __LINE__, kul::log::mode::DBG)
+#define KLOG_OTH kul::LogMessage(__FILE__, __func__, __LINE__, kul::log::mode::OTH)
 #define KLOG_TRC kul::LogMessage(__FILE__, __func__, __LINE__, kul::log::mode::TRC)
 #define KLOG(sev) KLOG_##sev
 
@@ -223,6 +224,7 @@ class ErrMessage : public Message {
 #define KOUT_INF kul::OutMessage(kul::log::mode::INF)
 #define KOUT_ERR kul::OutMessage(kul::log::mode::ERR)
 #define KOUT_DBG kul::OutMessage(kul::log::mode::DBG)
+#define KOUT_OTH kul::OutMessage(kul::log::mode::OTH)
 #define KOUT_TRC kul::OutMessage(kul::log::mode::TRC)
 #define KOUT(sev) KOUT_##sev
 
