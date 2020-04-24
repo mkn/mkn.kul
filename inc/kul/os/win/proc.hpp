@@ -42,7 +42,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "kul/defs.hpp"
 #include "kul/log.hpp"
 #include "kul/os.hpp"
-#include "kul/proc.base.hpp"
 #include "kul/string.hpp"
 
 

@@ -158,7 +158,7 @@ class Args {
   const std::vector<Cmd> &commands() const { return cmds; }
   const std::vector<Arg> &arguments() const { return args; }
   const std::string &get(const std::string &s) const {
-    if (has(s)) return (*vals.find(s)).second;
+    if (has(s)) return vals.at(s);
     KEXCEPT(ArgNotFoundException, "No value " + s + " found");
   }
   bool empty() const { return vals.size() == 0; }

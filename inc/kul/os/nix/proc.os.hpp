@@ -40,7 +40,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <unistd.h>
 #include <stdexcept>
 
-#include "kul/proc.base.hpp"
 
 namespace kul {
 namespace this_proc {
