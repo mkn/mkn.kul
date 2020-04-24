@@ -44,7 +44,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <mach/mach.h>
 #endif
 
-#include "kul/proc.base.hpp"
 
 namespace kul {
 namespace this_proc {
