@@ -46,7 +46,7 @@ class  Var {
  public:
   enum Mode { APPE = 0, PREP, REPL };
 
-  Var(const std::string n, const std::string v, const Mode m) : n(n), v(v), m(m) {}
+  Var(const std::string _n, const std::string _v, const Mode _m) : n(_n), v(_v), m(_m) {}
   Var(const Var &e) : n(e.n), v(e.v), m(e.m) {}
   const char *name() const { return n.c_str(); }
   const char *value() const { return v.c_str(); }

@@ -213,6 +213,7 @@ class ErrMessage : public Message {
   ErrMessage() : Message(log::mode::ERR) {}
 };
 
+#define KLOG_NON kul::LogMessage(__FILE__, __func__, __LINE__, kul::log::mode::NON)
 #define KLOG_INF kul::LogMessage(__FILE__, __func__, __LINE__, kul::log::mode::INF)
 #define KLOG_ERR kul::LogMessage(__FILE__, __func__, __LINE__, kul::log::mode::ERR)
 #define KLOG_DBG kul::LogMessage(__FILE__, __func__, __LINE__, kul::log::mode::DBG)
