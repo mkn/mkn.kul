@@ -41,6 +41,16 @@ struct Pointer {
   T* p                          = nullptr;
 };
 
+template<typename T>
+struct Pointers {
+  Pointers(T const * p_, size_t s_) : p{p_}, s{s_}{}
+  T const * p = nullptr;
+  size_t s    = 0;
+  auto& begin() const { return p; }
+  auto  end()   const { return p + s; }
+  auto& size()  const { return s; }
+};
+
 template<typename Tuple>
 struct PointersApply {
   PointersApply(Tuple& t) : tuple{t}{}
