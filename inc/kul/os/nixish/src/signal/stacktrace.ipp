@@ -137,22 +137,21 @@ std::vector<std::string> stacktrace(ucontext_t *uc = nullptr, int start = 2){
 
     if(!euaddr) {
       v.emplace_back("eu-addr2line not found, install elfutils");
-      return v;
-    {
-    }
-      constexpr size_t SIZE = 256;
-      int i;
-      void *buffer[SIZE];
-
-      int nptrs = backtrace(buffer, SIZE);
-
-      for (i = 1; i < nptrs; ++i) {
-          char syscom[1024];
-          syscom[0] = '\0';
-          snprintf(syscom, 1024, "eu-addr2line '%p' --pid=%d > /dev/stderr\n", buffer[i], getpid());
-          if (system(syscom) != 0)
-              fprintf(stderr, "eu-addr2line failed\n");
-      }
-    }
     return v;
+
+    constexpr size_t SIZE = 256;
+    int i;
+    void *buffer[SIZE];
+
+    int nptrs = backtrace(buffer, SIZE);
+
+    for (i = 1; i < nptrs; ++i) {
+        char syscom[1024];
+        syscom[0] = '\0';
+        snprintf(syscom, 1024, "eu-addr2line '%p' --pid=%d > /dev/stderr\n", buffer[i], getpid());
+        if (system(syscom) != 0)
+            fprintf(stderr, "eu-addr2line failed\n");
+    }
+  }
+  return v;
 }

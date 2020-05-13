@@ -43,7 +43,7 @@ namespace kul {
 namespace sys {
 
 template <class F>
-class SharedFunctionp;
+class SharedFunction;
 
 class SharedLibrary {
   template <class F>
@@ -75,7 +75,7 @@ class SharedFunction {
   SharedLibrary &_lib;
 
  public:
-  SharedFunction(SharedLibrary &lib, const std::string &f) KTHROW(Exception) : _lib(lib) {
+  SharedFunction(SharedLibrary &lib,  std::string const& f) KTHROW(Exception) : _lib(lib) {
     _funcP = (F *)dlsym(_lib._handle, f.c_str());
     const char *dlsym_error = dlerror();
     if (dlsym_error) KEXCEPSTREAM << "Cannot load symbol create " << dlsym_error;
