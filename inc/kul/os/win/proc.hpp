@@ -44,7 +44,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "kul/os.hpp"
 #include "kul/string.hpp"
 
-
 // extern char **environ;
 
 namespace kul {

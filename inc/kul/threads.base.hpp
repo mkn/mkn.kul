@@ -60,11 +60,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // namespace threading {
 // class Exception : public kul::Exception {
 //  public:
-//   Exception(const char *f, const uint16_t &l, const std::string &s) : kul::Exception(f, l, s) {}
+//   Exception(const char *f, const uint16_t &l, const std::string &s) :
+//   kul::Exception(f, l, s) {}
 // };
 // class InterruptionException : public Exception {
 //  public:
-//   InterruptionException(const char *f, const uint16_t &l, const std::string &s)
+//   InterruptionException(const char *f, const uint16_t &l, const std::string
+//   &s)
 //       : Exception(f, l, s) {}
 // };
 

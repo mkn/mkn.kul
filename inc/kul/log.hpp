@@ -192,15 +192,35 @@ class Message {
   }
 };
 class LogMessage : public Message {
- private:
-  const char *f;
-  const char *fn;
-  const uint16_t &l;
-
  public:
-  ~LogMessage() { LogMan::INSTANCE().log(f, fn, l, m, ss.str()); }
   LogMessage(const char *_f, const char *_fn, const uint16_t &_l, const log::mode &_m)
       : Message(_m), f(_f), fn(_fn), l(_l) {}
+  ~LogMessage() { LogMan::INSTANCE().log(f, fn, l, m, ss.str()); }
+
+ private:
+  const char *f, *fn;
+  const uint16_t &l;
+};
+class DBgMessage : public Message {
+ public:
+  ~DBgMessage() {
+#if !defined(NDEBUG)
+    LogMan::INSTANCE().log(f, fn, l, m, ss.str());
+#endif
+  }
+  DBgMessage(const char *_f, const char *_fn, const uint16_t &_l, const log::mode &_m)
+      : Message(_m), f(_f), fn(_fn), l(_l) {}
+  template <class T>
+  DBgMessage &operator<<(const T &s) {
+#if !defined(NDEBUG)
+    ss << s;
+#endif
+    return *this;
+  }
+
+ private:
+  const char *f, *fn;
+  const uint16_t &l;
 };
 class OutMessage : public Message {
  public:
@@ -212,21 +232,37 @@ class ErrMessage : public Message {
   ~ErrMessage() { LogMan::INSTANCE().err(ss.str()); }
   ErrMessage() : Message(log::mode::ERR) {}
 };
+class DBoMessage : public Message {
+ public:
+  ~DBoMessage() {
+#if !defined(NDEBUG)
+    LogMan::INSTANCE().out(m, ss.str());
+#endif
+  }
+  DBoMessage(const log::mode &_m = kul::log::mode::NON) : Message(_m) {}
+  template <class T>
+  DBoMessage &operator<<(const T &s) {
+#if !defined(NDEBUG)
+    ss << s;
+#endif
+    return *this;
+  }
+};
 
 #define KLOG_NON kul::LogMessage(__FILE__, __func__, __LINE__, kul::log::mode::NON)
 #define KLOG_INF kul::LogMessage(__FILE__, __func__, __LINE__, kul::log::mode::INF)
 #define KLOG_ERR kul::LogMessage(__FILE__, __func__, __LINE__, kul::log::mode::ERR)
-#define KLOG_DBG kul::LogMessage(__FILE__, __func__, __LINE__, kul::log::mode::DBG)
-#define KLOG_OTH kul::LogMessage(__FILE__, __func__, __LINE__, kul::log::mode::OTH)
-#define KLOG_TRC kul::LogMessage(__FILE__, __func__, __LINE__, kul::log::mode::TRC)
+#define KLOG_DBG kul::DBgMessage(__FILE__, __func__, __LINE__, kul::log::mode::DBG)
+#define KLOG_OTH kul::DBgMessage(__FILE__, __func__, __LINE__, kul::log::mode::OTH)
+#define KLOG_TRC kul::DBgMessage(__FILE__, __func__, __LINE__, kul::log::mode::TRC)
 #define KLOG(sev) KLOG_##sev
 
 #define KOUT_NON kul::OutMessage()
 #define KOUT_INF kul::OutMessage(kul::log::mode::INF)
 #define KOUT_ERR kul::OutMessage(kul::log::mode::ERR)
-#define KOUT_DBG kul::OutMessage(kul::log::mode::DBG)
-#define KOUT_OTH kul::OutMessage(kul::log::mode::OTH)
-#define KOUT_TRC kul::OutMessage(kul::log::mode::TRC)
+#define KOUT_DBG kul::DBoMessage(kul::log::mode::DBG)
+#define KOUT_OTH kul::DBoMessage(kul::log::mode::OTH)
+#define KOUT_TRC kul::DBoMessage(kul::log::mode::TRC)
 #define KOUT(sev) KOUT_##sev
 
 #define KERR kul::ErrMessage()

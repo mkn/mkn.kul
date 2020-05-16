@@ -31,22 +31,21 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _KUL_OS_NIXISH_PROC_HPP_
 #define _KUL_OS_NIXISH_PROC_HPP_
 
-#include <queue>
 #include <memory>
-#include <string>
+#include <queue>
 #include <sstream>
+#include <string>
 
-#include "kul/os.hpp"
 #include "kul/log.hpp"
+#include "kul/os.hpp"
 
-#if   KUL_IS_NIX
+#if KUL_IS_NIX
 #include "kul/os/nix/proc.os.hpp"
 #elif KUL_IS_BSD
 #include "kul/os/bsd/proc.os.hpp"
 #else
 #error unresolved
 #endif
-
 
 #ifndef __KUL_PROC_DUP_RETRY__
 #define __KUL_PROC_DUP_RETRY__ 3
@@ -99,14 +98,13 @@ class Process : public kul::AProcess {
 };
 }  // namespace kul
 
-
 #ifndef _KUL_COMPILED_LIB_
 #include "kul/os/nixish/src/proc/child.ipp"
 #include "kul/os/nixish/src/proc/expand.ipp"
-#include "kul/os/nixish/src/proc/waitForStatus.ipp"
-#include "kul/os/nixish/src/proc/waitExit.ipp"
-#include "kul/os/nixish/src/proc/tearDown.ipp"
 #include "kul/os/nixish/src/proc/run.ipp"
+#include "kul/os/nixish/src/proc/tearDown.ipp"
+#include "kul/os/nixish/src/proc/waitExit.ipp"
+#include "kul/os/nixish/src/proc/waitForStatus.ipp"
 #endif
 
 #endif /* _KUL_OS_NIXISH_PROC_HPP_ */

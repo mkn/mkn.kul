@@ -170,7 +170,7 @@ class Git : public SCM {
     kul::Process p("git", d);
     try {
       p << "status";
-      if(!full) p << "--short";
+      if (!full) p << "--short";
       p.start();
     } catch (const kul::proc::ExitException &e) {
       KEXCEPT(Exception, "SCM ERROR " + std::string(e.what()));
@@ -189,48 +189,42 @@ class Git : public SCM {
 /*
 class Svn : public SCM {
  public:
-  const std::string co(const std::string &d, const std::string &r, const std::string &v) const
-      KTHROW(Exception) {
-    Dir dr(d, true);
-    kul::Process p("svn", d);
-    p.arg("checkout").arg(kul::env::GET("KUL_SVN_CO"));
-    if (v.empty())
-      p.arg(r);
+  const std::string co(const std::string &d, const std::string &r, const
+std::string &v) const KTHROW(Exception) { Dir dr(d, true); kul::Process p("svn",
+d); p.arg("checkout").arg(kul::env::GET("KUL_SVN_CO")); if (v.empty()) p.arg(r);
     else
       p.arg(r + "/" + v);
     try {
       p.arg(".").start();
     } catch (const kul::proc::ExitException &e) {
       dr.rm();
-      KEXCEPT(Exception, "SCM ERROR - Check remote dependency location / version");
+      KEXCEPT(Exception, "SCM ERROR - Check remote dependency location /
+version");
     }
     return p.toString();
   }
-  void up(const std::string &d, const std::string &r, const std::string &v) const
-      KTHROW(Exception) {
-    if (!Dir(d).is())
-      co(d, r, v);
-    else
-      KEXCEPT(Exception, "SCM ERROR - SVN NOT IMPLEMENTED");
+  void up(const std::string &d, const std::string &r, const std::string &v)
+const KTHROW(Exception) { if (!Dir(d).is()) co(d, r, v); else KEXCEPT(Exception,
+"SCM ERROR - SVN NOT IMPLEMENTED");
   }
   // svn info . | lines | split | ifeq "Repository Root" go |
   // http://svnbook.red-bean.com/en/1.6/svn.ref.svn.c.info.html
   const std::string origin(const std::string &d) const {
     KEXCEPT(Exception, "SCM ERROR - SVN NOT IMPLEMENTED");
   }
-  const std::string localVersion(const std::string &d, const std::string &b) const {
-    KEXCEPT(Exception, "SCM ERROR - SVN NOT IMPLEMENTED");
+  const std::string localVersion(const std::string &d, const std::string &b)
+const { KEXCEPT(Exception, "SCM ERROR - SVN NOT IMPLEMENTED");
   }
-  const std::string remoteVersion(const std::string &url, const std::string &b) const
-      KTHROW(Exception) {
-    KEXCEPT(Exception, "SCM ERROR - SVN NOT IMPLEMENTED");
+  const std::string remoteVersion(const std::string &url, const std::string &b)
+const KTHROW(Exception) { KEXCEPT(Exception, "SCM ERROR - SVN NOT IMPLEMENTED");
   }
 
   bool hasChanges(const std::string &d) const {
     KEXCEPT(Exception, "SCM ERROR - SVN NOT IMPLEMENTED");
   }
-  void status(const std::string &d, bool full) const { KEXCEPT(Exception, "SCM ERROR - SVN NOT IMPLEMENTED"); }
-  void diff(const std::string &d) const { KEXCEPT(Exception, "SCM ERROR - SVN NOT IMPLEMENTED"); }
+  void status(const std::string &d, bool full) const { KEXCEPT(Exception, "SCM
+ERROR - SVN NOT IMPLEMENTED"); } void diff(const std::string &d) const {
+KEXCEPT(Exception, "SCM ERROR - SVN NOT IMPLEMENTED"); }
 };
 */
 

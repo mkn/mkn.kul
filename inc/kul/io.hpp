@@ -96,7 +96,7 @@ class AReader {
       std::vector<char> v;
       v.resize(l);
       _f.read(&v[0], l);
-      v.resize((size_t) _f.gcount());
+      v.resize((size_t)_f.gcount());
       s1 = std::string(v.begin(), v.end());
       std::strcpy(c, s1.c_str());
       return s1.size();

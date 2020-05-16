@@ -34,7 +34,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // void kul::Process::run() KTHROW(kul::proc::Exception){
 
-
 SECURITY_ATTRIBUTES sa;
 ZeroMemory(&sa, sizeof(SECURITY_ATTRIBUTES));
 // Set the bInheritHandle flag so pipe handles are inherited.
@@ -136,8 +135,8 @@ if (vars().size()) {
     newEnv.push_back('\0');
   }
   // may not work
-  bSuccess = CreateProcess(NULL, szCmdline, NULL, NULL, TRUE, flags, (LPVOID) newEnv.c_str(), dir, &siStartInfo,
-                           &piProcInfo);
+  bSuccess = CreateProcess(NULL, szCmdline, NULL, NULL, TRUE, flags, (LPVOID)newEnv.c_str(), dir,
+                           &siStartInfo, &piProcInfo);
 } else
   bSuccess =
       CreateProcess(NULL, szCmdline, NULL, NULL, TRUE, flags, NULL, dir, &siStartInfo, &piProcInfo);
@@ -205,6 +204,5 @@ if (this->waitForExit()) {
 }
 CloseHandle(piProcInfo.hThread);
 CloseHandle(piProcInfo.hProcess);
-
 
 // }

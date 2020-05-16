@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace kul {
 namespace env {
 
-class  Var {
+class Var {
  public:
   enum Mode { APPE = 0, PREP, REPL };
 

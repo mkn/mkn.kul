@@ -31,8 +31,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _KUL_EXCEPT_HPP_
 #define _KUL_EXCEPT_HPP_
 
-#include <sstream>
 #include <iostream>
+#include <sstream>
 #include <stdexcept>
 
 #include "kul/defs.hpp"
@@ -61,11 +61,9 @@ class Exception : public std::runtime_error {
   Exception(const char *f, const uint16_t &l, const std::string &s = "")
       : std::runtime_error(s), _f(f), _l(l), _ep(std::current_exception()), err(s) {}
   Exception(Exception const &e)
-    : std::runtime_error(e), _f(e.file()), _l(e.line()), _ep(e._ep), err(e.err) {
-  }
+      : std::runtime_error(e), _f(e.file()), _l(e.line()), _ep(e._ep), err(e.err) {}
   Exception(Exception const &&e)
-    : std::runtime_error(e), _f(e.file()), _l(e.line()), _ep(e._ep), err(e.err) {
-  }
+      : std::runtime_error(e), _f(e.file()), _l(e.line()), _ep(e._ep), err(e.err) {}
   virtual ~Exception() KNOTHROW {}
 
   std::string debug() const {
@@ -74,12 +72,8 @@ class Exception : public std::runtime_error {
     return ss.str();
   }
 
-  const char* what() const noexcept override {
-    return err.c_str();
-  }
-  std::string str() const noexcept {
-    return err;
-  }
+  const char *what() const noexcept override { return err.c_str(); }
+  std::string str() const noexcept { return err; }
 
   const char *file() const { return _f; }
   const uint16_t &line() const { return _l; }
@@ -107,6 +101,7 @@ class Exception : public std::runtime_error {
     err += msg.str();
     return *this;
   }
+
  protected:
   const char *_f;
   const uint16_t _l;

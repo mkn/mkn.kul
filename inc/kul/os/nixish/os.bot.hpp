@@ -62,11 +62,10 @@ bool kul::Dir::mk() const {
 }
 bool kul::Dir::root() const { return is() && real().size() == 1; }
 
-
 bool kul::File::is() const {
   if (name().empty()) return false;
   struct stat buffer;
-  if(stat(_d.join(_n).c_str(), &buffer) == 0) return S_ISREG(buffer.st_mode);
+  if (stat(_d.join(_n).c_str(), &buffer) == 0) return S_ISREG(buffer.st_mode);
   return 0;
 }
 bool kul::File::rm() const {
@@ -119,9 +118,9 @@ inline bool CWD(const kul::Dir &d) { return chdir(d.path().c_str()) != -1; }
 }  // namespace kul
 
 #ifndef _KUL_COMPILED_LIB_
-#include "kul/os/nixish/src/os/dir/real.ipp"
 #include "kul/os/nixish/src/os/dir/dirs.ipp"
 #include "kul/os/nixish/src/os/dir/files.ipp"
+#include "kul/os/nixish/src/os/dir/real.ipp"
 #endif  //_KUL_COMPILED_LIB_
 
 #endif /* _KUL_OS_NIXISH_OS_BOT_HPP_ */

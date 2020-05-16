@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "kul/defs.hpp"
 
-#if   KUL_IS_NIX
+#if KUL_IS_NIX
 #include "kul/os/nix/cpu.hpp"
 #elif KUL_IS_BSD
 #include "kul/os/bsd/cpu.hpp"

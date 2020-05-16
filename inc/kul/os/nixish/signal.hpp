@@ -39,11 +39,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <execinfo.h>
 
+#include <cxxabi.h>
+#include <execinfo.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <execinfo.h>
-#include <cxxabi.h>
-
 
 #ifndef __USE_GNU
 #define __USE_GNU
@@ -69,14 +68,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 inline void kul_sig_handler(int s, siginfo_t *info, void *v);
 
 namespace kul {
-namespace this_thread{
+namespace this_thread {
 #include "kul/os/nixish/src/signal/stacktrace.ipp"
 
-void print_stacktrace(){
-  for(auto const& s : stacktrace()) std::cout << s << std::endl;
+void print_stacktrace() {
+  for (auto const &s : stacktrace()) std::cout << s << std::endl;
 }
-}
-
+}  // namespace this_thread
 
 class Signal;
 class SignalStatic {

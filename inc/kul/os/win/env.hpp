@@ -42,17 +42,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <algorithm>
 #include <fstream>
 
-
 namespace kul {
 namespace env {
 
-#if   defined(_KUL_MAX_PATH_)
+#if defined(_KUL_MAX_PATH_)
 constexpr size_t KUL_MAX_PATH = _KUL_MAX_PATH_;
 #elif defined(_MAX_PATH)
 constexpr size_t KUL_MAX_PATH = _MAX_PATH;
 #else
-#error // could not set KUL_MAX_PATH
-#endif /*_KUL_MAX_PATH_*/
+#error  // could not set KUL_MAX_PATH
+#endif  /*_KUL_MAX_PATH_*/
 
 inline std::string EOL() {
 #if (_MSC_VER >= 1800)
@@ -88,7 +87,6 @@ inline void SET(const char *var, const char *val) {
 }
 
 inline char SEP() { return ';'; }
-
 
 inline std::string CWD() {
   char c[KUL_MAX_PATH];
