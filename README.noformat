@@ -29,11 +29,15 @@ Type            number or string
 Default         0 / NON
 Description - Enable logging with level given
 	Values include
-		0 / NON
-		1 / INF
-		2 / ERR
-		3 / DBG
+		0 = NON
+		1 = INF
+		2 = ERR
+		3 = DBG
+    4 = OTH
+    5 = TRC
 Used by macros KOUT and KLOG : see inc/usage.hpp
+        KLOG >= 3 is disabled with -DNDEBUG
+
 
 Key             KUL_GIT_CO
 Type            string
