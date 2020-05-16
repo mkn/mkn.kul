@@ -65,7 +65,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define KUL_PRIVATE
 #endif
 
-#if defined(__APPLE__) ||  defined(__NetBSD__) || defined(__FreeBSD__)
+#if defined(__APPLE__) || defined(__NetBSD__) || defined(__FreeBSD__)
 #define KUL_IS_BSD 1
 #endif
 

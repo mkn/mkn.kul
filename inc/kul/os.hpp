@@ -33,8 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vector>
 
-#include "kul/env.hpp"
 #include "kul/cpu.hpp"
+#include "kul/env.hpp"
 #include "kul/except.hpp"
 #include "kul/string.hpp"
 
@@ -77,7 +77,6 @@ class Item {
   virtual std::string mini() const = 0;
 };
 }  // namespace fs
-
 
 class Dir : public fs::Item {
  private:
@@ -292,8 +291,6 @@ inline std::ostream &operator<<(std::ostream &s, const File &d) { return s << d.
 
 }  // namespace kul
 
-
-
 namespace kul {
 namespace os {
 
@@ -330,11 +327,9 @@ inline std::string WHERE(const char *c) {
   return "";
 }
 
-inline bool WHICH(const char *c) {
-  return WHERE(c).size();
-}
-} // namespace env
-} // namespace kul
+inline bool WHICH(const char *c) { return WHERE(c).size(); }
+}  // namespace env
+}  // namespace kul
 
 #if KUL_IS_WIN
 #include "kul/os/win/os.bot.hpp"

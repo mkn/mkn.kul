@@ -2,7 +2,8 @@
 #ifndef KUL_MATH_NOOP_HPP_
 #define KUL_MATH_NOOP_HPP_
 
-// This macro ensures that the corresponding optimized blas function is used if available
+// This macro ensures that the corresponding optimized blas function is used if
+// available
 #if !defined(NDEBUG) && defined(_KUL_USE_CBLAS)
 // x and y are two pointers
 #define CHECK_BLAS_OPTIMIZATION_PP(x, y, func_name)                               \
@@ -57,33 +58,33 @@ T dot(const size_t n, const T *x, const std::atomic<T> *y) {
 }
 }  // namespace detail
 template <typename T, typename K>
-typename std::enable_if<
-  (!std::is_same<T, double>::value && !std::is_same<T, float>::value) &&
-  std::is_same<T, std::atomic<K>>::value, T>::type
+typename std::enable_if<(!std::is_same<T, double>::value && !std::is_same<T, float>::value) &&
+                            std::is_same<T, std::atomic<K>>::value,
+                        T>::type
 dot(const size_t n, const T *x, const K *y) {
   return detail::dot(n, y, x);
 }
 template <typename T, typename K>
-typename std::enable_if<
-  (!std::is_same<T, double>::value && !std::is_same<T, float>::value) &&
-  std::is_same<T, std::atomic<K>>::value, K>::type
+typename std::enable_if<(!std::is_same<T, double>::value && !std::is_same<T, float>::value) &&
+                            std::is_same<T, std::atomic<K>>::value,
+                        K>::type
 dot(const size_t n, const K *x, const T *y) {
   return detail::dot(n, x, y);
 }
 
 template <typename T, typename K>
-typename std::enable_if<
-  (!std::is_same<T, double>::value && !std::is_same<T, float>::value) &&
-  !std::is_same<T, std::atomic<K>>::value, T>::type
+typename std::enable_if<(!std::is_same<T, double>::value && !std::is_same<T, float>::value) &&
+                            !std::is_same<T, std::atomic<K>>::value,
+                        T>::type
 dot(const size_t n, const T *x, const K *y) {
   CHECK_BLAS_OPTIMIZATION_PP(x, y, "dot prod");
   return detail::dot(n, x, y);
 }
 
 template <typename T, typename K, typename Y>
-typename std::enable_if<
-  !(std::is_same<T, double>::value || std::is_same<T, float>::value) &&
-  std::is_same<T, std::atomic<K>>::value && !std::is_same<Y, std::atomic<K>>::value>::type
+typename std::enable_if<!(std::is_same<T, double>::value || std::is_same<T, float>::value) &&
+                        std::is_same<T, std::atomic<K>>::value &&
+                        !std::is_same<Y, std::atomic<K>>::value>::type
 mult_incr(const uint64_t n, const K alpha, const Y *x, T *y) {
   for (uint64_t i = 0; i < n; ++i) {
     K y_i = y[i].load();
@@ -93,9 +94,9 @@ mult_incr(const uint64_t n, const K alpha, const Y *x, T *y) {
 }
 
 template <typename T, typename K, typename Y>
-typename std::enable_if<
-  !(std::is_same<T, double>::value || std::is_same<T, float>::value) &&
-  std::is_same<Y, std::atomic<K>>::value && !std::is_same<T, std::atomic<K>>::value>::type
+typename std::enable_if<!(std::is_same<T, double>::value || std::is_same<T, float>::value) &&
+                        std::is_same<Y, std::atomic<K>>::value &&
+                        !std::is_same<T, std::atomic<K>>::value>::type
 mult_incr(const uint64_t n, const K alpha, const Y *x, T *y) {
   for (uint64_t i = 0; i < n; ++i) {
     K y_i = y[i];
@@ -104,9 +105,9 @@ mult_incr(const uint64_t n, const K alpha, const Y *x, T *y) {
   }
 }
 template <typename T, typename K, typename Y>
-typename std::enable_if<
-  !(std::is_same<T, double>::value || std::is_same<T, float>::value) &&
-  std::is_same<T, std::atomic<K>>::value && std::is_same<Y, std::atomic<K>>::value>::type
+typename std::enable_if<!(std::is_same<T, double>::value || std::is_same<T, float>::value) &&
+                        std::is_same<T, std::atomic<K>>::value &&
+                        std::is_same<Y, std::atomic<K>>::value>::type
 mult_incr(const uint64_t n, const K alpha, const Y *x, T *y) {
   for (uint64_t i = 0; i < n; ++i) {
     K y_i = y[i].load();
@@ -115,22 +116,20 @@ mult_incr(const uint64_t n, const K alpha, const Y *x, T *y) {
   }
 }
 template <typename T, typename K, typename Y>
-typename std::enable_if<
-  !(std::is_same<T, double>::value || std::is_same<T, float>::value)>::type
+typename std::enable_if<!(std::is_same<T, double>::value || std::is_same<T, float>::value)>::type
 mult_incr(const uint64_t n, const K alpha, const Y *x, T *y) {
   CHECK_BLAS_OPTIMIZATION_PP(x, y, "mult_incr");
   return detail::mult_incr(n, alpha, x, y);
 }
 
-
 template <typename T, typename K>
-typename std::enable_if<std::is_same<T, std::atomic<K>>::value>::type
-set(const size_t n, const K alpha, T *x) {
+typename std::enable_if<std::is_same<T, std::atomic<K>>::value>::type set(const size_t n,
+                                                                          const K alpha, T *x) {
   for (uint64_t i = 0; i < n; ++i) x[i].store(alpha);
 }
 template <typename T, typename K>
-typename std::enable_if<!std::is_same<T, std::atomic<K>>::value>::type
-set(const size_t n, const K alpha, T *x) {
+typename std::enable_if<!std::is_same<T, std::atomic<K>>::value>::type set(const size_t n,
+                                                                           const K alpha, T *x) {
   for (uint64_t i = 0; i < n; ++i) x[i] = alpha;
 }
 
@@ -140,9 +139,8 @@ K sum(const size_t n, const T *x) {
 }
 
 template <typename T, typename K>
-typename std::enable_if<
-  !(std::is_same<T, double>::value || std::is_same<T, float>::value) &&
-  std::is_same<T, std::atomic<K>>::value>::type
+typename std::enable_if<!(std::is_same<T, double>::value || std::is_same<T, float>::value) &&
+                        std::is_same<T, std::atomic<K>>::value>::type
 scale(const size_t n, const K alpha, T *x) {
   for (uint64_t i = 0; i < n; ++i) {
     K x_i = x[i].load();
@@ -151,18 +149,16 @@ scale(const size_t n, const K alpha, T *x) {
   }
 }
 template <typename T, typename K>
-typename std::enable_if<
-  !(std::is_same<T, double>::value || std::is_same<T, float>::value) &&
-  !std::is_same<T, std::atomic<K>>::value>::type
+typename std::enable_if<!(std::is_same<T, double>::value || std::is_same<T, float>::value) &&
+                        !std::is_same<T, std::atomic<K>>::value>::type
 scale(const size_t n, const K alpha, T *x) {
   CHECK_BLAS_OPTIMIZATION_PS(x, alpha, "scale");
   detail::scale(n, alpha, x);
 }
 
 template <typename T, typename K>
-typename std::enable_if<std::is_same<T, std::atomic<K>>::value>::type
-dot_matrix_vector_incr(const size_t m, const size_t n, const K alpha, const T *a, const T *x,
-                                const T beta, T *y) {
+typename std::enable_if<std::is_same<T, std::atomic<K>>::value>::type dot_matrix_vector_incr(
+    const size_t m, const size_t n, const K alpha, const T *a, const T *x, const T beta, T *y) {
   for (size_t i = 0; i < m; ++i) {
     K y_i = beta * y[i];
     for (size_t j = 0; j < n; ++j) y_i += alpha * a[i * n + j] * x[j].load();
@@ -171,10 +167,8 @@ dot_matrix_vector_incr(const size_t m, const size_t n, const K alpha, const T *a
 }
 
 template <typename T, typename K>
-typename std::enable_if<!std::is_same<T, std::atomic<K>>::value>::type
-dot_matrix_vector_incr(
-  const size_t m, const size_t n, const K alpha, const T *a, const T *x,
-                                const T beta, T *y) {
+typename std::enable_if<!std::is_same<T, std::atomic<K>>::value>::type dot_matrix_vector_incr(
+    const size_t m, const size_t n, const K alpha, const T *a, const T *x, const T beta, T *y) {
   for (size_t i = 0; i < m; ++i) {
     y[i] = beta * y[i];
     for (size_t j = 0; j < n; ++j) y[i] += alpha * a[i * n + j] * x[j];
@@ -182,8 +176,8 @@ dot_matrix_vector_incr(
 }
 
 template <typename T, typename K>
-typename std::enable_if<std::is_same<T, std::atomic<K>>::value>::type
-dot_matrix_vector(const size_t m, const size_t n, const K alpha, const T *a, const T *x, T *y) {
+typename std::enable_if<std::is_same<T, std::atomic<K>>::value>::type dot_matrix_vector(
+    const size_t m, const size_t n, const K alpha, const T *a, const T *x, T *y) {
   for (size_t i = 0; i < m; ++i) {
     K y_i = 0;
     for (size_t j = 0; j < n; ++j) y_i += alpha * a[i * n + j] * x[j].load();
@@ -192,8 +186,8 @@ dot_matrix_vector(const size_t m, const size_t n, const K alpha, const T *a, con
 }
 
 template <typename T, typename K>
-typename std::enable_if<!std::is_same<T, std::atomic<K>>::value>::type
-dot_matrix_vector(    const size_t m, const size_t n, const K alpha, const T *a, const T *x, T *y) {
+typename std::enable_if<!std::is_same<T, std::atomic<K>>::value>::type dot_matrix_vector(
+    const size_t m, const size_t n, const K alpha, const T *a, const T *x, T *y) {
   for (size_t i = 0; i < m; ++i) {
     y[i] = 0;
     for (size_t j = 0; j < n; ++j) y[i] += alpha * a[i * n + j] * x[j];

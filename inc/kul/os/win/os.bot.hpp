@@ -44,7 +44,6 @@ std::string kul::Dir::ESC(std::string s) {
   return s;
 }
 
-
 std::string kul::Dir::LOCL(std::string s) {
   kul::String::REPLACE_ALL(s, "/", "\\");
   return s;
@@ -62,7 +61,6 @@ bool kul::Dir::mk() const {
   return CreateDirectory(locl().c_str(), NULL);
 }
 bool kul::Dir::root() const { return is() && real().size() == 3; }
-
 
 bool kul::File::is() const { return !name().empty() && (bool)std::ifstream(_d.join(_n).c_str()); }
 bool kul::File::rm() const {
@@ -110,7 +108,7 @@ inline std::string EOL() {
   return "\n";
 #else
   return "\r\n";
-#endif // _MSC_VER
+#endif  // _MSC_VER
 }
 
 }  // namespace os
@@ -126,16 +124,15 @@ inline kul::Dir home(const std::string &app) { return kul::Dir(home().join(app))
 
 }  // namespace user
 
-
 namespace env {
 inline bool CWD(const kul::Dir &d) { return _chdir(d.path().c_str()) != -1; }
 }  // namespace env
 }  // namespace kul
 
 #ifndef _KUL_COMPILED_LIB_
-#include "kul/os/win/src/os/dir/real.ipp"
 #include "kul/os/win/src/os/dir/dirs.ipp"
 #include "kul/os/win/src/os/dir/files.ipp"
+#include "kul/os/win/src/os/dir/real.ipp"
 #endif  //_KUL_COMPILED_LIB_
 
 #endif /* _KUL_OS_WIN_OS_BOT_HPP_ */

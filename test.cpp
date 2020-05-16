@@ -56,11 +56,11 @@ auto tryCatch = [](std::vector<std::function<void()>> funcs, bool katch) {
 };
 
 #include "test/cli.ipp"
+#include "test/except.ipp"
 #include "test/io.ipp"
 #include "test/math.ipp"
 #include "test/os.ipp"
 #include "test/proc.ipp"
-#include "test/except.ipp"
 #include "test/string.ipp"
 
 int main(int argc, char *argv[]) {

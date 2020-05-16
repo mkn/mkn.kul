@@ -40,7 +40,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <unistd.h>
 #include <stdexcept>
 
-
 namespace kul {
 namespace this_proc {
 
@@ -77,8 +76,8 @@ inline uint16_t cpuLoad() { return 0; }
 
 #ifndef _KUL_COMPILED_LIB_
 #include "kul/os/nix/src/proc//xparse_line.ipp"
-#include "kul/os/nix/src/proc//xvirtual.ipp"
 #include "kul/os/nix/src/proc//xphysical.ipp"
+#include "kul/os/nix/src/proc//xvirtual.ipp"
 #endif
 
 #endif /* _KUL_OS_NIX_PROC_OS_HPP_ */

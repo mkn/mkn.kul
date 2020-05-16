@@ -87,9 +87,11 @@ class Thread : public threading::AThread {
   template <class T>
   Thread(const T &t) : func(std::bind((void (T::*)()) & T::operator(), t)) {}
   template <class T>
-  Thread(const std::reference_wrapper<T> &r) : func(std::bind((void (T::*)()) & T::operator(), r)) {}
+  Thread(const std::reference_wrapper<T> &r)
+      : func(std::bind((void (T::*)()) & T::operator(), r)) {}
   template <class T>
-  Thread(const std::reference_wrapper<const T> &r) : func(std::bind((void (T::*)() const) & T::operator(), r)) {}
+  Thread(const std::reference_wrapper<const T> &r)
+      : func(std::bind((void (T::*)() const) & T::operator(), r)) {}
   virtual ~Thread() {}
   void join() {
     if (!s) run();

@@ -35,58 +35,56 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace kul {
 
-template<size_t N, typename T>
+template <size_t N, typename T>
 struct Pointer {
   static constexpr size_t INDEX = N;
-  T* p                          = nullptr;
+  T* p = nullptr;
 };
 
-template<typename T, typename SIZE = size_t>
+template <typename T, typename SIZE = size_t>
 struct Pointers {
-  Pointers(T const * p_, SIZE s_) : p{p_}, s{s_}{}
-  T const * p = nullptr;
-  SIZE s    = 0;
+  Pointers(T const* p_, SIZE s_) : p{p_}, s{s_} {}
+  T const* p = nullptr;
+  SIZE s = 0;
   auto& operator[](SIZE i) const { return p[i]; }
   auto& begin() const { return p; }
-  auto  end()   const { return p + s; }
-  auto& size()  const { return s; }
+  auto end() const { return p + s; }
+  auto& size() const { return s; }
 };
 
-template<typename Tuple>
+template <typename Tuple>
 struct PointersApply {
-  PointersApply(Tuple& t) : tuple{t}{}
+  PointersApply(Tuple& t) : tuple{t} {}
 
-  template<size_t i>
-  decltype(auto) operator()()
-  {
-      auto t  = std::get<i>(tuple);
-      using T = decltype(t);
-      if constexpr (std::is_pointer<T>::value)
-          return Pointer<i, std::remove_pointer_t<std::decay_t<T>>>{t};
-      else
-          return Pointer<i, std::decay_t<T>>{&t};
+  template <size_t i>
+  decltype(auto) operator()() {
+    auto t = std::get<i>(tuple);
+    using T = decltype(t);
+    if constexpr (std::is_pointer<T>::value)
+      return Pointer<i, std::remove_pointer_t<std::decay_t<T>>>{t};
+    else
+      return Pointer<i, std::decay_t<T>>{&t};
   }
 
   Tuple& tuple;
 };
 
-template <typename ...Pointer>
-struct PointerContainer : public Pointer...{
-    PointerContainer(Pointer&... args) : Pointer(std::forward<Pointer>(args))...{}
+template <typename... Pointer>
+struct PointerContainer : public Pointer... {
+  PointerContainer(Pointer&... args) : Pointer(std::forward<Pointer>(args))... {}
 };
 
-template <typename ...Args>
-decltype(auto) _make_pointer_container(std::tuple<Args...>&& t){
-   return std::make_from_tuple<PointerContainer<Args...>>(t);
+template <typename... Args>
+decltype(auto) _make_pointer_container(std::tuple<Args...>&& t) {
+  return std::make_from_tuple<PointerContainer<Args...>>(t);
 }
 
-template <typename ...Refs>
-decltype(auto) make_pointer_container(Refs&&... args){
+template <typename... Refs>
+decltype(auto) make_pointer_container(Refs&&... args) {
   auto tuple = std::forward_as_tuple(args...);
   constexpr size_t size = std::tuple_size<decltype(tuple)>::value;
   return _make_pointer_container(for_N<size>(PointersApply{tuple}));
 }
-
 
 }  // namespace kul
 

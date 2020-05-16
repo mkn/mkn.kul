@@ -65,16 +65,16 @@ BOOL WINAPI kul_sigint_function(DWORD d) {
 }
 
 namespace kul {
-namespace this_thread{
-std::vector<std::string> stacktrace(){
-// #include "kul/os/win/src/signal/stacktrace.ipp"
+namespace this_thread {
+std::vector<std::string> stacktrace() {
+  // #include "kul/os/win/src/signal/stacktrace.ipp"
   return std::vector<std::string>{};
 }
 
-void print_stacktrace(){
-  for(auto const& s : stacktrace()) std::cout << s << std::endl;
+void print_stacktrace() {
+  for (auto const &s : stacktrace()) std::cout << s << std::endl;
 }
-}
+}  // namespace this_thread
 
 class Signal;
 

@@ -31,5 +31,5 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "kul/proc.hpp"
 
 #include "kul/os/nix/src/proc/xparse_line.ipp"
-#include "kul/os/nix/src/proc/xvirtual.ipp"
 #include "kul/os/nix/src/proc/xphysical.ipp"
+#include "kul/os/nix/src/proc/xvirtual.ipp"

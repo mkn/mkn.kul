@@ -81,7 +81,7 @@ class Item {
   friend class Validator;
 
  protected:
-  YAML::Node r; // root
+  YAML::Node r;  // root
 
   Item() {}
   Item(const YAML::Node &r) : r(r) {}
@@ -177,8 +177,7 @@ class File : public Item {
   File(const std::string &f) KTHROW(Exception) : f(f) { reload(); }
 
  private:
-  const std::string f; // file
-
+  const std::string f;  // file
 };
 }  // namespace yaml
 }  // namespace kul

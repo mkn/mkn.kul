@@ -37,19 +37,17 @@ namespace kul {
 /*
 struct Apply {
   template<size_t i>
-  decltype(auto) operator()(){}
+  constexpr decltype(auto) operator()(){}
 };*/
-template<typename Apply, size_t... Is>
-constexpr decltype(auto) for_N(Apply& f, std::integer_sequence<size_t, Is...> const&)
-{
-    if constexpr (!std::is_same_v<decltype(f.template operator()<0>()), void>)
-        return std::make_tuple(f.template operator()<Is>()...);
-    (f.template operator()<Is>(), ...);
+template <typename Apply, size_t... Is>
+constexpr decltype(auto) for_N(Apply& f, std::integer_sequence<size_t, Is...> const&) {
+  if constexpr (!std::is_same_v<decltype(f.template operator()<0>()), void>)
+    return std::make_tuple(f.template operator()<Is>()...);
+  (f.template operator()<Is>(), ...);
 }
-template<size_t T, typename Apply>
-constexpr decltype(auto) for_N(Apply&& f)
-{
-    return for_N(f, std::make_integer_sequence<size_t, T>{});
+template <size_t T, typename Apply>
+constexpr decltype(auto) for_N(Apply&& f) {
+  return for_N(f, std::make_integer_sequence<size_t, T>{});
 }
 
 }  // namespace kul

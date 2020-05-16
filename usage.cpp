@@ -30,23 +30,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #define KUL_FORCE_TRACE
 
-
 #include <iomanip>
-#include "kul/io.hpp"
-#include "kul/dbg.hpp"
+#include "kul/asio/log.hpp"
+#include "kul/assert.hpp"
 #include "kul/cli.hpp"
+#include "kul/dbg.hpp"
+#include "kul/io.hpp"
 #include "kul/ipc.hpp"
 #include "kul/log.hpp"
 #include "kul/math.hpp"
 #include "kul/os.hpp"
 #include "kul/proc.hpp"
-#include "kul/assert.hpp"
 #include "kul/signal.hpp"
 #include "kul/string.hpp"
 #include "kul/threads.hpp"
 #include "kul/time.hpp"
 #include "kul/wstring.hpp"
-#include "kul/asio/log.hpp"
 
 namespace kul {
 
@@ -158,7 +157,7 @@ class Test {
                                                  // before exiting -
                                                  // CAUTION! KEEP
                                                  // SIMPLE!
-      // Allows lamda notation
+    // Allows lamda notation
     sig.segv([this](int16_t) { KOUT(NON) << s; });
 
     KERR << "KERR";            // KOUT/KLOG are controlled via env/var KLOG

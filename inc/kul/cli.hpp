@@ -36,9 +36,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vector>
 
 #include "kul/env.hpp"
+#include "kul/except.hpp"
 #include "kul/map.hpp"
 #include "kul/os/cli.hpp"
-#include "kul/except.hpp"
 #include "kul/serial.hpp"
 #include "kul/string.hpp"
 
@@ -112,20 +112,19 @@ class EnvVar {
 enum ArgType { FLAG = 0, STRING, MAYBE };
 
 class Arg : public Cmd {
- static constexpr char INVALID_CHAR = ' ';
+  static constexpr char INVALID_CHAR = ' ';
 
  public:
   Arg(const char d, char const *dd, ArgType t, bool m = false) : Cmd(dd), man(m), d(d), t(t) {}
   Arg(const char d, char const *dd, bool m = false) : Cmd(dd), man(m), d(d) {}
 
   Arg(char const *dd, ArgType t, bool m = false) : Cmd(dd), man(m), t(t) {}
-  Arg(char const *dd, bool m = false) : Cmd(dd), man(m){}
+  Arg(char const *dd, bool m = false) : Cmd(dd), man(m) {}
 
   bool mandatory() const { return man; }
   char dash() const { return d; }
   char const *dashdash() const { return command(); }
   const ArgType &type() const { return t; }
-
 
  private:
   bool man;
@@ -262,6 +261,7 @@ class Args {
   std::vector<Cmd> cmds;
   std::vector<Arg> args;
   hash::map::S2S vals;
+
  public:
 #include "kul/serial/cli.arg.end.hpp"
 };
@@ -282,6 +282,5 @@ inline std::vector<std::string> asArgs(const std::string &cmd) {
 #endif
 
 #include "kul/serial/cli.bottom.hpp"
-
 
 #endif /* _KUL_CLI_HPP_ */

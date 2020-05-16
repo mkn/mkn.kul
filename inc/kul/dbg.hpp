@@ -36,19 +36,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace kul {
 namespace dbg {
 
-class StackTrace{
+class StackTrace {
  private:
-   std::vector<std::string> _stk;
+  std::vector<std::string> _stk;
+
  public:
-   StackTrace() = delete;
-   StackTrace(const StackTrace &) = delete;
-   StackTrace &operator=(const StackTrace &) = delete;
-   StackTrace &operator=(const StackTrace &&) = delete;
-   StackTrace(const std::string &s) { _stk.emplace_back(s); }
-   StackTrace(const StackTrace &&that) {
-     if(this != &that) this->_stk = that._stk;
-   }
-   const std::vector<std::string> &stack() const { return _stk; }
+  StackTrace() = delete;
+  StackTrace(const StackTrace &) = delete;
+  StackTrace &operator=(const StackTrace &) = delete;
+  StackTrace &operator=(const StackTrace &&) = delete;
+  StackTrace(const std::string &s) { _stk.emplace_back(s); }
+  StackTrace(const StackTrace &&that) {
+    if (this != &that) this->_stk = that._stk;
+  }
+  const std::vector<std::string> &stack() const { return _stk; }
 };
 
 #if !defined(NDEBUG) || defined(KUL_FORCE_TRACE)
@@ -69,10 +70,10 @@ class StackTrace{
 #endif  // KUL_DBG_FUNC_ENTER
 
 #ifndef KUL_DBG_FUNC_ON_ENTER
-#define KUL_DBG_FUNC_ON_ENTER                                                          \
+#define KUL_DBG_FUNC_ON_ENTER                                                         \
   KOUT(TRC) << kul::LogMan::INSTANCE().str(m_fi, m_fu, m_li, kul::log::mode::TRC, "", \
                                            "[%M]: %T - %D : %F:%L fn(%N)")            \
-                                            << " - ENTERED";
+            << " - ENTERED";
 #endif  // KUL_DBG_FUNC_ON_ENTER
 
 #ifndef KUL_DBG_FUNC_ON_EXIT

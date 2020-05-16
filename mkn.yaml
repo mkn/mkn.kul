@@ -45,9 +45,5 @@ profile:
     main: usage.cpp
 
   - name: format
-    mod:
-    - name: clang.format
-      init:
-        style: file
-        types: cpp:cxx:cc:h:hpp
-        paths: .
+    mod: |
+      clang.format{init{style: file, paths: .}}

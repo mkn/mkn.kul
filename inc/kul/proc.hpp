@@ -171,8 +171,8 @@ class AProcess {
     evs[n] = v;
     return *this;
   }
-  AProcess &set(std::vector<kul::cli::EnvVar> const& in) {
-    for(auto const& ev: in) evs[ev.name()] = ev.toString();
+  AProcess &set(std::vector<kul::cli::EnvVar> const &in) {
+    for (auto const &ev : in) evs[ev.name()] = ev.toString();
     return *this;
   }
 
@@ -215,12 +215,10 @@ class ProcessCapture {
 };
 }  // namespace kul
 
-
 #ifndef _KUL_COMPILED_LIB_
 #include "kul/src/proc.base/start.ipp"
 #include "kul/src/proc.base/toString.ipp"
 #endif
-
 
 #if defined(_WIN32)
 #include "kul/os/win/proc.hpp"

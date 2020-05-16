@@ -92,7 +92,6 @@ class AThread {
 }  // namespace threading
 }  // namespace kul
 
-
 #if defined(_WIN32)
 #include "kul/os/win/threads.os.hpp"
 #else

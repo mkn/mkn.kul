@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _KUL_OS_DEF_HPP_
 #define _KUL_OS_DEF_HPP_
 
-#if   KUL_IS_NIX
+#if KUL_IS_NIX
 #include "kul/os/nix/def.hpp"
 #elif KUL_IS_BSD
 #include "kul/os/bsd/def.hpp"
@@ -42,5 +42,3 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 #endif  // _KUL_OS_DEF_HPP_
-
-

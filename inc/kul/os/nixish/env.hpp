@@ -47,17 +47,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace kul {
 namespace env {
 
-inline std::string EOL() {
-  return "\r\n";
-}
+inline std::string EOL() { return "\r\n"; }
 
-#if   defined(_KUL_MAX_PATH_)
+#if defined(_KUL_MAX_PATH_)
 constexpr size_t KUL_MAX_PATH = _KUL_MAX_PATH_;
 #elif defined(PATH_MAX)
 constexpr size_t KUL_MAX_PATH = PATH_MAX;
 #else
-#error // could not set KUL_MAX_PATH
-#endif /*_KUL_MAX_PATH_*/
+#error  // could not set KUL_MAX_PATH
+#endif  /*_KUL_MAX_PATH_*/
 
 inline bool EXISTS(const char *c) { return getenv(c); }
 inline std::string GET(const char *c) {

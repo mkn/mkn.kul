@@ -33,31 +33,32 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "kul/signal.hpp"
 
-namespace kul{
-struct Assert{
+namespace kul {
+struct Assert {
   template <typename T>
   Assert(T t) {
 #if !defined(NDEBUG)
-    if(!(t)) {
+    if (!(t)) {
       auto tid = kul::this_thread::id();
       KOUT(NON) << tid << " : Stacktrace:";
-      for(auto const& s : kul::this_thread::stacktrace()) KOUT(NON) << tid << " : " << s;
+      for (auto const& s : kul::this_thread::stacktrace()) KOUT(NON) << tid << " : " << s;
       exit(111);
     }
 #endif
   }
 };
-}
+}  // namespace kul
 
 #if !defined(KASSERT)
-#define KASSERT(b) kul::Assert{(b)}
+#define KASSERT(b) \
+  kul::Assert { (b) }
 #endif
 
 #if defined(KASSERT_REPLACE_ASSERT)
-  #ifdef assert
-    #undef assert
-  #endif
-  #define assert(b)  KASSERT(b)
+#ifdef assert
+#undef assert
+#endif
+#define assert(b) KASSERT(b)
 #endif
 
 #endif /* _KUL_ASSERT_HPP_ */

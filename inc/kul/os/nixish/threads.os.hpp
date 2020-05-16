@@ -31,8 +31,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _KUL_OS_NIXISH_THREADS_OS_HPP_
 #define _KUL_OS_NIXISH_THREADS_OS_HPP_
 
-
-
 #include <pthread.h>
 #include <signal.h>
 #include <sys/syscall.h>
