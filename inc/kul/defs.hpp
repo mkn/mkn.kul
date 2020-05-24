@@ -91,8 +91,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #if !defined(NDEBUG) || defined(KUL_FORCE_DEBUG_DO)
 #define KUL_DEBUG_DO(...) __VA_ARGS__
+#define KUL_DEBUG_DO_ELSE(...)
 #else
 #define KUL_DEBUG_DO(...)
+#define KUL_DEBUG_DO_ELSE(...) __VA_ARGS__
 #endif
 
 #include "kul/os/def.hpp"

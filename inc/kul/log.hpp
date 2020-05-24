@@ -206,8 +206,14 @@ class DBgMessage : public Message {
   ~DBgMessage() {
     KUL_DEBUG_DO(LogMan::INSTANCE().log(f, fn, l, m, ss.str()));
   }
-  DBgMessage(const char *_f, const char *_fn, const uint16_t &_l, const log::mode &_m)
+
+#if !defined(NDEBUG)
+  DBgMessage( const char * _f, const char *_fn, const uint16_t &_l, const log::mode &_m)
       : Message(_m), f(_f), fn(_fn), l(_l) {}
+#else
+  DBgMessage() : Message(kul::log::mode::NON){}
+#endif
+
   template <class T>
   DBgMessage &operator<<([[maybe_unused]] const T &s) {
     KUL_DEBUG_DO(ss << s;)
@@ -215,8 +221,8 @@ class DBgMessage : public Message {
   }
 
  private:
-  const char *f, *fn;
-  const uint16_t &l;
+  KUL_DEBUG_DO(const char *f, *fn;)
+  KUL_DEBUG_DO(const uint16_t &l;)
 };
 class OutMessage : public Message {
  public:
@@ -244,10 +250,17 @@ class DBoMessage : public Message {
 #define KLOG_NON kul::LogMessage(__FILE__, __func__, __LINE__, kul::log::mode::NON)
 #define KLOG_INF kul::LogMessage(__FILE__, __func__, __LINE__, kul::log::mode::INF)
 #define KLOG_ERR kul::LogMessage(__FILE__, __func__, __LINE__, kul::log::mode::ERR)
+#define KLOG(sev) KLOG_##sev
+
+#if !defined(NDEBUG)
 #define KLOG_DBG kul::DBgMessage(__FILE__, __func__, __LINE__, kul::log::mode::DBG)
 #define KLOG_OTH kul::DBgMessage(__FILE__, __func__, __LINE__, kul::log::mode::OTH)
 #define KLOG_TRC kul::DBgMessage(__FILE__, __func__, __LINE__, kul::log::mode::TRC)
-#define KLOG(sev) KLOG_##sev
+#else
+#define KLOG_DBG kul::DBgMessage()
+#define KLOG_OTH kul::DBgMessage()
+#define KLOG_TRC kul::DBgMessage()
+#endif
 
 #define KOUT_NON kul::OutMessage()
 #define KOUT_INF kul::OutMessage(kul::log::mode::INF)
