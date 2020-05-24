@@ -210,13 +210,13 @@ class DBgMessage : public Message {
       : Message(_m), f(_f), fn(_fn), l(_l) {}
   template <class T>
   DBgMessage &operator<<([[maybe_unused]] const T &s) {
-    KUL_DEBUG_DO(ss << s);
+    KUL_DEBUG_DO(ss << s;)
     return *this;
   }
 
  private:
-  KUL_DEBUG_DO(const char *f, *fn);
-  KUL_DEBUG_DO(const uint16_t &l);
+  const char *f, *fn;
+  const uint16_t &l;
 };
 class OutMessage : public Message {
  public:
@@ -236,7 +236,7 @@ class DBoMessage : public Message {
   DBoMessage(const log::mode &_m = kul::log::mode::NON) : Message(_m) {}
   template <class T>
   DBoMessage &operator<<([[maybe_unused]] const T &s) {
-    KUL_DEBUG_DO(ss << s);
+    KUL_DEBUG_DO(ss << s;)
     return *this;
   }
 };
