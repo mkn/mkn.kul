@@ -204,23 +204,19 @@ class LogMessage : public Message {
 class DBgMessage : public Message {
  public:
   ~DBgMessage() {
-#if !defined(NDEBUG)
-    LogMan::INSTANCE().log(f, fn, l, m, ss.str());
-#endif
+    KUL_DEBUG_DO(LogMan::INSTANCE().log(f, fn, l, m, ss.str()));
   }
   DBgMessage(const char *_f, const char *_fn, const uint16_t &_l, const log::mode &_m)
       : Message(_m), f(_f), fn(_fn), l(_l) {}
   template <class T>
-  DBgMessage &operator<<(const T &s) {
-#if !defined(NDEBUG)
-    ss << s;
-#endif
+  DBgMessage &operator<<([[maybe_unused]] const T &s) {
+    KUL_DEBUG_DO(ss << s);
     return *this;
   }
 
  private:
-  const char *f, *fn;
-  const uint16_t &l;
+  KUL_DEBUG_DO(const char *f, *fn);
+  KUL_DEBUG_DO(const uint16_t &l);
 };
 class OutMessage : public Message {
  public:
@@ -235,16 +231,12 @@ class ErrMessage : public Message {
 class DBoMessage : public Message {
  public:
   ~DBoMessage() {
-#if !defined(NDEBUG)
-    LogMan::INSTANCE().out(m, ss.str());
-#endif
+    KUL_DEBUG_DO(LogMan::INSTANCE().out(m, ss.str()));
   }
   DBoMessage(const log::mode &_m = kul::log::mode::NON) : Message(_m) {}
   template <class T>
-  DBoMessage &operator<<(const T &s) {
-#if !defined(NDEBUG)
-    ss << s;
-#endif
+  DBoMessage &operator<<([[maybe_unused]] const T &s) {
+    KUL_DEBUG_DO(ss << s);
     return *this;
   }
 };

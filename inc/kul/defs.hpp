@@ -89,6 +89,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define KUL_IS_NIX 0
 #endif
 
+#if !defined(NDEBUG) || defined(KUL_FORCE_DEBUG_DO)
+#define KUL_DEBUG_DO(...) __VA_ARGS__
+#else
+#define KUL_DEBUG_DO(...)
+#endif
+
 #include "kul/os/def.hpp"
 
 #endif /* _KUL_DEFS_HPP_ */
