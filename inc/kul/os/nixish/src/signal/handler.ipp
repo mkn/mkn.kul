@@ -39,7 +39,7 @@ void kul_sig_handler(int s, siginfo_t* info, void* v) {
       auto tid = kul::this_thread::id();
       ucontext_t *uc = (ucontext_t *)v;
       printf("[bt] Stacktrace:\n");
-      for(auto const& s : kul::this_thread::stacktrace(uc)) KOUT(NON) << tid << " : " << s;
+      for(auto const& st : kul::this_thread::stacktrace(uc)) KOUT(NON) << tid << " : " << st;
     }
     exit(s);
   }
