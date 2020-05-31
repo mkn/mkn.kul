@@ -86,6 +86,20 @@ decltype(auto) make_pointer_container(Refs&&... args) {
   return _make_pointer_container(for_N<size>(PointersApply{tuple}));
 }
 
+template <typename T>
+struct ApplySingleTupleValue {
+  constexpr ApplySingleTupleValue(T t_) : t{t_} {}
+  template <size_t i>
+  constexpr decltype(auto) operator()() { return t; }
+  T t;
+};
+
+template <typename T, size_t Size>
+constexpr decltype(auto) tuple_from(T t){
+  return for_N<Size>(ApplySingleTupleValue{t});
+}
+
+
 }  // namespace kul
 
 #endif /* _KUL_TUPLE_HPP_ */

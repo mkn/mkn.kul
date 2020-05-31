@@ -186,7 +186,7 @@ class Dir : public fs::Item {
       upsies++;
     }
     std::string rel = "";
-    for (uint16_t i = 0; i < upsies; i++) rel += ".." + Dir::SEP();
+    for (size_t i = 0; i < upsies; i++) rel += ".." + Dir::SEP();
     right = right.substr(left.size());
     if (right[0] == Dir::SEP().c_str()[0]) right = right.substr(1);
     rel += right;

@@ -63,7 +63,7 @@ class Process : public kul::AProcess {
   int inFd[2], outFd[2], errFd[2], popPip[3];
   int cStat;  // child status
 
-  inline int16_t recall(const uint16_t &s) {
+  inline int16_t recall(int16_t const& s) {
     int ret;
     while ((ret = (s)) < 0x0 && (errno == EINTR)) {
     }
