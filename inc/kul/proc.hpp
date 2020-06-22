@@ -64,8 +64,8 @@ class ExitException : public kul::proc::Exception {
   const short ec;
 
  public:
-  ExitException(const char *f, const uint16_t &l, const short ec, const std::string &s)
-      : Exception(f, l, s), ec(ec) {}
+  ExitException(const char *f, const uint16_t &l, const short _ec, const std::string &s)
+      : Exception(f, l, s), ec(_ec) {}
   const short &code() const { return ec; }
 };
 
@@ -88,9 +88,9 @@ class Call {
     for (const std::pair<std::string, std::string> &oldEv : oldEvs)
       kul::env::SET(oldEv.first.c_str(), oldEv.second.c_str());
   }
-  Call(const std::string &s, const std::string &d = "") : d(d), s(s) { setCWD(); }
-  Call(const std::string &s, const kul::hash::map::S2S &evs, const std::string &d = "")
-      : d(d), s(s) {
+  Call(const std::string &_s, const std::string &_d = "") : d(_d), s(_s) { setCWD(); }
+  Call(const std::string &_s, const kul::hash::map::S2S &evs, const std::string &_d = "")
+      : d(_d), s(_s) {
     setCWD();
     for (const auto &ev : evs) {
       const std::string &v = kul::env::GET(ev.first.c_str());
@@ -114,8 +114,8 @@ class AProcess {
   friend std::ostream &operator<<(std::ostream &, const AProcess &);
 
  protected:
-  AProcess(const std::string &cmd, const bool &wfe) : wfe(wfe) { argv.push_back(cmd); }
-  AProcess(const std::string &cmd, const std::string &d, const bool &wfe) : wfe(wfe), d(d) {
+  AProcess(const std::string &cmd, const bool &_wfe) : wfe(_wfe) { argv.push_back(cmd); }
+  AProcess(const std::string &cmd, const std::string &_d, const bool &_wfe) : wfe(_wfe), d(_d) {
     argv.push_back(cmd);
   }
   virtual ~AProcess() {}
@@ -144,11 +144,11 @@ class AProcess {
     else
       fprintf(stderr, "%s", s.c_str());
   }
-  void error(const int16_t &line, const std::string &s) KTHROW(kul::Exception) {
+  void error(const int16_t &line, const std::string &_s) KTHROW(kul::Exception) {
     tearDown();
-    throw Exception("kul/proc.hpp", line, s);
+    throw Exception("kul/proc.hpp", line, _s);
   }
-  void exitCode(const int32_t &e) { pec = e; }
+  void exitCode(const int32_t &_e) { pec = _e; }
 
  public:
   template <class T>
@@ -187,8 +187,8 @@ class AProcess {
     arg(s);
     return *this;
   }
-  void setOut(std::function<void(const std::string &)> o) { this->o = o; }
-  void setErr(std::function<void(const std::string &)> e) { this->e = e; }
+  void setOut(std::function<void(const std::string &)> _o) { this->o = _o; }
+  void setErr(std::function<void(const std::string &)> _e) { this->e = _e; }
 };
 
 inline std::ostream &operator<<(std::ostream &s, const AProcess &p) { return s << p.toString(); }

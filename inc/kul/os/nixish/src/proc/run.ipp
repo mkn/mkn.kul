@@ -31,15 +31,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 void kul::Process::run() KTHROW(kul::proc::Exception){
 
-  int16_t ret = 0;
-
-  if ((ret = pipe(inFd)) < 0) error(__LINE__, "Failed to pipe in");
-  if ((ret = pipe(outFd)) < 0) error(__LINE__, "Failed to pipe out");
-  if ((ret = pipe(errFd)) < 0) error(__LINE__, "Failed to pipe err");
+  {
+    int16_t ret = 0;
+    if ((ret = pipe(inFd)) < 0) error(__LINE__, "Failed to pipe in");
+    if ((ret = pipe(outFd)) < 0) error(__LINE__, "Failed to pipe out");
+    if ((ret = pipe(errFd)) < 0) error(__LINE__, "Failed to pipe err");
+  }
 
   this->preStart();
   pid(fork());
   if (pid() > 0) {
+    int16_t ret = 0;
     if (this->waitForExit()) {  // parent
       popPip[0] = inFd[1];
       popPip[1] = outFd[0];

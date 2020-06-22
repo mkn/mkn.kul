@@ -68,7 +68,7 @@ class Cmd {
   char const *c;
 
  public:
-  Cmd(char const *c) : c(c) {}
+  Cmd(char const *_c) : c(_c) {}
   char const *command() const { return c; }
 };
 
@@ -116,9 +116,9 @@ class Arg : public Cmd {
 
  public:
   Arg(const char _d, char const *dd, ArgType _t, bool m = false) : Cmd(dd), man(m), d(_d), t(_t) {}
-  Arg(const char d, char const *dd, bool m = false) : Cmd(dd), man(m), d(d) {}
+  Arg(const char _d, char const *dd, bool m = false) : Cmd(dd), man(m), d(_d) {}
 
-  Arg(char const *dd, ArgType t, bool m = false) : Cmd(dd), man(m), t(t) {}
+  Arg(char const *dd, ArgType _t, bool m = false) : Cmd(dd), man(m), t(_t) {}
   Arg(char const *dd, bool m = false) : Cmd(dd), man(m) {}
 
   bool mandatory() const { return man; }
