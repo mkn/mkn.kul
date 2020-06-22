@@ -78,7 +78,7 @@ enum EnvVarMode { APPE = 0, PREP, REPL };
 // deprecated : use kul::env::Var
 class EnvVar {
  public:
-  EnvVar(const std::string n, const std::string v, const EnvVarMode m) : n(n), v(v), m(m) {}
+  EnvVar(const std::string _n, const std::string _v, const EnvVarMode _m) : n(_n), v(_v), m(_m) {}
   EnvVar(const EnvVar &e) : n(e.n), v(e.v), m(e.m) {}
   char const *name() const { return n.c_str(); }
   char const *value() const { return v.c_str(); }
@@ -115,7 +115,7 @@ class Arg : public Cmd {
   static constexpr char INVALID_CHAR = ' ';
 
  public:
-  Arg(const char d, char const *dd, ArgType t, bool m = false) : Cmd(dd), man(m), d(d), t(t) {}
+  Arg(const char _d, char const *dd, ArgType _t, bool m = false) : Cmd(dd), man(m), d(_d), t(_t) {}
   Arg(const char d, char const *dd, bool m = false) : Cmd(dd), man(m), d(d) {}
 
   Arg(char const *dd, ArgType t, bool m = false) : Cmd(dd), man(m), t(t) {}
@@ -135,7 +135,7 @@ class Arg : public Cmd {
 class Args {
  public:
   Args() {}
-  Args(const std::vector<Cmd> &cmds, const std::vector<Arg> &args) : cmds(cmds), args(args) {}
+  Args(const std::vector<Cmd> &_cmds, const std::vector<Arg> &_args) : cmds(_cmds), args(_args) {}
 
   void arg(const Arg &a) { args.push_back(a); }
   void cmd(const Cmd &c) { cmds.push_back(c); }

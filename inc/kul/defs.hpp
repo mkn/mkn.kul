@@ -35,46 +35,46 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define KTOSTRING(x) KSTRINGIFY(x)
 
 #ifdef KUL_SHARED
-#if defined _WIN32 || defined __CYGWIN__
-#ifdef KUL_EXPORT
-#ifdef __GNUC__
-#define KUL_PUBLISH __attribute__((dllexport))
-#else
-#define KUL_PUBLISH __declspec(dllexport)
-#endif
-#else
-#ifdef __GNUC__
-#define KUL_PUBLISH __attribute__((dllimport))
-#else
-#define KUL_PUBLISH __declspec(dllimport)
-#endif
-#endif
-#else
-#if __GNUC__ >= 4
-#define KUL_PUBLISH __attribute__((visibility("default")))
-#define KUL_PRIVATE __attribute__((visibility("hidden")))
-#endif
-#endif
-#endif
+  #if defined _WIN32 || defined __CYGWIN__
+    #ifdef KUL_EXPORT
+      #ifdef __GNUC__
+        #define KUL_PUBLISH __attribute__((dllexport))
+      #else
+        #define KUL_PUBLISH __declspec(dllexport)
+      #endif
+    #else
+      #ifdef __GNUC__
+        #define KUL_PUBLISH __attribute__((dllimport))
+      #else
+      #define KUL_PUBLISH __declspec(dllimport)
+      #endif
+    #endif
+  #else
+    #if __GNUC__ >= 4
+      #define KUL_PUBLISH __attribute__((visibility("default")))
+      #define KUL_PRIVATE __attribute__((visibility("hidden")))
+    #endif
+  #endif
+#endif // KUL_SHARED
 
 #ifndef KUL_PUBLISH
-#define KUL_PUBLISH
+  #define KUL_PUBLISH
 #endif
 
 #ifndef KUL_PRIVATE
-#define KUL_PRIVATE
+  #define KUL_PRIVATE
 #endif
 
 #if defined(__APPLE__) || defined(__NetBSD__) || defined(__FreeBSD__)
-#define KUL_IS_BSD 1
+  #define KUL_IS_BSD 1
 #endif
 
 #if defined(_WIN32)
-#define KUL_IS_WIN 1
+  #define KUL_IS_WIN 1
 #endif
 
 #ifndef KUL_IS_WIN
-#define KUL_IS_WIN 0
+  #define KUL_IS_WIN 0
 #endif
 
 #ifndef KUL_IS_BSD
