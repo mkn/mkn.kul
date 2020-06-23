@@ -63,19 +63,19 @@ class Process : public kul::AProcess {
   int inFd[2], outFd[2], errFd[2], popPip[3];
   int cStat;  // child status
 
-  inline int16_t recall(int16_t const& s) {
+  inline int16_t recall(int16_t const& _s) {
     int ret;
-    while ((ret = (s)) < 0x0 && (errno == EINTR)) {
+    while ((ret = (_s)) < 0x0 && (errno == EINTR)) {
     }
     return ret;
   }
 
  public:
-  Process(const std::string &cmd, const bool &wfe = true) : kul::AProcess(cmd, wfe) {}
-  Process(const std::string &cmd, const std::string &path, const bool &wfe = true)
-      : kul::AProcess(cmd, path, wfe) {}
-  Process(const std::string &cmd, const kul::Dir &d, const bool &wfe = true)
-      : kul::AProcess(cmd, (d ? d.real() : d.path()), wfe) {}
+  Process(const std::string &cmd, const bool &_wfe = true) : kul::AProcess(cmd, _wfe) {}
+  Process(const std::string &cmd, const std::string &path, const bool &_wfe = true)
+      : kul::AProcess(cmd, path, _wfe) {}
+  Process(const std::string &cmd, const kul::Dir &_d, const bool &_wfe = true)
+      : kul::AProcess(cmd, (_d ? _d.real() : _d.path()), _wfe) {}
   bool kill(int16_t k = 6) {
     if (started()) {
       bool b = ::kill(pid(), k) == 0;
@@ -87,7 +87,7 @@ class Process : public kul::AProcess {
 
  protected:
   int16_t inline child();
-  virtual void inline expand(std::string &s) const;
+  virtual void inline expand(std::string &) const;
   void inline waitForStatus();
   void inline waitExit() KTHROW(kul::proc::ExitException);
   void inline tearDown();

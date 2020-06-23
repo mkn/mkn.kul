@@ -102,14 +102,14 @@ class Server : public IPCCall {
       if (lp != -1) lp--;
     }
   }
-  Server(const int16_t &lp = -1) KTHROW(Exception)
-      : lp(lp),
+  Server(const int16_t &_lp = -1) KTHROW(Exception)
+      : lp(_lp),
         uuid(std::to_string(kul::this_proc::id()),
              Dir(_KUL_IPC_UUID_PREFIX_ + std::string("/pid/"))) {
     start();
   }
-  Server(const std::string &ui, const int16_t &lp = -1) KTHROW(Exception)
-      : lp(lp), uuid(ui, Dir(_KUL_IPC_UUID_PREFIX_)) {
+  Server(const std::string &ui, const int16_t &_lp = -1) KTHROW(Exception)
+      : lp(_lp), uuid(ui, Dir(_KUL_IPC_UUID_PREFIX_)) {
     start();
   }
 };

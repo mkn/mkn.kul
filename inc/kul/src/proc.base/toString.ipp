@@ -30,8 +30,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 std::string kul::AProcess::toString() const{
-  std::string s;
-  for (const std::string &a : args()) s += a + " ";
-  s.pop_back();
-  return s;
+  std::string _s;
+  for (const std::string &a : args()) _s += a + " ";
+  _s.pop_back();
+  return _s;
 }

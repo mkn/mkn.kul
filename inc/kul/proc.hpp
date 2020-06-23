@@ -138,11 +138,11 @@ class AProcess {
     else
       printf("%s", _s.c_str());
   }
-  virtual void err(const std::string &s) {
+  virtual void err(const std::string &_s) {
     if (this->e)
-      this->e(s);
+      this->e(_s);
     else
-      fprintf(stderr, "%s", s.c_str());
+      fprintf(stderr, "%s", _s.c_str());
   }
   void error(const int16_t &line, const std::string &_s) KTHROW(kul::Exception) {
     tearDown();
@@ -183,8 +183,8 @@ class AProcess {
   bool started() const { return pi > 0; }
   bool finished() const { return f; }
   const int32_t &exitCode() { return pec; }
-  AProcess &operator<<(const std::string &s) {
-    arg(s);
+  AProcess &operator<<(const std::string &_s) {
+    arg(_s);
     return *this;
   }
   void setOut(std::function<void(const std::string &)> _o) { this->o = _o; }

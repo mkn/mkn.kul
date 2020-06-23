@@ -87,7 +87,7 @@ class Message {
   std::stringstream ss;
   const kul::log::mode &m;
 
-  Message(const kul::log::mode &m) : m(m) {}
+  Message(const kul::log::mode &_m) : m(_m) {}
 
  public:
   template <class T>
@@ -100,15 +100,15 @@ class LogMessage : public Message {
 
  public:
   ~LogMessage() { LogMan::INSTANCE().log(f, fn, l, m, ss.str()); }
-  LogMessage(const char *f, const char *fn, const uint16_t &l, const kul::log::mode &m)
-      : Message(m), f(f), fn(fn), l(l) {}
+  LogMessage(const char *_f, const char *_fn, const uint16_t &_l, const kul::log::mode &_m)
+      : Message(_m), f(_f), fn(_fn), l(_l) {}
 
  private:
   const char *f, *fn;
   const uint16_t &l;
 };
 struct OutMessage : public Message {
-  OutMessage(const kul::log::mode &m = kul::log::mode::NON) : Message(m) {}
+  OutMessage(const kul::log::mode &_m = kul::log::mode::NON) : Message(_m) {}
   ~OutMessage() { LogMan::INSTANCE().out(m, ss.str()); }
 };
 struct ErrMessage : public Message {

@@ -41,7 +41,7 @@ class ScopeLock {
   Mutex &m;
 
  public:
-  ScopeLock(Mutex &m) : m(m) { this->m.lock(); }
+  ScopeLock(Mutex &_m) : m(_m) { this->m.lock(); }
   ~ScopeLock() { this->m.unlock(); }
 };
 
@@ -66,7 +66,7 @@ class ThreadQueue {
   }
 
  public:
-  ThreadQueue(const std::function<void()> &func) : th(std::ref(*this)), func(func) {}
+  ThreadQueue(const std::function<void()> &_func) : th(std::ref(*this)), func(_func) {}
   template <class T>
   ThreadQueue(const T &t) : th(std::ref(*this)), func(std::bind(&T::operator(), t)) {}
   template <class T>
@@ -141,8 +141,8 @@ class PredicatedThreadQueue : public ThreadQueue {
   }
 
  public:
-  PredicatedThreadQueue(const std::function<void()> &func, P &pr)
-      : ThreadQueue(func), p(pr), ps(p.size()) {}
+  PredicatedThreadQueue(const std::function<void()> &_func, P &pr)
+      : ThreadQueue(_func), p(pr), ps(p.size()) {}
   template <class T>
   PredicatedThreadQueue(const T &t, P &pr) : ThreadQueue(t), p(pr), ps(p.size()) {}
   template <class T>
