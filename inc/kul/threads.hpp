@@ -221,7 +221,7 @@ class ConcurrentThreadQueue {
       : _max(max), m_nWait(nWait), _block(0), _detatched(0), _up(0), _thread(std::ref(*this)) {
     _k.setDeletedKey("");
     _e.setDeletedKey("");
-    if (strt) start();
+    if (strt) ConcurrentThreadQueue::start();
   }
   virtual ~ConcurrentThreadQueue() {}
 

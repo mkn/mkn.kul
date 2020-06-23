@@ -128,15 +128,15 @@ class AProcess {
   virtual void tearDown() {}
   virtual void run() KTHROW(kul::Exception) = 0;
   bool waitForExit() const { return wfe; }
-  void pid(const int32_t &pi) { this->pi = pi; }
+  void pid(const int32_t &_pi) { this->pi = _pi; }
 
   const std::vector<std::string> &args() const { return argv; };
   const kul::hash::map::S2S &vars() const { return evs; }
-  virtual void out(const std::string &s) {
+  virtual void out(const std::string &_s) {
     if (this->o)
-      this->o(s);
+      this->o(_s);
     else
-      printf("%s", s.c_str());
+      printf("%s", _s.c_str());
   }
   virtual void err(const std::string &s) {
     if (this->e)
