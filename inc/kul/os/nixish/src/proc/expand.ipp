@@ -29,17 +29,17 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-void kul::Process::expand(std::string& s) const {
-  std::string r = s;
-  auto lb = s.find("$(");
-  auto clb = s.find("\\$(");
+void kul::Process::expand(std::string& _s) const {
+  std::string r = _s;
+  auto lb = _s.find("$(");
+  auto clb = _s.find("\\$(");
   while ((lb - clb + 1) == 0) {
     lb = r.find("$(", clb + 3);
     clb = r.find("\\$(", clb + 3);
   }
   if (lb == std::string::npos) return;
-  auto rb = s.find(")");
-  auto crb = s.find("\\)");
+  auto rb = _s.find(")");
+  auto crb = _s.find("\\)");
   while ((rb - crb + 1) == 0) {
     rb = r.find(")", crb + 2);
     crb = r.find("\\)", crb + 2);
@@ -63,5 +63,5 @@ void kul::Process::expand(std::string& s) const {
 
   std::string t(ss.str());
   expand(t);
-  s = t;
+  _s = t;
 }

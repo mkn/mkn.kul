@@ -30,9 +30,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 int16_t kul::Process::child(){
-  std::string s(toString());
-  expand(s);
-  std::vector<std::string> cli(kul::cli::asArgs(s));
+  std::string _s(toString());
+  expand(_s);
+  std::vector<std::string> cli(kul::cli::asArgs(_s));
   std::vector<char *> argV;
   for (auto &a : cli) argV.push_back(&a[0]);
   argV.push_back(NULL);

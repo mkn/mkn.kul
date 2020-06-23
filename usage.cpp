@@ -78,7 +78,7 @@ class TestThreadQueueObject {
   Mutex &mutex;
 
  public:
-  TestThreadQueueObject(Mutex &mutex) : mutex(mutex) {}
+  TestThreadQueueObject(Mutex &_mutex) : mutex(_mutex) {}
   void operator()() {
     kul::ScopeLock lock(mutex);
     KLOG(INF) << "THREAD RUNNING";
@@ -93,7 +93,7 @@ class TestThreadQueueQObject : public TestThreadQueueObject {
   std::queue<int> &q;
 
  public:
-  TestThreadQueueQObject(Mutex &mutex, std::queue<int> &q) : TestThreadQueueObject(mutex), q(q) {}
+  TestThreadQueueQObject(Mutex &_mutex, std::queue<int> &_q) : TestThreadQueueObject(_mutex), q(_q) {}
   void operator()() {
     kul::ScopeLock lock(mutex);
     KLOG(INF) << "THREAD RUNNING";
@@ -179,8 +179,8 @@ class Test {
     {
       kul::io::Writer wo(fo);
       kul::io::Writer we(fe);
-      auto lo = [&](const std::string &s) { wo << s; };
-      auto le = [&](const std::string &s) { we << s; };
+      auto lo = [&](const std::string &_s) { wo << _s; };
+      auto le = [&](const std::string &_s) { we << _s; };
       kul::LogMan::INSTANCE().setOut(lo);
       kul::LogMan::INSTANCE().setErr(le);
       KOUT(INF) << "KOUT(INF)";
