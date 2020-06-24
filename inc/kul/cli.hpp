@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace kul {
 namespace cli {
 
-inline const std::string receive(const std::string &t = "") {
+inline const std::string receive(std::string const &t = "") {
   if (!t.empty()) std::cout << t << std::endl;
   std::string s;
   std::getline(std::cin, s);
@@ -54,12 +54,12 @@ inline const std::string receive(const std::string &t = "") {
 
 class Exception : public kul::Exception {
  public:
-  Exception(char const *f, const uint16_t &l, const std::string &s) : kul::Exception(f, l, s) {}
+  Exception(char const *f, uint16_t const &l, std::string const &s) : kul::Exception(f, l, s) {}
 };
 
 class ArgNotFoundException : public Exception {
  public:
-  ArgNotFoundException(char const *f, const uint16_t &l, const std::string &s)
+  ArgNotFoundException(char const *f, uint16_t const &l, std::string const &s)
       : Exception(f, l, s) {}
 };
 
@@ -156,15 +156,15 @@ class Args {
   }
   const std::vector<Cmd> &commands() const { return cmds; }
   const std::vector<Arg> &arguments() const { return args; }
-  const std::string &get(const std::string &s) const {
+  std::string const &get(std::string const &s) const {
     if (has(s)) return vals.at(s);
     KEXCEPT(ArgNotFoundException, "No value " + s + " found");
   }
   bool empty() const { return vals.size() == 0; }
-  bool has(const std::string &s) const { return vals.count(s); }
+  bool has(std::string const &s) const { return vals.count(s); }
   size_t size() const { return vals.size(); }
-  bool erase(const std::string &key) { return vals.erase(key); }
-  void process(const uint16_t &argc, char *argv[], uint16_t first = 1)
+  bool erase(std::string const &key) { return vals.erase(key); }
+  void process(uint16_t const &argc, char *argv[], uint16_t first = 1)
       KTHROW(ArgNotFoundException) {
     for (const Arg &a1 : arguments())
       for (const Arg &a2 : arguments()) {
@@ -266,9 +266,9 @@ class Args {
 #include "kul/serial/cli.arg.end.hpp"
 };
 
-inline void asArgs(const std::string &cmd, std::vector<std::string> &args);
+inline void asArgs(std::string const &cmd, std::vector<std::string> &args);
 
-inline std::vector<std::string> asArgs(const std::string &cmd) {
+inline std::vector<std::string> asArgs(std::string const &cmd) {
   std::vector<std::string> args;
   asArgs(cmd, args);
   return args;

@@ -42,7 +42,7 @@ std::vector<kul::File> kul::Dir::files(bool recursive) const KTHROW(fs::Exceptio
   }
   closedir(dir);
   if (recursive) {
-    for (const kul::Dir &d : dirs()) {
+    for (kul::Dir const& d : dirs()) {
       const std::vector<kul::File> &tFs = d.files(true);
       fs.insert(fs.end(), tFs.begin(), tFs.end());
     }

@@ -40,6 +40,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "kul/os/nixish/src/os/dir/files.ipp"
 // }
 
-// std::string kul::Dir::REAL(const std::string &s) KTHROW(fs::Exception) {
+// std::string kul::Dir::REAL(std::string const&s) KTHROW(fs::Exception) {
 #include "kul/os/nixish/src/os/dir/Xreal.ipp"
 // }

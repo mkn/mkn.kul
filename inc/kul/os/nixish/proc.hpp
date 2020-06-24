@@ -63,7 +63,7 @@ class Process : public kul::AProcess {
   int inFd[2], outFd[2], errFd[2], popPip[3];
   int cStat;  // child status
 
-  inline int16_t recall(int16_t const& _s) {
+  inline int16_t recall(int16_t const &_s) {
     int ret;
     while ((ret = (_s)) < 0x0 && (errno == EINTR)) {
     }
@@ -71,10 +71,10 @@ class Process : public kul::AProcess {
   }
 
  public:
-  Process(const std::string &cmd, const bool &_wfe = true) : kul::AProcess(cmd, _wfe) {}
-  Process(const std::string &cmd, const std::string &path, const bool &_wfe = true)
+  Process(std::string const &cmd, const bool &_wfe = true) : kul::AProcess(cmd, _wfe) {}
+  Process(std::string const &cmd, std::string const &path, const bool &_wfe = true)
       : kul::AProcess(cmd, path, _wfe) {}
-  Process(const std::string &cmd, const kul::Dir &_d, const bool &_wfe = true)
+  Process(std::string const &cmd, kul::Dir const &_d, const bool &_wfe = true)
       : kul::AProcess(cmd, (_d ? _d.real() : _d.path()), _wfe) {}
   bool kill(int16_t k = 6) {
     if (started()) {

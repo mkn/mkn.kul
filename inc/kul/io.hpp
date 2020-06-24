@@ -47,7 +47,7 @@ namespace io {
 
 class Exception : public kul::Exception {
  public:
-  Exception(const char *f, const size_t &l, const std::string &s) : kul::Exception(f, l, s) {}
+  Exception(char const *f, const size_t &l, std::string const &s) : kul::Exception(f, l, s) {}
 };
 
 class AReader {
@@ -59,13 +59,13 @@ class AReader {
     if (!f) KEXCEPT(Exception, "FileException : file \"" + std::string(path) + "\" not found");
   }
   virtual ~AReader() {}
-  virtual const char *readLine() = 0;
+  virtual char const *readLine() = 0;
   virtual size_t read(char *c, const size_t &l) = 0;
   virtual void seek(const size_t &l) = 0;
   static void seek(std::ifstream &_f, const size_t &_l) { _f.seekg(_l); }
 
  protected:
-  const char *readLine(std::ifstream &_f) {
+  char const *readLine(std::ifstream &_f) {
     s1.clear();
     if (_f.good()) {
       std::stringstream ss;
@@ -110,22 +110,22 @@ class AReader {
 };
 class Reader : public AReader {
  public:
-  Reader(const char *c) : AReader(c, std::ios::in) {}
-  Reader(const File &c) : Reader(c.full().c_str()) {}
+  Reader(char const *c) : AReader(c, std::ios::in) {}
+  Reader(File const &c) : Reader(c.full().c_str()) {}
   ~Reader() { f.close(); }
-  const char *readLine() { return AReader::readLine(f); }
+  char const *readLine() { return AReader::readLine(f); }
   size_t read(char *c, const size_t &s) { return AReader::read(c, f, s); }
   void seek(const size_t &l) { AReader::seek(f, l); }
 };
 class BinaryReader : public AReader {
  private:
  public:
-  BinaryReader(const char *c) : AReader(c, std::ios::in | std::ios::binary) {
+  BinaryReader(char const *c) : AReader(c, std::ios::in | std::ios::binary) {
     f.exceptions(std::ifstream::badbit | std::ifstream::failbit);
   }
-  BinaryReader(const File &c) : BinaryReader(c.full().c_str()) {}
+  BinaryReader(File const &c) : BinaryReader(c.full().c_str()) {}
   ~BinaryReader() { f.close(); }
-  const char *readLine() { return AReader::readLine(f); }
+  char const *readLine() { return AReader::readLine(f); }
 #ifdef _WIN32
   size_t read(char *c, const size_t &s) { return AReader::read(c, f, s); }
 #else
@@ -159,19 +159,19 @@ class AWriter {
   }
   void close() { f.close(); }
 
-  AWriter &write(const char *c, bool nl = false) {
+  AWriter &write(char const *c, bool nl = false) {
     if (nl)
       f << c << kul::os::EOL();
     else
       f << c;
     return *this;
   }
-  AWriter &write(const char *c, size_t len) {
+  AWriter &write(char const *c, size_t len) {
     f.write(c, len);
     return *this;
   }
   AWriter &write(const uint8_t *c, size_t len) {
-    f.write((const char *)(c), len);
+    f.write((char const *)(c), len);
     return *this;
   }
   template <class T>
@@ -194,24 +194,24 @@ class AWriter {
 };
 class Writer : public AWriter {
  public:
-  Writer(const char *c, bool a = 0) {
+  Writer(char const *c, bool a = 0) {
     if (a)
       f.open(c, std::ios::out | std::ios::app);
     else
       f.open(c, std::ios::out);
     if (!f) KEXCEPT(Exception, "FileException : file \"" + std::string(c) + "\" not found");
   }
-  Writer(const File &c, bool a = 0) : Writer(c.full().c_str(), a) {}
+  Writer(File const &c, bool a = 0) : Writer(c.full().c_str(), a) {}
   ~Writer() {}
 };
 class BinaryWriter : public AWriter {
  public:
-  BinaryWriter(const char *c) {
+  BinaryWriter(char const *c) {
     f.open(c, std::ios::out | std::ios::binary);
     if (!f) KEXCEPT(Exception, "FileException : file \"" + std::string(c) + "\" not found");
     f.unsetf(std::ios_base::skipws);
   }
-  BinaryWriter(const File &c) : BinaryWriter(c.full().c_str()) {}
+  BinaryWriter(File const &c) : BinaryWriter(c.full().c_str()) {}
   ~BinaryWriter() {
     f << std::flush;
     f.close();

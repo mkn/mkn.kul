@@ -38,7 +38,7 @@ namespace kul {
 namespace bon {
 class Exception : public kul::Exception {
  public:
-  Exception(const char *f, const size_t &l, const std::string &s) : kul::Exception(f, l, s) {}
+  Exception(char const *f, const size_t &l, std::string const &s) : kul::Exception(f, l, s) {}
 };
 
 enum class TYPE { OBJ = 0, STR, INT };

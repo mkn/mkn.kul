@@ -40,14 +40,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace kul {
 namespace cli {
 #ifndef _KUL_COMPILED_LIB_
-inline std::string hidden(const std::string &t) {
+inline std::string hidden(std::string const& t) {
 #include "kul/os/win/src/cli/hidden.cpp"
 }
 inline void show() {
 #include "kul/os/win/src/cli/show.cpp"
 }
 #else
-std::string hidden(const std::string &t);
+std::string hidden(std::string const& t);
 void show();
 #endif
 }  // namespace cli

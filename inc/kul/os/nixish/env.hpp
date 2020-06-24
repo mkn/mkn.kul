@@ -57,12 +57,12 @@ constexpr size_t KUL_MAX_PATH = PATH_MAX;
 #error  // could not set KUL_MAX_PATH
 #endif  /*_KUL_MAX_PATH_*/
 
-inline bool EXISTS(const char *c) { return getenv(c); }
-inline std::string GET(const char *c) {
-  const char *r = getenv(c);
+inline bool EXISTS(char const *c) { return getenv(c); }
+inline std::string GET(char const *c) {
+  char const *r = getenv(c);
   return std::string(r ? r : "");
 }
-inline void SET(const char *var, const char *val) { setenv(var, val, 1); }
+inline void SET(char const *var, char const *val) { setenv(var, val, 1); }
 inline char SEP() { return ':'; }
 
 inline std::string CWD() {
@@ -73,7 +73,7 @@ inline std::string CWD() {
   return str;
 }
 
-inline bool CWD(const std::string &c) { return chdir(c.c_str()) != -1; }
+inline bool CWD(std::string const &c) { return chdir(c.c_str()) != -1; }
 
 }  // namespace env
 }  // namespace kul

@@ -44,7 +44,7 @@ class Manager {
     static Manager instance;
     return instance;
   }
-  const SCM &get(const std::string &s) KTHROW(NotFoundException) {
+  const SCM &get(std::string const &s) KTHROW(NotFoundException) {
     if (SCMs.count(s) > 0) return *(*SCMs.find(s)).second;
     KEXCEPT(NotFoundException, "Source Control Management for " + s + " is not implemented");
   }

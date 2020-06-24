@@ -30,7 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "kul/cli.hpp"
 
-std::string kul::cli::hidden(const std::string &t) {
+std::string kul::cli::hidden(std::string const& t) {
 #include "kul/os/win/src/cli/hidden.cpp"
 }
 

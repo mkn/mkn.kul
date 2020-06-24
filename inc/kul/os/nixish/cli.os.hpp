@@ -38,7 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace kul {
 namespace cli {
 
-inline std::string hidden(const std::string &t);
+inline std::string hidden(std::string const& t);
 inline void show();
 
 }  // namespace cli

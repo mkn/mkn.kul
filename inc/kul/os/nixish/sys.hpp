@@ -55,7 +55,7 @@ class SharedLibrary {
   const kul::File _f;
 
  public:
-  SharedLibrary(const kul::File &f) KTHROW(Exception) : _f(f) {
+  SharedLibrary(kul::File const &f) KTHROW(Exception) : _f(f) {
     if (!_f) KEXCEPSTREAM << "Library attempted to be loaded does not exist: " << _f.full();
     _handle = dlopen(_f.real().c_str(), __KUL_SYS_DLOPEN__);
     if (!_handle) KEXCEPSTREAM << "Cannot load library: " << f << " - Error: " << dlerror();
@@ -77,7 +77,7 @@ class SharedFunction {
  public:
   SharedFunction(SharedLibrary &lib, std::string const &f) KTHROW(Exception) : _lib(lib) {
     _funcP = (F *)dlsym(_lib._handle, f.c_str());
-    const char *dlsym_error = dlerror();
+    char const *dlsym_error = dlerror();
     if (dlsym_error) KEXCEPSTREAM << "Cannot load symbol create " << dlsym_error;
   }
   ~SharedFunction() { dlerror(); }
@@ -95,7 +95,7 @@ class SharedClass {
   SharedFunction<destruct_t> _d;
 
  public:
-  SharedClass(const kul::File &f, const std::string &c, const std::string &d) KTHROW(Exception)
+  SharedClass(kul::File const &f, std::string const &c, std::string const &d) KTHROW(Exception)
       : _lib(f), _c(_lib, c), _d(_lib, d) {}
   virtual ~SharedClass() {}
 

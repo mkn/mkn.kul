@@ -48,7 +48,7 @@ void kul_se_translator_function(unsigned int sig, EXCEPTION_POINTERS *pException
   kul_real_se_handler(pExceptionInfo);
 }
 
-void kul_sig_function_handler(const uint16_t &s);
+void kul_sig_function_handler(uint16_t const &s);
 
 BOOL WINAPI kul_sigint_function(DWORD d) {
   switch (d) {
@@ -84,7 +84,7 @@ class SignalStatic {
   std::vector<std::function<void(int)>> ab, in, se;
   friend class Signal;
   friend void ::kul_real_se_handler(EXCEPTION_POINTERS *pExceptionInfo);
-  friend void ::kul_sig_function_handler(const uint16_t &s);
+  friend void ::kul_sig_function_handler(uint16_t const &s);
   static SignalStatic &INSTANCE() {
     static SignalStatic ss;
     return ss;
@@ -125,7 +125,7 @@ class Signal {
 };
 }  // namespace kul
 
-void kul_sig_function_handler(const uint16_t &s) {
+void kul_sig_function_handler(uint16_t const &s) {
   if (s == 2)
     for (auto &f : kul::SignalStatic::INSTANCE().in) f(s);
   if (s == 11)
