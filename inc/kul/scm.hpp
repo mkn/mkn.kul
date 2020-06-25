@@ -41,12 +41,12 @@ namespace scm {
 
 class Exception : public kul::Exception {
  public:
-  Exception(const char *f, const uint16_t &l, const std::string &s) : kul::Exception(f, l, s) {}
+  Exception(char const *f, uint16_t const &l, std::string const &s) : kul::Exception(f, l, s) {}
 };
 
 class NotFoundException : public kul::Exception {
  public:
-  NotFoundException(const char *f, const uint16_t &l, const std::string &s)
+  NotFoundException(char const *f, uint16_t const &l, std::string const &s)
       : kul::Exception(f, l, s) {}
 };
 }  // namespace scm
@@ -58,25 +58,25 @@ class SCM {
  public:
   virtual ~SCM() {}
   const std::string type() { return typeid(*this).name(); }
-  virtual const std::string co(const std::string &d, const std::string &r,
-                               const std::string &v) const KTHROW(Exception) = 0;
-  virtual void up(const std::string &d, const std::string &r, const std::string &v) const
+  virtual const std::string co(std::string const &d, std::string const &r,
+                               std::string const &v) const KTHROW(Exception) = 0;
+  virtual void up(std::string const &d, std::string const &r, std::string const &v) const
       KTHROW(Exception) = 0;
-  virtual const std::string origin(const std::string &d) const = 0;
-  virtual const std::string localVersion(const std::string &d, const std::string &b) const = 0;
-  virtual const std::string remoteVersion(const std::string &url, const std::string &branch) const
+  virtual const std::string origin(std::string const &d) const = 0;
+  virtual const std::string localVersion(std::string const &d, std::string const &b) const = 0;
+  virtual const std::string remoteVersion(std::string const &url, std::string const &branch) const
       KTHROW(Exception) = 0;
 
-  virtual bool hasChanges(const std::string &d) const = 0;
-  virtual void status(const std::string &d, bool full = 1) const = 0;
-  virtual void diff(const std::string &d) const = 0;
+  virtual bool hasChanges(std::string const &d) const = 0;
+  virtual void status(std::string const &d, bool full = 1) const = 0;
+  virtual void diff(std::string const &d) const = 0;
 };
 
 // review https://gist.github.com/aleksey-bykov/1273f4982c317c92d532
 namespace scm {
 class Git : public SCM {
  public:
-  const std::string co(const std::string &d, const std::string &r, const std::string &v) const
+  const std::string co(std::string const &d, std::string const &r, std::string const &v) const
       KTHROW(Exception) override {
     Dir dr(d, true);
     kul::Process p("git");
@@ -90,7 +90,7 @@ class Git : public SCM {
     }
     return p.toString();
   }
-  void up(const std::string &d, const std::string &r, const std::string &v) const
+  void up(std::string const &d, std::string const &r, std::string const &v) const
       KTHROW(Exception) override {
     if (!Dir(d).is())
       co(d, r, v);
@@ -106,7 +106,7 @@ class Git : public SCM {
       }
     }
   }
-  const std::string origin(const std::string &d) const override {
+  const std::string origin(std::string const &d) const override {
     kul::Process p("git", d);
     kul::ProcessCapture pc(p);
     try {
@@ -124,7 +124,7 @@ class Git : public SCM {
     if (lines.size()) return kul::String::SPLIT(lines[0], ' ')[1];
     KEXCEPT(Exception, "SCM ERROR - Check remote dependency location / version");
   }
-  const std::string localVersion(const std::string &d, const std::string &b) const override {
+  const std::string localVersion(std::string const &d, std::string const &b) const override {
     kul::Process p("git", d);
     kul::ProcessCapture pc(p);
     try {
@@ -138,7 +138,7 @@ class Git : public SCM {
     return kul::String::LINES(pc.outs())[0];
   }
 
-  const std::string remoteVersion(const std::string &url, const std::string &b) const
+  const std::string remoteVersion(std::string const &url, std::string const &b) const
       KTHROW(Exception) override {
     kul::Process p("git");
     kul::ProcessCapture pc(p);
@@ -155,7 +155,7 @@ class Git : public SCM {
     return s.substr(0, s.find('\t'));
   }
 
-  bool hasChanges(const std::string &d) const override {
+  bool hasChanges(std::string const &d) const override {
     kul::Process p("git", d);
     kul::ProcessCapture pc(p);
     try {
@@ -166,7 +166,7 @@ class Git : public SCM {
     }
     return kul::String::LINES(pc.outs()).size() > 1;
   }
-  void status(const std::string &d, bool full = 1) const override {
+  void status(std::string const &d, bool full = 1) const override {
     kul::Process p("git", d);
     try {
       p << "status";
@@ -176,7 +176,7 @@ class Git : public SCM {
       KEXCEPT(Exception, "SCM ERROR " + std::string(e.what()));
     }
   }
-  void diff(const std::string &d) const override {
+  void diff(std::string const &d) const override {
     kul::Process p("git", d);
     try {
       p.arg("diff").start();
@@ -189,7 +189,7 @@ class Git : public SCM {
 /*
 class Svn : public SCM {
  public:
-  const std::string co(const std::string &d, const std::string &r, const
+  const std::string co(std::string const&d, std::string const&r, const
 std::string &v) const KTHROW(Exception) { Dir dr(d, true); kul::Process p("svn",
 d); p.arg("checkout").arg(kul::env::GET("KUL_SVN_CO")); if (v.empty()) p.arg(r);
     else
@@ -203,27 +203,27 @@ version");
     }
     return p.toString();
   }
-  void up(const std::string &d, const std::string &r, const std::string &v)
+  void up(std::string const&d, std::string const&r, std::string const&v)
 const KTHROW(Exception) { if (!Dir(d).is()) co(d, r, v); else KEXCEPT(Exception,
 "SCM ERROR - SVN NOT IMPLEMENTED");
   }
   // svn info . | lines | split | ifeq "Repository Root" go |
   // http://svnbook.red-bean.com/en/1.6/svn.ref.svn.c.info.html
-  const std::string origin(const std::string &d) const {
+  const std::string origin(std::string const&d) const {
     KEXCEPT(Exception, "SCM ERROR - SVN NOT IMPLEMENTED");
   }
-  const std::string localVersion(const std::string &d, const std::string &b)
+  const std::string localVersion(std::string const&d, std::string const&b)
 const { KEXCEPT(Exception, "SCM ERROR - SVN NOT IMPLEMENTED");
   }
-  const std::string remoteVersion(const std::string &url, const std::string &b)
+  const std::string remoteVersion(std::string const&url, std::string const&b)
 const KTHROW(Exception) { KEXCEPT(Exception, "SCM ERROR - SVN NOT IMPLEMENTED");
   }
 
-  bool hasChanges(const std::string &d) const {
+  bool hasChanges(std::string const&d) const {
     KEXCEPT(Exception, "SCM ERROR - SVN NOT IMPLEMENTED");
   }
-  void status(const std::string &d, bool full) const { KEXCEPT(Exception, "SCM
-ERROR - SVN NOT IMPLEMENTED"); } void diff(const std::string &d) const {
+  void status(std::string const&d, bool full) const { KEXCEPT(Exception, "SCM
+ERROR - SVN NOT IMPLEMENTED"); } void diff(std::string const&d) const {
 KEXCEPT(Exception, "SCM ERROR - SVN NOT IMPLEMENTED"); }
 };
 */

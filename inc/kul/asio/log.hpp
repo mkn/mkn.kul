@@ -40,7 +40,7 @@ namespace log {
 
 class Exception : public kul::Exception {
  public:
-  Exception(const char *f, const uint16_t &l, const std::string &s) : kul::Exception(f, l, s) {}
+  Exception(char const *f, uint16_t const &l, std::string const &s) : kul::Exception(f, l, s) {}
 };
 }  // namespace log
 
@@ -50,20 +50,20 @@ class Logger : public kul::Logger {
 
  private:
   kul::ChroncurrentThreadPool<> ctp;
-  std::function<void(const std::string &)> defE, defO;
+  std::function<void(std::string const &)> defE, defO;
 
  public:
   Logger()
       : ctp(1, 1),
-        defE([&](const std::string &s) { kul::Logger::err(s); }),
-        defO([&](const std::string &s) { kul::Logger::out(s); }) {}
-  void err(const std::string &s) override {
+        defE([&](std::string const &s) { kul::Logger::err(s); }),
+        defO([&](std::string const &s) { kul::Logger::out(s); }) {}
+  void err(std::string const &s) override {
     if (e)
       ctp.async(std::bind(e, s));
     else
       ctp.async(std::bind(defE, s));
   }
-  void out(const std::string &s) override {
+  void out(std::string const &s) override {
     if (o)
       ctp.async(std::bind(o, s));
     else
@@ -97,15 +97,14 @@ class Message {
   }
 };
 class LogMessage : public Message {
-
  public:
   ~LogMessage() { LogMan::INSTANCE().log(f, fn, l, m, ss.str()); }
-  LogMessage(const char *_f, const char *_fn, const uint16_t &_l, const kul::log::mode &_m)
+  LogMessage(char const *_f, char const *_fn, uint16_t const &_l, const kul::log::mode &_m)
       : Message(_m), f(_f), fn(_fn), l(_l) {}
 
  private:
-  const char *f, *fn;
-  const uint16_t &l;
+  char const *f, *fn;
+  uint16_t const &l;
 };
 struct OutMessage : public Message {
   OutMessage(const kul::log::mode &_m = kul::log::mode::NON) : Message(_m) {}

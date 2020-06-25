@@ -50,7 +50,7 @@ namespace ipc {
 
 class Exception : public kul::Exception {
  public:
-  Exception(const char *f, const uint16_t &l, const std::string &s) : kul::Exception(f, l, s) {}
+  Exception(char const *f, uint16_t const &l, std::string const &s) : kul::Exception(f, l, s) {}
 };
 
 class Server {
@@ -79,7 +79,7 @@ class Server {
   }
 
  protected:
-  virtual void handle(const std::string &s) { KOUT(INF) << s; }
+  virtual void handle(std::string const &s) { KOUT(INF) << s; }
 
  public:
   virtual ~Server() {
@@ -113,7 +113,7 @@ class Server {
         uuid(_KUL_IPC_UUID_PREFIX_ + std::string("pid\\") + std::to_string(kul::this_proc::id())) {
     start();
   }
-  Server(const std::string &ui, const int16_t &lp = -1) KTHROW(Exception)
+  Server(std::string const &ui, const int16_t &lp = -1) KTHROW(Exception)
       : uuid(_KUL_IPC_UUID_PREFIX_ + ui), lp(lp) {
     start();
   }
@@ -155,12 +155,12 @@ class Client {
 
  public:
   virtual ~Client() { stop(); }
-  Client(const std::string &ui) KTHROW(Exception) : uuid(_KUL_IPC_UUID_PREFIX_ + ui) { start(); }
+  Client(std::string const &ui) KTHROW(Exception) : uuid(_KUL_IPC_UUID_PREFIX_ + ui) { start(); }
   Client(const int16_t &pid) KTHROW(Exception)
       : uuid(_KUL_IPC_UUID_PREFIX_ + std::string("pid\\") + std::to_string(pid)) {
     start();
   }
-  virtual void send(const std::string &m) const KTHROW(Exception) {
+  virtual void send(std::string const &m) const KTHROW(Exception) {
     DWORD cbToWrite, cbWritten;
     LPTSTR lpvMessage = _strdup(m.c_str());
     cbToWrite = (lstrlen(lpvMessage) + 1) * sizeof(TCHAR);

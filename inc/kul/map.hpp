@@ -94,7 +94,7 @@ namespace kul {
 
 struct StdStringComparator {
  public:
-  bool operator()(const std::string &s1, const std::string &s2) const {
+  bool operator()(std::string const &s1, std::string const &s2) const {
     return (s1.compare(s2) == 0);
   }
 };

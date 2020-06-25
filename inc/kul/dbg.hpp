@@ -45,7 +45,7 @@ class StackTrace {
   StackTrace(const StackTrace &) = delete;
   StackTrace &operator=(const StackTrace &) = delete;
   StackTrace &operator=(const StackTrace &&) = delete;
-  StackTrace(const std::string &s) { _stk.emplace_back(s); }
+  StackTrace(std::string const &s) { _stk.emplace_back(s); }
   StackTrace(const StackTrace &&that) {
     if (this != &that) this->_stk = that._stk;
   }
@@ -98,11 +98,11 @@ class FunctionScope {
  private:
 #if defined(KUL_FORCE_TRACE) || !defined(NDEBUG)
   uint64_t m_start = 0, m_li = 0;
-  const char *m_fi = nullptr, *m_fu = nullptr;
+  char const *m_fi = nullptr, *m_fu = nullptr;
 #endif  // defined(KUL_FORCE_TRACE) || !defined(NDEBUG)
  public:
 #if defined(KUL_FORCE_TRACE) || !defined(NDEBUG)
-  FunctionScope(const char *fi, const char *fu, const uint16_t &li)
+  FunctionScope(char const *fi, char const *fu, uint16_t const &li)
       : m_start(kul::Now::MICROS()), m_li(li), m_fi(fi), m_fu(fu) {
     KUL_DBG_FUNC_ON_ENTER
   }

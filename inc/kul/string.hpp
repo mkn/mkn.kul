@@ -47,7 +47,7 @@ enum STR_INT_RET { IS_SUCCESS = 0, IS_OVERFLOW, IS_UNDERFLOW, IS_INCONVERTIBLE }
 
 class StringException : public kul::Exception {
  public:
-  StringException(const char *f, const uint16_t &l, const std::string &s)
+  StringException(char const *f, uint16_t const &l, std::string const &s)
       : kul::Exception(f, l, s) {}
 };
 
@@ -74,21 +74,21 @@ class StringOpHelper {
 
 class String {
  public:
-  static void REPLACE(std::string &s, const std::string &f, const std::string &r) {
+  static void REPLACE(std::string &s, std::string const &f, std::string const &r) {
     size_t p = 0;
     if ((p = s.find(f)) != std::string::npos) s.replace(p, f.size(), r);
   }
-  static void REPLACE_ALL(std::string &s, const std::string &f, const std::string &r) {
+  static void REPLACE_ALL(std::string &s, std::string const &f, std::string const &r) {
     size_t p = s.find(f);
     while (p != std::string::npos) {
       s.replace(s.find(f, p), f.size(), r);
       p = s.find(f, p + r.size());
     }
   }
-  static void TRIM_LEFT(std::string &s, const char &delim = ' ') {
+  static void TRIM_LEFT(std::string &s, char const &delim = ' ') {
     while (s.find(delim) == 0) s.erase(0, 1);
   }
-  static void TRIM_RIGHT(std::string &s, const char &delim = ' ') {
+  static void TRIM_RIGHT(std::string &s, char const &delim = ' ') {
     while (s.rfind(delim) == s.size() - 1) s.pop_back();
   }
   static void TRIM(std::string &s) {
@@ -102,15 +102,15 @@ class String {
     for (auto &v : strs) TRIM(v);
   }
 
-  static void PAD(std::string &s, const uint16_t &p) {
+  static void PAD(std::string &s, uint16_t const &p) {
     while (s.size() < p) s += " ";
   }
-  static std::vector<std::string> SPLIT(const std::string &s, const char &d) {
+  static std::vector<std::string> SPLIT(std::string const &s, char const &d) {
     std::vector<std::string> v;
     SPLIT(s, d, v);
     return v;
   }
-  static void SPLIT(const std::string &s, const char &d, std::vector<std::string> &v) {
+  static void SPLIT(std::string const &s, char const &d, std::vector<std::string> &v) {
     if (s.find(d) != std::string::npos) {
       std::string l;
       std::stringstream stream(s);
@@ -119,12 +119,12 @@ class String {
     } else
       v.push_back(s);
   }
-  static std::vector<std::string> SPLIT(const std::string &s, const std::string &d) {
+  static std::vector<std::string> SPLIT(std::string const &s, std::string const &d) {
     std::vector<std::string> v;
     SPLIT(s, d, v);
     return v;
   }
-  static void SPLIT(const std::string &s, const std::string &d, std::vector<std::string> &v) {
+  static void SPLIT(std::string const &s, std::string const &d, std::vector<std::string> &v) {
     std::string l = s;
     size_t pos = 0;
     while ((pos = l.find(d)) != std::string::npos) {
@@ -133,14 +133,14 @@ class String {
     }
     v.push_back(l);
   }
-  static std::vector<std::string> ESC_SPLIT(const std::string &s, const char &d,
-                                            const char &e = '\\') {
+  static std::vector<std::string> ESC_SPLIT(std::string const &s, char const &d,
+                                            char const &e = '\\') {
     std::vector<std::string> v;
     ESC_SPLIT(s, d, v, e);
     return v;
   }
-  static void ESC_SPLIT(const std::string &s, const char &d, std::vector<std::string> &v,
-                        const char &e = '\\') {
+  static void ESC_SPLIT(std::string const &s, char const &d, std::vector<std::string> &v,
+                        char const &e = '\\') {
     std::string l = s, ds = std::string(1, d), es = std::string(1, e);
     std::string tmp = l;
     size_t pos = 0, esc = 0;
@@ -166,12 +166,12 @@ class String {
     std::transform(b.begin(), b.end(), b.begin(), ::tolower);
     return (a == b);
   }
-  static std::vector<std::string> LINES(const std::string &s) {
+  static std::vector<std::string> LINES(std::string const &s) {
     std::vector<std::string> v;
     LINES(s, v);
     return v;
   }
-  static void LINES(const std::string &s, std::vector<std::string> &v) {
+  static void LINES(std::string const &s, std::vector<std::string> &v) {
     if (s.find("\n") != std::string::npos) {
       std::string l;
       std::stringstream ss(s);
@@ -191,8 +191,8 @@ class String {
     KEXCEPT(StringException, "input not bool-able, " + s);
   }
 
-  static uint16_t UINT16(const std::string &str) KTHROW(StringException) {
-    auto lambda = [](const char *s, uint32_t &lresult) {
+  static uint16_t UINT16(std::string const &str) KTHROW(StringException) {
+    auto lambda = [](char const *s, uint32_t &lresult) {
       char *end;
       errno = 0;
       lresult = strtoul(s, &end, 10);
@@ -209,8 +209,8 @@ class String {
     if (result != lresult) KEXCEPT(StringException, "UINT16 conversion failed");
     return result;
   }
-  static int16_t INT16(const std::string &str) KTHROW(StringException) {
-    auto lambda = [](const char *s, int32_t &lresult) {
+  static int16_t INT16(std::string const &str) KTHROW(StringException) {
+    auto lambda = [](char const *s, int32_t &lresult) {
       char *end;
       errno = 0;
       lresult = strtol(s, &end, 10);
@@ -229,8 +229,8 @@ class String {
     return result;
   }
 
-  static uint32_t UINT32(const std::string &str) KTHROW(StringException) {
-    auto lambda = [](const char *s, uint64_t &lresult) {
+  static uint32_t UINT32(std::string const &str) KTHROW(StringException) {
+    auto lambda = [](char const *s, uint64_t &lresult) {
       char *end;
       errno = 0;
       lresult = strtoull(s, &end, 10);
@@ -247,8 +247,8 @@ class String {
     if (result != lresult) KEXCEPT(StringException, "UINT32 conversion failed");
     return result;
   }
-  static int32_t INT32(const std::string &str) KTHROW(StringException) {
-    auto lambda = [](const char *s, int64_t &lresult) {
+  static int32_t INT32(std::string const &str) KTHROW(StringException) {
+    auto lambda = [](char const *s, int64_t &lresult) {
       char *end;
       errno = 0;
       lresult = strtoll(s, &end, 10);
@@ -267,8 +267,8 @@ class String {
     return result;
   }
 
-  static uint64_t UINT64(const std::string &str) KTHROW(StringException) {
-    auto lambda = [](const char *s, uint64_t &lresult) {
+  static uint64_t UINT64(std::string const &str) KTHROW(StringException) {
+    auto lambda = [](char const *s, uint64_t &lresult) {
       char *end;
       errno = 0;
       lresult = strtoull(s, &end, 10);
@@ -286,8 +286,8 @@ class String {
     return result;
   }
 
-  static int64_t INT64(const std::string &str) KTHROW(StringException) {
-    auto lambda = [](const char *s, int64_t &lresult) {
+  static int64_t INT64(std::string const &str) KTHROW(StringException) {
+    auto lambda = [](char const *s, int64_t &lresult) {
       char *end;
       errno = 0;
       lresult = strtoll(s, &end, 10);

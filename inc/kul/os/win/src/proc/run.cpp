@@ -117,7 +117,7 @@ for (lpszVariable = (LPTSTR)lpvEnv; *lpszVariable; lpszVariable++) {
 }
 if (FreeEnvironmentStrings(lpvEnv) == 0) error(__LINE__, "FreeEnvironmentStrings() failed");
 
-const char *dir = directory().empty() ? 0 : directory().c_str();
+char const *dir = directory().empty() ? 0 : directory().c_str();
 std::string cmd(toString());
 
 expand(cmd);

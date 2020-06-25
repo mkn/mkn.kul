@@ -54,7 +54,7 @@ class NodeValidator;
 
 class Exception : public kul::Exception {
  public:
-  Exception(const char *f, const uint16_t &l, const std::string &s) : kul::Exception(f, l, s) {}
+  Exception(char const *f, uint16_t const &l, std::string const &s) : kul::Exception(f, l, s) {}
 };
 
 enum NodeType { NON = 0, STRING, LIST, MAP };
@@ -67,13 +67,13 @@ class NodeValidator {
   std::vector<NodeValidator> kids;
 
  public:
-  NodeValidator(const std::string n, bool m = 0) : m(m), typ(STRING), nam(n) {}
-  NodeValidator(const std::string n, const std::vector<NodeValidator> &c, bool m,
+  NodeValidator(std::string const &n, bool m = 0) : m(m), typ(STRING), nam(n) {}
+  NodeValidator(std::string const &n, const std::vector<NodeValidator> &c, bool m,
                 const NodeType &typ)
       : m(m), typ(typ), nam(n), kids(c) {}
   const std::vector<NodeValidator> &children() const { return this->kids; }
   bool mandatory() const { return this->m; }
-  const std::string &name() const { return this->nam; }
+  std::string const &name() const { return this->nam; }
   const NodeType &type() const { return this->typ; }
 };
 
@@ -84,13 +84,13 @@ class Item {
   YAML::Node r;  // root
 
   Item() {}
-  Item(const YAML::Node &r) : r(r) {}
+  Item(YAML::Node const &r) : r(r) {}
 
  public:
   virtual ~Item() {}
-  const YAML::Node &root() const { return r; }
+  YAML::Node const &root() const { return r; }
 
-  static void VALIDATE(const YAML::Node &n, const std::vector<NodeValidator> &nvs)
+  static void VALIDATE(YAML::Node const &n, const std::vector<NodeValidator> &nvs)
       KTHROW(Exception) {
     KUL_DBG_FUNC_ENTER
     kul::hash::set::String keys;
@@ -98,7 +98,7 @@ class Item {
       if (nv.name() == "*") return;
 
     for (YAML::const_iterator it = n.begin(); it != n.end(); ++it) {
-      const std::string &key(it->first.as<std::string>());
+      std::string const &key(it->first.as<std::string>());
       if (keys.count(key)) KEXCEPTION("Duplicate key detected: " + key);
       keys.insert(key);
       bool f = 0;
@@ -127,7 +127,7 @@ class Validator {
  public:
   Validator(const std::vector<NodeValidator> &kids) : kids(kids) {}
   const std::vector<NodeValidator> &children() const { return this->kids; }
-  void validate(const YAML::Node &n) { Item::VALIDATE(n, children()); }
+  void validate(YAML::Node const &n) { Item::VALIDATE(n, children()); }
 };
 
 class String : public Item {
@@ -135,14 +135,14 @@ class String : public Item {
   const std::string s;
 
  public:
-  String(const std::string &s) KTHROW(Exception) : s(s) {
+  String(std::string const &s) KTHROW(Exception) : s(s) {
     try {
       r = YAML::Load(s);
     } catch (const std::exception &e) {
       KEXCEPTION("YAML failed to parse\nError/String: " + std::string(e.what())) << "\n" << s;
     }
   }
-  const YAML::Node &validate(const Validator &&v) KTHROW(Exception) {
+  YAML::Node const &validate(const Validator &&v) KTHROW(Exception) {
     Item::VALIDATE(root(), v.children());
     return r;
   }
@@ -151,7 +151,7 @@ class String : public Item {
 class File : public Item {
  public:
   template <class T>
-  static T CREATE(const std::string &f) KTHROW(Exception) {
+  static T CREATE(std::string const &f) KTHROW(Exception) {
     T file(f);
     try {
       Item::VALIDATE(file.root(), file.validator().children());
@@ -161,7 +161,7 @@ class File : public Item {
     return file;
   }
   virtual ~File() {}
-  const std::string &file() const { return f; }
+  std::string const &file() const { return f; }
   const virtual Validator validator() const = 0;
 
  protected:
@@ -172,9 +172,9 @@ class File : public Item {
       KEXCEPTION("YAML failed to parse\nFile: " + f);
     }
   }
-  File(const File &f) : Item(f.r), f(f.f) {}
-  File(const kul::File &f) KTHROW(Exception) : f(f.real()) { reload(); }
-  File(const std::string &f) KTHROW(Exception) : f(f) { reload(); }
+  File(File const &f) : Item(f.r), f(f.f) {}
+  File(kul::File const &f) KTHROW(Exception) : f(f.real()) { reload(); }
+  File(std::string const &f) KTHROW(Exception) : f(f) { reload(); }
 
  private:
   const std::string f;  // file

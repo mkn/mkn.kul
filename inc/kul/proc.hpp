@@ -56,7 +56,7 @@ namespace proc {
 
 class Exception : public kul::Exception {
  public:
-  Exception(const char *f, const uint16_t &l, const std::string &s) : kul::Exception(f, l, s) {}
+  Exception(char const *f, uint16_t const &l, std::string const &s) : kul::Exception(f, l, s) {}
 };
 
 class ExitException : public kul::proc::Exception {
@@ -64,7 +64,7 @@ class ExitException : public kul::proc::Exception {
   const short ec;
 
  public:
-  ExitException(const char *f, const uint16_t &l, const short _ec, const std::string &s)
+  ExitException(char const *f, uint16_t const &l, const short _ec, std::string const &s)
       : Exception(f, l, s), ec(_ec) {}
   const short &code() const { return ec; }
 };
@@ -73,7 +73,7 @@ class Call {
  private:
   std::string cwd;
   const std::string d;
-  const std::string &s;
+  std::string const &s;
   kul::hash::map::S2S oldEvs;
   void setCWD() {
     if (d.size()) {
@@ -88,12 +88,12 @@ class Call {
     for (const std::pair<std::string, std::string> &oldEv : oldEvs)
       kul::env::SET(oldEv.first.c_str(), oldEv.second.c_str());
   }
-  Call(const std::string &_s, const std::string &_d = "") : d(_d), s(_s) { setCWD(); }
-  Call(const std::string &_s, const kul::hash::map::S2S &evs, const std::string &_d = "")
+  Call(std::string const &_s, std::string const &_d = "") : d(_d), s(_s) { setCWD(); }
+  Call(std::string const &_s, const kul::hash::map::S2S &evs, std::string const &_d = "")
       : d(_d), s(_s) {
     setCWD();
     for (const auto &ev : evs) {
-      const std::string &v = kul::env::GET(ev.first.c_str());
+      std::string const &v = kul::env::GET(ev.first.c_str());
       if (v.size()) oldEvs.insert(ev.first, v);
       kul::env::SET(ev.first.c_str(), ev.second.c_str());
     }
@@ -108,19 +108,19 @@ class AProcess {
   const bool wfe = 1;
   int32_t pec = -1, pi = 0;
   const std::string d;
-  std::function<void(const std::string &)> e, o;
+  std::function<void(std::string const &)> e, o;
   std::vector<std::string> argv;
   kul::hash::map::S2S evs;
   friend std::ostream &operator<<(std::ostream &, const AProcess &);
 
  protected:
-  AProcess(const std::string &cmd, const bool &_wfe) : wfe(_wfe) { argv.push_back(cmd); }
-  AProcess(const std::string &cmd, const std::string &_d, const bool &_wfe) : wfe(_wfe), d(_d) {
+  AProcess(std::string const &cmd, const bool &_wfe) : wfe(_wfe) { argv.push_back(cmd); }
+  AProcess(std::string const &cmd, std::string const &_d, const bool &_wfe) : wfe(_wfe), d(_d) {
     argv.push_back(cmd);
   }
   virtual ~AProcess() {}
 
-  const std::string &directory() const { return d; }
+  std::string const &directory() const { return d; }
   void setFinished() { f = 1; }
   virtual bool kill(int16_t k = 6) = 0;
   virtual void preStart() {}
@@ -132,19 +132,19 @@ class AProcess {
 
   const std::vector<std::string> &args() const { return argv; };
   const kul::hash::map::S2S &vars() const { return evs; }
-  virtual void out(const std::string &_s) {
+  virtual void out(std::string const &_s) {
     if (this->o)
       this->o(_s);
     else
       printf("%s", _s.c_str());
   }
-  virtual void err(const std::string &_s) {
+  virtual void err(std::string const &_s) {
     if (this->e)
       this->e(_s);
     else
       fprintf(stderr, "%s", _s.c_str());
   }
-  void error(const int16_t &line, const std::string &_s) KTHROW(kul::Exception) {
+  void error(const int16_t &line, std::string const &_s) KTHROW(kul::Exception) {
     tearDown();
     throw Exception("kul/proc.hpp", line, _s);
   }
@@ -158,16 +158,16 @@ class AProcess {
     if (ss.str().size()) argv.push_back(ss.str());
     return *this;
   }
-  AProcess &arg(const std::string &a) {
+  AProcess &arg(std::string const &a) {
     argv.push_back(a);
     return *this;
   }
-  AProcess &args(const std::string &a) {
+  AProcess &args(std::string const &a) {
     if (a.size())
       for (const auto &c : kul::cli::asArgs(a)) argv.push_back(c);
     return *this;
   }
-  AProcess &var(const std::string &n, const std::string &v) {
+  AProcess &var(std::string const &n, std::string const &v) {
     evs[n] = v;
     return *this;
   }
@@ -183,12 +183,12 @@ class AProcess {
   bool started() const { return pi > 0; }
   bool finished() const { return f; }
   const int32_t &exitCode() { return pec; }
-  AProcess &operator<<(const std::string &_s) {
+  AProcess &operator<<(std::string const &_s) {
     arg(_s);
     return *this;
   }
-  void setOut(std::function<void(const std::string &)> _o) { this->o = _o; }
-  void setErr(std::function<void(const std::string &)> _e) { this->e = _e; }
+  void setOut(std::function<void(std::string const &)> _o) { this->o = _o; }
+  void setErr(std::function<void(std::string const &)> _e) { this->e = _e; }
 };
 
 inline std::ostream &operator<<(std::ostream &s, const AProcess &p) { return s << p.toString(); }
@@ -200,8 +200,8 @@ class ProcessCapture {
  protected:
   ProcessCapture() {}
   ProcessCapture(const ProcessCapture &pc) : so(pc.so.str()), se(pc.se.str()) {}
-  virtual void out(const std::string &s) { so << s; }
-  virtual void err(const std::string &s) { se << s; }
+  virtual void out(std::string const &s) { so << s; }
+  virtual void err(std::string const &s) { se << s; }
 
  public:
   ProcessCapture(AProcess &p) { setProcess(p); }

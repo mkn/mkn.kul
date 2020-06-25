@@ -90,15 +90,16 @@ template <typename T>
 struct ApplySingleTupleValue {
   constexpr ApplySingleTupleValue(T t_) : t{t_} {}
   template <size_t i>
-  constexpr decltype(auto) operator()() { return t; }
+  constexpr decltype(auto) operator()() {
+    return t;
+  }
   T t;
 };
 
 template <typename T, size_t Size>
-constexpr decltype(auto) tuple_from(T t){
+constexpr decltype(auto) tuple_from(T t) {
   return for_N<Size>(ApplySingleTupleValue{t});
 }
-
 
 }  // namespace kul
 

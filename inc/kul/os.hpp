@@ -52,7 +52,7 @@ class File;
 namespace fs {
 class Exception : public kul::Exception {
  public:
-  Exception(const char *f, const uint16_t &l, const std::string &s) : kul::Exception(f, l, s) {}
+  Exception(char const *f, uint16_t const &l, std::string const &s) : kul::Exception(f, l, s) {}
 };
 
 class TimeStamps {
@@ -81,13 +81,13 @@ class Item {
 class Dir : public fs::Item {
  private:
   std::string _p;
-  static fs::TimeStamps TIMESTAMPS(const std::string &s) {
+  static fs::TimeStamps TIMESTAMPS(std::string const &s) {
     uint64_t a = 0, c = 0, m = 0;
     fs::KulTimeStampsResolver::GET(s.c_str(), a, c, m);
     return fs::TimeStamps(a, c, m);
   }
   static inline std::string LOCL(std::string s);
-  static void ESC_REPLACE(std::string &s, const std::string &f, const std::string &r) {
+  static void ESC_REPLACE(std::string &s, std::string const &f, std::string const &r) {
     size_t p = s.find(f);
     while (p != std::string::npos) {
       s.replace(s.find(f, p), f.size(), r);
@@ -95,11 +95,11 @@ class Dir : public fs::Item {
     }
   }
   static inline std::string ESC(std::string s);
-  static std::string PRNT(const std::string &s) {
-    const std::string &p = s.substr(0, s.rfind(SEP()) + 1);
+  static std::string PRNT(std::string const &s) {
+    std::string const &p = s.substr(0, s.rfind(SEP()) + 1);
     return kul::Dir(p).root() ? p : s.substr(0, s.rfind(SEP()));
   }
-  static std::string MINI(const std::string &a) {
+  static std::string MINI(std::string const &a) {
     return a.find(env::CWD()) == std::string::npos
                ? a
                : a.compare(env::CWD()) == 0 ? a.substr(std::string(env::CWD()).size())
@@ -108,31 +108,31 @@ class Dir : public fs::Item {
 
  public:
   Dir() : _p() {}
-  Dir(const char *p, bool m = false) KTHROW(fs::Exception) : Dir(std::string(p), m) {}
-  Dir(const std::string &p, bool m = false) KTHROW(fs::Exception) : _p(Dir::LOCL(p)) {
+  Dir(char const *p, bool m = false) KTHROW(fs::Exception) : Dir(std::string(p), m) {}
+  Dir(std::string const &p, bool m = false) KTHROW(fs::Exception) : _p(Dir::LOCL(p)) {
 #ifndef _WIN32
     if (p.size() && p[0] == '~') this->_p = (env::GET("HOME") + p.substr(1));
 #endif
     if (m && !is() && !mk()) KEXCEPT(fs::Exception, "Invalid directory path provided");
   }
-  Dir(const Dir &d) : _p(d._p) {}
-  Dir(const std::string &s, const Dir &d) : _p(d.join(s)) {}
+  Dir(Dir const &d) : _p(d._p) {}
+  Dir(std::string const &s, Dir const &d) : _p(d.join(s)) {}
 
-  bool cp(const Dir &d) const;
-  bool mv(const Dir &d) const { return std::rename(this->path().c_str(), d.path().c_str()); }
+  bool cp(Dir const &d) const;
+  bool mv(Dir const &d) const { return std::rename(this->path().c_str(), d.path().c_str()); }
 
   inline void rm() const;
   inline bool is() const;
   inline bool mk() const;
   inline bool root() const;
 
-  const std::string join(const std::string &s) const {
+  const std::string join(std::string const &s) const {
     return _p.size() == 0 ? s : root() ? path() + s : JOIN(path(), s);
   }
   const std::string name() const {
     return root() ? path() : path().substr(path().rfind(SEP()) + 1);
   }
-  const std::string &path() const { return _p; }
+  std::string const &path() const { return _p; }
 
   std::string esc() const { return ESC(path()); }
   std::string escr() const { return ESC(is() ? real() : path()); }
@@ -148,9 +148,9 @@ class Dir : public fs::Item {
   inline std::vector<Dir> dirs(bool incHidden = false) const KTHROW(fs::Exception);
   inline std::vector<File> files(bool recursive = false) const KTHROW(fs::Exception);
 
-  static std::string JOIN(const std::string &a, const std::string &b) { return a + SEP() + b; }
+  static std::string JOIN(std::string const &a, std::string const &b) { return a + SEP() + b; }
 
-  static inline std::string REAL(const std::string &s) KTHROW(fs::Exception);
+  static inline std::string REAL(std::string const &s) KTHROW(fs::Exception);
 
 #ifdef _WIN32
   static std::string SEP() { return std::string("\\"); }
@@ -159,17 +159,17 @@ class Dir : public fs::Item {
 #endif
   friend class File;
 
-  Dir &operator=(const Dir &d) {
+  Dir &operator=(Dir const &d) {
     this->_p = d._p;
     return *this;
   }
-  bool operator==(const Dir &d) const {
+  bool operator==(Dir const &d) const {
     if (is() && d.is()) return real().compare(d.real()) == 0;
     return path().compare(d.path()) == 0;
   }
   explicit operator bool() const { return is(); }
 
-  std::string relative(const kul::Dir &r) const {
+  std::string relative(kul::Dir const &r) const {
     const auto &l(*this);
     std::string left = l.real(), right = r.real();
     auto l_p = l, r_p = r;
@@ -194,7 +194,7 @@ class Dir : public fs::Item {
   }
 };
 
-inline std::ostream &operator<<(std::ostream &s, const Dir &d) { return s << d.path(); }
+inline std::ostream &operator<<(std::ostream &s, Dir const &d) { return s << d.path(); }
 
 class File : public fs::Item {
  private:
@@ -203,7 +203,7 @@ class File : public fs::Item {
 
  public:
   File() : _n(), _d() {}
-  File(const std::string &n, bool m = false) : _n(Dir::LOCL(n)), _d(env::CWD()) {
+  File(std::string const &n, bool m = false) : _n(Dir::LOCL(n)), _d(env::CWD()) {
     if (is()) {
       try {
         this->_n = Dir::REAL(this->_n);
@@ -223,17 +223,17 @@ class File : public fs::Item {
       }
     }
   }
-  File(const char *n, bool m = false) : File(std::string(n), m) {}
-  File(const std::string &n, const Dir &d) : _n(n), _d(d) {}
-  File(const std::string &n, const char *c) : _n(n), _d(c) {}
-  File(const std::string &n, const std::string &d1) : _n(n), _d(d1) {}
-  File(const File &f) : _n(f._n), _d(f._d) {}
+  File(char const *n, bool m = false) : File(std::string(n), m) {}
+  File(std::string const &n, Dir const &d) : _n(n), _d(d) {}
+  File(std::string const &n, char const *c) : _n(n), _d(c) {}
+  File(std::string const &n, std::string const &d1) : _n(n), _d(d1) {}
+  File(File const &f) : _n(f._n), _d(f._d) {}
 
-  bool cp(const Dir &d) const {
+  bool cp(Dir const &d) const {
     if (!d.is() && !d.mk()) KEXCEPT(fs::Exception, "Directory: \"" + _d.path() + "\" is not valid");
     return cp(kul::File(name(), d._p));
   }
-  bool cp(const File &f) const {
+  bool cp(File const &f) const {
     std::ifstream src(_d.join(_n), std::ios::binary);
     std::ofstream dst(f.dir().join(f.name()), std::ios::binary);
     return (bool)(dst << src.rdbuf());
@@ -243,12 +243,12 @@ class File : public fs::Item {
   inline bool mk() const;
   inline bool rm() const;
 
-  bool mv(const File &f) const { return std::rename(this->full().c_str(), f.full().c_str()); }
-  bool mv(const Dir &d) const {
+  bool mv(File const &f) const { return std::rename(this->full().c_str(), f.full().c_str()); }
+  bool mv(Dir const &d) const {
     return std::rename(this->full().c_str(), d.join(this->name()).c_str());
   }
 
-  const std::string &name() const { return _n; }
+  std::string const &name() const { return _n; }
 
   std::string esc() const { return Dir::ESC(full()); }
   std::string escr() const { return Dir::ESC(is() ? real() : full()); }
@@ -259,26 +259,26 @@ class File : public fs::Item {
 
   inline uint64_t size() const;
 
-  const Dir &dir() const { return _d; }
+  Dir const &dir() const { return _d; }
   fs::TimeStamps timeStamps() const { return Dir::TIMESTAMPS(mini()); }
 
-  File &operator=(const File &f) = default;
-  bool operator==(const File &f) const {
+  File &operator=(File const &f) = default;
+  bool operator==(File const &f) const {
     if (is() && f.is()) return real().compare(f.real()) == 0;
     return full().compare(f.full()) == 0;
   }
   explicit operator bool() const { return is(); }
 
-  std::string relative(const kul::Dir &r) const { return this->dir().relative(r); }
+  std::string relative(kul::Dir const &r) const { return this->dir().relative(r); }
 
-  std::string relative(const kul::File &r) const {
+  std::string relative(kul::File const &r) const {
     std::string rel = this->dir().relative(r.dir());
     rel += Dir::SEP() + r.name();
     return rel;
   }
 };
 
-inline bool kul::Dir::cp(const Dir &d) const {
+inline bool kul::Dir::cp(Dir const &d) const {
   if (!d.is() && !d.mk()) KEXCEPT(fs::Exception, "Directory: \"" + d.path() + "\" is not valid");
   Dir c(d.join(name()));
   c.mk();
@@ -287,7 +287,7 @@ inline bool kul::Dir::cp(const Dir &d) const {
   return 1;
 }
 
-inline std::ostream &operator<<(std::ostream &s, const File &d) { return s << d.full(); }
+inline std::ostream &operator<<(std::ostream &s, File const &d) { return s << d.full(); }
 
 }  // namespace kul
 
@@ -300,12 +300,12 @@ class PushDir {
   kul::Dir m_dir;
 
  public:
-  PushDir(const std::string &d) : m_dir(d) {
+  PushDir(std::string const &d) : m_dir(d) {
     if (!m_dir) KEXCEPTION("PushDir directory does not exist: ") << d;
     cwd = kul::env::CWD();
     kul::env::CWD(m_dir.real());
   }
-  PushDir(const kul::Dir &d) : m_dir(d) {
+  PushDir(kul::Dir const &d) : m_dir(d) {
     if (!m_dir) KEXCEPTION("PushDir directory does not exist: ") << d;
     cwd = kul::env::CWD();
     kul::env::CWD(m_dir.real());
@@ -317,7 +317,7 @@ class PushDir {
 
 namespace env {
 
-inline std::string WHERE(const char *c) {
+inline std::string WHERE(char const *c) {
   for (const auto &s : kul::String::SPLIT(env::GET("PATH"), kul::env::SEP())) {
     const kul::Dir d(s);
     if (d)
@@ -327,7 +327,7 @@ inline std::string WHERE(const char *c) {
   return "";
 }
 
-inline bool WHICH(const char *c) { return WHERE(c).size(); }
+inline bool WHICH(char const *c) { return WHERE(c).size(); }
 }  // namespace env
 }  // namespace kul
 

@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // void kul_real_se_handler(EXCEPTION_POINTERS* pExceptionInfo){
 
-const std::string &tid(kul::this_thread::id());
+std::string const &tid(kul::this_thread::id());
 uint16_t sig = pExceptionInfo->ExceptionRecord->ExceptionCode;
 if (pExceptionInfo->ExceptionRecord->ExceptionCode == EXCEPTION_ACCESS_VIOLATION)
   kul_sig_function_handler(sig = 11);

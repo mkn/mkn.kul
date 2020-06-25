@@ -41,7 +41,7 @@ namespace kul {
 class WString {
  public:
   static std::string toString(const std::wstring &ws) { return std::string(ws.begin(), ws.end()); }
-  static std::wstring toWString(const std::string &s) { return std::wstring(s.begin(), s.end()); }
+  static std::wstring toWString(std::string const &s) { return std::wstring(s.begin(), s.end()); }
   static void replace(std::wstring &s, const std::wstring &f, const std::wstring &r) {
     s = s.substr(0, s.find(f)) + r + s.substr(s.find(f) + f.size());
   }

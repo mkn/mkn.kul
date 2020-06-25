@@ -58,7 +58,7 @@ namespace kul {
 
 class Exception : public std::runtime_error {
  public:
-  Exception(const char *f, const uint16_t &l, const std::string &s = "")
+  Exception(char const *f, uint16_t const &l, std::string const &s = "")
       : std::runtime_error(s), _f(f), _l(l), _ep(std::current_exception()), err(s) {}
   Exception(Exception const &e)
       : std::runtime_error(e), _f(e.file()), _l(e.line()), _ep(e._ep), err(e.err) {}
@@ -72,11 +72,11 @@ class Exception : public std::runtime_error {
     return ss.str();
   }
 
-  const char *what() const noexcept override { return err.c_str(); }
+  char const *what() const noexcept override { return err.c_str(); }
   std::string str() const noexcept { return err; }
 
-  const char *file() const { return _f; }
-  const uint16_t &line() const { return _l; }
+  char const *file() const { return _f; }
+  uint16_t const &line() const { return _l; }
   const std::exception_ptr &cause() const { return _ep; }
   const std::string stack() const {
     std::stringstream ss;
@@ -103,7 +103,7 @@ class Exception : public std::runtime_error {
   }
 
  protected:
-  const char *_f;
+  char const *_f;
   const uint16_t _l;
   const std::exception_ptr _ep;
   std::string err;
@@ -123,11 +123,11 @@ inline std::ostream &operator<<(std::ostream &s, const Exception &e) {
 
 class Exit : public Exception {
  public:
-  Exit(const char *f, const uint16_t &l, const std::string &s, const uint16_t &e)
+  Exit(char const *f, uint16_t const &l, std::string const &s, uint16_t const &e)
       : Exception(f, l, s), _e(e) {}
   Exit(const Exit &e) : Exception(e), _e(e._e) {}
 
-  const uint16_t &code() const { return _e; }
+  uint16_t const &code() const { return _e; }
 
  private:
   const uint16_t _e;

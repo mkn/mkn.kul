@@ -56,7 +56,7 @@ bool kul::Dir::is() const {
 }
 bool kul::Dir::mk() const {
   if (path().empty()) return false;
-  const kul::Dir &prnt(parent());
+  kul::Dir const &prnt(parent());
   if (_p != prnt.path() && !prnt.is()) parent().mk();
   return CreateDirectory(locl().c_str(), NULL);
 }
@@ -97,7 +97,7 @@ uint64_t kul::File::size() const {
 namespace kul {
 namespace os {
 
-inline uint16_t exec(const std::string &cmd, bool q = false) {
+inline uint16_t exec(std::string const &cmd, bool q = false) {
   if (q) {
     return system(std::string(cmd + " > nul").c_str());
   }
@@ -120,12 +120,12 @@ inline kul::Dir home() {
   if (h.size()) return kul::Dir(h);
   return kul::Dir(std::string(env::GET("HOMEDRIVE")) + std::string(env::GET("HOMEPATH")));
 }
-inline kul::Dir home(const std::string &app) { return kul::Dir(home().join(app)); }
+inline kul::Dir home(std::string const &app) { return kul::Dir(home().join(app)); }
 
 }  // namespace user
 
 namespace env {
-inline bool CWD(const kul::Dir &d) { return _chdir(d.path().c_str()) != -1; }
+inline bool CWD(kul::Dir const &d) { return _chdir(d.path().c_str()) != -1; }
 }  // namespace env
 }  // namespace kul
 

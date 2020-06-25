@@ -93,7 +93,8 @@ class TestThreadQueueQObject : public TestThreadQueueObject {
   std::queue<int> &q;
 
  public:
-  TestThreadQueueQObject(Mutex &_mutex, std::queue<int> &_q) : TestThreadQueueObject(_mutex), q(_q) {}
+  TestThreadQueueQObject(Mutex &_mutex, std::queue<int> &_q)
+      : TestThreadQueueObject(_mutex), q(_q) {}
   void operator()() {
     kul::ScopeLock lock(mutex);
     KLOG(INF) << "THREAD RUNNING";
@@ -116,7 +117,7 @@ class TestConcQueueQObject {
 class TestIPCServer : public kul::ipc::Server {
  public:
   TestIPCServer() : kul::ipc::Server("uuid", 1) {}  // UUID     CHECKS ONCE
-  void handle(const std::string &s) { KLOG(INF) << "TestIPCServer " << s; }
+  void handle(std::string const &s) { KLOG(INF) << "TestIPCServer " << s; }
   void operator()() { listen(); }
 };
 
@@ -179,8 +180,8 @@ class Test {
     {
       kul::io::Writer wo(fo);
       kul::io::Writer we(fe);
-      auto lo = [&](const std::string &_s) { wo << _s; };
-      auto le = [&](const std::string &_s) { we << _s; };
+      auto lo = [&](std::string const &_s) { wo << _s; };
+      auto le = [&](std::string const &_s) { we << _s; };
       kul::LogMan::INSTANCE().setOut(lo);
       kul::LogMan::INSTANCE().setErr(le);
       KOUT(INF) << "KOUT(INF)";
@@ -201,8 +202,8 @@ class Test {
       KLOG(INF) << os_inc.dir().relative(os_hpp.dir());
     }
 
-    for (const kul::Dir &d : kul::Dir(kul::env::CWD()).dirs())
-      for (const kul::File &f : d.files()) KOUT(NON) << d.join(f.name());  // or f.full()
+    for (kul::Dir const &d : kul::Dir(kul::env::CWD()).dirs())
+      for (kul::File const &f : d.files()) KOUT(NON) << d.join(f.name());  // or f.full()
     try {
       kul::Process("echo").arg("Hello").arg("World").start();
 
@@ -228,16 +229,16 @@ class Test {
       }
     }
 
-    for (const std::string &arg :
+    for (std::string const &arg :
          kul::cli::asArgs("/path/to \"words in quotes\" words\\ not\\ in\\ quotes end"))
       KOUT(NON) << "ARG: " << arg;
 
-    for (const std::string &arg : kul::String::SPLIT("split - by - char - dash", '-'))
+    for (std::string const &arg : kul::String::SPLIT("split - by - char - dash", '-'))
       KOUT(NON) << "BIT: " << arg;
-    for (const std::string &arg : kul::String::SPLIT("split - by - string - dash", "-"))
+    for (std::string const &arg : kul::String::SPLIT("split - by - string - dash", "-"))
       KOUT(NON) << "BIT: " << arg;
 
-    for (const std::string &arg :
+    for (std::string const &arg :
          kul::String::ESC_SPLIT("split \\- by - char - dash with escape backslash", '-'))
       KOUT(NON) << "BIT: " << arg;
 

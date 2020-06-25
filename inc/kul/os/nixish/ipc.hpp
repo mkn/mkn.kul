@@ -52,7 +52,7 @@ namespace ipc {
 
 class Exception : public kul::Exception {
  public:
-  Exception(const char *f, const uint16_t &l, const std::string &s) : kul::Exception(f, l, s) {}
+  Exception(char const *f, uint16_t const &l, std::string const &s) : kul::Exception(f, l, s) {}
 };
 
 class IPCCall {
@@ -63,7 +63,7 @@ class IPCCall {
     while (s.size() < 9) s = "0" + s;
     write(fd, s.c_str(), 9);
   }
-  void writeLength(const std::string &m) const {
+  void writeLength(std::string const &m) const {
     std::string s = std::to_string(m.size());
     while (s.size() < 3) s = "0" + s;
     write(fd, s.c_str(), 3);
@@ -80,8 +80,8 @@ class Server : public IPCCall {
   }
 
  protected:
-  virtual void handle(const std::string &s) { KLOG(INF) << s; }
-  void respond(const std::string &s);
+  virtual void handle(std::string const &s) { KLOG(INF) << s; }
+  void respond(std::string const &s);
 
  public:
   virtual ~Server() {}
@@ -108,7 +108,7 @@ class Server : public IPCCall {
              Dir(_KUL_IPC_UUID_PREFIX_ + std::string("/pid/"))) {
     start();
   }
-  Server(const std::string &ui, const int16_t &_lp = -1) KTHROW(Exception)
+  Server(std::string const &ui, const int16_t &_lp = -1) KTHROW(Exception)
       : lp(_lp), uuid(ui, Dir(_KUL_IPC_UUID_PREFIX_)) {
     start();
   }
@@ -126,14 +126,14 @@ class Client : public IPCCall {
 
  public:
   virtual ~Client() { stop(); }
-  Client(const std::string &ui) KTHROW(Exception) : uuid(ui, Dir(_KUL_IPC_UUID_PREFIX_)) {
+  Client(std::string const &ui) KTHROW(Exception) : uuid(ui, Dir(_KUL_IPC_UUID_PREFIX_)) {
     start();
   }
   Client(const int16_t &pid) KTHROW(Exception)
       : uuid(std::to_string(pid), Dir(_KUL_IPC_UUID_PREFIX_ + std::string("/pid/"))) {
     start();
   }
-  virtual void send(const std::string &m) const KTHROW(Exception) {
+  virtual void send(std::string const &m) const KTHROW(Exception) {
     writeLength(m);
     write(fd, m.c_str(), m.size());
   }

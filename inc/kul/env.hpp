@@ -48,8 +48,8 @@ class Var {
 
   Var(const std::string _n, const std::string _v, const Mode _m) : n(_n), v(_v), m(_m) {}
   Var(const Var &e) : n(e.n), v(e.v), m(e.m) {}
-  const char *name() const { return n.c_str(); }
-  const char *value() const { return v.c_str(); }
+  char const *name() const { return n.c_str(); }
+  char const *value() const { return v.c_str(); }
   Mode mode() const { return m; }
   const std::string toString() const {
     std::string var(value());

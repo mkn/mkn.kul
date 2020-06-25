@@ -59,7 +59,7 @@ class KulTimeStampsResolver {
     date.QuadPart -= adjust.QuadPart;
     return (uint64_t)date.QuadPart / 10000000;
   }
-  static void GET(const char *const p, uint64_t &a, uint64_t &c, uint64_t &m) {
+  static void GET(char const *const p, uint64_t &a, uint64_t &c, uint64_t &m) {
     WIN32_FIND_DATA ffd;
     HANDLE h = FindFirstFile(TEXT(p), &ffd);
     if (h) {
