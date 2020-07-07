@@ -47,6 +47,7 @@ struct Pointers {
   T const* p = nullptr;
   SIZE s = 0;
   auto& operator[](SIZE i) const { return p[i]; }
+  auto& data() const { return p; }
   auto& begin() const { return p; }
   auto end() const { return p + s; }
   auto& size() const { return s; }
