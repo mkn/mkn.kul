@@ -61,11 +61,19 @@ struct SplitVector {
   using SplitVector_ = SplitVector<T, SIZE>;
 
   SplitVector() {}
-  SplitVector(SIZE size) : vec(size) {}
-  SplitVector(SplitVector&& from) : vec{std::move(from.vec)}, sizes{std::move(from.sizes)} {};
+  SplitVector(std::vector<SIZE>&& sizes_)
+      : sizes(sizes_), vec(std::accumulate(sizes.begin(), sizes.end(), 0)) {}
+  SplitVector(SplitVector&& from) : sizes{std::move(from.sizes)}, vec{std::move(from.vec)} {};
+
+  auto operator[](SIZE i) const {
+    size_t pos = std::accumulate(sizes.begin() + 1, sizes.begin() + i + 1, 0);
+    return Pointers<T, SIZE>{this->vec.data() + pos, this->sizes[i]};
+  }
+
+  T* data() { return const_cast<T*>(&vec[0]); }
 
   struct iterator {
-    iterator(SplitVector_* sv) : sv(sv) {}
+    iterator(SplitVector_* _sv) : sv(_sv) {}
     iterator operator++() {
       curr_pos += sv->sizes[curr_ptr++];
       return *this;
@@ -79,21 +87,14 @@ struct SplitVector {
     SIZE curr_pos = 0, curr_ptr = 0;
   };
 
-  auto operator[](SIZE i) const {
-    size_t pos = std::accumulate(sizes.begin() + 1, sizes.begin() + i + 1, 0);
-    return Pointers<T, SIZE>{this->vec.data() + pos, this->sizes[i]};
-  }
-
-  T* data() { return const_cast<T*>(&vec[0]); }
-
   auto begin() { return iterator(this); }
   auto cbegin() const { return iterator(this); }
 
   auto end() { return iterator(this); }
   auto cend() const { return iterator(this); }
 
-  std::vector<T> vec;
   std::vector<SIZE> sizes;
+  std::vector<T> vec;
 };
 
 template <typename Tuple>
