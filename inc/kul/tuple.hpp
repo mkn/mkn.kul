@@ -31,6 +31,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _KUL_TUPLE_HPP_
 #define _KUL_TUPLE_HPP_
 
+#include <vector>
+#include <numeric>
 #include "kul/for.hpp"
 
 namespace kul {
@@ -42,49 +44,77 @@ struct Pointer {
 };
 
 template <typename T, typename SIZE = size_t>
-struct Pointers {
-  Pointers(T const* p_, SIZE s_) : p{p_}, s{s_} {}
-  T const* p = nullptr;
+class Span {
+ public:
+  using value_type = T;
+
+  Span() = default;
+  Span(T* ptr_, SIZE s_) : ptr{ptr_}, s{s_}{}
+
+  auto& operator[](SIZE i)  { return ptr[i]; }
+  auto const& operator[](SIZE i) const { return ptr[i]; }
+  auto data() { return ptr; }
+  auto data() const { return ptr; }
+  auto begin() { return ptr; }
+  auto cbegin() const { return ptr; }
+  auto end() { return ptr + s; }
+  auto cend() const { return ptr + s; }
+  SIZE const& size() const { return s; }
+
+ private:
+  T* ptr = nullptr;
   SIZE s = 0;
-  auto& operator[](SIZE i) const { return p[i]; }
-  auto& data() const { return p; }
-  auto& begin() const { return p; }
-  auto end() const { return p + s; }
-  auto& size() const { return s; }
 };
 
 
-
 template <typename T, typename SIZE = size_t>
-struct SplitVector {
+struct SpanSet {
+ public:
   using value_type = T;
-  using SplitVector_ = SplitVector<T, SIZE>;
+  using SpanSet_ = SpanSet<T, SIZE>;
 
-  SplitVector() {}
-  SplitVector(std::vector<SIZE>&& sizes_)
-      : sizes(sizes_), vec(std::accumulate(sizes.begin(), sizes.end(), 0)) {}
-  SplitVector(SplitVector&& from) : sizes{std::move(from.sizes)}, vec{std::move(from.vec)} {};
+  SpanSet() = default;
 
-  auto operator[](SIZE i) const {
-    size_t pos = std::accumulate(sizes.begin() + 1, sizes.begin() + i + 1, 0);
-    return Pointers<T, SIZE>{this->vec.data() + pos, this->sizes[i]};
+  SpanSet(std::vector<SIZE>&& sizes_)
+      : m_size{std::accumulate(sizes_.begin(), sizes_.end(), 0)}
+      , m_sizes(sizes_)
+      , m_displs(sizes_.size())
+      , m_vec(m_size)
+  {
+      for (SIZE off = 0, i = 0; i < static_cast<SIZE>(sizes_.size()); i++, off += sizes_[i])
+          m_displs[i] = off;
   }
 
-  T* data() { return const_cast<T*>(&vec[0]); }
+  SpanSet(SpanSet_&& from)
+      : m_size{from.m_size}
+      , m_sizes{std::move(from.m_sizes)}
+      , m_displs{std::move(from.m_displs)}
+      , m_vec{std::move(from.m_vec)}
+  {
+  }
 
-  struct iterator {
-    iterator(SplitVector_* _sv) : sv(_sv) {}
-    iterator operator++() {
-      curr_pos += sv->sizes[curr_ptr++];
-      return *this;
-    }
-    bool operator!=(const iterator& other) const { return curr_ptr != sv->sizes.size(); }
-    Pointers<T, SIZE> operator*() const {
-      return Pointers<T, SIZE>{sv->vec.data() + curr_pos, sv->sizes[curr_ptr]};
-    }
+  Span<T, SIZE> operator[](SIZE i) { return { m_vec.data() + m_displs[i], m_sizes[i]}; }
+  Span<T, SIZE> operator[](SIZE i) const { return { m_vec.data() + m_displs[i], m_sizes[i]}; }
 
-    SplitVector_* sv = nullptr;
-    SIZE curr_pos = 0, curr_ptr = 0;
+  T* data() { return m_vec.data(); }
+  T* data() const { return m_vec.data(); }
+
+  struct iterator
+  {
+      iterator(SpanSet_* _sv)
+          : sv(_sv)
+      {
+      }
+      iterator operator++()
+      {
+          curr_pos += sv->m_sizes[curr_ptr++];
+          return *this;
+      }
+      bool operator!=(const iterator& other) const { return curr_ptr != sv->m_sizes.size(); }
+      Span<T, SIZE> operator*() const { return {sv->vec.data() + curr_pos, sv->m_sizes[curr_ptr]}; }
+
+      SpanSet_* sv  = nullptr;
+      SIZE curr_pos = 0, curr_ptr = 0;
   };
 
   auto begin() { return iterator(this); }
@@ -93,8 +123,14 @@ struct SplitVector {
   auto end() { return iterator(this); }
   auto cend() const { return iterator(this); }
 
-  std::vector<SIZE> sizes;
-  std::vector<T> vec;
+  SIZE const& size() const { return m_size; }
+  std::vector<SIZE> const& sizes() const { return m_sizes; }
+  std::vector<SIZE> const& displs() const { return m_displs; }
+
+ private:
+  SIZE m_size = 0;
+  std::vector<SIZE> m_sizes, m_displs;
+  std::vector<T> m_vec;
 };
 
 template <typename Tuple>

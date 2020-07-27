@@ -30,16 +30,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "kul/os.hpp"
 
-// std::vector<kul::Dir> kul::Dir::dirs(bool incHidden) const
-// KTHROW(kul::fs::Exception){
 #include "kul/os/nixish/src/os/dir/dirs.ipp"
-// }
-
-// std::vector<kul::File> kul::Dir::files(bool recursive) const
-// KTHROW(kul::fs::Exception){
 #include "kul/os/nixish/src/os/dir/files.ipp"
-// }
-
-// std::string kul::Dir::REAL(std::string const&s) KTHROW(fs::Exception) {
 #include "kul/os/nixish/src/os/dir/Xreal.ipp"
-// }
