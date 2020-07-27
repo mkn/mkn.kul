@@ -30,6 +30,4 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "kul/signal.hpp"
 
-void kul_sig_handler(int s, siginfo_t *info, void *v) {
 #include "kul/os/nixish/src/signal/handler.ipp"
-}

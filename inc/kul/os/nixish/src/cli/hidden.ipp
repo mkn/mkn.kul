@@ -28,6 +28,7 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+// IWYU pragma: private, include "kul/cli.hpp"
 
 std::string kul::cli::hidden(const std::string& t){
   if (!t.empty()) std::cout << t << std::endl;
