@@ -49,23 +49,22 @@ class Span {
   using value_type = T;
 
   Span() = default;
-  Span(T* ptr_, SIZE s_) : ptr{ptr_}, s{s_}{}
+  Span(T* ptr_, SIZE s_) : ptr{ptr_}, s{s_} {}
 
-  auto& operator[](SIZE i)  { return ptr[i]; }
+  auto& operator[](SIZE i) { return ptr[i]; }
   auto const& operator[](SIZE i) const { return ptr[i]; }
   auto data() { return ptr; }
   auto data() const { return ptr; }
   auto begin() { return ptr; }
-  auto cbegin() const { return ptr; }
+  auto begin() const { return ptr; }
   auto end() { return ptr + s; }
-  auto cend() const { return ptr + s; }
+  auto end() const { return ptr + s; }
   SIZE const& size() const { return s; }
 
  private:
   T* ptr = nullptr;
   SIZE s = 0;
 };
-
 
 template <typename T, typename SIZE = size_t>
 struct SpanSet {
@@ -76,45 +75,40 @@ struct SpanSet {
   SpanSet() = default;
 
   SpanSet(std::vector<SIZE>&& sizes_)
-      : m_size{std::accumulate(sizes_.begin(), sizes_.end(), 0)}
-      , m_sizes(sizes_)
-      , m_displs(sizes_.size())
-      , m_vec(m_size)
-  {
-      for (SIZE off = 0, i = 0; i < static_cast<SIZE>(sizes_.size()); i++, off += sizes_[i])
-          m_displs[i] = off;
+      : m_size{std::accumulate(sizes_.begin(), sizes_.end(), SIZE{0})},
+        m_sizes(sizes_),
+        m_displs(sizes_.size()),
+        m_vec(m_size) {
+    for (SIZE off = 0, i = 0; i < static_cast<SIZE>(sizes_.size()); i++, off += sizes_[i])
+      m_displs[i] = off;
   }
 
   SpanSet(SpanSet_&& from)
-      : m_size{from.m_size}
-      , m_sizes{std::move(from.m_sizes)}
-      , m_displs{std::move(from.m_displs)}
-      , m_vec{std::move(from.m_vec)}
-  {
-  }
+      : m_size{from.m_size},
+        m_sizes{std::move(from.m_sizes)},
+        m_displs{std::move(from.m_displs)},
+        m_vec{std::move(from.m_vec)} {}
 
-  Span<T, SIZE> operator[](SIZE i) { return { m_vec.data() + m_displs[i], m_sizes[i]}; }
-  Span<T, SIZE> operator[](SIZE i) const { return { m_vec.data() + m_displs[i], m_sizes[i]}; }
+  Span<T, SIZE> operator[](SIZE i) { return {m_vec.data() + m_displs[i], m_sizes[i]}; }
+  Span<T, SIZE> operator[](SIZE i) const { return {m_vec.data() + m_displs[i], m_sizes[i]}; }
 
   T* data() { return m_vec.data(); }
   T* data() const { return m_vec.data(); }
 
-  struct iterator
-  {
-      iterator(SpanSet_* _sv)
-          : sv(_sv)
-      {
-      }
-      iterator operator++()
-      {
-          curr_pos += sv->m_sizes[curr_ptr++];
-          return *this;
-      }
-      bool operator!=(const iterator& other) const { return curr_ptr != sv->m_sizes.size(); }
-      Span<T, SIZE> operator*() const { return {sv->vec.data() + curr_pos, sv->m_sizes[curr_ptr]}; }
+  Span<T, SIZE> raw() { return {m_vec.data(), m_size}; }
+  Span<T, SIZE> raw() const { return {m_vec.data(), m_size}; }
 
-      SpanSet_* sv  = nullptr;
-      SIZE curr_pos = 0, curr_ptr = 0;
+  struct iterator {
+    iterator(SpanSet_* _sv) : sv(_sv) {}
+    iterator operator++() {
+      curr_pos += sv->m_sizes[curr_ptr++];
+      return *this;
+    }
+    bool operator!=(const iterator& other) const { return curr_ptr != sv->m_sizes.size(); }
+    Span<T, SIZE> operator*() const { return {sv->m_vec.data() + curr_pos, sv->m_sizes[curr_ptr]}; }
+
+    SpanSet_* sv = nullptr;
+    SIZE curr_pos = 0, curr_ptr = 0;
   };
 
   auto begin() { return iterator(this); }

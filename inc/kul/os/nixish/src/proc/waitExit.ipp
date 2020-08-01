@@ -30,7 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 // IWYU pragma: private, include "kul/proc.hpp"
 
-void kul::Process::waitExit() KTHROW(kul::proc::ExitException){
+void kul::Process::waitExit() KTHROW(kul::proc::ExitException) {
   tearDown();
   exitCode(WEXITSTATUS(cStat));
   finish();

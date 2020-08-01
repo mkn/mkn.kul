@@ -30,8 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 // IWYU pragma: private, include "kul/os.hpp"
 
-std::vector<kul::Dir> kul::Dir::dirs(bool incHidden) const KTHROW(fs::Exception){
-
+std::vector<kul::Dir> kul::Dir::dirs(bool incHidden) const KTHROW(fs::Exception) {
   if (!is()) KEXCEPT(fs::Exception, "Directory : \"" + path() + "\" does not exist");
   std::vector<Dir> dirs;
 
@@ -48,5 +47,4 @@ std::vector<kul::Dir> kul::Dir::dirs(bool incHidden) const KTHROW(fs::Exception)
   closedir(dir);
 
   return dirs;
-
 }

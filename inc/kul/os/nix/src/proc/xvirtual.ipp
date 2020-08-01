@@ -30,8 +30,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 // IWYU pragma: private, include "kul/proc.hpp"
 
-void kul::this_proc::ProcParser::VIRTUAL(uint64_t& mem){
-  FILE *file = fopen("/proc/self/status", "r");
+void kul::this_proc::ProcParser::VIRTUAL(uint64_t& mem) {
+  FILE* file = fopen("/proc/self/status", "r");
   char line[128];
   while (fgets(line, 128, file) != NULL) {
     if (strncmp(line, "VmSize:", 7) == 0) {

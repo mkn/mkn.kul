@@ -29,8 +29,7 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-std::vector<kul::Dir> kul::Dir::dirs(bool incHidden) const KTHROW(fs::Exception){
-
+std::vector<kul::Dir> kul::Dir::dirs(bool incHidden) const KTHROW(fs::Exception) {
   if (!is()) KEXCEPT(fs::Exception, "Directory : \"" + path() + "\" does not exist");
   std::vector<Dir> dirs;
 
@@ -56,5 +55,4 @@ std::vector<kul::Dir> kul::Dir::dirs(bool incHidden) const KTHROW(fs::Exception)
   FindClose(hFind);
 
   return dirs;
-
 }

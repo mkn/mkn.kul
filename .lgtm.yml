@@ -7,4 +7,4 @@ extraction:
       - git clone https://github.com/Dekken/maiken -b master --depth 1 maiken
       - cd maiken; make nix; mv mkn ..; cd ..; rm -rf maiken
     index:
-      build_command: ./mkn
+      build_command: ./mkn clean build -dtOp test -a "-std=c++17 -fPIC"

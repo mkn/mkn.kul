@@ -29,12 +29,16 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "benchmark/benchmark_api.h"
-
 #include "kul/cli.hpp"
 #include "kul/log.hpp"
 #include "kul/os.hpp"
 #include "kul/threads.hpp"
+
+#if __has_include("benchmark/benchmark.h")
+  #include "benchmark/benchmark.h"
+#else
+  #include "benchmark/benchmark_api.h"
+#endif
 
 void createDeleteFile(benchmark::State &state) {
   while (state.KeepRunning()) {
@@ -100,4 +104,8 @@ void chroncurrentThreadPool(benchmark::State &state) {
 }
 BENCHMARK(chroncurrentThreadPool)->Unit(benchmark::kMicrosecond);
 
-BENCHMARK_MAIN()
+int main(int argc, char** argv)
+{
+   ::benchmark::Initialize(&argc, argv);
+   ::benchmark::RunSpecifiedBenchmarks();
+}

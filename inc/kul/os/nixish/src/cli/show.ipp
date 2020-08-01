@@ -30,7 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 // IWYU pragma: private, include "kul/cli.hpp"
 
-void kul::cli::show(){
+void kul::cli::show() {
   termios tty;
   tcgetattr(STDIN_FILENO, &tty);
   tty.c_lflag |= ECHO;

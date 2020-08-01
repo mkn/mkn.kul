@@ -30,8 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 // IWYU pragma: private, include "kul/proc.hpp"
 
-void kul::Process::run() KTHROW(kul::proc::Exception){
-
+void kul::Process::run() KTHROW(kul::proc::Exception) {
   {
     int16_t ret = 0;
     if ((ret = pipe(inFd)) < 0) error(__LINE__, "Failed to pipe in");
@@ -48,15 +47,15 @@ void kul::Process::run() KTHROW(kul::proc::Exception){
       popPip[1] = outFd[0];
       popPip[2] = errFd[0];
 
-  #ifdef __KUL_PROC_BLOCK_ERR__
+#ifdef __KUL_PROC_BLOCK_ERR__
       if ((ret = fcntl(popPip[1], F_SETFL, O_NONBLOCK)) < 0)
         error(__LINE__, "Failed nonblocking for popPip[1]");
       if ((ret = fcntl(popPip[2], F_SETFL, O_NONBLOCK)) < 0)
         error(__LINE__, "Failed nonblocking for popPip[2]");
-  #else
+#else
       fcntl(popPip[1], F_SETFL, O_NONBLOCK);
       fcntl(popPip[2], F_SETFL, O_NONBLOCK);
-  #endif
+#endif
       fd_set childOutFds;
       FD_ZERO(&childOutFds);
       FD_SET(popPip[1], &childOutFds);
@@ -67,9 +66,9 @@ void kul::Process::run() KTHROW(kul::proc::Exception){
       char cOut[30024] = {'\0'};
       char cErr[30024] = {'\0'};
       do {
-  #if defined(_KUL_PROC_LOOP_NSLEEP_) && (_KUL_PROC_LOOP_NSLEEP_ > 0)
+#if defined(_KUL_PROC_LOOP_NSLEEP_) && (_KUL_PROC_LOOP_NSLEEP_ > 0)
         kul::this_thread::nSleep(_KUL_PROC_LOOP_NSLEEP_);
-  #endif
+#endif
         alive = ::kill(pid(), 0) == 0;
         if (FD_ISSET(popPip[1], &childOutFds)) {
           bool b = 0;

@@ -30,7 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 // IWYU pragma: private, include "kul/proc.hpp"
 
-void kul::Process::tearDown(){
+void kul::Process::tearDown() {
   recall(close(popPip[0]));
   recall(close(popPip[1]));
   recall(close(popPip[2]));

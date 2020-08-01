@@ -328,7 +328,7 @@ inline std::string WHERE(char const *c) {
 }
 
 inline bool WHICH(char const *c) { return WHERE(c).size(); }
-inline bool WHICH(std::string const& s) { return WHERE(s.c_str()).size(); }
+inline bool WHICH(std::string const &s) { return WHERE(s.c_str()).size(); }
 }  // namespace env
 }  // namespace kul
 

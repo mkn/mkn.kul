@@ -30,7 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 // IWYU pragma: private, include "kul/proc.hpp"
 
-int kul::this_proc::ProcParser::PARSE_LINE(char* line){
+int kul::this_proc::ProcParser::PARSE_LINE(char* line) {
   int i = strlen(line);
   while (*line < '0' || *line > '9') line++;
   line[i - 3] = '\0';

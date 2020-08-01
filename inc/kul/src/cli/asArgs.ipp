@@ -30,8 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 // IWYU pragma: private, include "kul/cli.hpp"
 
-void kul::cli::asArgs(const std::string& cmd, std::vector<std::string>& args){
-
+void kul::cli::asArgs(const std::string& cmd, std::vector<std::string>& args) {
   std::string arg;
   bool openQuotesS = false, openQuotesD = false, backSlashed = false;
   for (const char c : cmd) {

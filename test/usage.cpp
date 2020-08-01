@@ -45,6 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "kul/string.hpp"
 #include "kul/threads.hpp"
 #include "kul/time.hpp"
+#include "kul/tuple.hpp"
 #include "kul/wstring.hpp"
 
 namespace kul {
@@ -266,6 +267,17 @@ class Test {
 
     KOUT(NON) << "CPU CORES:   " << kul::cpu::cores();
     KOUT(NON) << "MAX THREADS: " << kul::cpu::threads();
+
+    {
+      kul::SpanSet<double> spanset{std::vector<size_t>{3, 2, 1}};
+      kul::Span<double> raw = spanset.raw();
+      std::vector<size_t> vals{1, 5, 5, 3, 4, 5};
+      for (size_t i = 0; i < 6; i++) raw[i] = vals[i];
+      for (auto const &span : spanset) {
+        KLOG(INF) << span.size();
+        for (auto const &d0 : span) KLOG(INF) << d0;
+      }
+    }
 
     {
       TestThreadObject tto1;
