@@ -30,17 +30,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 // IWYU pragma: private, include "kul/signal.hpp"
 
-void kul_sig_handler(int s, siginfo_t* info, void* v) {
-
+void kul_sig_handler(int s, siginfo_t *info, void *v) {
   if (info->si_pid == 0 || info->si_pid == kul::this_proc::id()) {
-    if(s == SIGABRT) for(auto &f : kul::SignalStatic::INSTANCE().ab ) f(s);
-    if(s == SIGINT)  for(auto &f : kul::SignalStatic::INSTANCE().in) f(s);
-    if(s == SIGSEGV) for(auto &f : kul::SignalStatic::INSTANCE().se) f(s);
-    if(s == SIGSEGV && !kul::SignalStatic::INSTANCE().q) {
+    if (s == SIGABRT)
+      for (auto &f : kul::SignalStatic::INSTANCE().ab) f(s);
+    if (s == SIGINT)
+      for (auto &f : kul::SignalStatic::INSTANCE().in) f(s);
+    if (s == SIGSEGV)
+      for (auto &f : kul::SignalStatic::INSTANCE().se) f(s);
+    if (s == SIGSEGV && !kul::SignalStatic::INSTANCE().q) {
       auto tid = kul::this_thread::id();
       ucontext_t *uc = (ucontext_t *)v;
       printf("[bt] Stacktrace:\n");
-      for(auto const& st : kul::this_thread::stacktrace(uc)) KOUT(NON) << tid << " : " << st;
+      for (auto const &st : kul::this_thread::stacktrace(uc)) KOUT(NON) << tid << " : " << st;
     }
     exit(s);
   }

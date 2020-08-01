@@ -16,5 +16,5 @@ jobs:
     - run: |
         git clone https://github.com/dekken/maiken -b master --depth 10 --recursive
         cd maiken && make nix && cp mkn .. && cd ..
-        KLOG=3 ./mkn
+        KLOG=3 ./mkn clean build -dtOp test -a "-std=c++17 -fPIC"
 

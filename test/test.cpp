@@ -29,39 +29,43 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-template <typename T>
-void do_math(){
-  T beta = 2;
-  T a[2] = {1 , 2}, b[2] = {3, 4};
-  kul::math::dot_matrix_vector_incr(2, 2, 2, &a[0], &b[0], beta, &b[0]);
-  kul::math::dot(2u, &a[0], &b[0]);
-  kul::math::scale(2u, 2u, &a[0]);
-  kul::math::mult_incr(2u, 2u, &a[0], &b[0]);
-}
+#include "gmock/gmock.h"
+#include "gtest/gtest.h"
 
-template <typename T>
-void do_math_has_atomics(){
-  T a[2] = {1 , 2};
-  std::atomic<T> b[2]; b[0] = 3; b[1] = 4;
-  kul::math::dot(2u, &a[0], &b[0]);
-  kul::math::scale(2u, 2u, &a[0]);
-  kul::math::mult_incr(2u, 2u, &a[0], &b[0]);
-}
+#include "kul/assert.hpp"
+#include "kul/cli.hpp"
+#include "kul/io.hpp"
+#include "kul/log.hpp"
+#include "kul/math.hpp"
+#include "kul/os.hpp"
+#include "kul/proc.hpp"
+#include "kul/threads.hpp"
+#include "kul/tuple.hpp"
 
-TEST(Math, double) {
-  do_math<double>();
-}
-TEST(Math, atomic_double) {
-  do_math_has_atomics<double>();
-}
-TEST(Math, float) {
-  do_math<float>();
-}
-TEST(Math, atomic_float) {
-  do_math_has_atomics<float>();
-}
+#ifdef _WIN32
+#define bzero ZeroMemory
+#endif
 
-TEST(Math, more) {
-  do_math<uint32_t>();
-  do_math<int32_t>();
+auto tryCatch = [](std::vector<std::function<void()>> funcs, bool katch) {
+  for (const auto &func : funcs) try {
+      func();
+      ASSERT_TRUE(!katch);
+    } catch (const kul::Exception &e) {
+      if (!katch) KOUT(NON) << e.debug();
+      ASSERT_TRUE(katch);
+    }
+};
+
+#include "test/cli.ipp"
+#include "test/except.ipp"
+#include "test/io.ipp"
+#include "test/math.ipp"
+#include "test/os.ipp"
+#include "test/proc.ipp"
+#include "test/string.ipp"
+#include "test/span.ipp"
+
+int main(int argc, char *argv[]) {
+  ::testing::InitGoogleMock(&argc, argv);
+  return RUN_ALL_TESTS();
 }

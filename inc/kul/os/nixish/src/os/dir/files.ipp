@@ -30,8 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 // IWYU pragma: private, include "kul/os.hpp"
 
-std::vector<kul::File> kul::Dir::files(bool recursive) const KTHROW(fs::Exception){
-
+std::vector<kul::File> kul::Dir::files(bool recursive) const KTHROW(fs::Exception) {
   if (!is()) KEXCEPT(fs::Exception, "Directory : \"" + path() + "\" does not exist");
 
   std::vector<File> fs;
@@ -43,11 +42,10 @@ std::vector<kul::File> kul::Dir::files(bool recursive) const KTHROW(fs::Exceptio
   }
   closedir(dir);
   if (recursive) {
-    for (kul::Dir const& d : dirs()) {
+    for (kul::Dir const &d : dirs()) {
       const std::vector<kul::File> &tFs = d.files(true);
       fs.insert(fs.end(), tFs.begin(), tFs.end());
     }
   }
   return fs;
-
 }

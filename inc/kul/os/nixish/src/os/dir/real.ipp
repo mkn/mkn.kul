@@ -30,15 +30,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 // IWYU pragma: private, include "kul/os.hpp"
 
-std::string kul::Dir::REAL(const std::string& s) KTHROW(fs::Exception){
-
-  char *expanded = realpath(s.c_str(), NULL);
+std::string kul::Dir::REAL(const std::string& s) KTHROW(fs::Exception) {
+  char* expanded = realpath(s.c_str(), NULL);
   if (expanded) {
-  std::string dir(expanded);
-  free(expanded);
-  if (dir.size() > PATH_MAX) KEXCEPT(fs::Exception, "Directory path too large");
-  return dir;
+    std::string dir(expanded);
+    free(expanded);
+    if (dir.size() > PATH_MAX) KEXCEPT(fs::Exception, "Directory path too large");
+    return dir;
   }
   KEXCEPT(fs::Exception, "Directory \"" + s + "\" does not exist");
-
 }

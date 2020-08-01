@@ -30,7 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 // IWYU pragma: private, include "kul/proc.hpp"
 
-int16_t kul::Process::child(){
+int16_t kul::Process::child() {
   std::string _s(toString());
   expand(_s);
   std::vector<std::string> cli(kul::cli::asArgs(_s));

@@ -30,7 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 // IWYU pragma: private, include "kul/proc.hpp"
 
-void kul::Process::waitForStatus(){
+void kul::Process::waitForStatus() {
   int16_t ret = 0;
   ret = recall(waitpid(pid(), &cStat, 0));
   (void)ret;
