@@ -1,0 +1,32 @@
+name: windows-latest
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Get mkn
+      uses: dawidd6/action-download-artifact@v2
+      with:
+        name: mkn
+        branch: master
+        workflow: build_win.yml
+        repo: Dekken/maiken
+
+    - uses: allenevans/set-env@v1.0.0
+      with:
+        MKN_CL_PREFERRED: 1
+
+    - name: "Build/Test" # contains slash so use quotes otherwise UB
+      shell: cmd
+      run: | # /bin/link interferes with cl/link.exe
+        bash -c "rm /bin/link"
+        call "C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Auxiliary/Build/vcvars64.bat"
+        bash -c 'KLOG=3 ./mkn clean build -dtKOp test -a "-EHsc -std:c++17"'
