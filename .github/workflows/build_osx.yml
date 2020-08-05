@@ -23,4 +23,4 @@ jobs:
     - name: "Build/Test" # contains slash so use quotes otherwise UB
       run: |
         chmod +x mkn
-        KLOG=3 ./mkn clean build -dtOp test -a "-std=c++17 -fPIC"
+        KLOG=3 ./mkn clean build run -dtOp test -a "-std=c++17 -fPIC"

@@ -29,4 +29,4 @@ jobs:
       run: | # /bin/link interferes with cl/link.exe
         bash -c "rm /bin/link"
         call "C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Auxiliary/Build/vcvars64.bat"
-        bash -c 'KLOG=3 ./mkn clean build -dtKOp test -a "-EHsc -std:c++17"'
+        bash -c 'KLOG=3 ./mkn clean build run -dtKOp test -a "-EHsc -std:c++17"'
