@@ -43,6 +43,29 @@ struct Pointer {
   T* p = nullptr;
 };
 
+
+namespace func {
+template<typename...>
+using check = void;
+}
+
+template<typename T, typename data_fn = void, typename size_fn = void>
+struct is_span_like : std::false_type
+{
+};
+
+template<typename T>
+struct is_span_like<T,
+        func::check<decltype(std::declval<T>().data())>,
+        func::check<decltype(std::declval<T>().size())>>
+    : std::true_type
+{
+};
+
+template<typename T>
+auto constexpr is_span_like_v =  is_span_like<T>::value;
+
+
 template <typename T, typename SIZE = size_t>
 class Span {
  public:
@@ -50,6 +73,8 @@ class Span {
 
   Span() = default;
   Span(T* ptr_, SIZE s_) : ptr{ptr_}, s{s_} {}
+  template<typename C, std::enable_if_t<is_span_like_v<C>, bool> = 0>
+  Span(C & c) : Span{c.data(), static_cast<SIZE>(c.size())} {}
 
   auto& operator[](SIZE i) { return ptr[i]; }
   auto const& operator[](SIZE i) const { return ptr[i]; }
@@ -175,6 +200,7 @@ template <typename T, size_t Size>
 constexpr decltype(auto) tuple_from(T t) {
   return for_N<Size>(ApplySingleTupleValue{t});
 }
+
 
 }  // namespace kul
 

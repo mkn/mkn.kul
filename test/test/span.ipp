@@ -1,4 +1,20 @@
 
+TEST(Span, init) {
+  {
+    std::vector<double> v{1, 2, 3};
+    kul::Span<double> span0{v};
+    double i = 1;
+    for (auto const& d0 : span0) EXPECT_EQ(d0, i++);
+
+    kul::Span<double> span1{span0};
+    i = 1;
+    for (auto const& d0 : span1) EXPECT_EQ(d0, i++);
+  }
+  std::vector<double> const v{1, 2, 3};
+  kul::Span<double const> span{v};
+  double i = 1;
+  for (auto const& d0 : span) EXPECT_EQ(d0, i++);
+}
 
 TEST(SpanSet, containsCorrectData) {
   kul::SpanSet<double> spanset{std::vector<size_t>{2, 2, 2}};
