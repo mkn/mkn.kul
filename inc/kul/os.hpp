@@ -295,22 +295,17 @@ namespace kul {
 namespace os {
 
 class PushDir {
+ public:
+  PushDir(kul::Dir const &d) {
+    if (!d) KEXCEPTION("PushDir directory does not exist: ") << d;
+    cwd = kul::env::CWD();
+    kul::env::CWD(d.real());
+  }
+  PushDir(std::string const &d) : PushDir(kul::Dir(d)) {}
+  ~PushDir() { kul::env::CWD(cwd); }
+
  private:
   std::string cwd;
-  kul::Dir m_dir;
-
- public:
-  PushDir(std::string const &d) : m_dir(d) {
-    if (!m_dir) KEXCEPTION("PushDir directory does not exist: ") << d;
-    cwd = kul::env::CWD();
-    kul::env::CWD(m_dir.real());
-  }
-  PushDir(kul::Dir const &d) : m_dir(d) {
-    if (!m_dir) KEXCEPTION("PushDir directory does not exist: ") << d;
-    cwd = kul::env::CWD();
-    kul::env::CWD(m_dir.real());
-  }
-  ~PushDir() { kul::env::CWD(cwd); }
 };
 
 }  // namespace os
