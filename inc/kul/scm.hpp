@@ -70,12 +70,29 @@ class SCM {
   virtual bool hasChanges(std::string const &d) const = 0;
   virtual void status(std::string const &d, bool full = 1) const = 0;
   virtual void diff(std::string const &d) const = 0;
+
+  virtual std::string defaultRemoteBranch(std::string const& repo) const = 0;
 };
 
 // review https://gist.github.com/aleksey-bykov/1273f4982c317c92d532
 namespace scm {
 class Git : public SCM {
  public:
+  std::string defaultRemoteBranch(std::string const& repo) const override {
+    kul::Process p("git");
+    kul::ProcessCapture pc(p);
+    p << "ls-remote" << "--symref" << repo << "HEAD";;
+    try {
+      KLOG(DBG) << kul::String::LINES(pc.outs())[0];
+      p.start();
+    } catch (const kul::proc::ExitException &e) {
+      KEXCEPT(Exception, "SCM ERROR - Checking local branch") << p.toString();
+    }
+    auto ret = kul::String::SPLIT(kul::String::LINES(pc.outs())[0], "/").back();
+    return ret.substr(0, ret.size() - 5); // HEAD+tab
+    //e.g. git ls-remote --symref git@github.com:user/repo HEAD
+  };
+
   std::string branch(kul::Dir const &dr) const {
     kul::os::PushDir pushd(dr);
     kul::Process p("git");
