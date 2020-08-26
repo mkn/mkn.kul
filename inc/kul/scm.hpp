@@ -58,8 +58,8 @@ class SCM {
  public:
   virtual ~SCM() {}
   std::string type() { return typeid(*this).name(); }
-  virtual std::string co(std::string const &d, std::string const &r,
-                               std::string const &v) const KTHROW(Exception) = 0;
+  virtual std::string co(std::string const &d, std::string const &r, std::string const &v) const
+      KTHROW(Exception) = 0;
   virtual void up(std::string const &d, std::string const &r, std::string const &v) const
       KTHROW(Exception) = 0;
   virtual std::string origin(std::string const &d) const = 0;
@@ -71,17 +71,19 @@ class SCM {
   virtual void status(std::string const &d, bool full = 1) const = 0;
   virtual void diff(std::string const &d) const = 0;
 
-  virtual std::string defaultRemoteBranch(std::string const& repo) const = 0;
+  virtual std::string defaultRemoteBranch(std::string const &repo) const = 0;
 };
 
 // review https://gist.github.com/aleksey-bykov/1273f4982c317c92d532
 namespace scm {
 class Git : public SCM {
  public:
-  std::string defaultRemoteBranch(std::string const& repo) const override {
+  std::string defaultRemoteBranch(std::string const &repo) const override {
     kul::Process p("git");
     kul::ProcessCapture pc(p);
-    p << "ls-remote" << "--symref" << repo << "HEAD";;
+    p << "ls-remote"
+      << "--symref" << repo << "HEAD";
+    ;
     try {
       KLOG(DBG) << kul::String::LINES(pc.outs())[0];
       p.start();
@@ -89,15 +91,16 @@ class Git : public SCM {
       KEXCEPT(Exception, "SCM ERROR - Checking local branch") << p.toString();
     }
     auto ret = kul::String::SPLIT(kul::String::LINES(pc.outs())[0], "/").back();
-    return ret.substr(0, ret.size() - 5); // HEAD+tab
-    //e.g. git ls-remote --symref git@github.com:user/repo HEAD
+    return ret.substr(0, ret.size() - 5);  // HEAD+tab
+    // e.g. git ls-remote --symref git@github.com:user/repo HEAD
   };
 
   std::string branch(kul::Dir const &dr) const {
     kul::os::PushDir pushd(dr);
     kul::Process p("git");
     kul::ProcessCapture pc(p);
-    p << "branch" << "--show-current";
+    p << "branch"
+      << "--show-current";
     try {
       p.start();
     } catch (const kul::proc::ExitException &e) {
@@ -107,9 +110,7 @@ class Git : public SCM {
     return kul::String::LINES(pc.outs())[0];
   }
 
-  std::string branch(std::string const &d) const {
-    return branch(kul::Dir(d));
-  }
+  std::string branch(std::string const &d) const { return branch(kul::Dir(d)); }
 
   std::string co(std::string const &d, std::string const &r, std::string const &v) const
       KTHROW(Exception) override {
@@ -141,7 +142,7 @@ class Git : public SCM {
       }
     }
   }
-   std::string origin(std::string const &d) const override {
+  std::string origin(std::string const &d) const override {
     kul::Process p("git", d);
     kul::ProcessCapture pc(p);
     try {
@@ -159,7 +160,7 @@ class Git : public SCM {
     if (lines.size()) return kul::String::SPLIT(lines[0], ' ')[1];
     KEXCEPT(Exception, "SCM ERROR - Check remote dependency location / version");
   }
-   std::string localVersion(std::string const &d, std::string const &b) const override {
+  std::string localVersion(std::string const &d, std::string const &b) const override {
     kul::Process p("git", d);
     kul::ProcessCapture pc(p);
     try {
@@ -173,7 +174,7 @@ class Git : public SCM {
     return kul::String::LINES(pc.outs())[0];
   }
 
-   std::string remoteVersion(std::string const &url, std::string const &b) const
+  std::string remoteVersion(std::string const &url, std::string const &b) const
       KTHROW(Exception) override {
     kul::Process p("git");
     kul::ProcessCapture pc(p);

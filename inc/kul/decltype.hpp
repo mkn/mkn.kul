@@ -1,5 +1,5 @@
 /**
-Copyright (c) 2017, Philip Deegan.
+Copyright (c) 2020, Philip Deegan.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -28,45 +28,16 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+#ifndef _KUL_DECLTYPE_HPP_
+#define _KUL_DECLTYPE_HPP_
 
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
+namespace kul {
 
-#include "kul/assert.hpp"
-#include "kul/cli.hpp"
-#include "kul/io.hpp"
-#include "kul/log.hpp"
-#include "kul/math.hpp"
-#include "kul/os.hpp"
-#include "kul/proc.hpp"
-#include "kul/threads.hpp"
-#include "kul/span.hpp"
-#include "kul/tuple.hpp"
-
-#ifdef _WIN32
-#define bzero ZeroMemory
-#endif
-
-auto tryCatch = [](std::vector<std::function<void()>> funcs, bool katch) {
-  for (const auto &func : funcs) try {
-      func();
-      ASSERT_TRUE(!katch);
-    } catch (const kul::Exception &e) {
-      if (!katch) KOUT(NON) << e.debug();
-      ASSERT_TRUE(katch);
-    }
-};
-
-#include "test/cli.ipp"
-#include "test/except.ipp"
-#include "test/io.ipp"
-#include "test/math.ipp"
-#include "test/os.ipp"
-#include "test/proc.ipp"
-#include "test/string.ipp"
-#include "test/span.ipp"
-
-int main(int argc, char *argv[]) {
-  ::testing::InitGoogleMock(&argc, argv);
-  return RUN_ALL_TESTS();
+namespace func {
+template <typename...>
+using check = void;
 }
+
+}  // namespace kul
+
+#endif /* _KUL_DECLTYPE_HPP_ */

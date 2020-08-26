@@ -35,9 +35,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "kul/threads.hpp"
 
 #if __has_include("benchmark/benchmark.h")
-  #include "benchmark/benchmark.h"
+#include "benchmark/benchmark.h"
 #else
-  #include "benchmark/benchmark_api.h"
+#include "benchmark/benchmark_api.h"
 #endif
 
 void createDeleteFile(benchmark::State &state) {
@@ -104,8 +104,7 @@ void chroncurrentThreadPool(benchmark::State &state) {
 }
 BENCHMARK(chroncurrentThreadPool)->Unit(benchmark::kMicrosecond);
 
-int main(int argc, char** argv)
-{
-   ::benchmark::Initialize(&argc, argv);
-   ::benchmark::RunSpecifiedBenchmarks();
+int main(int argc, char **argv) {
+  ::benchmark::Initialize(&argc, argv);
+  ::benchmark::RunSpecifiedBenchmarks();
 }
