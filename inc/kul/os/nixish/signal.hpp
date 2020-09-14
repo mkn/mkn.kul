@@ -73,7 +73,7 @@ namespace kul {
 namespace this_thread {
 #include "kul/os/nixish/src/signal/stacktrace.ipp"
 
-void print_stacktrace() {
+inline void print_stacktrace() {
   for (auto const &s : stacktrace()) std::cout << s << std::endl;
 }
 }  // namespace this_thread
