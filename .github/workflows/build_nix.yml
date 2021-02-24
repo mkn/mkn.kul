@@ -18,7 +18,7 @@ jobs:
         name: mkn
         branch: master
         workflow: build_nix.yml
-        repo: Dekken/maiken
+        repo: mkn/maiken
 
     - name: "Build/Test" # contains slash so use quotes otherwise UB
       run: |
