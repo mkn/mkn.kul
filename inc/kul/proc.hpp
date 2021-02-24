@@ -85,7 +85,7 @@ class Call {
  public:
   ~Call() {
     if (d.size()) kul::env::CWD(cwd);
-    for (const std::pair<std::string, std::string> &oldEv : oldEvs)
+    for (auto const &oldEv : oldEvs)
       kul::env::SET(oldEv.first.c_str(), oldEv.second.c_str());
   }
   Call(std::string const &_s, std::string const &_d = "") : d(_d), s(_s) { setCWD(); }

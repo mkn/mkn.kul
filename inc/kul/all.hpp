@@ -31,15 +31,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _KUL_TUPLE_HPP_
 #define _KUL_TUPLE_HPP_
 
+#include <tuple>
 #include <vector>
 #include <numeric>
-#include <tuple>
+#include <algorithm>
 
 namespace kul {
-
-#include <vector>
-#include <iostream>
-#include <algorithm>
 
 #define PRINT_LINE() std::cout << __LINE__ << std::endl
 

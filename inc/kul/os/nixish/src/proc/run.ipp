@@ -133,7 +133,7 @@ void kul::Process::run() KTHROW(kul::proc::Exception) {
 
     /* SETUP EnvVars */  // SET ENV, it's a forked process so it doesn't matter -
                          // it'll die soon, like you.
-    for (const std::pair<const std::string, const std::string> &ev : vars())
+    for (auto const &ev : vars())
       env::SET(ev.first.c_str(), ev.second.c_str());
 
     if (!this->directory().empty()) kul::env::CWD(this->directory());
