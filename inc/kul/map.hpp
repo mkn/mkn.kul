@@ -45,6 +45,8 @@ REQUIRES
 #ifndef _KUL_MAP_HPP_
 #define _KUL_MAP_HPP_
 
+#include <string>
+
 #ifndef _MKN_WITH_GOOGLE_SPARSEHASH_
 
 #include <unordered_map>
