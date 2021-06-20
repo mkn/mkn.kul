@@ -12,8 +12,8 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    - name: "Build/Test" # contains slash so use quotes otherwise UB
+    - name: "Build/Test"
       run: |
-        wget https://github.com/mkn/mkn/releases/download/latest/mkn_nix
-        chmod +x mkn_nix
-        KLOG=3 ./mkn_nix clean build run -dtOp test -a "-std=c++17 -fPIC"
+        curl -Lo mkn https://github.com/mkn/mkn/releases/download/latest/mkn_nix
+        chmod +x mkn
+        KLOG=3 ./mkn clean build run -dtOp test -a "-std=c++17 -fPIC"
