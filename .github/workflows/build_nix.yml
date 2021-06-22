@@ -12,7 +12,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: Get mkn
+    - name: get
       uses: dawidd6/action-download-artifact@v2
       with:
         name: mkn
@@ -20,7 +20,18 @@ jobs:
         workflow: build_nix.yml
         repo: mkn/maiken
 
-    - name: "Build/Test" # contains slash so use quotes otherwise UB
+    - name: dbg
       run: |
         chmod +x mkn
+        set -x
+        ld -v
+        ldd --version
+        g++ -v
+        ./mkn -v
+
+    - name: "mkn"
+      env:
+        MKN_GCC_PREFERRED: 1
+        KUL_GIT_CO: --depth 1
+      run: |
         KLOG=3 ./mkn clean build run -dtOp test -a "-std=c++17 -fPIC"

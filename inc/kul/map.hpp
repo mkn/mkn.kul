@@ -56,17 +56,39 @@ namespace kul {
 namespace hash {
 
 template <class K, class V>
-class Map : public std::unordered_map<K, V> {
+class Map {
  public:
-  Map &insert(const K &k, const V &v) {
-    this->insert(std::make_pair(k, v));
+  Map& emplace(const K &k, const V &v) {
+    _map.emplace(k, v);
     return *this;
   }
-  Map &insert(const std::pair<K, V> &pair) {
-    std::unordered_map<K, V>::insert(pair);
+  Map& insert(const K &k, const V &v) {
+    _map.insert(std::make_pair(k, v));
+    return *this;
+  }
+  Map& insert(const std::pair<K, V> &pair) {
+    _map.insert(pair);
     return *this;
   }
   void setDeletedKey(const K &key) { (void)key; }
+
+  auto& at(K const& k) { return _map.at(k); }
+  auto& at(K const& k) const { return _map.at(k); }
+
+  auto& operator[](K const& k) { return _map[k]; }
+  auto& operator[](K const& k) const { return _map[k]; }
+
+  auto count(K const& k) const { return _map.count(k); }
+  auto erase(K const& k) { return  _map.erase(k); }
+  auto size() const { return _map.size(); }
+
+  auto begin() { return _map.begin(); }
+  auto begin() const { return _map.begin(); }
+  auto end() { return _map.end(); }
+  auto end() const { return _map.end(); }
+
+private:
+  std::unordered_map<K, V> _map;
 };
 
 namespace map {
