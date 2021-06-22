@@ -12,7 +12,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    - name: "Build/Test"
+    - name: "mkn"
       run: |
         curl -Lo mkn https://github.com/mkn/mkn/releases/download/latest/mkn_nix
         chmod +x mkn
