@@ -87,7 +87,7 @@ class Git : public SCM {
     try {
       KLOG(DBG) << kul::String::LINES(pc.outs())[0];
       p.start();
-    } catch (const kul::proc::ExitException &e) {
+    } catch (kul::proc::ExitException const& e) {
       KEXCEPT(Exception, "SCM ERROR - Checking local branch") << p.toString();
     }
     auto ret = kul::String::SPLIT(kul::String::LINES(pc.outs())[0], "/").back();
@@ -103,8 +103,7 @@ class Git : public SCM {
       << "--show-current";
     try {
       p.start();
-    } catch (const kul::proc::ExitException &e) {
-      dr.rm();
+    } catch (kul::proc::ExitException const& e) {
       KEXCEPT(Exception, "SCM ERROR - Checking local branch");
     }
     return kul::String::LINES(pc.outs())[0];
@@ -120,7 +119,7 @@ class Git : public SCM {
     if (!v.empty()) p.arg("-b").arg(v);
     try {
       p.arg(d).start();
-    } catch (const kul::proc::ExitException &e) {
+    } catch (kul::proc::ExitException const& e) {
       dr.rm();
       KEXCEPT(Exception, "SCM ERROR - Check remote dependency location / version");
     }
@@ -137,7 +136,7 @@ class Git : public SCM {
       if (!r.empty() && !v.empty()) p.arg(v);
       try {
         p.start();
-      } catch (const kul::proc::ExitException &e) {
+      } catch (kul::proc::ExitException const& e) {
         KEXCEPT(Exception, "SCM ERROR - Check remote dependency location / version");
       }
     }
@@ -147,7 +146,7 @@ class Git : public SCM {
     kul::ProcessCapture pc(p);
     try {
       p.arg("remote").arg("-v").start();
-    } catch (const kul::proc::ExitException &e) {
+    } catch (kul::proc::ExitException const& e) {
       KERR << pc.errs();
       KEXCEPT(Exception, "SCM ERROR " + std::string(e.what()));
     }
@@ -165,7 +164,7 @@ class Git : public SCM {
     kul::ProcessCapture pc(p);
     try {
       p.arg("rev-parse").arg(b.empty() ? "HEAD" : b).start();
-    } catch (const kul::proc::ExitException &e) {
+    } catch (kul::proc::ExitException const& e) {
       KERR << pc.errs();
       KEXCEPT(Exception, "SCM ERROR " + std::string(e.what()));
     }
@@ -180,7 +179,7 @@ class Git : public SCM {
     kul::ProcessCapture pc(p);
     try {
       p.arg("ls-remote").arg(url).arg(b).start();
-    } catch (const kul::proc::ExitException &e) {
+    } catch (kul::proc::ExitException const& e) {
       KERR << pc.errs();
       KEXCEPT(Exception, "SCM ERROR " + std::string(e.what()));
     }
@@ -196,7 +195,7 @@ class Git : public SCM {
     kul::ProcessCapture pc(p);
     try {
       p.arg("status").arg("-sb").start();
-    } catch (const kul::proc::ExitException &e) {
+    } catch (kul::proc::ExitException const& e) {
       KERR << pc.errs();
       KEXCEPT(Exception, "SCM ERROR " + std::string(e.what()));
     }
@@ -208,7 +207,7 @@ class Git : public SCM {
       p << "status";
       if (!full) p << "--short";
       p.start();
-    } catch (const kul::proc::ExitException &e) {
+    } catch (kul::proc::ExitException const& e) {
       KEXCEPT(Exception, "SCM ERROR " + std::string(e.what()));
     }
   }
@@ -216,7 +215,7 @@ class Git : public SCM {
     kul::Process p("git", d);
     try {
       p.arg("diff").start();
-    } catch (const kul::proc::ExitException &e) {
+    } catch (kul::proc::ExitException const& e) {
       KEXCEPT(Exception, "SCM ERROR " + std::string(e.what()));
     }
   }
@@ -232,7 +231,7 @@ d); p.arg("checkout").arg(kul::env::GET("KUL_SVN_CO")); if (v.empty()) p.arg(r);
       p.arg(r + "/" + v);
     try {
       p.arg(".").start();
-    } catch (const kul::proc::ExitException &e) {
+    } catch (kul::proc::ExitException const& e) {
       dr.rm();
       KEXCEPT(Exception, "SCM ERROR - Check remote dependency location /
 version");
