@@ -67,6 +67,7 @@ auto tryCatch = [](std::vector<std::function<void()>> funcs, bool katch) {
 #include "test/span.ipp"
 
 int main(int argc, char *argv[]) {
+  KOUT(NON) << __FILE__;
   ::testing::InitGoogleMock(&argc, argv);
   return RUN_ALL_TESTS();
 }

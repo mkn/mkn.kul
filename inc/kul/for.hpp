@@ -34,21 +34,37 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <tuple>
 
 namespace kul {
-/*
+
+template<typename T = std::size_t>
 struct Apply {
   template<size_t i>
-  constexpr decltype(auto) operator()(){}
-};*/
+  constexpr auto operator()(){ return std::integral_constant<T, i>{}(); }
+};
+
 template <typename Apply, size_t... Is>
-constexpr decltype(auto) for_N(Apply& f, std::integer_sequence<size_t, Is...> const&) {
+constexpr auto apply_N(Apply& f, std::integer_sequence<size_t, Is...> const&) {
   if constexpr (!std::is_same_v<decltype(f.template operator()<0>()), void>)
     return std::make_tuple(f.template operator()<Is>()...);
   (f.template operator()<Is>(), ...);
 }
-template <size_t T, typename Apply>
-constexpr decltype(auto) for_N(Apply&& f) {
-  return for_N(f, std::make_integer_sequence<size_t, T>{});
+template <size_t N, typename Apply>
+constexpr auto apply_N(Apply&& f) {
+  return apply_N(f, std::make_integer_sequence<size_t, N>{});
 }
+
+template <size_t N, typename Fn>
+constexpr void for_N(Fn&& fn) {
+/*
+    for_N<2>([](auto ic) {
+        constexpr auto i = ic();
+        // ...
+    });
+*/
+
+  std::apply([&](auto ... ics)  { (fn(ics), ...);}, apply_N<N>(Apply{}));
+}
+
+
 
 }  // namespace kul
 
