@@ -48,7 +48,7 @@ struct PointersApply {
   PointersApply(Tuple& t) : tuple{t} {}
 
   template <size_t i>
-  decltype(auto) operator()() {
+  auto operator()() {
     auto t = std::get<i>(tuple);
     using T = decltype(t);
     if constexpr (std::is_pointer<T>::value)
@@ -60,36 +60,36 @@ struct PointersApply {
   Tuple& tuple;
 };
 
-template <typename... Pointer>
-struct PointerContainer : public Pointer... {
-  PointerContainer(Pointer&... args) : Pointer(std::forward<Pointer>(args))... {}
+template <typename... Pointers>
+struct PointerContainer : public Pointers... {
+  PointerContainer(Pointers&... args) : Pointers(std::forward<Pointers>(args))... {}
 };
 
 template <typename... Args>
-decltype(auto) _make_pointer_container(std::tuple<Args...>&& t) {
+auto _make_pointer_container(std::tuple<Args...>&& t) {
   return std::make_from_tuple<PointerContainer<Args...>>(t);
 }
 
 template <typename... Refs>
-decltype(auto) make_pointer_container(Refs&&... args) {
+auto make_pointer_container(Refs&&... args) {
   auto tuple = std::forward_as_tuple(args...);
   constexpr size_t size = std::tuple_size<decltype(tuple)>::value;
-  return _make_pointer_container(for_N<size>(PointersApply{tuple}));
+  return _make_pointer_container(apply_N<size>(PointersApply{tuple}));
 }
 
 template <typename T>
 struct ApplySingleTupleValue {
   constexpr ApplySingleTupleValue(T t_) : t{t_} {}
   template <size_t i>
-  constexpr decltype(auto) operator()() {
+  constexpr auto operator()() {
     return t;
   }
   T t;
 };
 
 template <typename T, size_t Size>
-constexpr decltype(auto) tuple_from(T t) {
-  return for_N<Size>(ApplySingleTupleValue{t});
+constexpr auto tuple_from(T t) {
+  return apply_N<Size>(ApplySingleTupleValue{t});
 }
 
 }  // namespace kul
