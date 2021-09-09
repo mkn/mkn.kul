@@ -38,7 +38,7 @@ namespace kul {
 template<typename T = std::size_t>
 struct Apply {
   template<size_t i>
-  constexpr auto operator()(){ return std::integral_constant<T, i>{}(); }
+  constexpr auto operator()(){ return std::integral_constant<T, i>{}; }
 };
 
 template <typename Apply, size_t... Is>
