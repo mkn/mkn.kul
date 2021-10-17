@@ -1,7 +1,7 @@
 
 
 TEST(Process_Test, LaunchProcess) {
-  kul::Process p("bash");
+  mkn::kul::Process p("bash");
   p << "-c"
     << "\"seq"
     << "1"
@@ -16,8 +16,8 @@ TEST(Process_Test, LaunchProcess) {
 
 TEST(Process_Test, CaptureProcess) {
   std::string lines;
-  kul::Process p("bash");
-  kul::ProcessCapture pc(p);
+  mkn::kul::Process p("bash");
+  mkn::kul::ProcessCapture pc(p);
   p << "-c"
     << "\"seq"
     << "1"
@@ -28,7 +28,7 @@ TEST(Process_Test, CaptureProcess) {
     ASSERT_TRUE(lines.size());
     ASSERT_FALSE(pc.errs().size());
     uint8_t i = 0;
-    for (auto s : kul::String::LINES(lines)) {
+    for (auto s : mkn::kul::String::LINES(lines)) {
       EXPECT_EQ(s, std::to_string(++i));
     }
   } catch (...) {

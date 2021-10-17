@@ -28,18 +28,18 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#include "kul/os.hpp"
+#include "mkn/kul/os.hpp"
 
-// std::vector<kul::Dir> kul::Dir::dirs(bool incHidden) const
-// KTHROW(kul::fs::Exception){
-#include "kul/os/win/src/os/dir/dirs.ipp"
+// std::vector<mkn::kul::Dir> mkn::kul::Dir::dirs(bool incHidden) const
+// KTHROW(mkn::kul::fs::Exception){
+#include "mkn/kul/os/win/src/os/dir/dirs.ipp"
 // }
 
-// std::vector<kul::File> kul::Dir::files(bool recursive) const
-// KTHROW(kul::fs::Exception){
-#include "kul/os/win/src/os/dir/files.ipp"
+// std::vector<mkn::kul::File> mkn::kul::Dir::files(bool recursive) const
+// KTHROW(mkn::kul::fs::Exception){
+#include "mkn/kul/os/win/src/os/dir/files.ipp"
 // }
 
-// std::string kul::Dir::REAL(std::string const&s) KTHROW(fs::Exception) {
-#include "kul/os/win/src/os/dir/Xreal.ipp"
+// std::string mkn::kul::Dir::REAL(std::string const&s) KTHROW(fs::Exception) {
+#include "mkn/kul/os/win/src/os/dir/Xreal.ipp"
 // }

@@ -12,15 +12,8 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: Get mkn
-      uses: dawidd6/action-download-artifact@v2
-      with:
-        name: mkn
-        branch: master
-        workflow: build_osx.yml
-        repo: mkn/maiken
-
     - name: "Build/Test" # contains slash so use quotes otherwise UB
       run: |
-        chmod +x mkn
-        KLOG=3 ./mkn clean build run -dtOp test -a "-std=c++17 -fPIC"
+        wget https://github.com/PhilipDeegan/mkn/releases/download/latest/mkn_osx
+        chmod +x mkn_osx
+        KLOG=3 ./mkn_osx clean build run -dtOp test -a "-std=c++17 -fPIC"

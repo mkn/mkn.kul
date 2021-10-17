@@ -52,14 +52,20 @@ Description - Add string to svn checkout as arguments
 
 Switches - OSX is considered BSD for swiches unless otherwise noted
 
-Key             _KUL_MAX_PATH_
+Key             _MKN_KUL_DISABLE_KLOG_DEF_
+Type            bool
+Default         undefined
+OS              all
+Description     if defined, or set to 1, do not register KLOG* macros
+
+Key             _MKN_KUL_MAX_PATH_
 Type            size_t
 Default         MAX_PATH/PATH_MAX - or 1024 if not found
 OS              all
 Description     Max array length for filesystem interactions
 
 
-Key             __KUL_LOG_FRMT__
+Key             __MKN_KUL_LOG_FRMT__
 Type            string
 Default         "[%M]: %T - %D : %F fn(%N)#%L - %S"
 OS              all
@@ -67,13 +73,13 @@ Description
 Logging format in format view:
 	%M = Mode - INF/ERR/DBG
 	%T = Thread ID
-	%D = DateTime - uses __KUL_LOG_DATE_FRMT__
+	%D = DateTime - uses __MKN_KUL_LOG_DATE_FRMT__
 	%F = File
 	%N = Function
 	%L = Line
 	%S = String
 
-Key             __KUL_LOG_DATE_FRMT__
+Key             __MKN_KUL_LOG_DATE_FRMT__
 Type            string
 Default         "%Y-%m-%d-%H:%M:%S:%i"
 OS              all
@@ -81,7 +87,7 @@ Description
 Logging DateTime format, reference: http://en.cppreference.com/w/cpp/chrono/c/strftime
 "%i" is custom for milliseconds, method strftime is used for all other
 
-Key             __KUL_THREAD_SPAWN_WAIT__
+Key             __MKN_KUL_THREAD_SPAWN_WAIT__
 Type            number
 Default
     nix/bsd     5000000
@@ -90,7 +96,7 @@ OS              all
 Description
 Used in thread queues. The amount of time in nanoseconds waited after launching a thread. Threads launched too quickly can cause issues on nix platforms, bsd assumed similar.
 
-Key             __KUL_PROC_BLOCK_ERR__
+Key             __MKN_KUL_PROC_BLOCK_ERR__
 Type            flag
 Default         disabled
 OS              nix/bsd
@@ -99,21 +105,21 @@ Turns on error checking for creating new processes when running -
     fcntl(fd, F_SETFL, O_NONBLOCK);
 Can be an issue being on when running many processes rapidly.
 
-Key             __KUL_PROC_DUP_RETRY__
+Key             __MKN_KUL_PROC_DUP_RETRY__
 Type            number
 Default         3
 OS              nix/bsd
 Description
 Allows N retries for "dup(fileDescriptor") calls in forked process.
 
-Key             __KUL_SYS_DLOPEN__
+Key             __MKN_KUL_SYS_DLOPEN__
 Type            text
 Default         RTLD_NOW|RTLD_GLOBAL
 OS              nix/bsd
 Description
 Flags for dlopen, see https://linux.die.net/man/3/dlopen
 
-Key             _KUL_PROC_LOOP_NSLEEP_
+Key             _MKN_KUL_PROC_LOOP_NSLEEP_
 Type            number
 Default         undefined
 OS              nix/bsd
@@ -121,7 +127,7 @@ Description
 Nanosecond sleep while reading running processes pipe output, if defined and greater than 0
 
 
-Key             _KUL_COMPILED_LIB_
+Key             _MKN_KUL_COMPILED_LIB_
 Type            flag
 Default         disabled
 OS              all
@@ -141,5 +147,5 @@ With options
 
 1. google.sparsehash
 
-   Uses google.sparsehash for kul::hash::set and kul::hash::map classes
+   Uses google.sparsehash for mkn::kul::hash::set and mkn::kul::hash::map classes
 

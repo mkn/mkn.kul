@@ -31,23 +31,25 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define KUL_FORCE_TRACE
 
 #include <iomanip>
-#include "kul/asio/log.hpp"
-#include "kul/assert.hpp"
-#include "kul/cli.hpp"
-#include "kul/dbg.hpp"
-#include "kul/io.hpp"
-#include "kul/ipc.hpp"
-#include "kul/log.hpp"
-#include "kul/math.hpp"
-#include "kul/os.hpp"
-#include "kul/proc.hpp"
-#include "kul/signal.hpp"
-#include "kul/string.hpp"
-#include "kul/threads.hpp"
-#include "kul/time.hpp"
-#include "kul/tuple.hpp"
-#include "kul/wstring.hpp"
+#include "mkn/kul/asio/log.hpp"
+#include "mkn/kul/assert.hpp"
+#include "mkn/kul/cli.hpp"
+#include "mkn/kul/dbg.hpp"
+#include "mkn/kul/io.hpp"
+#include "mkn/kul/ipc.hpp"
+#include "mkn/kul/log.hpp"
+#include "mkn/kul/math.hpp"
+#include "mkn/kul/os.hpp"
+#include "mkn/kul/proc.hpp"
+#include "mkn/kul/signal.hpp"
+#include "mkn/kul/span.hpp"
+#include "mkn/kul/string.hpp"
+#include "mkn/kul/threads.hpp"
+#include "mkn/kul/time.hpp"
+#include "mkn/kul/tuple.hpp"
+#include "mkn/kul/wstring.hpp"
 
+namespace mkn {
 namespace kul {
 
 class Test;
@@ -70,7 +72,7 @@ class TestThreadObject {
     KLOG(INF) << "CONST THREAD FINISHED";
   }
   friend class Test;
-  friend class kul::Thread;
+  friend class mkn::kul::Thread;
 };
 
 class TestThreadQueueObject {
@@ -81,7 +83,7 @@ class TestThreadQueueObject {
  public:
   TestThreadQueueObject(Mutex &_mutex) : mutex(_mutex) {}
   void operator()() {
-    kul::ScopeLock lock(mutex);
+    mkn::kul::ScopeLock lock(mutex);
     KLOG(INF) << "THREAD RUNNING";
     i++;
     KLOG(INF) << "THREAD FINISHED";
@@ -97,7 +99,7 @@ class TestThreadQueueQObject : public TestThreadQueueObject {
   TestThreadQueueQObject(Mutex &_mutex, std::queue<int> &_q)
       : TestThreadQueueObject(_mutex), q(_q) {}
   void operator()() {
-    kul::ScopeLock lock(mutex);
+    mkn::kul::ScopeLock lock(mutex);
     KLOG(INF) << "THREAD RUNNING";
     i++;
     q.pop();
@@ -111,13 +113,13 @@ class TestConcQueueQObject {
   TestConcQueueQObject() {}
   void operator()() {
     KLOG(INF) << "TestConcQueueQObject RUNNING";
-    kul::this_thread::sleep(10);
+    mkn::kul::this_thread::sleep(10);
   }
 };
 
-class TestIPCServer : public kul::ipc::Server {
+class TestIPCServer : public mkn::kul::ipc::Server {
  public:
-  TestIPCServer() : kul::ipc::Server("uuid", 1) {}  // UUID     CHECKS ONCE
+  TestIPCServer() : mkn::kul::ipc::Server("uuid", 1) {}  // UUID     CHECKS ONCE
   void handle(std::string const &s) { KLOG(INF) << "TestIPCServer " << s; }
   void operator()() { listen(); }
 };
@@ -126,10 +128,10 @@ class TestIPC {
  public:
   void run() {
     TestIPCServer ipc;
-    kul::Thread t(std::ref(ipc));
+    mkn::kul::Thread t(std::ref(ipc));
     t.run();
-    kul::this_thread::sleep(1000);
-    kul::ipc::Client("uuid").send("TestIPCClient");
+    mkn::kul::this_thread::sleep(1000);
+    mkn::kul::ipc::Client("uuid").send("TestIPCClient");
     t.join();
   }
 };
@@ -151,7 +153,7 @@ class Test {
   Test(int argc, char *argv[]) : s("LAMBDAS ALLOWED IN SIGNAL") {
     KUL_DBG_FUNC_ENTER;
     Catch c;
-    kul::Signal sig;  // Windows: each thread requires own handler, static
+    mkn::kul::Signal sig;  // Windows: each thread requires own handler, static
                       // singleton otherwise so only ever one.
     sig.segv(std::bind(&Catch::print, std::ref(c),
                        std::placeholders::_1));  // Vector of
@@ -170,107 +172,107 @@ class Test {
     KLOG(INF) << "KLOG(INF)";  // KLOG=1
     KLOG(ERR) << "KLOG(ERR)";  // KLOG=2
     KLOG(DBG) << "KLOG(DBG)";  // KLOG=3
-    KOUT(NON) << kul::Dir::SEP();
-    KOUT(NON) << kul::env::SEP();
-    KOUT(NON) << kul::env::CWD();
-    KOUT(NON) << kul::user::home().path();
-    KLOG(INF) << kul::user::home("maiken").path();
+    KOUT(NON) << mkn::kul::Dir::SEP();
+    KOUT(NON) << mkn::kul::env::SEP();
+    KOUT(NON) << mkn::kul::env::CWD();
+    KOUT(NON) << mkn::kul::user::home().path();
+    KLOG(INF) << mkn::kul::user::home("maiken").path();
 
-    kul::File fo("TEST_WRITE_OUT");
-    kul::File fe("TEST_WRITE_ERR");
+    mkn::kul::File fo("TEST_WRITE_OUT");
+    mkn::kul::File fe("TEST_WRITE_ERR");
     {
-      kul::io::Writer wo(fo);
-      kul::io::Writer we(fe);
+      mkn::kul::io::Writer wo(fo);
+      mkn::kul::io::Writer we(fe);
       auto lo = [&](std::string const &_s) { wo << _s; };
       auto le = [&](std::string const &_s) { we << _s; };
-      kul::LogMan::INSTANCE().setOut(lo);
-      kul::LogMan::INSTANCE().setErr(le);
+      mkn::kul::LogMan::INSTANCE().setOut(lo);
+      mkn::kul::LogMan::INSTANCE().setErr(le);
       KOUT(INF) << "KOUT(INF)";
       KERR << "KOUT(ERR)";
       // scoped for autoflush - segfault later drops stream
     }
     fo.rm();
     fe.rm();
-    kul::LogMan::INSTANCE().setOut(nullptr);
-    kul::LogMan::INSTANCE().setErr(nullptr);
+    mkn::kul::LogMan::INSTANCE().setOut(nullptr);
+    mkn::kul::LogMan::INSTANCE().setErr(nullptr);
 
     {
-      kul::File os_inc("os.ipp", kul::Dir("test"));
-      kul::File os_hpp("os.hpp", kul::Dir("inc/kul"));
+      mkn::kul::File os_inc("os.ipp", mkn::kul::Dir("test"));
+      mkn::kul::File os_hpp("os.hpp", mkn::kul::Dir("inc/kul"));
       if (!os_hpp || !os_inc) KEXCEPTION("UH OH!");
       KLOG(INF) << os_inc.relative(os_hpp);
       KLOG(INF) << os_inc.relative(os_hpp.dir());
       KLOG(INF) << os_inc.dir().relative(os_hpp.dir());
     }
 
-    for (kul::Dir const &d : kul::Dir(kul::env::CWD()).dirs())
-      for (kul::File const &f : d.files()) KOUT(NON) << d.join(f.name());  // or f.full()
+    for (mkn::kul::Dir const &d : mkn::kul::Dir(mkn::kul::env::CWD()).dirs())
+      for (mkn::kul::File const &f : d.files()) KOUT(NON) << d.join(f.name());  // or f.full()
     try {
-      kul::Process("echo").arg("Hello").arg("World").start();
+      mkn::kul::Process("echo").arg("Hello").arg("World").start();
 
-    } catch (const kul::proc::ExitException &e) {
+    } catch (const mkn::kul::proc::ExitException &e) {
       KERR << e.stack();
       KERR << e.code();
-    } catch (const kul::proc::Exception &e) {
+    } catch (const mkn::kul::proc::Exception &e) {
       KERR << e.debug() << " : " << typeid(e).name();
       KERR << "Error expected on windows without echo on path";
     }
 
     {
-      std::vector<kul::cli::Arg> argV{{kul::cli::Arg('f', "flag"),
-                                       kul::cli::Arg('m', "maybe_value", kul::cli::ArgType::MAYBE),
-                                       kul::cli::Arg('o', "option", kul::cli::ArgType::STRING)}};
-      std::vector<kul::cli::Cmd> cmdV{{"COMMAND"}};
+      std::vector<mkn::kul::cli::Arg> argV{{mkn::kul::cli::Arg('f', "flag"),
+                                       mkn::kul::cli::Arg('m', "maybe_value", mkn::kul::cli::ArgType::MAYBE),
+                                       mkn::kul::cli::Arg('o', "option", mkn::kul::cli::ArgType::STRING)}};
+      std::vector<mkn::kul::cli::Cmd> cmdV{{"COMMAND"}};
 
-      kul::cli::Args args(cmdV, argV);
+      mkn::kul::cli::Args args(cmdV, argV);
       try {
         args.process(argc, argv);
-      } catch (const kul::cli::Exception &e) {
+      } catch (const mkn::kul::cli::Exception &e) {
         KEXIT(1, e.what());
       }
     }
 
     for (std::string const &arg :
-         kul::cli::asArgs("/path/to \"words in quotes\" words\\ not\\ in\\ quotes end"))
+         mkn::kul::cli::asArgs("/path/to \"words in quotes\" words\\ not\\ in\\ quotes end"))
       KOUT(NON) << "ARG: " << arg;
 
-    for (std::string const &arg : kul::String::SPLIT("split - by - char - dash", '-'))
+    for (std::string const &arg : mkn::kul::String::SPLIT("split - by - char - dash", '-'))
       KOUT(NON) << "BIT: " << arg;
-    for (std::string const &arg : kul::String::SPLIT("split - by - string - dash", "-"))
+    for (std::string const &arg : mkn::kul::String::SPLIT("split - by - string - dash", "-"))
       KOUT(NON) << "BIT: " << arg;
 
     for (std::string const &arg :
-         kul::String::ESC_SPLIT("split \\- by - char - dash with escape backslash", '-'))
+         mkn::kul::String::ESC_SPLIT("split \\- by - char - dash with escape backslash", '-'))
       KOUT(NON) << "BIT: " << arg;
 
-    kul::hash::map::S2S sparse;
+    mkn::kul::hash::map::S2S sparse;
     sparse.insert("LEFT", "RIGHT");
 
 #if defined(_MKN_WITH_GOOGLE_SPARSEHASH_)
     {
-      kul::dense::hash::map::S2S dense;
+      mkn::kul::dense::hash::map::S2S dense;
       dense.setEmptyKey("");  // unique non occuring key
       dense.insert("LEFT", "RIGHT");
     }
 #endif
 
-    kul::File file("./write_access");
+    mkn::kul::File file("./write_access");
     if (file && !file.rm()) KERR << "CANNOT DELETE FILE " << file;
     if (!file && !file.mk()) KERR << "CANNOT CREATE FILE " << file;
     if (file && !file.rm()) KERR << "CANNOT DELETE FILE " << file;
 
-    KOUT(NON) << "kul::Now::MILLIS(); " << kul::Now::MILLIS();
-    KOUT(NON) << "kul::Now::MICROS(); " << kul::Now::MICROS();
-    KOUT(NON) << "kul::Now::NANOS();  " << kul::Now::NANOS();
+    KOUT(NON) << "mkn::kul::Now::MILLIS(); " << mkn::kul::Now::MILLIS();
+    KOUT(NON) << "mkn::kul::Now::MICROS(); " << mkn::kul::Now::MICROS();
+    KOUT(NON) << "mkn::kul::Now::NANOS();  " << mkn::kul::Now::NANOS();
 
-    KOUT(NON) << "kul::DateTime::NOW();  " << kul::DateTime::NOW();
+    KOUT(NON) << "mkn::kul::DateTime::NOW();  " << mkn::kul::DateTime::NOW();
 
-    KOUT(NON) << "CPU CORES:   " << kul::cpu::cores();
-    KOUT(NON) << "MAX THREADS: " << kul::cpu::threads();
+    KOUT(NON) << "CPU CORES:   " << mkn::kul::cpu::cores();
+    KOUT(NON) << "MAX THREADS: " << mkn::kul::cpu::threads();
 
     {
-      kul::SpanSet<double> spanset{std::vector<size_t>{3, 2, 1}};
-      kul::Span<double> raw = spanset.raw();
+      mkn::kul::SpanSet<double> spanset{std::vector<size_t>{3, 2, 1}};
+      mkn::kul::Span<double> raw = spanset.raw();
       std::vector<size_t> vals{1, 5, 5, 3, 4, 5};
       for (size_t i = 0; i < 6; i++) raw[i] = vals[i];
       for (auto const &span : spanset) {
@@ -281,37 +283,37 @@ class Test {
 
     {
       TestThreadObject tto1;
-      kul::Thread th(std::ref(tto1));
+      mkn::kul::Thread th(std::ref(tto1));
       th.join();
       tto1.print();
       th.join();
       tto1.print();
 
       TestThreadObject tto2;
-      kul::Thread th2(std::cref(tto2));
+      mkn::kul::Thread th2(std::cref(tto2));
       th2.join();
       tto2.print();
 
       TestThreadObject tto3;
-      kul::Thread th3(tto3);
+      mkn::kul::Thread th3(tto3);
       th3.join();
       tto3.print();
 
-      kul::Thread([&tto1]() { tto1(); }).join();
+      mkn::kul::Thread([&tto1]() { tto1(); }).join();
       tto1.print();
-      kul::Thread([tto1]() { tto1(); }).join();
+      mkn::kul::Thread([tto1]() { tto1(); }).join();
       tto1.print();
     }
 
-    kul::Mutex mutex;
+    mkn::kul::Mutex mutex;
     {
-      { kul::ScopeLock lock(mutex); }
-      kul::ScopeLock lock(mutex);
+      { mkn::kul::ScopeLock lock(mutex); }
+      mkn::kul::ScopeLock lock(mutex);
     }
     {
       KOUT(NON) << "LAUNCHING THREAD POOL";
       TestThreadQueueObject ttpo1(mutex);
-      kul::ThreadQueue tp1(std::ref(ttpo1));
+      mkn::kul::ThreadQueue tp1(std::ref(ttpo1));
       tp1.setMax(4);
       tp1.detach();
       tp1.join();
@@ -321,8 +323,8 @@ class Test {
       for (int i = 0; i < 10; i++) q.push(i);
       KOUT(NON) << "LAUNCHING PREDICATED THREAD POOL";
       TestThreadQueueQObject ttpo2(mutex, q);
-      kul::PredicatedThreadQueue<std::queue<int>> tp2(std::ref(ttpo2), q);
-      tp2.setMax(kul::cpu::threads());
+      mkn::kul::PredicatedThreadQueue<std::queue<int>> tp2(std::ref(ttpo2), q);
+      tp2.setMax(mkn::kul::cpu::threads());
       tp2.detach();
       tp2.join();
       ttpo2.print();
@@ -332,42 +334,42 @@ class Test {
     ConcurrentThreadQueue<void()> ctq(5, 1);
     for (size_t i = 0; i < 10; i++)
       ctq.async(std::bind(&TestConcQueueQObject::operator(), std::ref(tcqqo)));
-    kul::this_thread::sleep(500);
+    mkn::kul::this_thread::sleep(500);
     ctq.stop().join();
 
     {
-      kul::ConcurrentThreadPool<> ctp(5, 1);
+      mkn::kul::ConcurrentThreadPool<> ctp(5, 1);
       auto lambda = [](unsigned int a, unsigned int b) { KLOG(INF) << (a + b); };
       ctp.async(std::bind(lambda, 2, 4));
       auto lambdb = [](unsigned int a, unsigned int b) {
         KLOG(INF) << (a + b);
         KEXCEPTION("Exceptional!");
       };
-      auto lambex = [](const kul::Exception &e) { KLOG(ERR) << e.stack(); };
+      auto lambex = [](const mkn::kul::Exception &e) { KLOG(ERR) << e.stack(); };
       ctp.async(std::bind(lambdb, 2, 4), std::bind(lambex, std::placeholders::_1));
-      kul::this_thread::sleep(500);
+      mkn::kul::this_thread::sleep(500);
       ctp.block().finish().join();
     }
 
     {
-      kul::ChroncurrentThreadPool<> ctp(5, 1);
+      mkn::kul::ChroncurrentThreadPool<> ctp(5, 1);
       auto lambda = [](unsigned int a, unsigned int b) { KLOG(INF) << (a + b); };
       ctp.async(std::bind(lambda, 2, 4));
       auto lambdb = [](unsigned int a, unsigned int b) {
         KLOG(INF) << (a + b);
-        KEXCEPT(kul::Exception, "Exceptional!");
+        KEXCEPT(mkn::kul::Exception, "Exceptional!");
       };
-      auto lambex = [](const kul::Exception &e) { KLOG(ERR) << e.stack(); };
+      auto lambex = [](const mkn::kul::Exception &e) { KLOG(ERR) << e.stack(); };
       ctp.async(std::bind(lambdb, 2, 4), std::bind(lambex, std::placeholders::_1));
-      kul::this_thread::sleep(500);
+      mkn::kul::this_thread::sleep(500);
       ctp.block().finish().join();
     }
 
     TestIPC().run();
 
-    KOUT(NON) << "Phsical RAM used in KB: " << kul::this_proc::physicalMemory();
-    KOUT(NON) << "Virtual RAM used in KB: " << kul::this_proc::virtualMemory();
-    KOUT(NON) << "Total RAM used in KB:   " << kul::this_proc::totalMemory();
+    KOUT(NON) << "Phsical RAM used in KB: " << mkn::kul::this_proc::physicalMemory();
+    KOUT(NON) << "Virtual RAM used in KB: " << mkn::kul::this_proc::virtualMemory();
+    KOUT(NON) << "Total RAM used in KB:   " << mkn::kul::this_proc::totalMemory();
 
     KOUT(NON);
     KOUT(NON) << "SEG FAULTING MAIN THREAD!";
@@ -380,11 +382,12 @@ class Test {
   }
 };
 }  // namespace kul
+}  // namespace mkn
 
 int main(int argc, char *argv[]) {
   try {
-    kul::Test(argc, argv);
-  } catch (const kul::Exception &e) {
+    mkn::kul::Test(argc, argv);
+  } catch (const mkn::kul::Exception &e) {
     KERR << e.stack();
   } catch (const std::exception &e) {
     KERR << e.what();

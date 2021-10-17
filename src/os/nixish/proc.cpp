@@ -28,11 +28,11 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#include "kul/proc.hpp"
+#include "mkn/kul/proc.hpp"
 
-#include "kul/os/nixish/src/proc/child.cpp"
-#include "kul/os/nixish/src/proc/expand.cpp"
-#include "kul/os/nixish/src/proc/waitForStatus.cpp"
-#include "kul/os/nixish/src/proc/waitExit.cpp"
-#include "kul/os/nixish/src/proc/tearDown.cpp"
-#include "kul/os/nixish/src/proc/tearDown.cpp"
+#include "mkn/kul/os/nixish/src/proc/child.cpp"
+#include "mkn/kul/os/nixish/src/proc/expand.cpp"
+#include "mkn/kul/os/nixish/src/proc/waitForStatus.cpp"
+#include "mkn/kul/os/nixish/src/proc/waitExit.cpp"
+#include "mkn/kul/os/nixish/src/proc/tearDown.cpp"
+#include "mkn/kul/os/nixish/src/proc/tearDown.cpp"

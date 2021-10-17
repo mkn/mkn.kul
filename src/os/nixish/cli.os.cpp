@@ -29,7 +29,7 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include <iostream>
-#include "kul/cli.hpp"
+#include "mkn/kul/cli.hpp"
 
-#include "kul/os/nixish/src/cli/hidden.ipp"
-#include "kul/os/nixish/src/cli/show.ipp"
+#include "mkn/kul/os/nixish/src/cli/hidden.ipp"
+#include "mkn/kul/os/nixish/src/cli/show.ipp"

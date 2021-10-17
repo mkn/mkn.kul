@@ -34,5 +34,5 @@ script:
       eval "${MATRIX_EVAL}"
       export CC CXX
       make nix -C maiken && cp maiken/mkn .
-      ./mkn build -dtKa "-D_KUL_USE_CBLAS -O2 -std=c++17 -fPIC" -l "-pthread -ldl -lblas" -p test run
+      ./mkn build -dtKa "-D_MKN_KUL_USE_CBLAS -O2 -std=c++17 -fPIC" -l "-pthread -ldl -lblas" -p test run
     fi

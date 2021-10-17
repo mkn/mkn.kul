@@ -1,14 +1,14 @@
 
 
 TEST(OperatingSystemTests, HasRAMUsageSupport) {
-  ASSERT_TRUE(kul::this_proc::physicalMemory());
-  ASSERT_TRUE(kul::this_proc::virtualMemory());
+  ASSERT_TRUE(mkn::kul::this_proc::physicalMemory());
+  ASSERT_TRUE(mkn::kul::this_proc::virtualMemory());
 }
 
 class TimeStampHandler {
  private:
-  kul::File f;
-  kul::fs::TimeStamps fts;
+  mkn::kul::File f;
+  mkn::kul::fs::TimeStamps fts;
   TimeStampHandler() : f("mkn.yaml"), fts(f.timeStamps()) {}
 
  public:
@@ -17,7 +17,7 @@ class TimeStampHandler {
     return i;
   }
   bool is() { return f.is(); }
-  const kul::fs::TimeStamps& timeStamps() { return fts; }
+  const mkn::kul::fs::TimeStamps& timeStamps() { return fts; }
 };
 
 TEST(OperatingSystemTests, HasFileAccessedTimeStampSupport) {

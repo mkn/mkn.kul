@@ -26,7 +26,7 @@ profile:
     if_src:
         bsd: ./src/os/nixish
         nix: ./src/os/nixish
-    arg: -D_KUL_COMPILED_LIB_
+    arg: -D_MKN_KUL_COMPILED_LIB_
 
   - name: test
     parent: lib

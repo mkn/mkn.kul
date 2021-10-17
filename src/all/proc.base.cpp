@@ -28,7 +28,7 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#include "kul/log.hpp"
+#include "mkn/kul/log.hpp"
 
-#include "kul/src/proc.base/start.ipp"
-#include "kul/src/proc.base/toString.ipp"
+#include "mkn/kul/src/proc.base/start.ipp"
+#include "mkn/kul/src/proc.base/toString.ipp"
