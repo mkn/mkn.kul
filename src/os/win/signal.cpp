@@ -28,8 +28,8 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#include "kul/signal.hpp"
+#include "mkn/kul/signal.hpp"
 
 void kul_real_se_handler(EXCEPTION_POINTERS *pExceptionInfo) {
-#include "kul/src/signal/se_handler.cpp"
+#include "mkn/kul/src/signal/se_handler.cpp"
 }

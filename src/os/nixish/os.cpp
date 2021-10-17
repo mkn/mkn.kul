@@ -28,8 +28,8 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#include "kul/os.hpp"
+#include "mkn/kul/os.hpp"
 
-#include "kul/os/nixish/src/os/dir/dirs.ipp"
-#include "kul/os/nixish/src/os/dir/files.ipp"
-#include "kul/os/nixish/src/os/dir/Xreal.ipp"
+#include "mkn/kul/os/nixish/src/os/dir/dirs.ipp"
+#include "mkn/kul/os/nixish/src/os/dir/files.ipp"
+#include "mkn/kul/os/nixish/src/os/dir/Xreal.ipp"

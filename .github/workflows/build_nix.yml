@@ -12,15 +12,8 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: Get mkn
-      uses: dawidd6/action-download-artifact@v2
-      with:
-        name: mkn
-        branch: master
-        workflow: build_nix.yml
-        repo: mkn/maiken
-
     - name: "Build/Test" # contains slash so use quotes otherwise UB
       run: |
-        chmod +x mkn
-        KLOG=3 ./mkn clean build run -dtOp test -a "-std=c++17 -fPIC"
+        wget https://github.com/PhilipDeegan/mkn/releases/download/latest/mkn_nix
+        chmod +x mkn_nix
+        KLOG=3 ./mkn_nix clean build run -dtOp test -a "-std=c++17 -fPIC"

@@ -28,8 +28,8 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#include "kul/threads.hpp"
+#include "mkn/kul/threads.hpp"
 
-bool kul::this_thread::main() {
-#include "kul/os/win/src/thread/main.cpp"
+bool mkn::kul::this_thread::main() {
+#include "mkn/kul/os/win/src/thread/main.cpp"
 }

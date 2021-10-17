@@ -28,12 +28,12 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#include "kul/cli.hpp"
+#include "mkn/kul/cli.hpp"
 
-std::string kul::cli::hidden(std::string const& t) {
-#include "kul/os/win/src/cli/hidden.cpp"
+std::string mkn::kul::cli::hidden(std::string const& t) {
+#include "mkn/kul/os/win/src/cli/hidden.cpp"
 }
 
-void kul::cli::show() {
-#include "kul/os/win/src/cli/show.cpp"
+void mkn::kul::cli::show() {
+#include "mkn/kul/os/win/src/cli/show.cpp"
 }
