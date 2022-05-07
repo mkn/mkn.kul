@@ -31,6 +31,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _MKN_KUL_ASSERT_HPP_
 #define _MKN_KUL_ASSERT_HPP_
 
+#include <cstdlib>
+
 #include "mkn/kul/signal.hpp"
 
 namespace mkn {
@@ -48,6 +50,11 @@ struct Assert {
 #endif
   }
 };
+
+void abort_if(bool b) {
+  if (b) std::abort();
+}
+
 }  // namespace kul
 }  // namespace mkn
 

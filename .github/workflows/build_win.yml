@@ -12,6 +12,10 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+    - uses: ilammy/msvc-dev-cmd@v1
+      with:
+        arch: amd64
+
     - name: "Build/Test" # contains slash so use quotes otherwise UB
       shell: cmd
       env:
@@ -19,5 +23,4 @@ jobs:
       run: | # /bin/link interferes with cl/link.exe
         bash -c "rm /bin/link"
         bash -c "curl -Lo mkn.exe https://github.com/PhilipDeegan/mkn/releases/download/latest/mkn.exe"
-        call "C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Auxiliary/Build/vcvars64.bat"
         bash -c 'KLOG=3 ./mkn clean build run -dtKOp test -a "-EHsc -std:c++17"'
