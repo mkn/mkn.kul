@@ -71,16 +71,16 @@ class StackTrace {
 #endif  // KUL_DBG_FUNC_ENTER
 
 #ifndef KUL_DBG_FUNC_ON_ENTER
-#define KUL_DBG_FUNC_ON_ENTER                                                         \
+#define KUL_DBG_FUNC_ON_ENTER                                                                   \
   KOUT(TRC) << mkn::kul::LogMan::INSTANCE().str(m_fi, m_fu, m_li, mkn::kul::log::mode::TRC, "", \
-                                           "[%M]: %T - %D : %F:%L fn(%N)")            \
+                                                "[%M]: %T - %D : %F:%L fn(%N)")                 \
             << " - ENTERED";
 #endif  // KUL_DBG_FUNC_ON_ENTER
 
 #ifndef KUL_DBG_FUNC_ON_EXIT
-#define KUL_DBG_FUNC_ON_EXIT                                                          \
+#define KUL_DBG_FUNC_ON_EXIT                                                                    \
   KOUT(TRC) << mkn::kul::LogMan::INSTANCE().str(m_fi, m_fu, m_li, mkn::kul::log::mode::TRC, "", \
-                                           "[%M]: %T - %D : %F:%L fn(%N)")            \
+                                                "[%M]: %T - %D : %F:%L fn(%N)")                 \
             << " - Function time: " << (mkn::kul::Now::MICROS() - m_start) << " μs";
 #endif  // KUL_DBG_FUNC_ON_EXIT
 

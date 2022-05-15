@@ -62,7 +62,9 @@ bool mkn::kul::Dir::mk() const {
 }
 bool mkn::kul::Dir::root() const { return is() && real().size() == 3; }
 
-bool mkn::kul::File::is() const { return !name().empty() && (bool)std::ifstream(_d.join(_n).c_str()); }
+bool mkn::kul::File::is() const {
+  return !name().empty() && (bool)std::ifstream(_d.join(_n).c_str());
+}
 bool mkn::kul::File::rm() const {
   if (is()) {
     _unlink(_d.join(_n).c_str());

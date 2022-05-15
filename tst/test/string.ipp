@@ -32,7 +32,9 @@ TEST(StringOperations, SplitByEscapedChar) {
 TEST(StringOperations, String_2_UInt16_t_invalid_tooLarge) {
   tryCatch(
       {// toolarge
-       []() { mkn::kul::String::UINT16(std::to_string((std::numeric_limits<uint16_t>::max)() + 10)); }},
+       []() {
+         mkn::kul::String::UINT16(std::to_string((std::numeric_limits<uint16_t>::max)() + 10));
+       }},
       true);
 }
 TEST(StringOperations, String_2_UInt16_t_invalid_tooNegative) {
@@ -57,7 +59,9 @@ TEST(StringOperations, String_2_UInt16_t_valid) {
 TEST(StringOperations, String_2_Int16_t_invalid_tooLarge) {
   tryCatch(
       {// toolarge
-       []() { mkn::kul::String::INT16(std::to_string((std::numeric_limits<int16_t>::max)() + 10)); }},
+       []() {
+         mkn::kul::String::INT16(std::to_string((std::numeric_limits<int16_t>::max)() + 10));
+       }},
       true);
 }
 TEST(StringOperations, String_2_Int16_t_invalid_tooNegative) {

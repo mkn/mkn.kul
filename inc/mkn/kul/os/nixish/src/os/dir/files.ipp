@@ -37,7 +37,7 @@ std::vector<mkn::kul::File> mkn::kul::Dir::files(bool recursive) const KTHROW(fs
   DIR *dir = opendir(path().c_str());
   struct dirent *entry = readdir(dir);
   while (entry != NULL) {
-    if ( !mkn::kul::Dir(JOIN(real(), entry->d_name)).is()) fs.push_back(File(entry->d_name, *this));
+    if (!mkn::kul::Dir(JOIN(real(), entry->d_name)).is()) fs.push_back(File(entry->d_name, *this));
     entry = readdir(dir);
   }
   closedir(dir);

@@ -111,7 +111,9 @@ inline std::string EOL() { return "\n"; }
 namespace user {
 
 inline mkn::kul::Dir home() { return Dir(env::GET("HOME")); }
-inline mkn::kul::Dir home(std::string const &app) { return Dir(Dir::JOIN(env::GET("HOME"), "." + app)); }
+inline mkn::kul::Dir home(std::string const &app) {
+  return Dir(Dir::JOIN(env::GET("HOME"), "." + app));
+}
 
 }  // namespace user
 

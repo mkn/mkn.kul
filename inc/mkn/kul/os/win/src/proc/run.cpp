@@ -53,9 +53,10 @@ std::string pipeIn = "\\\\.\\Pipe\\kul_proc_in." + std::to_string(this_proc::id(
                      ss.str() + "." + std::to_string(pipeID);
 
 LPSTR lPipeOut = _strdup(pipeOut.c_str());
-g_hChildStd_OUT_Wr = ::CreateNamedPipeA(lPipeOut, PIPE_ACCESS_OUTBOUND | FILE_FLAG_OVERLAPPED,
-                                        PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE | PIPE_WAIT, 1,
-                                        __MKN_KUL_PROCESS_BUFFER__, __MKN_KUL_PROCESS_BUFFER__, 0, &sa);
+g_hChildStd_OUT_Wr =
+    ::CreateNamedPipeA(lPipeOut, PIPE_ACCESS_OUTBOUND | FILE_FLAG_OVERLAPPED,
+                       PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE | PIPE_WAIT, 1,
+                       __MKN_KUL_PROCESS_BUFFER__, __MKN_KUL_PROCESS_BUFFER__, 0, &sa);
 if (!g_hChildStd_OUT_Wr) error(__LINE__, "CreatePipe failed");
 g_hChildStd_OUT_Rd = ::CreateFileA(lPipeOut, GENERIC_READ, 0, &sa, OPEN_EXISTING,
                                    FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED, 0);
@@ -64,9 +65,10 @@ if (!SetHandleInformation(g_hChildStd_OUT_Rd, HANDLE_FLAG_INHERIT, 0))
   error(__LINE__, "SetHandleInformation failed");
 
 LPSTR lPipeErr = _strdup(pipeErr.c_str());
-g_hChildStd_ERR_Wr = ::CreateNamedPipeA(lPipeErr, PIPE_ACCESS_OUTBOUND | FILE_FLAG_OVERLAPPED,
-                                        PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE | PIPE_WAIT, 1,
-                                        __MKN_KUL_PROCESS_BUFFER__, __MKN_KUL_PROCESS_BUFFER__, 0, &sa);
+g_hChildStd_ERR_Wr =
+    ::CreateNamedPipeA(lPipeErr, PIPE_ACCESS_OUTBOUND | FILE_FLAG_OVERLAPPED,
+                       PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE | PIPE_WAIT, 1,
+                       __MKN_KUL_PROCESS_BUFFER__, __MKN_KUL_PROCESS_BUFFER__, 0, &sa);
 if (!g_hChildStd_ERR_Wr) error(__LINE__, "CreatePipe failed");
 g_hChildStd_ERR_Rd = ::CreateFileA(lPipeErr, GENERIC_READ, 0, &sa, OPEN_EXISTING,
                                    FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED, 0);

@@ -65,7 +65,8 @@ inline void nSleep(unsigned long const &nanos) {
 namespace threading {
 class Exception : public mkn::kul::Exception {
  public:
-  Exception(char const *f, uint16_t const &l, std::string const &s) : mkn::kul::Exception(f, l, s) {}
+  Exception(char const *f, uint16_t const &l, std::string const &s)
+      : mkn::kul::Exception(f, l, s) {}
 };
 class InterruptionException : public Exception {
  public:
@@ -86,7 +87,7 @@ class AThread {
   virtual void join() = 0;
   bool started() const { return s; }
   bool finished() const { return f; }
-  auto& exception() const { return ep; }
+  auto &exception() const { return ep; }
   void rethrow() {
     if (ep) std::rethrow_exception(ep);
   }
@@ -103,4 +104,3 @@ class AThread {
 #endif
 
 #endif  // _MKN_KUL_OS_THREADS_HPP_
-

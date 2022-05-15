@@ -39,7 +39,8 @@ namespace sys {
 
 class Exception : public mkn::kul::Exception {
  public:
-  Exception(char const *f, uint16_t const &l, std::string const &s) : mkn::kul::Exception(f, l, s) {}
+  Exception(char const *f, uint16_t const &l, std::string const &s)
+      : mkn::kul::Exception(f, l, s) {}
 };
 
 }  // namespace sys

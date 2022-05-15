@@ -55,7 +55,8 @@ enum mode { OFF = -1, NON = 0, INF, ERR, DBG, OTH, TRC };
 
 class Exception : public mkn::kul::Exception {
  public:
-  Exception(char const *f, uint16_t const &l, std::string const &s) : mkn::kul::Exception(f, l, s) {}
+  Exception(char const *f, uint16_t const &l, std::string const &s)
+      : mkn::kul::Exception(f, l, s) {}
 };
 }  // namespace log
 
@@ -183,9 +184,7 @@ class Message {
   std::stringstream ss;
   const log::mode &m;
 
-  Message(const log::mode &_m) : m(_m) {
-    ss.precision(22);
-  }
+  Message(const log::mode &_m) : m(_m) { ss.precision(22); }
 
  public:
   template <class T>
@@ -276,6 +275,6 @@ class DBoMessage : public Message {
 
 #define KERR mkn::kul::ErrMessage()
 
-#endif //!defined(_MKN_KUL_DISABLE_KLOG_DEF_)
+#endif  //! defined(_MKN_KUL_DISABLE_KLOG_DEF_)
 
 #endif /* _MKN_KUL_LOG_HPP_ */

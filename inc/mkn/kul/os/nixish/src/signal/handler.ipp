@@ -38,7 +38,7 @@ void kul_sig_handler(int s, siginfo_t *info, void *v) {
       for (auto &f : mkn::kul::SignalStatic::INSTANCE().in) f(s);
     if (s == SIGSEGV)
       for (auto &f : mkn::kul::SignalStatic::INSTANCE().se) f(s);
-    if (s == SIGSEGV &&  !mkn::kul::SignalStatic::INSTANCE().q) {
+    if (s == SIGSEGV && !mkn::kul::SignalStatic::INSTANCE().q) {
       auto tid = mkn::kul::this_thread::id();
       ucontext_t *uc = (ucontext_t *)v;
       printf("[bt] Stacktrace:\n");

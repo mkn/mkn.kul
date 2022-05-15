@@ -243,7 +243,8 @@ class ConcurrentThreadQueue {
     _thread.interrupt();
     return *this;
   }
-  virtual ConcurrentThreadQueue &finish(const uint64_t &nWait = 1000000) KTHROW(mkn::kul::Exception) {
+  virtual ConcurrentThreadQueue &finish(const uint64_t &nWait = 1000000)
+      KTHROW(mkn::kul::Exception) {
     while (_up) {
       this_thread::nSleep(nWait);
       {
@@ -281,7 +282,7 @@ class ConcurrentThreadQueue {
     return true;
   }
 
-   std::exception_ptr const& exception() const { return _thread.exception(); }
+  std::exception_ptr const &exception() const { return _thread.exception(); }
 
   void rethrow() {
     if (_thread.exception()) std::rethrow_exception(_thread.exception());

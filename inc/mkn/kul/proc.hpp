@@ -57,7 +57,8 @@ namespace proc {
 
 class Exception : public mkn::kul::Exception {
  public:
-  Exception(char const *f, uint16_t const &l, std::string const &s) : mkn::kul::Exception(f, l, s) {}
+  Exception(char const *f, uint16_t const &l, std::string const &s)
+      : mkn::kul::Exception(f, l, s) {}
 };
 
 class ExitException : public mkn::kul::proc::Exception {
@@ -79,15 +80,14 @@ class Call {
   void setCWD() {
     if (d.size()) {
       cwd = mkn::kul::env::CWD();
-      if ( !mkn::kul::env::CWD(d)) KEXCEPTION("FAILED TO SET DIRECTORY: " + d);
+      if (!mkn::kul::env::CWD(d)) KEXCEPTION("FAILED TO SET DIRECTORY: " + d);
     }
   }
 
  public:
   ~Call() {
     if (d.size()) mkn::kul::env::CWD(cwd);
-    for (auto const &oldEv : oldEvs)
-      mkn::kul::env::SET(oldEv.first.c_str(), oldEv.second.c_str());
+    for (auto const &oldEv : oldEvs) mkn::kul::env::SET(oldEv.first.c_str(), oldEv.second.c_str());
   }
   Call(std::string const &_s, std::string const &_d = "") : d(_d), s(_s) { setCWD(); }
   Call(std::string const &_s, const mkn::kul::hash::map::S2S &evs, std::string const &_d = "")

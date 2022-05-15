@@ -38,7 +38,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace mkn {
 namespace kul {
 
-
 template <typename T, typename data_fn = void, typename size_fn = void>
 struct is_span_like : std::false_type {};
 
@@ -140,7 +139,6 @@ struct SpanSet {
   std::vector<SIZE> m_sizes, m_displs;
   std::vector<T> m_vec;
 };
-
 
 }  // namespace kul
 }  // namespace mkn

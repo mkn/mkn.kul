@@ -142,8 +142,6 @@ class Exit : public Exception {
 }  // namespace kul
 }  // namespace mkn
 
-
-
 #define KEXCEPT(e, m) throw e(__FILE__, __LINE__, m)
 #define KEXCEPTSTR(e) throw e(__FILE__, __LINE__, "")
 #define KEXCEPTION(m) throw Exception(__FILE__, __LINE__, m)

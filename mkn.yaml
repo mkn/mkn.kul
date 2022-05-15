@@ -31,7 +31,7 @@ profile:
   - name: test
     parent: lib
     inc: .
-    main: test/test.cpp
+    main: tst/test.cpp
     mode: none
     dep: google.test
     if_arg:
@@ -39,12 +39,12 @@ profile:
 
   - name: bench
     parent: lib
-    main: test/bench.cpp
+    main: tst/bench.cpp
     dep: google.benchmark
 
   - name: usage
     parent: lib
-    main: test/usage.cpp
+    main: tst/usage.cpp
 
   - name: format
     mod: |

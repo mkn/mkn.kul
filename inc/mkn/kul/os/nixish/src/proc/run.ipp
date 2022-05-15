@@ -133,8 +133,7 @@ void mkn::kul::Process::run() KTHROW(mkn::kul::proc::Exception) {
 
     /* SETUP EnvVars */  // SET ENV, it's a forked process so it doesn't matter -
                          // it'll die soon, like you.
-    for (auto const &ev : vars())
-      env::SET(ev.first.c_str(), ev.second.c_str());
+    for (auto const &ev : vars()) env::SET(ev.first.c_str(), ev.second.c_str());
 
     if (!this->directory().empty()) mkn::kul::env::CWD(this->directory());
     exit(this->child());

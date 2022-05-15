@@ -42,7 +42,8 @@ namespace scm {
 
 class Exception : public mkn::kul::Exception {
  public:
-  Exception(char const *f, uint16_t const &l, std::string const &s) : mkn::kul::Exception(f, l, s) {}
+  Exception(char const *f, uint16_t const &l, std::string const &s)
+      : mkn::kul::Exception(f, l, s) {}
 };
 
 class NotFoundException : public mkn::kul::Exception {
@@ -88,7 +89,7 @@ class Git : public SCM {
     try {
       KLOG(DBG) << mkn::kul::String::LINES(pc.outs())[0];
       p.start();
-    } catch (mkn::kul::proc::ExitException const& e) {
+    } catch (mkn::kul::proc::ExitException const &e) {
       KEXCEPT(Exception, "SCM ERROR - Checking local branch") << p.toString();
     }
     auto ret = mkn::kul::String::SPLIT(mkn::kul::String::LINES(pc.outs())[0], "/").back();
@@ -104,7 +105,7 @@ class Git : public SCM {
       << "--show-current";
     try {
       p.start();
-    } catch (mkn::kul::proc::ExitException const& e) {
+    } catch (mkn::kul::proc::ExitException const &e) {
       KEXCEPT(Exception, "SCM ERROR - Checking local branch");
     }
     return mkn::kul::String::LINES(pc.outs())[0];
@@ -120,7 +121,7 @@ class Git : public SCM {
     if (!v.empty()) p.arg("-b").arg(v);
     try {
       p.arg(d).start();
-    } catch (mkn::kul::proc::ExitException const& e) {
+    } catch (mkn::kul::proc::ExitException const &e) {
       dr.rm();
       KEXCEPT(Exception, "SCM ERROR - Check remote dependency location / version");
     }
@@ -137,7 +138,7 @@ class Git : public SCM {
       if (!r.empty() && !v.empty()) p.arg(v);
       try {
         p.start();
-      } catch (mkn::kul::proc::ExitException const& e) {
+      } catch (mkn::kul::proc::ExitException const &e) {
         KEXCEPT(Exception, "SCM ERROR - Check remote dependency location / version");
       }
     }
@@ -147,7 +148,7 @@ class Git : public SCM {
     mkn::kul::ProcessCapture pc(p);
     try {
       p.arg("remote").arg("-v").start();
-    } catch (mkn::kul::proc::ExitException const& e) {
+    } catch (mkn::kul::proc::ExitException const &e) {
       KERR << pc.errs();
       KEXCEPT(Exception, "SCM ERROR " + std::string(e.what()));
     }
@@ -165,7 +166,7 @@ class Git : public SCM {
     mkn::kul::ProcessCapture pc(p);
     try {
       p.arg("rev-parse").arg(b.empty() ? "HEAD" : b).start();
-    } catch (mkn::kul::proc::ExitException const& e) {
+    } catch (mkn::kul::proc::ExitException const &e) {
       KERR << pc.errs();
       KEXCEPT(Exception, "SCM ERROR " + std::string(e.what()));
     }
@@ -180,7 +181,7 @@ class Git : public SCM {
     mkn::kul::ProcessCapture pc(p);
     try {
       p.arg("ls-remote").arg(url).arg(b).start();
-    } catch (mkn::kul::proc::ExitException const& e) {
+    } catch (mkn::kul::proc::ExitException const &e) {
       KERR << pc.errs();
       KEXCEPT(Exception, "SCM ERROR " + std::string(e.what()));
     }
@@ -196,7 +197,7 @@ class Git : public SCM {
     mkn::kul::ProcessCapture pc(p);
     try {
       p.arg("status").arg("-sb").start();
-    } catch (mkn::kul::proc::ExitException const& e) {
+    } catch (mkn::kul::proc::ExitException const &e) {
       KERR << pc.errs();
       KEXCEPT(Exception, "SCM ERROR " + std::string(e.what()));
     }
@@ -208,7 +209,7 @@ class Git : public SCM {
       p << "status";
       if (!full) p << "--short";
       p.start();
-    } catch (mkn::kul::proc::ExitException const& e) {
+    } catch (mkn::kul::proc::ExitException const &e) {
       KEXCEPT(Exception, "SCM ERROR " + std::string(e.what()));
     }
   }
@@ -216,7 +217,7 @@ class Git : public SCM {
     mkn::kul::Process p("git", d);
     try {
       p.arg("diff").start();
-    } catch (mkn::kul::proc::ExitException const& e) {
+    } catch (mkn::kul::proc::ExitException const &e) {
       KEXCEPT(Exception, "SCM ERROR " + std::string(e.what()));
     }
   }

@@ -67,24 +67,15 @@ T root(const float &f, const int16_t &r = 2, uint16_t const &it = 6, T g = 0) {
   return g;
 }
 
-
-
-template<typename Container, typename Multiplies = typename Container::value_type>
-Multiplies product(Container const& container, Multiplies mul = 1)
-{
-    return std::accumulate(container.begin(), container.end(), mul, std::multiplies<Multiplies>());
+template <typename Container, typename Multiplies = typename Container::value_type>
+Multiplies product(Container const &container, Multiplies mul = 1) {
+  return std::accumulate(container.begin(), container.end(), mul, std::multiplies<Multiplies>());
 }
 
-
-template<typename Container, typename Return = typename Container::value_type>
-Return sum(Container const& container, Return r = 0)
-{
-    return std::accumulate(container.begin(), container.end(), r);
+template <typename Container, typename Return = typename Container::value_type>
+Return sum(Container const &container, Return r = 0) {
+  return std::accumulate(container.begin(), container.end(), r);
 }
-
-
-
-
 
 }  // namespace math
 }  // namespace kul

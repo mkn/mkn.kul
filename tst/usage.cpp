@@ -154,7 +154,7 @@ class Test {
     KUL_DBG_FUNC_ENTER;
     Catch c;
     mkn::kul::Signal sig;  // Windows: each thread requires own handler, static
-                      // singleton otherwise so only ever one.
+                           // singleton otherwise so only ever one.
     sig.segv(std::bind(&Catch::print, std::ref(c),
                        std::placeholders::_1));  // Vector of
                                                  // functions to call
@@ -219,9 +219,10 @@ class Test {
     }
 
     {
-      std::vector<mkn::kul::cli::Arg> argV{{mkn::kul::cli::Arg('f', "flag"),
-                                       mkn::kul::cli::Arg('m', "maybe_value", mkn::kul::cli::ArgType::MAYBE),
-                                       mkn::kul::cli::Arg('o', "option", mkn::kul::cli::ArgType::STRING)}};
+      std::vector<mkn::kul::cli::Arg> argV{
+          {mkn::kul::cli::Arg('f', "flag"),
+           mkn::kul::cli::Arg('m', "maybe_value", mkn::kul::cli::ArgType::MAYBE),
+           mkn::kul::cli::Arg('o', "option", mkn::kul::cli::ArgType::STRING)}};
       std::vector<mkn::kul::cli::Cmd> cmdV{{"COMMAND"}};
 
       mkn::kul::cli::Args args(cmdV, argV);

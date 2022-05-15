@@ -51,7 +51,8 @@ namespace ipc {
 
 class Exception : public mkn::kul::Exception {
  public:
-  Exception(char const *f, uint16_t const &l, std::string const &s) : mkn::kul::Exception(f, l, s) {}
+  Exception(char const *f, uint16_t const &l, std::string const &s)
+      : mkn::kul::Exception(f, l, s) {}
 };
 
 class Server {
@@ -76,7 +77,8 @@ class Server {
                             0,                           // client time-out
                             NULL);                       // default security attribute
     if (hPipe == INVALID_HANDLE_VALUE)
-      KEXCEPT(mkn::kul::ipc::Exception, "CreateNamedPipe failed: " + std::to_string(GetLastError()));
+      KEXCEPT(mkn::kul::ipc::Exception,
+              "CreateNamedPipe failed: " + std::to_string(GetLastError()));
   }
 
  protected:
@@ -111,7 +113,8 @@ class Server {
   }
   Server(const int16_t &lp = -1) KTHROW(Exception)
       : lp(lp),
-        uuid(_MKN_KUL_IPC_UUID_PREFIX_ + std::string("pid\\") + std::to_string(mkn::kul::this_proc::id())) {
+        uuid(_MKN_KUL_IPC_UUID_PREFIX_ + std::string("pid\\") +
+             std::to_string(mkn::kul::this_proc::id())) {
     start();
   }
   Server(std::string const &ui, const int16_t &lp = -1) KTHROW(Exception)
@@ -156,7 +159,9 @@ class Client {
 
  public:
   virtual ~Client() { stop(); }
-  Client(std::string const &ui) KTHROW(Exception) : uuid(_MKN_KUL_IPC_UUID_PREFIX_ + ui) { start(); }
+  Client(std::string const &ui) KTHROW(Exception) : uuid(_MKN_KUL_IPC_UUID_PREFIX_ + ui) {
+    start();
+  }
   Client(const int16_t &pid) KTHROW(Exception)
       : uuid(_MKN_KUL_IPC_UUID_PREFIX_ + std::string("pid\\") + std::to_string(pid)) {
     start();
@@ -166,7 +171,8 @@ class Client {
     LPTSTR lpvMessage = _strdup(m.c_str());
     cbToWrite = (lstrlen(lpvMessage) + 1) * sizeof(TCHAR);
     if (!WriteFile(hPipe, lpvMessage, cbToWrite, &cbWritten, NULL))
-      KEXCEPT(mkn::kul::ipc::Exception, "WriteFile to pipe failed: " + std::to_string(GetLastError()));
+      KEXCEPT(mkn::kul::ipc::Exception,
+              "WriteFile to pipe failed: " + std::to_string(GetLastError()));
   }
 };
 

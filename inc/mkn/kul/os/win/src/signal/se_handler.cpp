@@ -39,7 +39,7 @@ uint16_t sig = pExceptionInfo->ExceptionRecord->ExceptionCode;
 if (pExceptionInfo->ExceptionRecord->ExceptionCode == EXCEPTION_ACCESS_VIOLATION)
   kul_sig_function_handler(sig = 11);
 
-if ( !mkn::kul::SignalStatic::INSTANCE().q) {
+if (!mkn::kul::SignalStatic::INSTANCE().q) {
   HANDLE process = GetCurrentProcess();
   SymInitialize(process, NULL, TRUE);
 

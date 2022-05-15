@@ -41,7 +41,8 @@ namespace log {
 
 class Exception : public mkn::kul::Exception {
  public:
-  Exception(char const *f, uint16_t const &l, std::string const &s) : mkn::kul::Exception(f, l, s) {}
+  Exception(char const *f, uint16_t const &l, std::string const &s)
+      : mkn::kul::Exception(f, l, s) {}
 };
 }  // namespace log
 
@@ -116,10 +117,14 @@ struct ErrMessage : public Message {
   ~ErrMessage() { LogMan::INSTANCE().err(ss.str()); }
 };
 
-#define KASIO_LOG_INF mkn::kul::asio::LogMessage(__FILE__, __func__, __LINE__, mkn::kul::log::mode::INF)
-#define KASIO_LOG_ERR mkn::kul::asio::LogMessage(__FILE__, __func__, __LINE__, mkn::kul::log::mode::ERR)
-#define KASIO_LOG_DBG mkn::kul::asio::LogMessage(__FILE__, __func__, __LINE__, mkn::kul::log::mode::DBG)
-#define KASIO_LOG_TRC mkn::kul::asio::LogMessage(__FILE__, __func__, __LINE__, mkn::kul::log::mode::TRC)
+#define KASIO_LOG_INF \
+  mkn::kul::asio::LogMessage(__FILE__, __func__, __LINE__, mkn::kul::log::mode::INF)
+#define KASIO_LOG_ERR \
+  mkn::kul::asio::LogMessage(__FILE__, __func__, __LINE__, mkn::kul::log::mode::ERR)
+#define KASIO_LOG_DBG \
+  mkn::kul::asio::LogMessage(__FILE__, __func__, __LINE__, mkn::kul::log::mode::DBG)
+#define KASIO_LOG_TRC \
+  mkn::kul::asio::LogMessage(__FILE__, __func__, __LINE__, mkn::kul::log::mode::TRC)
 #define KASIO_LOG(sev) KLOG_##sev
 
 #define KASIO_OUT_NON mkn::kul::asio::OutMessage()
