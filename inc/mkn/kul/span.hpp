@@ -69,6 +69,19 @@ class Span {
   auto end() const { return ptr + s; }
   SIZE const& size() const { return s; }
 
+  template <typename C, std::enable_if_t<is_span_like_v<C>, bool> = 0>
+  void reset(C& c) {
+    ptr = c.data();
+    s = c.size();
+  }
+
+  template <typename C, std::enable_if_t<is_span_like_v<C>, bool> = 0>
+  auto& operator=(C& c) {
+    reset(c);
+    return *this;
+  }
+
+
  private:
   T* ptr = nullptr;
   SIZE s = 0;

@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace mkn::kul {
 
-template <typename T, std::size_t alignment = 32>
+template <typename T, std::int32_t alignment = 32>
 class AlignedAllocator {
   using This = AlignedAllocator<T, alignment>;
  public:
@@ -54,8 +54,11 @@ class AlignedAllocator {
   T* allocate(std::size_t const n) const {
     if (n == 0) return nullptr;
 
-    void* p = std::aligned_alloc(alignment, n * sizeof(T));
+    auto size = n * sizeof(T);
+    std::uint32_t diff = size  % alignment;
+    if(diff > 0) diff = alignment - diff;
 
+    void* p = std::aligned_alloc(alignment, size + diff);
     if (!p) throw std::bad_alloc();
 
     return static_cast<T*>(p);
@@ -81,3 +84,4 @@ class AlignedAllocator {
 }  // namespace mkn::kul
 
 #endif /*_MKN_KUL_ALLOC_HPP_*/
+
