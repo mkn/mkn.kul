@@ -1,0 +1,51 @@
+name: "CodeQL"
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+  schedule:
+    - cron: "27 3 * * 3"
+
+jobs:
+  analyze:
+    name: Analyze
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ cpp ]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install Packages
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes build-essential
+
+      - name: Configure
+        run: |
+          git clone https://github.com/Dekken/maiken -b master --depth 1 maiken
+          cd maiken; make nix; mv mkn ..; cd ..; rm -rf maiken
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: ${{ matrix.language }}
+          queries: +security-and-quality
+
+      - name: Build cpp
+        run: ./mkn clean build -dtOp test -a "-std=c++17 -fPIC"
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
+        with:
+          category: "/language:${{ matrix.language }}"
