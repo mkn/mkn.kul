@@ -71,7 +71,7 @@ inline bool EXISTS(char const *c) {
   if (len) free(r);
   return set;
 }
-inline std::string GET(char const *c) {
+inline std::string GET(char const *c, std::string default_ = "") {
   char *r;
   size_t len;
   _dupenv_s(&r, &len, c);
@@ -80,7 +80,7 @@ inline std::string GET(char const *c) {
     free(r);
     return s;
   }
-  return "";
+  return default_;
 }
 
 inline void SET(char const *var, char const *val) {

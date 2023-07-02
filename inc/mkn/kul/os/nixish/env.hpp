@@ -61,9 +61,9 @@ constexpr size_t KUL_MAX_PATH = PATH_MAX;
 #endif  /*_MKN_KUL_MAX_PATH_*/
 
 inline bool EXISTS(char const *c) { return getenv(c); }
-inline std::string GET(char const *c) {
+inline std::string GET(char const *c, std::string default_ = "") {
   char const *r = getenv(c);
-  return std::string(r ? r : "");
+  return std::string(r ? r : default_);
 }
 inline void SET(char const *var, char const *val) { setenv(var, val, 1); }
 inline char SEP() { return ':'; }
