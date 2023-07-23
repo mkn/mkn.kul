@@ -40,6 +40,7 @@ namespace kul {
 struct Assert {
   template <typename T>
   Assert(T t) {
+    (void) t;
 #if !defined(NDEBUG)
     if (!(t)) {
       auto tid = mkn::kul::this_thread::id();
