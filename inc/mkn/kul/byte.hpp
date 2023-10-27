@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _MKN_KUL_BYTE_HPP_
 #define _MKN_KUL_BYTE_HPP_
 
-#include <stdint.h>
+#include <cstdint>
 
 namespace mkn {
 namespace kul {
