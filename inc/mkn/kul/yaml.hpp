@@ -93,7 +93,6 @@ class Item {
 
   static void VALIDATE(YAML::Node const &n, const std::vector<NodeValidator> &nvs)
       KTHROW(Exception) {
-    KUL_DBG_FUNC_ENTER
     mkn::kul::hash::set::String keys;
     for (const auto &nv : nvs)
       if (nv.name() == "*") return;
