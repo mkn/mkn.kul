@@ -14,6 +14,6 @@ jobs:
 
     - name: "Build/Test" # contains slash so use quotes otherwise UB
       run: |
-        wget https://github.com/PhilipDeegan/mkn/releases/download/latest/mkn_osx
+        wget https://github.com/mkn/mkn/releases/download/latest/mkn_osx
         chmod +x mkn_osx
         KLOG=3 ./mkn_osx clean build run -dtOp test -a "-std=c++17 -fPIC"

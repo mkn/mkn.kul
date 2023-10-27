@@ -31,6 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _MKN_KUL_EXCEPT_HPP_
 #define _MKN_KUL_EXCEPT_HPP_
 
+#include <cstdint>
 #include <iostream>
 #include <sstream>
 #include <stdexcept>

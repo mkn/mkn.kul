@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _MKN_KUL_IO_HPP_
 
 #include <time.h>
+#include <cstdint>
 #include <cstring>
 #include <fstream>
 #include <memory>
