@@ -1,5 +1,5 @@
 /**
-Copyright (c) 2017, Philip Deegan.
+Copyright (c) 2023, Philip Deegan.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -30,10 +30,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 /*
 REQUIRES
-    dep:
-      - name: google.sparsehash
-        version: stable
-        scm: http://github.com/mkn/google.sparsehash
+    dep: google.sparsehash
+
 */
 /**     BREAKDOWN
  *
@@ -71,13 +69,13 @@ class Map {
     _map.insert(pair);
     return *this;
   }
-  void setDeletedKey(const K &key) { (void)key; }
+  void setDeletedKey(K const&) { /* ununused, but here for interoperability with sparsehash */ }
 
   auto& at(K const& k) { return _map.at(k); }
   auto& at(K const& k) const { return _map.at(k); }
 
   auto& operator[](K const& k) { return _map[k]; }
-  auto& operator[](K const& k) const { return _map[k]; }
+  auto& operator[](K const& k) const { return _map.at(k); }
 
   auto count(K const& k) const { return _map.count(k); }
   auto erase(K const& k) { return  _map.erase(k); }

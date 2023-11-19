@@ -5,7 +5,7 @@ TEST(IO_Test, ReadFileLine) {
   const char* c = r.readLine();
   std::string s1 = c, s2;
   while ((c = r.readLine())) s2 = c;
-  EXPECT_EQ("Copyright (c) 2017, Philip Deegan.", s1);
+  EXPECT_EQ("Copyright (c) 2023, Philip Deegan.", s1);
   EXPECT_EQ("OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.", s2);
 }
 TEST(IO_Test, ReadFile) {
@@ -21,7 +21,7 @@ TEST(IO_Test, ReadFile) {
     ss << c;
     break;
   }
-  EXPECT_EQ("Copyright (c) 2017, ", s1);
+  EXPECT_EQ("Copyright (c) 2023, ", s1);
   EXPECT_EQ("Philip Deegan.\nAll r", ss.str());
 }
 
@@ -32,7 +32,7 @@ TEST(IO_Test, ReadBinaryFileLine) {
   const char* c = r.readLine();
   std::string s1 = c, s2;
   while ((c = r.readLine())) s2 = c;
-  EXPECT_EQ("Copyright (c) 2017, Philip Deegan.", s1);
+  EXPECT_EQ("Copyright (c) 2023, Philip Deegan.", s1);
   EXPECT_EQ("OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.", s2);
 }
 TEST(IO_Test, ReadBinaryFile) {
@@ -48,7 +48,7 @@ TEST(IO_Test, ReadBinaryFile) {
     ss << c;
     break;
   }
-  EXPECT_EQ("Copyright (c) 2017, ", s1);
+  EXPECT_EQ("Copyright (c) 2023, ", s1);
   EXPECT_EQ("Philip Deegan.\nAll r", ss.str());
 }
 #endif
