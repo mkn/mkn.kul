@@ -41,7 +41,8 @@ namespace log {
 
 class Exception : public mkn::kul::Exception {
  public:
-  Exception(char const *f, uint16_t const &l, std::string const &s) : mkn::kul::Exception(f, l, s) {}
+  Exception(char const* f, uint16_t const& l, std::string const& s)
+      : mkn::kul::Exception(f, l, s) {}
 };
 }  // namespace log
 
@@ -51,20 +52,20 @@ class Logger : public mkn::kul::Logger {
 
  private:
   mkn::kul::ChroncurrentThreadPool<> ctp;
-  std::function<void(std::string const &)> defE, defO;
+  std::function<void(std::string const&)> defE, defO;
 
  public:
   Logger()
       : ctp(1, 1),
-        defE([&](std::string const &s) { mkn::kul::Logger::err(s); }),
-        defO([&](std::string const &s) { mkn::kul::Logger::out(s); }) {}
-  void err(std::string const &s) override {
+        defE([&](std::string const& s) { mkn::kul::Logger::err(s); }),
+        defO([&](std::string const& s) { mkn::kul::Logger::out(s); }) {}
+  void err(std::string const& s) override {
     if (e)
       ctp.async(std::bind(e, s));
     else
       ctp.async(std::bind(defE, s));
   }
-  void out(std::string const &s) override {
+  void out(std::string const& s) override {
     if (o)
       ctp.async(std::bind(o, s));
     else
@@ -77,7 +78,7 @@ class LogMan : public mkn::kul::ALogMan {
   LogMan() : ALogMan(new mkn::kul::asio::Logger()) {}
 
  public:
-  static LogMan &INSTANCE() {
+  static LogMan& INSTANCE() {
     static LogMan instance;
     return instance;
   };
@@ -86,13 +87,13 @@ class LogMan : public mkn::kul::ALogMan {
 class Message {
  protected:
   std::stringstream ss;
-  const mkn::kul::log::mode &m;
+  const mkn::kul::log::mode& m;
 
-  Message(const mkn::kul::log::mode &_m) : m(_m) {}
+  Message(const mkn::kul::log::mode& _m) : m(_m) {}
 
  public:
   template <class T>
-  Message &operator<<(const T &s) {
+  Message& operator<<(const T& s) {
     ss << s;
     return *this;
   }
@@ -100,15 +101,15 @@ class Message {
 class LogMessage : public Message {
  public:
   ~LogMessage() { LogMan::INSTANCE().log(f, fn, l, m, ss.str()); }
-  LogMessage(char const *_f, char const *_fn, uint16_t const &_l, const mkn::kul::log::mode &_m)
+  LogMessage(char const* _f, char const* _fn, uint16_t const& _l, const mkn::kul::log::mode& _m)
       : Message(_m), f(_f), fn(_fn), l(_l) {}
 
  private:
   char const *f, *fn;
-  uint16_t const &l;
+  uint16_t const& l;
 };
 struct OutMessage : public Message {
-  OutMessage(const mkn::kul::log::mode &_m = mkn::kul::log::mode::NON) : Message(_m) {}
+  OutMessage(const mkn::kul::log::mode& _m = mkn::kul::log::mode::NON) : Message(_m) {}
   ~OutMessage() { LogMan::INSTANCE().out(m, ss.str()); }
 };
 struct ErrMessage : public Message {
@@ -116,10 +117,14 @@ struct ErrMessage : public Message {
   ~ErrMessage() { LogMan::INSTANCE().err(ss.str()); }
 };
 
-#define KASIO_LOG_INF mkn::kul::asio::LogMessage(__FILE__, __func__, __LINE__, mkn::kul::log::mode::INF)
-#define KASIO_LOG_ERR mkn::kul::asio::LogMessage(__FILE__, __func__, __LINE__, mkn::kul::log::mode::ERR)
-#define KASIO_LOG_DBG mkn::kul::asio::LogMessage(__FILE__, __func__, __LINE__, mkn::kul::log::mode::DBG)
-#define KASIO_LOG_TRC mkn::kul::asio::LogMessage(__FILE__, __func__, __LINE__, mkn::kul::log::mode::TRC)
+#define KASIO_LOG_INF \
+  mkn::kul::asio::LogMessage(__FILE__, __func__, __LINE__, mkn::kul::log::mode::INF)
+#define KASIO_LOG_ERR \
+  mkn::kul::asio::LogMessage(__FILE__, __func__, __LINE__, mkn::kul::log::mode::ERR)
+#define KASIO_LOG_DBG \
+  mkn::kul::asio::LogMessage(__FILE__, __func__, __LINE__, mkn::kul::log::mode::DBG)
+#define KASIO_LOG_TRC \
+  mkn::kul::asio::LogMessage(__FILE__, __func__, __LINE__, mkn::kul::log::mode::TRC)
 #define KASIO_LOG(sev) KLOG_##sev
 
 #define KASIO_OUT_NON mkn::kul::asio::OutMessage()

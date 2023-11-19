@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _MKN_KUL_TUPLE_HPP_
 #define _MKN_KUL_TUPLE_HPP_
 
-#include <vector>
+#include <tuple>
 #include <numeric>
 #include "mkn/kul/for.hpp"
 

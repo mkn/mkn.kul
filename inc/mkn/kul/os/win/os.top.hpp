@@ -52,7 +52,7 @@ namespace fs {
 
 class KulTimeStampsResolver {
  private:
-  static uint64_t FileTimeToPOSIX(FILETIME &ft) {
+  static uint64_t FileTimeToPOSIX(FILETIME& ft) {
     LARGE_INTEGER date, adjust;
     date.HighPart = ft.dwHighDateTime;
     date.LowPart = ft.dwLowDateTime;
@@ -60,7 +60,7 @@ class KulTimeStampsResolver {
     date.QuadPart -= adjust.QuadPart;
     return (uint64_t)date.QuadPart / 10000000;
   }
-  static void GET(char const *const p, uint64_t &a, uint64_t &c, uint64_t &m) {
+  static void GET(char const* const p, uint64_t& a, uint64_t& c, uint64_t& m) {
     WIN32_FIND_DATA ffd;
     HANDLE h = FindFirstFile(TEXT(p), &ffd);
     if (h) {

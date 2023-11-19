@@ -44,7 +44,7 @@ namespace hash {
 
 class SHA {
  public:
-  static void _256(std::string const &str, std::string &ret) {
+  static void _256(std::string const& str, std::string& ret) {
     unsigned char h[SHA256_DIGEST_LENGTH];
     SHA256_CTX sha;
     SHA256_Init(&sha);

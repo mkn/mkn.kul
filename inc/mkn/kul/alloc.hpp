@@ -39,6 +39,7 @@ namespace mkn::kul {
 template <typename T, std::int32_t alignment = 32>
 class AlignedAllocator {
   using This = AlignedAllocator<T, alignment>;
+
  public:
   using pointer = T*;
   using reference = T&;
@@ -71,13 +72,10 @@ class AlignedAllocator {
     deallocate(p);
   }
 
-
-  bool operator!=(This const& that) const {
-      return !(*this == that);
-  }
+  bool operator!=(This const& that) const { return !(*this == that); }
 
   bool operator==(This const& /*that*/) const {
-      return true; // stateless
+    return true;  // stateless
   }
 };
 

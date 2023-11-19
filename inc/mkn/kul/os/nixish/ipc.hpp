@@ -55,7 +55,8 @@ namespace ipc {
 
 class Exception : public mkn::kul::Exception {
  public:
-  Exception(char const *f, uint16_t const &l, std::string const &s) : mkn::kul::Exception(f, l, s) {}
+  Exception(char const* f, uint16_t const& l, std::string const& s)
+      : mkn::kul::Exception(f, l, s) {}
 };
 
 class IPCCall {
@@ -66,7 +67,7 @@ class IPCCall {
     while (s.size() < 9) s = "0" + s;
     write(fd, s.c_str(), 9);
   }
-  void writeLength(std::string const &m) const {
+  void writeLength(std::string const& m) const {
     std::string s = std::to_string(m.size());
     while (s.size() < 3) s = "0" + s;
     write(fd, s.c_str(), 3);
@@ -83,8 +84,8 @@ class Server : public IPCCall {
   }
 
  protected:
-  virtual void handle(std::string const &s) { KLOG(INF) << s; }
-  void respond(std::string const &s);
+  virtual void handle(std::string const& s) { KLOG(INF) << s; }
+  void respond(std::string const& s);
 
  public:
   virtual ~Server() {}
@@ -105,13 +106,13 @@ class Server : public IPCCall {
       if (lp != -1) lp--;
     }
   }
-  Server(const int16_t &_lp = -1) KTHROW(Exception)
+  Server(const int16_t& _lp = -1) KTHROW(Exception)
       : lp(_lp),
         uuid(std::to_string(mkn::kul::this_proc::id()),
              Dir(_MKN_KUL_IPC_UUID_PREFIX_ + std::string("/pid/"))) {
     start();
   }
-  Server(std::string const &ui, const int16_t &_lp = -1) KTHROW(Exception)
+  Server(std::string const& ui, const int16_t& _lp = -1) KTHROW(Exception)
       : lp(_lp), uuid(ui, Dir(_MKN_KUL_IPC_UUID_PREFIX_)) {
     start();
   }
@@ -129,14 +130,14 @@ class Client : public IPCCall {
 
  public:
   virtual ~Client() { stop(); }
-  Client(std::string const &ui) KTHROW(Exception) : uuid(ui, Dir(_MKN_KUL_IPC_UUID_PREFIX_)) {
+  Client(std::string const& ui) KTHROW(Exception) : uuid(ui, Dir(_MKN_KUL_IPC_UUID_PREFIX_)) {
     start();
   }
-  Client(const int16_t &pid) KTHROW(Exception)
+  Client(const int16_t& pid) KTHROW(Exception)
       : uuid(std::to_string(pid), Dir(_MKN_KUL_IPC_UUID_PREFIX_ + std::string("/pid/"))) {
     start();
   }
-  virtual void send(std::string const &m) const KTHROW(Exception) {
+  virtual void send(std::string const& m) const KTHROW(Exception) {
     writeLength(m);
     write(fd, m.c_str(), m.size());
   }

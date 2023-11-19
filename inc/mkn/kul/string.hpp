@@ -48,7 +48,7 @@ enum STR_INT_RET { IS_SUCCESS = 0, IS_OVERFLOW, IS_UNDERFLOW, IS_INCONVERTIBLE }
 
 class StringException : public mkn::kul::Exception {
  public:
-  StringException(char const *f, uint16_t const &l, std::string const &s)
+  StringException(char const* f, uint16_t const& l, std::string const& s)
       : mkn::kul::Exception(f, l, s) {}
 };
 
@@ -58,7 +58,7 @@ class StringOpHelper {
 
  private:
   std::unordered_map<uint16_t, std::string> STR_INT_STR;
-  std::string getStrForRet(const STR_INT_RET &ret) { return (*STR_INT_STR.find(ret)).second; }
+  std::string getStrForRet(const STR_INT_RET& ret) { return (*STR_INT_STR.find(ret)).second; }
   StringOpHelper() {
     STR_INT_STR.insert(std::make_pair(0, "SUCCESS"));
     STR_INT_STR.insert(std::make_pair(1, "OVERFLOW"));
@@ -67,7 +67,7 @@ class StringOpHelper {
   }
 
  public:
-  static StringOpHelper &INSTANCE() {
+  static StringOpHelper& INSTANCE() {
     static StringOpHelper i;
     return i;
   }
@@ -75,43 +75,43 @@ class StringOpHelper {
 
 class String {
  public:
-  static void REPLACE(std::string &s, std::string const &f, std::string const &r) {
+  static void REPLACE(std::string& s, std::string const& f, std::string const& r) {
     size_t p = 0;
     if ((p = s.find(f)) != std::string::npos) s.replace(p, f.size(), r);
   }
-  static void REPLACE_ALL(std::string &s, std::string const &f, std::string const &r) {
+  static void REPLACE_ALL(std::string& s, std::string const& f, std::string const& r) {
     size_t p = s.find(f);
     while (p != std::string::npos) {
       s.replace(s.find(f, p), f.size(), r);
       p = s.find(f, p + r.size());
     }
   }
-  static void TRIM_LEFT(std::string &s, char const &delim = ' ') {
+  static void TRIM_LEFT(std::string& s, char const& delim = ' ') {
     while (s.find(delim) == 0) s.erase(0, 1);
   }
-  static void TRIM_RIGHT(std::string &s, char const &delim = ' ') {
+  static void TRIM_RIGHT(std::string& s, char const& delim = ' ') {
     while (s.rfind(delim) == s.size() - 1) s.pop_back();
   }
-  static void TRIM(std::string &s) {
+  static void TRIM(std::string& s) {
     while (s.find(' ') == 0 || s.find('\t') == 0) s.erase(0, 1);
     if (s.size() == 0) return;
     while (s.rfind(' ') == s.size() - 1 || s.rfind('\t') == s.size() - 1) s.pop_back();
   }
 
   template <typename V>
-  static void TRIM(V &strs) {
-    for (auto &v : strs) TRIM(v);
+  static void TRIM(V& strs) {
+    for (auto& v : strs) TRIM(v);
   }
 
-  static void PAD(std::string &s, uint16_t const &p) {
+  static void PAD(std::string& s, uint16_t const& p) {
     while (s.size() < p) s += " ";
   }
-  static std::vector<std::string> SPLIT(std::string const &s, char const &d) {
+  static std::vector<std::string> SPLIT(std::string const& s, char const& d) {
     std::vector<std::string> v;
     SPLIT(s, d, v);
     return v;
   }
-  static void SPLIT(std::string const &s, char const &d, std::vector<std::string> &v) {
+  static void SPLIT(std::string const& s, char const& d, std::vector<std::string>& v) {
     if (s.find(d) != std::string::npos) {
       std::string l;
       std::stringstream stream(s);
@@ -120,12 +120,12 @@ class String {
     } else
       v.push_back(s);
   }
-  static std::vector<std::string> SPLIT(std::string const &s, std::string const &d) {
+  static std::vector<std::string> SPLIT(std::string const& s, std::string const& d) {
     std::vector<std::string> v;
     SPLIT(s, d, v);
     return v;
   }
-  static void SPLIT(std::string const &s, std::string const &d, std::vector<std::string> &v) {
+  static void SPLIT(std::string const& s, std::string const& d, std::vector<std::string>& v) {
     std::string l = s;
     size_t pos = 0;
     while ((pos = l.find(d)) != std::string::npos) {
@@ -134,14 +134,14 @@ class String {
     }
     v.push_back(l);
   }
-  static std::vector<std::string> ESC_SPLIT(std::string const &s, char const &d,
-                                            char const &e = '\\') {
+  static std::vector<std::string> ESC_SPLIT(std::string const& s, char const& d,
+                                            char const& e = '\\') {
     std::vector<std::string> v;
     ESC_SPLIT(s, d, v, e);
     return v;
   }
-  static void ESC_SPLIT(std::string const &s, char const &d, std::vector<std::string> &v,
-                        char const &e = '\\') {
+  static void ESC_SPLIT(std::string const& s, char const& d, std::vector<std::string>& v,
+                        char const& e = '\\') {
     std::string l = s, ds = std::string(1, d), es = std::string(1, e);
     std::string tmp = l;
     size_t pos = 0, esc = 0;
@@ -167,12 +167,12 @@ class String {
     std::transform(b.begin(), b.end(), b.begin(), ::tolower);
     return (a == b);
   }
-  static std::vector<std::string> LINES(std::string const &s) {
+  static std::vector<std::string> LINES(std::string const& s) {
     std::vector<std::string> v;
     LINES(s, v);
     return v;
   }
-  static void LINES(std::string const &s, std::vector<std::string> &v) {
+  static void LINES(std::string const& s, std::vector<std::string>& v) {
     if (s.find("\n") != std::string::npos) {
       std::string l;
       std::stringstream ss(s);
@@ -184,17 +184,17 @@ class String {
 
   static bool BOOL(std::string s) {
     TRIM(s);
-    const std::vector<std::string> &pos{"yes", "y", "true", "1"};
-    const std::vector<std::string> &neg{"no", "n", "false", "0"};
+    const std::vector<std::string>& pos{"yes", "y", "true", "1"};
+    const std::vector<std::string>& neg{"no", "n", "false", "0"};
     std::transform(s.begin(), s.end(), s.begin(), ::tolower);
     if (std::find(pos.begin(), pos.end(), s) != pos.end()) return true;
     if (std::find(neg.begin(), neg.end(), s) != neg.end()) return false;
     KEXCEPT(StringException, "input not bool-able, " + s);
   }
 
-  static uint16_t UINT16(std::string const &str) KTHROW(StringException) {
-    auto lambda = [](char const *s, uint32_t &lresult) {
-      char *end;
+  static uint16_t UINT16(std::string const& str) KTHROW(StringException) {
+    auto lambda = [](char const* s, uint32_t& lresult) {
+      char* end;
       errno = 0;
       lresult = strtoul(s, &end, 10);
       if ((errno == ERANGE) || lresult > UINT16_MAX) return IS_OVERFLOW;
@@ -210,9 +210,9 @@ class String {
     if (result != lresult) KEXCEPT(StringException, "UINT16 conversion failed");
     return result;
   }
-  static int16_t INT16(std::string const &str) KTHROW(StringException) {
-    auto lambda = [](char const *s, int32_t &lresult) {
-      char *end;
+  static int16_t INT16(std::string const& str) KTHROW(StringException) {
+    auto lambda = [](char const* s, int32_t& lresult) {
+      char* end;
       errno = 0;
       lresult = strtol(s, &end, 10);
       if ((errno == ERANGE) || lresult > INT16_MAX) return IS_OVERFLOW;
@@ -230,9 +230,9 @@ class String {
     return result;
   }
 
-  static uint32_t UINT32(std::string const &str) KTHROW(StringException) {
-    auto lambda = [](char const *s, uint64_t &lresult) {
-      char *end;
+  static uint32_t UINT32(std::string const& str) KTHROW(StringException) {
+    auto lambda = [](char const* s, uint64_t& lresult) {
+      char* end;
       errno = 0;
       lresult = strtoull(s, &end, 10);
       if ((errno == ERANGE) || lresult > UINT32_MAX) return IS_OVERFLOW;
@@ -248,9 +248,9 @@ class String {
     if (result != lresult) KEXCEPT(StringException, "UINT32 conversion failed");
     return result;
   }
-  static int32_t INT32(std::string const &str) KTHROW(StringException) {
-    auto lambda = [](char const *s, int64_t &lresult) {
-      char *end;
+  static int32_t INT32(std::string const& str) KTHROW(StringException) {
+    auto lambda = [](char const* s, int64_t& lresult) {
+      char* end;
       errno = 0;
       lresult = strtoll(s, &end, 10);
       if ((errno == ERANGE) || lresult > INT32_MAX) return IS_OVERFLOW;
@@ -268,9 +268,9 @@ class String {
     return result;
   }
 
-  static uint64_t UINT64(std::string const &str) KTHROW(StringException) {
-    auto lambda = [](char const *s, uint64_t &lresult) {
-      char *end;
+  static uint64_t UINT64(std::string const& str) KTHROW(StringException) {
+    auto lambda = [](char const* s, uint64_t& lresult) {
+      char* end;
       errno = 0;
       lresult = strtoull(s, &end, 10);
       if ((errno == ERANGE) || lresult > UINT64_MAX) return IS_OVERFLOW;
@@ -287,9 +287,9 @@ class String {
     return result;
   }
 
-  static int64_t INT64(std::string const &str) KTHROW(StringException) {
-    auto lambda = [](char const *s, int64_t &lresult) {
-      char *end;
+  static int64_t INT64(std::string const& str) KTHROW(StringException) {
+    auto lambda = [](char const* s, int64_t& lresult) {
+      char* end;
       errno = 0;
       lresult = strtoll(s, &end, 10);
       if ((errno == ERANGE) || lresult > INT64_MAX) return IS_OVERFLOW;

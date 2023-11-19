@@ -59,12 +59,12 @@ class MemGetter {
     f = KERN_SUCCESS != task_info(mach_task_self(), TASK_BASIC_INFO, (task_info_t)&inf, &inf_count);
   }
 #endif
-  void virtula(uint64_t &v) {
+  void virtula(uint64_t& v) {
 #if defined(__APPLE__)
     if (!f) v += inf.virtual_size;
 #endif
   }
-  void physical(uint64_t &v) {
+  void physical(uint64_t& v) {
 #if defined(__APPLE__)
     if (!f) v += inf.resident_size;
 #endif

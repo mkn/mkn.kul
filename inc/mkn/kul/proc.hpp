@@ -45,7 +45,7 @@ namespace kul {
 
 namespace this_proc {
 int32_t id();
-void kill(const uint32_t &e);
+void kill(const uint32_t& e);
 
 uint64_t virtualMemory();
 uint64_t physicalMemory();
@@ -57,7 +57,8 @@ namespace proc {
 
 class Exception : public mkn::kul::Exception {
  public:
-  Exception(char const *f, uint16_t const &l, std::string const &s) : mkn::kul::Exception(f, l, s) {}
+  Exception(char const* f, uint16_t const& l, std::string const& s)
+      : mkn::kul::Exception(f, l, s) {}
 };
 
 class ExitException : public mkn::kul::proc::Exception {
@@ -65,36 +66,35 @@ class ExitException : public mkn::kul::proc::Exception {
   const short ec;
 
  public:
-  ExitException(char const *f, uint16_t const &l, const short _ec, std::string const &s)
+  ExitException(char const* f, uint16_t const& l, const short _ec, std::string const& s)
       : Exception(f, l, s), ec(_ec) {}
-  const short &code() const { return ec; }
+  const short& code() const { return ec; }
 };
 
 class Call {
  private:
   std::string cwd;
   const std::string d;
-  std::string const &s;
+  std::string const& s;
   mkn::kul::hash::map::S2S oldEvs;
   void setCWD() {
     if (d.size()) {
       cwd = mkn::kul::env::CWD();
-      if ( !mkn::kul::env::CWD(d)) KEXCEPTION("FAILED TO SET DIRECTORY: " + d);
+      if (!mkn::kul::env::CWD(d)) KEXCEPTION("FAILED TO SET DIRECTORY: " + d);
     }
   }
 
  public:
   ~Call() {
     if (d.size()) mkn::kul::env::CWD(cwd);
-    for (auto const &oldEv : oldEvs)
-      mkn::kul::env::SET(oldEv.first.c_str(), oldEv.second.c_str());
+    for (auto const& oldEv : oldEvs) mkn::kul::env::SET(oldEv.first.c_str(), oldEv.second.c_str());
   }
-  Call(std::string const &_s, std::string const &_d = "") : d(_d), s(_s) { setCWD(); }
-  Call(std::string const &_s, const mkn::kul::hash::map::S2S &evs, std::string const &_d = "")
+  Call(std::string const& _s, std::string const& _d = "") : d(_d), s(_s) { setCWD(); }
+  Call(std::string const& _s, const mkn::kul::hash::map::S2S& evs, std::string const& _d = "")
       : d(_d), s(_s) {
     setCWD();
-    for (const auto &ev : evs) {
-      std::string const &v = mkn::kul::env::GET(ev.first.c_str());
+    for (const auto& ev : evs) {
+      std::string const& v = mkn::kul::env::GET(ev.first.c_str());
       if (v.size()) oldEvs.insert(ev.first, v);
       mkn::kul::env::SET(ev.first.c_str(), ev.second.c_str());
     }
@@ -109,19 +109,19 @@ class AProcess {
   const bool wfe = 1;
   int32_t pec = -1, pi = 0;
   const std::string d;
-  std::function<void(std::string const &)> e, o;
+  std::function<void(std::string const&)> e, o;
   std::vector<std::string> argv;
   mkn::kul::hash::map::S2S evs;
-  friend std::ostream &operator<<(std::ostream &, const AProcess &);
+  friend std::ostream& operator<<(std::ostream&, const AProcess&);
 
  protected:
-  AProcess(std::string const &cmd, const bool &_wfe) : wfe(_wfe) { argv.push_back(cmd); }
-  AProcess(std::string const &cmd, std::string const &_d, const bool &_wfe) : wfe(_wfe), d(_d) {
+  AProcess(std::string const& cmd, const bool& _wfe) : wfe(_wfe) { argv.push_back(cmd); }
+  AProcess(std::string const& cmd, std::string const& _d, const bool& _wfe) : wfe(_wfe), d(_d) {
     argv.push_back(cmd);
   }
   virtual ~AProcess() {}
 
-  std::string const &directory() const { return d; }
+  std::string const& directory() const { return d; }
   void setFinished() { f = 1; }
   virtual bool kill(int16_t k = 6) = 0;
   virtual void preStart() {}
@@ -129,70 +129,70 @@ class AProcess {
   virtual void tearDown() {}
   virtual void run() KTHROW(mkn::kul::Exception) = 0;
   bool waitForExit() const { return wfe; }
-  void pid(const int32_t &_pi) { this->pi = _pi; }
+  void pid(const int32_t& _pi) { this->pi = _pi; }
 
-  const std::vector<std::string> &args() const { return argv; };
-  const mkn::kul::hash::map::S2S &vars() const { return evs; }
-  virtual void out(std::string const &_s) {
+  const std::vector<std::string>& args() const { return argv; };
+  const mkn::kul::hash::map::S2S& vars() const { return evs; }
+  virtual void out(std::string const& _s) {
     if (this->o)
       this->o(_s);
     else
       printf("%s", _s.c_str());
   }
-  virtual void err(std::string const &_s) {
+  virtual void err(std::string const& _s) {
     if (this->e)
       this->e(_s);
     else
       fprintf(stderr, "%s", _s.c_str());
   }
-  void error(const int16_t &line, std::string const &_s) KTHROW(mkn::kul::Exception) {
+  void error(const int16_t& line, std::string const& _s) KTHROW(mkn::kul::Exception) {
     tearDown();
     throw Exception("mkn/kul/proc.hpp", line, _s);
   }
-  void exitCode(const int32_t &_e) { pec = _e; }
+  void exitCode(const int32_t& _e) { pec = _e; }
 
  public:
   template <class T>
-  AProcess &arg(const T &a) {
+  AProcess& arg(const T& a) {
     std::stringstream ss;
     ss << a;
     if (ss.str().size()) argv.push_back(ss.str());
     return *this;
   }
-  AProcess &arg(std::string const &a) {
+  AProcess& arg(std::string const& a) {
     argv.push_back(a);
     return *this;
   }
-  AProcess &args(std::string const &a) {
+  AProcess& args(std::string const& a) {
     if (a.size())
-      for (const auto &c : mkn::kul::cli::asArgs(a)) argv.push_back(c);
+      for (const auto& c : mkn::kul::cli::asArgs(a)) argv.push_back(c);
     return *this;
   }
-  AProcess &var(std::string const &n, std::string const &v) {
+  AProcess& var(std::string const& n, std::string const& v) {
     evs[n] = v;
     return *this;
   }
-  AProcess &set(std::vector<mkn::kul::cli::EnvVar> const &in) {
-    for (auto const &ev : in) evs[ev.name()] = ev.toString();
+  AProcess& set(std::vector<mkn::kul::cli::EnvVar> const& in) {
+    for (auto const& ev : in) evs[ev.name()] = ev.toString();
     return *this;
   }
 
   virtual inline void start() KTHROW(mkn::kul::Exception);
   virtual inline std::string toString() const;
 
-  const int32_t &pid() const { return pi; }
+  const int32_t& pid() const { return pi; }
   bool started() const { return pi > 0; }
   bool finished() const { return f; }
-  const int32_t &exitCode() { return pec; }
-  AProcess &operator<<(std::string const &_s) {
+  const int32_t& exitCode() { return pec; }
+  AProcess& operator<<(std::string const& _s) {
     arg(_s);
     return *this;
   }
-  void setOut(std::function<void(std::string const &)> _o) { this->o = _o; }
-  void setErr(std::function<void(std::string const &)> _e) { this->e = _e; }
+  void setOut(std::function<void(std::string const&)> _o) { this->o = _o; }
+  void setErr(std::function<void(std::string const&)> _e) { this->e = _e; }
 };
 
-inline std::ostream &operator<<(std::ostream &s, const AProcess &p) { return s << p.toString(); }
+inline std::ostream& operator<<(std::ostream& s, const AProcess& p) { return s << p.toString(); }
 
 class ProcessCapture {
  private:
@@ -200,16 +200,16 @@ class ProcessCapture {
 
  protected:
   ProcessCapture() {}
-  ProcessCapture(const ProcessCapture &pc) : so(pc.so.str()), se(pc.se.str()) {}
-  virtual void out(std::string const &s) { so << s; }
-  virtual void err(std::string const &s) { se << s; }
+  ProcessCapture(const ProcessCapture& pc) : so(pc.so.str()), se(pc.se.str()) {}
+  virtual void out(std::string const& s) { so << s; }
+  virtual void err(std::string const& s) { se << s; }
 
  public:
-  ProcessCapture(AProcess &p) { setProcess(p); }
+  ProcessCapture(AProcess& p) { setProcess(p); }
   virtual ~ProcessCapture() {}
   const std::string outs() const { return so.str(); }
   const std::string errs() const { return se.str(); }
-  void setProcess(AProcess &p) {
+  void setProcess(AProcess& p) {
     p.setOut(std::bind(&ProcessCapture::out, std::ref(*this), std::placeholders::_1));
     p.setErr(std::bind(&ProcessCapture::err, std::ref(*this), std::placeholders::_1));
   }

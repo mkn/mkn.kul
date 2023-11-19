@@ -43,14 +43,14 @@ class StackTrace {
 
  public:
   StackTrace() = delete;
-  StackTrace(const StackTrace &) = delete;
-  StackTrace &operator=(const StackTrace &) = delete;
-  StackTrace &operator=(const StackTrace &&) = delete;
-  StackTrace(std::string const &s) { _stk.emplace_back(s); }
-  StackTrace(const StackTrace &&that) {
+  StackTrace(const StackTrace&) = delete;
+  StackTrace& operator=(const StackTrace&) = delete;
+  StackTrace& operator=(const StackTrace&&) = delete;
+  StackTrace(std::string const& s) { _stk.emplace_back(s); }
+  StackTrace(const StackTrace&& that) {
     if (this != &that) this->_stk = that._stk;
   }
-  const std::vector<std::string> &stack() const { return _stk; }
+  const std::vector<std::string>& stack() const { return _stk; }
 };
 
 #if !defined(NDEBUG) || defined(KUL_FORCE_TRACE)
@@ -71,16 +71,16 @@ class StackTrace {
 #endif  // KUL_DBG_FUNC_ENTER
 
 #ifndef KUL_DBG_FUNC_ON_ENTER
-#define KUL_DBG_FUNC_ON_ENTER                                                         \
+#define KUL_DBG_FUNC_ON_ENTER                                                                   \
   KOUT(TRC) << mkn::kul::LogMan::INSTANCE().str(m_fi, m_fu, m_li, mkn::kul::log::mode::TRC, "", \
-                                           "[%M]: %T - %D : %F:%L fn(%N)")            \
+                                                "[%M]: %T - %D : %F:%L fn(%N)")                 \
             << " - ENTERED";
 #endif  // KUL_DBG_FUNC_ON_ENTER
 
 #ifndef KUL_DBG_FUNC_ON_EXIT
-#define KUL_DBG_FUNC_ON_EXIT                                                          \
+#define KUL_DBG_FUNC_ON_EXIT                                                                    \
   KOUT(TRC) << mkn::kul::LogMan::INSTANCE().str(m_fi, m_fu, m_li, mkn::kul::log::mode::TRC, "", \
-                                           "[%M]: %T - %D : %F:%L fn(%N)")            \
+                                                "[%M]: %T - %D : %F:%L fn(%N)")                 \
             << " - Function time: " << (mkn::kul::Now::MICROS() - m_start) << " μs";
 #endif  // KUL_DBG_FUNC_ON_EXIT
 
@@ -103,7 +103,7 @@ class FunctionScope {
 #endif  // defined(KUL_FORCE_TRACE) || !defined(NDEBUG)
  public:
 #if defined(KUL_FORCE_TRACE) || !defined(NDEBUG)
-  FunctionScope(char const *fi, char const *fu, uint16_t const &li)
+  FunctionScope(char const* fi, char const* fu, uint16_t const& li)
       : m_start(mkn::kul::Now::MICROS()), m_li(li), m_fi(fi), m_fu(fu) {
     KUL_DBG_FUNC_ON_ENTER
   }

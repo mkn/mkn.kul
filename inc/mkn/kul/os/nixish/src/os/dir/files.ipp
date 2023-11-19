@@ -34,16 +34,16 @@ std::vector<mkn::kul::File> mkn::kul::Dir::files(bool recursive) const KTHROW(fs
   if (!is()) KEXCEPT(fs::Exception, "Directory : \"" + path() + "\" does not exist");
 
   std::vector<File> fs;
-  DIR *dir = opendir(path().c_str());
-  struct dirent *entry = readdir(dir);
+  DIR* dir = opendir(path().c_str());
+  struct dirent* entry = readdir(dir);
   while (entry != NULL) {
-    if ( !mkn::kul::Dir(JOIN(real(), entry->d_name)).is()) fs.push_back(File(entry->d_name, *this));
+    if (!mkn::kul::Dir(JOIN(real(), entry->d_name)).is()) fs.push_back(File(entry->d_name, *this));
     entry = readdir(dir);
   }
   closedir(dir);
   if (recursive) {
-    for (mkn::kul::Dir const &d : dirs()) {
-      const std::vector<mkn::kul::File> &tFs = d.files(true);
+    for (mkn::kul::Dir const& d : dirs()) {
+      const std::vector<mkn::kul::File>& tFs = d.files(true);
       fs.insert(fs.end(), tFs.begin(), tFs.end());
     }
   }

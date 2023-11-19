@@ -36,10 +36,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace mkn {
 namespace kul {
 
-template<typename T = std::size_t>
+template <typename T = std::size_t>
 struct Apply {
-  template<size_t i>
-  constexpr auto operator()(){ return std::integral_constant<T, i>{}; }
+  template <size_t i>
+  constexpr auto operator()() {
+    return std::integral_constant<T, i>{};
+  }
 };
 
 template <typename Apply, size_t... Is>
@@ -55,17 +57,61 @@ constexpr auto apply_N(Apply&& f) {
 
 template <size_t N, typename Fn>
 constexpr void for_N(Fn&& fn) {
-/*
-    for_N<2>([](auto ic) {
-        constexpr auto i = ic();
-        // ...
-    });
-*/
+  /*
+      for_N<2>([](auto ic) {
+          constexpr auto i = ic();
+          // ...
+      });
+  */
 
-  std::apply([&](auto ... ics)  { (fn(ics), ...);}, apply_N<N>(Apply{}));
+  std::apply([&](auto... ics) { (fn(ics), ...); }, apply_N<N>(Apply{}));
 }
 
+template <typename F>
+auto generate(F&& f, std::size_t from, std::size_t to) {
+  using value_type = std::decay_t<std::result_of_t<F&(std::size_t const&)>>;
+  std::vector<value_type> v;
+  std::size_t count = to - from;
+  if (count > 0) v.reserve(count);
+  for (std::size_t i = from; i < to; ++i) v.emplace_back(f(i));
+  return v;
+}
 
+template <typename F>
+auto generate(F&& f, std::size_t count) {
+  return generate(std::forward<F>(f), 0, count);
+}
+
+template <typename F, typename Container>
+auto generate(F&& f, Container& container) {
+  using T = typename Container::value_type;
+  using value_type = std::decay_t<std::result_of_t<F&(T&)>>;
+  std::vector<value_type> v1;
+  if (container.size() > 0) v1.reserve(container.size());
+  for (auto& v : container) v1.emplace_back(f(v));
+  return v1;
+}
+
+template <std::size_t Idx, typename F, typename Type, std::size_t Size>
+auto constexpr generate_array__(F& f, std::array<Type, Size>& arr) {
+  return f(arr[Idx]);
+}
+
+template <typename Type, std::size_t Size, typename F, std::size_t... Is>
+auto constexpr generate_array_(F& f, std::array<Type, Size>& arr,
+                               std::integer_sequence<std::size_t, Is...>) {
+  return std::array{generate_array__<Is>(f, arr)...};
+}
+
+template <typename F, typename Type, std::size_t Size>
+auto constexpr generate(F&& f, std::array<Type, Size>& arr) {
+  return generate_array_(f, arr, std::make_integer_sequence<std::size_t, Size>{});
+}
+
+template <typename F, typename Container>
+auto generate(F&& f, Container&& v) {
+  return generate(std::forward<F>(f), v);
+}
 
 }  // namespace kul
 }  // namespace mkn

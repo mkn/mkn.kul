@@ -45,22 +45,15 @@ namespace mkn {
 namespace kul {
 namespace sys {
 
-template <class F>
+template <typename F>
 class SharedFunction;
 
 class SharedLibrary {
-  template <class F>
-  friend class SharedFunction;
-
- private:
-  bool _loaded = 0;
-  void *_handle;
-  const mkn::kul::File _f;
-
  public:
-  SharedLibrary(mkn::kul::File const &f) KTHROW(Exception) : _f(f) {
+  SharedLibrary(mkn::kul::File const& f, int const flags = __MKN_KUL_SYS_DLOPEN__) KTHROW(Exception)
+      : _f(f) {
     if (!_f) KEXCEPSTREAM << "Library attempted to be loaded does not exist: " << _f.full();
-    _handle = dlopen(_f.real().c_str(), __MKN_KUL_SYS_DLOPEN__);
+    _handle = dlopen(_f.real().c_str(), flags);
     if (!_handle) KEXCEPSTREAM << "Cannot load library: " << f << " - Error: " << dlerror();
     _loaded = 1;
   }
@@ -68,50 +61,59 @@ class SharedLibrary {
     if (_loaded) dlclose(_handle);
     dlerror();
   }
-  const mkn::kul::File file() const { return _f; }
+  auto& file() const { return _f; }
+
+ private:
+  bool _loaded = 0;
+  void* _handle;
+  mkn::kul::File const _f;
+
+  template <typename F>
+  friend class SharedFunction;
 };
 
-template <class F>
+template <typename F>
 class SharedFunction {
- private:
-  F *_funcP;
-  SharedLibrary &_lib;
-
  public:
-  SharedFunction(SharedLibrary &lib, std::string const &f) KTHROW(Exception) : _lib(lib) {
-    _funcP = (F *)dlsym(_lib._handle, f.c_str());
-    char const *dlsym_error = dlerror();
+  SharedFunction(SharedLibrary& lib, std::string const& f) KTHROW(Exception) : _lib(lib) {
+    _funcP = (F*)dlsym(_lib._handle, f.c_str());
+    char const* dlsym_error = dlerror();
     if (dlsym_error) KEXCEPSTREAM << "Cannot load symbol create " << dlsym_error;
   }
   ~SharedFunction() { dlerror(); }
-  F *pointer() { return _funcP; }
-};
-
-template <class T>
-class SharedClass {
-  typedef T *construct_t();
-  typedef void destruct_t(T *t);
+  auto pointer() { return _funcP; }
 
  private:
-  SharedLibrary _lib;
-  SharedFunction<construct_t> _c;
-  SharedFunction<destruct_t> _d;
+  F* _funcP;
+  SharedLibrary& _lib;
+};
 
+template <typename T>
+class SharedClass {
  public:
-  SharedClass(mkn::kul::File const &f, std::string const &c, std::string const &d) KTHROW(Exception)
+  SharedClass(mkn::kul::File const& f, std::string const& c, std::string const& d) KTHROW(Exception)
       : _lib(f), _c(_lib, c), _d(_lib, d) {}
+
   virtual ~SharedClass() {}
 
  protected:
-  void construct(T *&t) KTHROW(Exception) {
+  void construct(T*& t) KTHROW(Exception) {
     t = _c.pointer()();
     if (!t) KEXCEPSTREAM << "Dynamically loaded class was not created";
   }
-  void destruct(T *&t) {
+  void destruct(T*& t) {
     _d.pointer()(t);
     t = nullptr;
     if (t) KEXCEPSTREAM << "Dynamically loaded class was not destroyed";
   }
+
+ private:
+  typedef T* construct_t();
+  typedef void destruct_t(T* t);
+
+  SharedLibrary _lib;
+  SharedFunction<construct_t> _c;
+  SharedFunction<destruct_t> _d;
 };
 
 }  // namespace sys
