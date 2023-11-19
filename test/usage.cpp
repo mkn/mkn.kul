@@ -78,10 +78,10 @@ class TestThreadObject {
 class TestThreadQueueObject {
  protected:
   int i = 0;
-  Mutex &mutex;
+  Mutex& mutex;
 
  public:
-  TestThreadQueueObject(Mutex &_mutex) : mutex(_mutex) {}
+  TestThreadQueueObject(Mutex& _mutex) : mutex(_mutex) {}
   void operator()() {
     mkn::kul::ScopeLock lock(mutex);
     KLOG(INF) << "THREAD RUNNING";
@@ -93,10 +93,10 @@ class TestThreadQueueObject {
 
 class TestThreadQueueQObject : public TestThreadQueueObject {
  private:
-  std::queue<int> &q;
+  std::queue<int>& q;
 
  public:
-  TestThreadQueueQObject(Mutex &_mutex, std::queue<int> &_q)
+  TestThreadQueueQObject(Mutex& _mutex, std::queue<int>& _q)
       : TestThreadQueueObject(_mutex), q(_q) {}
   void operator()() {
     mkn::kul::ScopeLock lock(mutex);
@@ -120,7 +120,7 @@ class TestConcQueueQObject {
 class TestIPCServer : public mkn::kul::ipc::Server {
  public:
   TestIPCServer() : mkn::kul::ipc::Server("uuid", 1) {}  // UUID     CHECKS ONCE
-  void handle(std::string const &s) { KLOG(INF) << "TestIPCServer " << s; }
+  void handle(std::string const& s) { KLOG(INF) << "TestIPCServer " << s; }
   void operator()() { listen(); }
 };
 
@@ -138,7 +138,7 @@ class TestIPC {
 
 class Catch {
  public:
-  void print(const int16_t &s) {
+  void print(int16_t const& s) {
     (void)s;
     KOUT(NON) << "SEGMENTATION FAULT INTERCEPTED";
     KOUT(NON) << "PRINT STACKTRACE";
@@ -150,11 +150,11 @@ class Test {
   const std::string s;
 
  public:
-  Test(int argc, char *argv[]) : s("LAMBDAS ALLOWED IN SIGNAL") {
+  Test(int argc, char* argv[]) : s("LAMBDAS ALLOWED IN SIGNAL") {
     KUL_DBG_FUNC_ENTER;
     Catch c;
     mkn::kul::Signal sig;  // Windows: each thread requires own handler, static
-                      // singleton otherwise so only ever one.
+                           // singleton otherwise so only ever one.
     sig.segv(std::bind(&Catch::print, std::ref(c),
                        std::placeholders::_1));  // Vector of
                                                  // functions to call
@@ -183,8 +183,8 @@ class Test {
     {
       mkn::kul::io::Writer wo(fo);
       mkn::kul::io::Writer we(fe);
-      auto lo = [&](std::string const &_s) { wo << _s; };
-      auto le = [&](std::string const &_s) { we << _s; };
+      auto lo = [&](std::string const& _s) { wo << _s; };
+      auto le = [&](std::string const& _s) { we << _s; };
       mkn::kul::LogMan::INSTANCE().setOut(lo);
       mkn::kul::LogMan::INSTANCE().setErr(le);
       KOUT(INF) << "KOUT(INF)";
@@ -205,43 +205,44 @@ class Test {
       KLOG(INF) << os_inc.dir().relative(os_hpp.dir());
     }
 
-    for (mkn::kul::Dir const &d : mkn::kul::Dir(mkn::kul::env::CWD()).dirs())
-      for (mkn::kul::File const &f : d.files()) KOUT(NON) << d.join(f.name());  // or f.full()
+    for (mkn::kul::Dir const& d : mkn::kul::Dir(mkn::kul::env::CWD()).dirs())
+      for (mkn::kul::File const& f : d.files()) KOUT(NON) << d.join(f.name());  // or f.full()
     try {
       mkn::kul::Process("echo").arg("Hello").arg("World").start();
 
-    } catch (const mkn::kul::proc::ExitException &e) {
+    } catch (mkn::kul::proc::ExitException const& e) {
       KERR << e.stack();
       KERR << e.code();
-    } catch (const mkn::kul::proc::Exception &e) {
+    } catch (mkn::kul::proc::Exception const& e) {
       KERR << e.debug() << " : " << typeid(e).name();
       KERR << "Error expected on windows without echo on path";
     }
 
     {
-      std::vector<mkn::kul::cli::Arg> argV{{mkn::kul::cli::Arg('f', "flag"),
-                                       mkn::kul::cli::Arg('m', "maybe_value", mkn::kul::cli::ArgType::MAYBE),
-                                       mkn::kul::cli::Arg('o', "option", mkn::kul::cli::ArgType::STRING)}};
+      std::vector<mkn::kul::cli::Arg> argV{
+          {mkn::kul::cli::Arg('f', "flag"),
+           mkn::kul::cli::Arg('m', "maybe_value", mkn::kul::cli::ArgType::MAYBE),
+           mkn::kul::cli::Arg('o', "option", mkn::kul::cli::ArgType::STRING)}};
       std::vector<mkn::kul::cli::Cmd> cmdV{{"COMMAND"}};
 
       mkn::kul::cli::Args args(cmdV, argV);
       try {
         args.process(argc, argv);
-      } catch (const mkn::kul::cli::Exception &e) {
+      } catch (mkn::kul::cli::Exception const& e) {
         KEXIT(1, e.what());
       }
     }
 
-    for (std::string const &arg :
+    for (std::string const& arg :
          mkn::kul::cli::asArgs("/path/to \"words in quotes\" words\\ not\\ in\\ quotes end"))
       KOUT(NON) << "ARG: " << arg;
 
-    for (std::string const &arg : mkn::kul::String::SPLIT("split - by - char - dash", '-'))
+    for (std::string const& arg : mkn::kul::String::SPLIT("split - by - char - dash", '-'))
       KOUT(NON) << "BIT: " << arg;
-    for (std::string const &arg : mkn::kul::String::SPLIT("split - by - string - dash", "-"))
+    for (std::string const& arg : mkn::kul::String::SPLIT("split - by - string - dash", "-"))
       KOUT(NON) << "BIT: " << arg;
 
-    for (std::string const &arg :
+    for (std::string const& arg :
          mkn::kul::String::ESC_SPLIT("split \\- by - char - dash with escape backslash", '-'))
       KOUT(NON) << "BIT: " << arg;
 
@@ -275,9 +276,9 @@ class Test {
       mkn::kul::Span<double> raw = spanset.raw();
       std::vector<size_t> vals{1, 5, 5, 3, 4, 5};
       for (size_t i = 0; i < 6; i++) raw[i] = vals[i];
-      for (auto const &span : spanset) {
+      for (auto const& span : spanset) {
         KLOG(INF) << span.size();
-        for (auto const &d0 : span) KLOG(INF) << d0;
+        for (auto const& d0 : span) KLOG(INF) << d0;
       }
     }
 
@@ -345,7 +346,7 @@ class Test {
         KLOG(INF) << (a + b);
         KEXCEPTION("Exceptional!");
       };
-      auto lambex = [](const mkn::kul::Exception &e) { KLOG(ERR) << e.stack(); };
+      auto lambex = [](mkn::kul::Exception const& e) { KLOG(ERR) << e.stack(); };
       ctp.async(std::bind(lambdb, 2, 4), std::bind(lambex, std::placeholders::_1));
       mkn::kul::this_thread::sleep(500);
       ctp.block().finish().join();
@@ -359,7 +360,7 @@ class Test {
         KLOG(INF) << (a + b);
         KEXCEPT(mkn::kul::Exception, "Exceptional!");
       };
-      auto lambex = [](const mkn::kul::Exception &e) { KLOG(ERR) << e.stack(); };
+      auto lambex = [](mkn::kul::Exception const& e) { KLOG(ERR) << e.stack(); };
       ctp.async(std::bind(lambdb, 2, 4), std::bind(lambex, std::placeholders::_1));
       mkn::kul::this_thread::sleep(500);
       ctp.block().finish().join();
@@ -384,12 +385,12 @@ class Test {
 }  // namespace kul
 }  // namespace mkn
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
   try {
     mkn::kul::Test(argc, argv);
-  } catch (const mkn::kul::Exception &e) {
+  } catch (mkn::kul::Exception const& e) {
     KERR << e.stack();
-  } catch (const std::exception &e) {
+  } catch (std::exception const& e) {
     KERR << e.what();
   } catch (...) {
     KERR << "UNKNOWN EXCEPTION CAUGHT";

@@ -48,9 +48,9 @@ class Var {
   enum Mode { APPE = 0, PREP, REPL };
 
   Var(const std::string _n, const std::string _v, const Mode _m) : n(_n), v(_v), m(_m) {}
-  Var(const Var &e) : n(e.n), v(e.v), m(e.m) {}
-  char const *name() const { return n.c_str(); }
-  char const *value() const { return v.c_str(); }
+  Var(Var const& e) : n(e.n), v(e.v), m(e.m) {}
+  char const* name() const { return n.c_str(); }
+  char const* value() const { return v.c_str(); }
   Mode mode() const { return m; }
   const std::string toString() const {
     std::string var(value());
@@ -65,7 +65,7 @@ class Var {
     }
     return var;
   }
-  Var &operator=(Var &&e) {
+  Var& operator=(Var&& e) {
     std::swap(m, e.m);
     std::swap(n, e.n);
     std::swap(v, e.v);

@@ -2,7 +2,7 @@
 
 TEST(IO_Test, ReadFileLine) {
   mkn::kul::io::Reader r("LICENSE.md");
-  const char* c = r.readLine();
+  char const* c = r.readLine();
   std::string s1 = c, s2;
   while ((c = r.readLine())) s2 = c;
   EXPECT_EQ("Copyright (c) 2023, Philip Deegan.", s1);
@@ -29,7 +29,7 @@ TEST(IO_Test, ReadFile) {
 #if defined(_MKN_TEST_BINARY_READING_)
 TEST(IO_Test, ReadBinaryFileLine) {
   mkn::kul::io::BinaryReader r("LICENSE.md");
-  const char* c = r.readLine();
+  char const* c = r.readLine();
   std::string s1 = c, s2;
   while ((c = r.readLine())) s2 = c;
   EXPECT_EQ("Copyright (c) 2023, Philip Deegan.", s1);

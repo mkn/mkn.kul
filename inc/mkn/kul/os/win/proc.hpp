@@ -54,10 +54,10 @@ class MemGetter {
  private:
   PROCESS_MEMORY_COUNTERS_EX pmc;
   MemGetter() {
-    GetProcessMemoryInfo(GetCurrentProcess(), (PROCESS_MEMORY_COUNTERS *)&pmc, sizeof(pmc));
+    GetProcessMemoryInfo(GetCurrentProcess(), (PROCESS_MEMORY_COUNTERS*)&pmc, sizeof(pmc));
   }
-  void virtula(uint64_t &v) { v += pmc.PrivateUsage; }
-  void physical(uint64_t &v) { v += pmc.WorkingSetSize; }
+  void virtula(uint64_t& v) { v += pmc.PrivateUsage; }
+  void physical(uint64_t& v) { v += pmc.WorkingSetSize; }
   friend uint64_t virtualMemory();
   friend uint64_t physicalMemory();
   friend uint64_t totalMemory();
@@ -83,7 +83,7 @@ inline uint64_t totalMemory() {
 inline uint16_t cpuLoad() { return 0; }
 
 inline int32_t id() { return GetCurrentProcessId(); }
-inline void kill(const int32_t &e) {
+inline void kill(int32_t const& e) {
   TerminateProcess(OpenProcess(PROCESS_TERMINATE, 0, mkn::kul::this_proc::id()), 128 + e);
 }
 }  // namespace this_proc
@@ -103,10 +103,10 @@ class Process : public mkn::kul::AProcess {
   HANDLE revent = CreateEvent(0, 1, 0, 0);
 
  public:
-  Process(std::string const &cmd, const bool &wfe = true) : mkn::kul::AProcess(cmd, wfe) {}
-  Process(std::string const &cmd, std::string const &path, const bool &wfe = true)
+  Process(std::string const& cmd, bool const& wfe = true) : mkn::kul::AProcess(cmd, wfe) {}
+  Process(std::string const& cmd, std::string const& path, bool const& wfe = true)
       : mkn::kul::AProcess(cmd, path, wfe) {}
-  Process(std::string const &cmd, mkn::kul::Dir const &d, const bool &wfe = true)
+  Process(std::string const& cmd, mkn::kul::Dir const& d, bool const& wfe = true)
       : mkn::kul::AProcess(cmd, d ? d.real() : d.path(), wfe) {}
   ~Process() { tearDown(); }
   bool kill(int16_t k = 6) {
@@ -126,7 +126,7 @@ class Process : public mkn::kul::AProcess {
   void tearDown() {
 #include "mkn/kul/os/win/src/proc/tearDown.cpp"
   }
-  virtual void expand(std::string &s) const {
+  virtual void expand(std::string& s) const {
 #include "mkn/kul/os/win/src/proc/expand.cpp"
   }
   void run() KTHROW(mkn::kul::Exception) {
@@ -134,7 +134,7 @@ class Process : public mkn::kul::AProcess {
   }
 #else
   void tearDown();
-  virtual void expand(std::string &s) const;
+  virtual void expand(std::string& s) const;
   void run() KTHROW(mkn::kul::Exception);
 #endif
 };

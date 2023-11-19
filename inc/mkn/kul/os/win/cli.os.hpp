@@ -44,7 +44,7 @@ namespace cli {
 inline std::string hidden(std::string const& t) {
 #include "mkn/kul/os/win/src/cli/hidden.cpp"
 }
-inline void show() {
+inline void show(){
 #include "mkn/kul/os/win/src/cli/show.cpp"
 }
 #else

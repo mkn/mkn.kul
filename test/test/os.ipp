@@ -17,7 +17,7 @@ class TimeStampHandler {
     return i;
   }
   bool is() { return f.is(); }
-  const mkn::kul::fs::TimeStamps& timeStamps() { return fts; }
+  mkn::kul::fs::TimeStamps const& timeStamps() { return fts; }
 };
 
 TEST(OperatingSystemTests, HasFileAccessedTimeStampSupport) {

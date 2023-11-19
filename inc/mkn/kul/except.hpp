@@ -60,11 +60,11 @@ namespace kul {
 
 class Exception : public std::runtime_error {
  public:
-  Exception(char const *f, uint16_t const &l, std::string const &s = "")
+  Exception(char const* f, uint16_t const& l, std::string const& s = "")
       : std::runtime_error(s), _f(f), _l(l), _ep(std::current_exception()), err(s) {}
-  Exception(Exception const &e)
+  Exception(Exception const& e)
       : std::runtime_error(e), _f(e.file()), _l(e.line()), _ep(e._ep), err(e.err) {}
-  Exception(Exception const &&e)
+  Exception(Exception const&& e)
       : std::runtime_error(e), _f(e.file()), _l(e.line()), _ep(e._ep), err(e.err) {}
   virtual ~Exception() KNOTHROW {}
 
@@ -74,20 +74,20 @@ class Exception : public std::runtime_error {
     return ss.str();
   }
 
-  char const *what() const noexcept override { return err.c_str(); }
+  char const* what() const noexcept override { return err.c_str(); }
   std::string str() const noexcept { return err; }
 
-  char const *file() const { return _f; }
-  uint16_t const &line() const { return _l; }
-  const std::exception_ptr &cause() const { return _ep; }
+  char const* file() const { return _f; }
+  uint16_t const& line() const { return _l; }
+  std::exception_ptr const& cause() const { return _ep; }
   const std::string stack() const {
     std::stringstream ss;
     if (_ep) {
       try {
         std::rethrow_exception(_ep);
-      } catch (const mkn::kul::Exception &e) {
+      } catch (mkn::kul::Exception const& e) {
         ss << e.stack() << std::endl;
-      } catch (const std::exception &e) {
+      } catch (std::exception const& e) {
         ss << e.what() << std::endl;
       } catch (...) {
         ss << "UNKNOWN EXCEPTION TYPE" << std::endl;
@@ -97,7 +97,7 @@ class Exception : public std::runtime_error {
     return ss.str();
   }
   template <class T>
-  Exception &operator<<(const T &s) {
+  Exception& operator<<(const T& s) {
     std::stringstream msg;
     msg << s;
     err += msg.str();
@@ -105,45 +105,43 @@ class Exception : public std::runtime_error {
   }
 
  protected:
-  char const *_f;
+  char const* _f;
   const uint16_t _l;
   const std::exception_ptr _ep;
   std::string err;
 
-  Exception &operator=(Exception &e) = delete;
-  Exception &operator=(Exception &&e) = delete;
-  Exception &operator=(const Exception &e) = delete;
-  Exception &operator=(const Exception &&e) = delete;
+  Exception& operator=(Exception& e) = delete;
+  Exception& operator=(Exception&& e) = delete;
+  Exception& operator=(Exception const& e) = delete;
+  Exception& operator=(Exception const&& e) = delete;
 
-  friend std::ostream &operator<<(std::ostream &, const Exception &);
+  friend std::ostream& operator<<(std::ostream&, Exception const&);
 };
 
-inline std::ostream &operator<<(std::ostream &s, const Exception &e) {
+inline std::ostream& operator<<(std::ostream& s, Exception const& e) {
   std::cout << __FILE__ << " " << __LINE__ << " " << e.str();
   return s << e.str();
 }
 
 class Exit : public Exception {
  public:
-  Exit(char const *f, uint16_t const &l, std::string const &s, uint16_t const &e)
+  Exit(char const* f, uint16_t const& l, std::string const& s, uint16_t const& e)
       : Exception(f, l, s), _e(e) {}
-  Exit(const Exit &e) : Exception(e), _e(e._e) {}
+  Exit(Exit const& e) : Exception(e), _e(e._e) {}
 
-  uint16_t const &code() const { return _e; }
+  uint16_t const& code() const { return _e; }
 
  private:
   const uint16_t _e;
 
-  Exit &operator=(Exit &e) = delete;
-  Exit &operator=(Exit &&e) = delete;
-  Exit &operator=(const Exit &e) = delete;
-  Exit &operator=(const Exit &&e) = delete;
+  Exit& operator=(Exit& e) = delete;
+  Exit& operator=(Exit&& e) = delete;
+  Exit& operator=(Exit const& e) = delete;
+  Exit& operator=(Exit const&& e) = delete;
 };
 
 }  // namespace kul
 }  // namespace mkn
-
-
 
 #define KEXCEPT(e, m) throw e(__FILE__, __LINE__, m)
 #define KEXCEPTSTR(e) throw e(__FILE__, __LINE__, "")

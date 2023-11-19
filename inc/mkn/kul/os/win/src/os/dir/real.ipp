@@ -29,7 +29,7 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-std::string mkn::kul::Dir::REAL(const std::string& s) KTHROW(fs::Exception) {
+std::string mkn::kul::Dir::REAL(std::string const& s) KTHROW(fs::Exception) {
   char* expanded = _fullpath(NULL, s.c_str(), _MAX_PATH);
   if (expanded) {
     std::string dir(expanded);

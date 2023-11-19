@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #if defined(_MKN_WITH_IO_CEREAL_)
 
 template <class Archive>
-void save(Archive &ar) const {
+void save(Archive& ar) const {
   auto convert_to_std_map =
       [](mkn::kul::hash::map::S2S const& s) -> std::unordered_map<std::string, std::string> {
     std::unordered_map<std::string, std::string> ret;
@@ -44,7 +44,7 @@ void save(Archive &ar) const {
   ar(convert_to_std_map(vals));
 }
 template <class Archive>
-void load(Archive &ar) {
+void load(Archive& ar) {
   auto convert_to_kul_map =
       [](std::unordered_map<std::string, std::string> const& s) -> mkn::kul::hash::map::S2S {
     mkn::kul::hash::map::S2S ret;

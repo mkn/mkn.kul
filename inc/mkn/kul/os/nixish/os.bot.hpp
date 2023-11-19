@@ -35,8 +35,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 void mkn::kul::Dir::rm() const {
   if (is()) {
-    for (const auto &a : files()) a.rm();
-    for (const auto &a : dirs()) a.rm();
+    for (auto const& a : files()) a.rm();
+    for (auto const& a : dirs()) a.rm();
     remove(real().c_str());
   }
 }
@@ -52,13 +52,13 @@ std::string mkn::kul::Dir::ESC(std::string s) {
 }
 bool mkn::kul::Dir::is() const {
   if (path().empty()) return false;
-  DIR *d = opendir(path().c_str());
+  DIR* d = opendir(path().c_str());
   if (d) closedir(d);
   return d;
 }
 bool mkn::kul::Dir::mk() const {
   if (path().empty()) return false;
-  mkn::kul::Dir const &prnt(parent());
+  mkn::kul::Dir const& prnt(parent());
   if (_p != prnt.path() && !prnt.is()) parent().mk();
   return mkdir(locl().c_str(), 0777) == 0;
 }
@@ -78,7 +78,7 @@ bool mkn::kul::File::rm() const {
   return false;
 }
 bool mkn::kul::File::mk() const {
-  FILE *pFile = fopen(full().c_str(), "w");
+  FILE* pFile = fopen(full().c_str(), "w");
   if (pFile != NULL) {
     fclose(pFile);
   }
@@ -95,7 +95,7 @@ namespace mkn {
 namespace kul {
 namespace os {
 
-inline int exec(std::string const &cmd, bool q = false) {
+inline int exec(std::string const& cmd, bool q = false) {
   int r = 0;
   if (q)
     r = system(std::string(cmd + " > /dev/null").c_str());
@@ -111,12 +111,14 @@ inline std::string EOL() { return "\n"; }
 namespace user {
 
 inline mkn::kul::Dir home() { return Dir(env::GET("HOME")); }
-inline mkn::kul::Dir home(std::string const &app) { return Dir(Dir::JOIN(env::GET("HOME"), "." + app)); }
+inline mkn::kul::Dir home(std::string const& app) {
+  return Dir(Dir::JOIN(env::GET("HOME"), "." + app));
+}
 
 }  // namespace user
 
 namespace env {
-inline bool CWD(mkn::kul::Dir const &d) { return chdir(d.path().c_str()) != -1; }
+inline bool CWD(mkn::kul::Dir const& d) { return chdir(d.path().c_str()) != -1; }
 }  // namespace env
 }  // namespace kul
 }  // namespace mkn

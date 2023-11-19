@@ -42,12 +42,13 @@ namespace scm {
 
 class Exception : public mkn::kul::Exception {
  public:
-  Exception(char const *f, uint16_t const &l, std::string const &s) : mkn::kul::Exception(f, l, s) {}
+  Exception(char const* f, uint16_t const& l, std::string const& s)
+      : mkn::kul::Exception(f, l, s) {}
 };
 
 class NotFoundException : public mkn::kul::Exception {
  public:
-  NotFoundException(char const *f, uint16_t const &l, std::string const &s)
+  NotFoundException(char const* f, uint16_t const& l, std::string const& s)
       : mkn::kul::Exception(f, l, s) {}
 };
 }  // namespace scm
@@ -59,27 +60,27 @@ class SCM {
  public:
   virtual ~SCM() {}
   std::string type() { return typeid(*this).name(); }
-  virtual std::string co(std::string const &d, std::string const &r, std::string const &v) const
+  virtual std::string co(std::string const& d, std::string const& r, std::string const& v) const
       KTHROW(Exception) = 0;
-  virtual void up(std::string const &d, std::string const &r, std::string const &v) const
+  virtual void up(std::string const& d, std::string const& r, std::string const& v) const
       KTHROW(Exception) = 0;
-  virtual std::string origin(std::string const &d) const = 0;
-  virtual std::string localVersion(std::string const &d, std::string const &b) const = 0;
-  virtual std::string remoteVersion(std::string const &url, std::string const &branch) const
+  virtual std::string origin(std::string const& d) const = 0;
+  virtual std::string localVersion(std::string const& d, std::string const& b) const = 0;
+  virtual std::string remoteVersion(std::string const& url, std::string const& branch) const
       KTHROW(Exception) = 0;
 
-  virtual bool hasChanges(std::string const &d) const = 0;
-  virtual void status(std::string const &d, bool full = 1) const = 0;
-  virtual void diff(std::string const &d) const = 0;
+  virtual bool hasChanges(std::string const& d) const = 0;
+  virtual void status(std::string const& d, bool full = 1) const = 0;
+  virtual void diff(std::string const& d) const = 0;
 
-  virtual std::string defaultRemoteBranch(std::string const &repo) const = 0;
+  virtual std::string defaultRemoteBranch(std::string const& repo) const = 0;
 };
 
 // review https://gist.github.com/aleksey-bykov/1273f4982c317c92d532
 namespace scm {
 class Git : public SCM {
  public:
-  std::string defaultRemoteBranch(std::string const &repo) const override {
+  std::string defaultRemoteBranch(std::string const& repo) const override {
     mkn::kul::Process p("git");
     mkn::kul::ProcessCapture pc(p);
     p << "ls-remote"
@@ -96,7 +97,7 @@ class Git : public SCM {
     // e.g. git ls-remote --symref git@github.com:user/repo HEAD
   };
 
-  std::string branch(mkn::kul::Dir const &dr) const {
+  std::string branch(mkn::kul::Dir const& dr) const {
     mkn::kul::os::PushDir pushd(dr);
     mkn::kul::Process p("git");
     mkn::kul::ProcessCapture pc(p);
@@ -110,9 +111,9 @@ class Git : public SCM {
     return mkn::kul::String::LINES(pc.outs())[0];
   }
 
-  std::string branch(std::string const &d) const { return branch(mkn::kul::Dir(d)); }
+  std::string branch(std::string const& d) const { return branch(mkn::kul::Dir(d)); }
 
-  std::string co(std::string const &d, std::string const &r, std::string const &v) const
+  std::string co(std::string const& d, std::string const& r, std::string const& v) const
       KTHROW(Exception) override {
     Dir dr(d, true);
     mkn::kul::Process p("git");
@@ -126,7 +127,7 @@ class Git : public SCM {
     }
     return p.toString();
   }
-  void up(std::string const &d, std::string const &r, std::string const &v) const
+  void up(std::string const& d, std::string const& r, std::string const& v) const
       KTHROW(Exception) override {
     if (!Dir(d).is())
       co(d, r, v);
@@ -142,7 +143,7 @@ class Git : public SCM {
       }
     }
   }
-  std::string origin(std::string const &d) const override {
+  std::string origin(std::string const& d) const override {
     mkn::kul::Process p("git", d);
     mkn::kul::ProcessCapture pc(p);
     try {
@@ -155,12 +156,12 @@ class Git : public SCM {
       KEXCEPT(Exception, "SCM ERROR: Directory may not be git repository : " + d);
     std::vector<std::string> lines;
     mkn::kul::String::LINES(pc.outs(), lines);
-    for (auto &line : lines) mkn::kul::String::REPLACE_ALL(line, "\t", " ");
-    for (auto &line : lines) mkn::kul::String::REPLACE_ALL(line, "  ", " ");
+    for (auto& line : lines) mkn::kul::String::REPLACE_ALL(line, "\t", " ");
+    for (auto& line : lines) mkn::kul::String::REPLACE_ALL(line, "  ", " ");
     if (lines.size()) return mkn::kul::String::SPLIT(lines[0], ' ')[1];
     KEXCEPT(Exception, "SCM ERROR - Check remote dependency location / version");
   }
-  std::string localVersion(std::string const &d, std::string const &b) const override {
+  std::string localVersion(std::string const& d, std::string const& b) const override {
     mkn::kul::Process p("git", d);
     mkn::kul::ProcessCapture pc(p);
     try {
@@ -174,7 +175,7 @@ class Git : public SCM {
     return mkn::kul::String::LINES(pc.outs())[0];
   }
 
-  std::string remoteVersion(std::string const &url, std::string const &b) const
+  std::string remoteVersion(std::string const& url, std::string const& b) const
       KTHROW(Exception) override {
     mkn::kul::Process p("git");
     mkn::kul::ProcessCapture pc(p);
@@ -191,7 +192,7 @@ class Git : public SCM {
     return s.substr(0, s.find('\t'));
   }
 
-  bool hasChanges(std::string const &d) const override {
+  bool hasChanges(std::string const& d) const override {
     mkn::kul::Process p("git", d);
     mkn::kul::ProcessCapture pc(p);
     try {
@@ -202,7 +203,7 @@ class Git : public SCM {
     }
     return mkn::kul::String::LINES(pc.outs()).size() > 1;
   }
-  void status(std::string const &d, bool full = 1) const override {
+  void status(std::string const& d, bool full = 1) const override {
     mkn::kul::Process p("git", d);
     try {
       p << "status";
@@ -212,7 +213,7 @@ class Git : public SCM {
       KEXCEPT(Exception, "SCM ERROR " + std::string(e.what()));
     }
   }
-  void diff(std::string const &d) const override {
+  void diff(std::string const& d) const override {
     mkn::kul::Process p("git", d);
     try {
       p.arg("diff").start();

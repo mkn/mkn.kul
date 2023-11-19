@@ -57,25 +57,25 @@ template <typename T>
 auto constexpr is_span_like_v = is_span_like<T>::value;
 
 template <typename Container, typename Function>
-void for_each(Container& container, Function && function) {
+void for_each(Container& container, Function&& function) {
   std::for_each(std::begin(container), std::end(container), function);
 }
 
 template <typename Container, typename Function>
-bool any_of(Container const& container, Function && function) {
+bool any_of(Container const& container, Function&& function) {
   return std::any_of(std::begin(container), std::end(container), function);
 }
 template <typename Container, typename Function>
-bool any_of(Container && container, Function && function) {
+bool any_of(Container&& container, Function&& function) {
   return std::any_of(std::begin(container), std::end(container), function);
 }
 
 template <typename Container, typename Function>
-bool all_of(Container const& container, Function && function) {
+bool all_of(Container const& container, Function&& function) {
   return std::all_of(std::begin(container), std::end(container), function);
 }
 template <typename Container, typename Function>
-bool all_of(Container && container, Function && function) {
+bool all_of(Container&& container, Function&& function) {
   return all_of(container, function);
 }
 
@@ -90,7 +90,7 @@ bool compare_to(T const& t, OP const& op, Args const&... args) {
   return ((op(args, t)) && ...);
 }
 template <typename T, typename OP, typename... Args>
-bool compare_to(T && t, OP && op, Args &&... args) {
+bool compare_to(T&& t, OP&& op, Args&&... args) {
   return compare_to(t, op, args...);
 }
 
@@ -100,7 +100,7 @@ bool compare_to(T const& t, OP const& op, std::tuple<TupleElements...> const& tu
   return std::apply([&](auto const&... args) { return compare_to(t, op, args...); }, tuple);
 }
 template <typename T, typename OP, typename... TupleElements>
-bool compare_to(T && t, OP && op, std::tuple<TupleElements...> && tuple) {
+bool compare_to(T&& t, OP&& op, std::tuple<TupleElements...>&& tuple) {
   return compare_to(t, op, tuple);
 }
 
@@ -114,7 +114,7 @@ class All {
     return are(t, std::equal_to<T>{});
   }
   template <typename T>
-  bool operator==(T && t) {
+  bool operator==(T&& t) {
     return are(t, std::equal_to<T>{});
   }
 
@@ -123,7 +123,7 @@ class All {
     return are(t, std::not_equal_to<T>{});
   }
   template <typename T>
-  bool operator!=(T && t) {
+  bool operator!=(T&& t) {
     return are(t, std::not_equal_to<T>{});
   }
 
@@ -132,7 +132,7 @@ class All {
     return are(t, std::greater<T>{});
   }
   template <typename T>
-  bool operator>(T && t) {
+  bool operator>(T&& t) {
     return are(t, std::greater<T>{});
   }
 
@@ -141,7 +141,7 @@ class All {
     return are(t, std::less<T>{});
   }
   template <typename T>
-  bool operator<(T && t) {
+  bool operator<(T&& t) {
     return are(t, std::less<T>{});
   }
 
@@ -150,7 +150,7 @@ class All {
     return are(t, std::greater_equal<T>{});
   }
   template <typename T>
-  bool operator>=(T && t) {
+  bool operator>=(T&& t) {
     return are(t, std::greater_equal<T>{});
   }
 
@@ -159,7 +159,7 @@ class All {
     return are(t, std::less_equal<T>{});
   }
   template <typename T>
-  bool operator<=(T && t) {
+  bool operator<=(T&& t) {
     return are(t, std::less_equal<T>{});
   }
 

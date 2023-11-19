@@ -34,8 +34,8 @@ int16_t mkn::kul::Process::child() {
   std::string _s(toString());
   expand(_s);
   std::vector<std::string> cli(mkn::kul::cli::asArgs(_s));
-  std::vector<char *> argV;
-  for (auto &a : cli) argV.push_back(&a[0]);
+  std::vector<char*> argV;
+  for (auto& a : cli) argV.push_back(&a[0]);
   argV.push_back(NULL);
   return execvp(cli[0].c_str(), &argV[0]);
 }

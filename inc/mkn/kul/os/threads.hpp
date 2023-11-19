@@ -48,13 +48,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace mkn {
 namespace kul {
 namespace this_thread {
-inline void sleep(unsigned long const &millis) {
+inline void sleep(unsigned long const& millis) {
   std::this_thread::sleep_for(std::chrono::milliseconds(millis));
 }
-inline void uSleep(unsigned long const &micros) {
+inline void uSleep(unsigned long const& micros) {
   std::this_thread::sleep_for(std::chrono::microseconds(micros));
 }
-inline void nSleep(unsigned long const &nanos) {
+inline void nSleep(unsigned long const& nanos) {
   std::this_thread::sleep_for(std::chrono::nanoseconds(nanos));
 }
 }  // namespace this_thread
@@ -65,11 +65,12 @@ inline void nSleep(unsigned long const &nanos) {
 namespace threading {
 class Exception : public mkn::kul::Exception {
  public:
-  Exception(char const *f, uint16_t const &l, std::string const &s) : mkn::kul::Exception(f, l, s) {}
+  Exception(char const* f, uint16_t const& l, std::string const& s)
+      : mkn::kul::Exception(f, l, s) {}
 };
 class InterruptionException : public Exception {
  public:
-  InterruptionException(char const *f, uint16_t const &l, std::string const &s)
+  InterruptionException(char const* f, uint16_t const& l, std::string const& s)
       : Exception(f, l, s) {}
 };
 
@@ -103,4 +104,3 @@ class AThread {
 #endif
 
 #endif  // _MKN_KUL_OS_THREADS_HPP_
-

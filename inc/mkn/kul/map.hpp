@@ -57,19 +57,20 @@ namespace hash {
 template <class K, class V>
 class Map {
  public:
-  Map& emplace(const K &k, const V &v) {
+  Map& emplace(const K& k, const V& v) {
     _map.emplace(k, v);
     return *this;
   }
-  Map& insert(const K &k, const V &v) {
+  Map& insert(const K& k, const V& v) {
     _map.insert(std::make_pair(k, v));
     return *this;
   }
-  Map& insert(const std::pair<K, V> &pair) {
+  Map& insert(std::pair<K, V> const& pair) {
     _map.insert(pair);
     return *this;
   }
-  void setDeletedKey(K const&) { /* ununused, but here for interoperability with sparsehash */ }
+  void setDeletedKey(K const&) { /* ununused, but here for interoperability with sparsehash */
+  }
 
   auto& at(K const& k) { return _map.at(k); }
   auto& at(K const& k) const { return _map.at(k); }
@@ -78,7 +79,7 @@ class Map {
   auto& operator[](K const& k) const { return _map.at(k); }
 
   auto count(K const& k) const { return _map.count(k); }
-  auto erase(K const& k) { return  _map.erase(k); }
+  auto erase(K const& k) { return _map.erase(k); }
   auto size() const { return _map.size(); }
 
   auto begin() { return _map.begin(); }
@@ -86,7 +87,13 @@ class Map {
   auto end() { return _map.end(); }
   auto end() const { return _map.end(); }
 
-private:
+  auto find(K const& key) { return _map.find(key); }
+  auto find(K const& key) const { return _map.find(key); }
+
+  void clear() { _map.clear(); }
+  // auto empty() { return size() == 0; }
+
+ private:
   std::unordered_map<K, V> _map;
 };
 
@@ -119,7 +126,7 @@ namespace kul {
 
 struct StdStringComparator {
  public:
-  bool operator()(std::string const &s1, std::string const &s2) const {
+  bool operator()(std::string const& s1, std::string const& s2) const {
     return (s1.compare(s2) == 0);
   }
 };
@@ -136,19 +143,19 @@ class Set : public google::sparse_hash_set<T, HashFcn, EqualKey> {
   typedef typename Hash::iterator iterator;
   typedef typename Hash::const_iterator const_iterator;
 
-  void setEmptyKey(const key_type &key) { Hash::set_empty_key(key); }
-  void setDeletedKey(const key_type &key) { Hash::set_deleted_key(key); }
+  void setEmptyKey(key_type const& key) { Hash::set_empty_key(key); }
+  void setDeletedKey(key_type const& key) { Hash::set_deleted_key(key); }
   void clear() { Hash::clear(); }
   std::pair<iterator, bool> insert(const T obj) { return Hash::insert(obj); }
-  T &operator[](const key_type &key) { return Hash::operator[](key); }
-  size_type erase(const key_type &key) { return Hash::erase(key); }
+  T& operator[](key_type const& key) { return Hash::operator[](key); }
+  size_type erase(key_type const& key) { return Hash::erase(key); }
   iterator begin() { return Hash::begin(); }
   iterator end() { return Hash::end(); }
   const_iterator begin() const { return Hash::begin(); }
   const_iterator end() const { return Hash::end(); }
   size_type size() const { return Hash::size(); }
   const key_type getDeletedKey() const { return Hash::deleted_key(); }
-  size_type count(const key_type &key) const { return Hash::count(key); }
+  size_type count(key_type const& key) const { return Hash::count(key); }
 };
 
 namespace set {
@@ -165,21 +172,21 @@ class Map : public google::sparse_hash_map<K, V, HashFcn, EqualKey> {
   typedef typename map::iterator iterator;
   typedef typename map::const_iterator const_iterator;
 
-  void setDeletedKey(const key_type &key) { map::set_deleted_key(key); }
-  void setEmptyKey(const key_type &key) { map::set_empty_key(key); }
+  void setDeletedKey(key_type const& key) { map::set_deleted_key(key); }
+  void setEmptyKey(key_type const& key) { map::set_empty_key(key); }
   void clear() { map::clear(); }
-  std::pair<iterator, bool> insert(const std::pair<K, V> &obj) { return map::insert(obj); }
+  std::pair<iterator, bool> insert(std::pair<K, V> const& obj) { return map::insert(obj); }
   std::pair<iterator, bool> insert(const K k, V v) { return insert(std::pair<K, V>(k, v)); }
-  V &operator[](const key_type &key) { return map::operator[](key); }
-  size_type erase(const key_type &key) { return map::erase(key); }
+  V& operator[](key_type const& key) { return map::operator[](key); }
+  size_type erase(key_type const& key) { return map::erase(key); }
   iterator begin() { return map::begin(); }
   iterator end() { return map::end(); }
-  iterator find(const key_type &key) { return map::find(key); }
+  iterator find(key_type const& key) { return map::find(key); }
   size_type size() const { return map::size(); }
   const_iterator begin() const { return map::begin(); }
   const_iterator end() const { return map::end(); }
-  const_iterator find(const key_type &key) const { return map::find(key); }
-  size_type count(const key_type &key) const { return map::count(key); }
+  const_iterator find(key_type const& key) const { return map::find(key); }
+  size_type count(key_type const& key) const { return map::count(key); }
   const key_type getDeletedKey() const { return map::deleted_key(); }
 };
 
@@ -204,19 +211,19 @@ class Set : public google::dense_hash_set<T, HashFcn, EqualKey> {
   typedef typename Hash::iterator iterator;
   typedef typename Hash::const_iterator const_iterator;
 
-  void setEmptyKey(const key_type &key) { Hash::set_empty_key(key); }
+  void setEmptyKey(key_type const& key) { Hash::set_empty_key(key); }
   void clear() { Hash::clear(); }
-  void setDeletedKey(const key_type &key) { Hash::set_deleted_key(key); }
+  void setDeletedKey(key_type const& key) { Hash::set_deleted_key(key); }
   std::pair<iterator, bool> insert(const T obj) { return Hash::insert(obj); }
-  T &operator[](const key_type &key) { return Hash::operator[](key); }
-  size_type erase(const key_type &key) { return Hash::erase(key); }
+  T& operator[](key_type const& key) { return Hash::operator[](key); }
+  size_type erase(key_type const& key) { return Hash::erase(key); }
   iterator begin() { return Hash::begin(); }
   iterator end() { return Hash::end(); }
   const_iterator begin() const { return Hash::begin(); }
   const_iterator end() const { return Hash::end(); }
   size_type size() const { return Hash::size(); }
   const key_type getDeletedKey() const { return Hash::deleted_key(); }
-  size_type count(const key_type &key) const { return Hash::count(key); }
+  size_type count(key_type const& key) const { return Hash::count(key); }
 };
 
 namespace set {
@@ -233,22 +240,22 @@ class Map : public google::dense_hash_map<K, V, HashFcn, EqualKey> {
   typedef typename map::iterator iterator;
   typedef typename map::const_iterator const_iterator;
 
-  void setDeletedKey(const key_type &key) { map::set_deleted_key(key); }
-  void setEmptyKey(const key_type &key) { map::set_empty_key(key); }
+  void setDeletedKey(key_type const& key) { map::set_deleted_key(key); }
+  void setEmptyKey(key_type const& key) { map::set_empty_key(key); }
   void clear() { map::clear(); }
-  std::pair<iterator, bool> insert(const std::pair<K, V> &obj) { return map::insert(obj); }
+  std::pair<iterator, bool> insert(std::pair<K, V> const& obj) { return map::insert(obj); }
   std::pair<iterator, bool> insert(const K k, V v) { return insert(std::pair<K, V>(k, v)); }
-  V &operator[](const key_type &key) { return map::operator[](key); }
-  size_type erase(const key_type &key) { return map::erase(key); }
+  V& operator[](key_type const& key) { return map::operator[](key); }
+  size_type erase(key_type const& key) { return map::erase(key); }
   iterator begin() { return map::begin(); }
   iterator end() { return map::end(); }
-  iterator find(const key_type &key) { return map::find(key); }
+  iterator find(key_type const& key) { return map::find(key); }
   size_type size() const { return map::size(); }
   const_iterator begin() const { return map::begin(); }
   const_iterator end() const { return map::end(); }
-  const_iterator find(const key_type &key) const { return map::find(key); }
+  const_iterator find(key_type const& key) const { return map::find(key); }
   const key_type getDeletedKey() const { return map::deleted_key(); }
-  size_type count(const key_type &key) const { return map::count(key); }
+  size_type count(key_type const& key) const { return map::count(key); }
 };
 
 namespace map {

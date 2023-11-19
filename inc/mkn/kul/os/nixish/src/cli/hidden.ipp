@@ -30,7 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 // IWYU pragma: private, include "mkn/kul/cli.hpp"
 
-std::string mkn::kul::cli::hidden(const std::string& t) {
+std::string mkn::kul::cli::hidden(std::string const& t) {
   if (!t.empty()) std::cout << t << std::endl;
   termios oldt;
   tcgetattr(STDIN_FILENO, &oldt);

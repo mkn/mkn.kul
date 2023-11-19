@@ -38,7 +38,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace mkn {
 namespace kul {
 
-
 template <typename T, typename data_fn = void, typename size_fn = void>
 struct is_span_like : std::false_type {};
 
@@ -80,7 +79,6 @@ class Span {
     reset(c);
     return *this;
   }
-
 
  private:
   T* ptr = nullptr;
@@ -131,7 +129,7 @@ struct SpanSet {
       curr_pos += sv->m_sizes[curr_ptr++];
       return *this;
     }
-    bool operator!=(const iterator& /*other*/) const { return curr_ptr != sv->m_sizes.size(); }
+    bool operator!=(iterator const& /*other*/) const { return curr_ptr != sv->m_sizes.size(); }
     Span<T, SIZE> operator*() const { return {sv->m_vec.data() + curr_pos, sv->m_sizes[curr_ptr]}; }
 
     SpanSet_* sv = nullptr;
@@ -153,7 +151,6 @@ struct SpanSet {
   std::vector<SIZE> m_sizes, m_displs;
   std::vector<T> m_vec;
 };
-
 
 }  // namespace kul
 }  // namespace mkn

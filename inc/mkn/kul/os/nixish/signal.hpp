@@ -67,7 +67,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif /* __NetBSD__ */
 #endif /* REG_EIP */
 
-inline void kul_sig_handler(int s, siginfo_t *info, void *v);
+inline void kul_sig_handler(int s, siginfo_t* info, void* v);
 
 namespace mkn {
 namespace kul {
@@ -75,7 +75,7 @@ namespace this_thread {
 #include "mkn/kul/os/nixish/src/signal/stacktrace.ipp"
 
 inline void print_stacktrace() {
-  for (auto const &s : stacktrace()) std::cout << s << std::endl;
+  for (auto const& s : stacktrace()) std::cout << s << std::endl;
 }
 }  // namespace this_thread
 
@@ -93,15 +93,15 @@ class SignalStatic {
     sigHandler.sa_sigaction = kul_sig_handler;
     sigaction(SIGSEGV, &sigHandler, NULL);
   }
-  static SignalStatic &INSTANCE() {
+  static SignalStatic& INSTANCE() {
     static SignalStatic ss;
     return ss;
   }
-  void abrt(const std::function<void(int)> &f) {
+  void abrt(std::function<void(int)> const& f) {
     if (ab.size() == 0) sigaction(SIGABRT, &sigHandler, NULL);
     ab.push_back(f);
   }
-  void intr(const std::function<void(int)> &f) {
+  void intr(std::function<void(int)> const& f) {
     if (in.size() == 0) sigaction(SIGINT, &sigHandler, NULL);
     in.push_back(f);
   }
@@ -109,21 +109,21 @@ class SignalStatic {
  public:
   void quiet() { q = 1; }
   friend class Signal;
-  friend void ::kul_sig_handler(int s, siginfo_t *i, void *v);
+  friend void ::kul_sig_handler(int s, siginfo_t* i, void* v);
 };
 
 class Signal {
  public:
   Signal() { mkn::kul::SignalStatic::INSTANCE(); }
-  Signal &abrt(const std::function<void(int16_t)> &f) {
+  Signal& abrt(std::function<void(int16_t)> const& f) {
     mkn::kul::SignalStatic::INSTANCE().abrt(f);
     return *this;
   }
-  Signal &intr(const std::function<void(int16_t)> &f) {
+  Signal& intr(std::function<void(int16_t)> const& f) {
     mkn::kul::SignalStatic::INSTANCE().intr(f);
     return *this;
   }
-  Signal &segv(const std::function<void(int16_t)> &f) {
+  Signal& segv(std::function<void(int16_t)> const& f) {
     mkn::kul::SignalStatic::INSTANCE().se.push_back(f);
     return *this;
   }
