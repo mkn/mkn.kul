@@ -1,5 +1,5 @@
 /**
-Copyright (c) 2017, Philip Deegan.
+Copyright (c) 2023, Philip Deegan.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -30,10 +30,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 /*
 REQUIRES
-    dep:
-      - name: google.sparsehash
-        version: stable
-        scm: http://github.com/mkn/google.sparsehash
+    dep: google.sparsehash
+
 */
 /**     BREAKDOWN
  *
@@ -57,17 +55,39 @@ namespace kul {
 namespace hash {
 
 template <class K, class V>
-class Map : public std::unordered_map<K, V> {
+class Map {
  public:
-  Map &insert(const K &k, const V &v) {
-    this->insert(std::make_pair(k, v));
+  Map& emplace(const K &k, const V &v) {
+    _map.emplace(k, v);
     return *this;
   }
-  Map &insert(const std::pair<K, V> &pair) {
-    std::unordered_map<K, V>::insert(pair);
+  Map& insert(const K &k, const V &v) {
+    _map.insert(std::make_pair(k, v));
     return *this;
   }
-  void setDeletedKey(const K &key) { (void)key; }
+  Map& insert(const std::pair<K, V> &pair) {
+    _map.insert(pair);
+    return *this;
+  }
+  void setDeletedKey(K const&) { /* ununused, but here for interoperability with sparsehash */ }
+
+  auto& at(K const& k) { return _map.at(k); }
+  auto& at(K const& k) const { return _map.at(k); }
+
+  auto& operator[](K const& k) { return _map[k]; }
+  auto& operator[](K const& k) const { return _map.at(k); }
+
+  auto count(K const& k) const { return _map.count(k); }
+  auto erase(K const& k) { return  _map.erase(k); }
+  auto size() const { return _map.size(); }
+
+  auto begin() { return _map.begin(); }
+  auto begin() const { return _map.begin(); }
+  auto end() { return _map.end(); }
+  auto end() const { return _map.end(); }
+
+private:
+  std::unordered_map<K, V> _map;
 };
 
 namespace map {
