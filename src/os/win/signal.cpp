@@ -30,6 +30,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "mkn/kul/signal.hpp"
 
-void kul_real_se_handler(EXCEPTION_POINTERS *pExceptionInfo) {
+void kul_real_se_handler(EXCEPTION_POINTERS* pExceptionInfo) {
 #include "mkn/kul/src/signal/se_handler.cpp"
 }

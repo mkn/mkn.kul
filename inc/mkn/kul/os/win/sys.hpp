@@ -52,7 +52,7 @@ class SharedLibrary {
   const mkn::kul::File _f;
 
  public:
-  SharedLibrary(mkn::kul::File const &f) KTHROW(Exception) : _f(f) {
+  SharedLibrary(mkn::kul::File const& f) KTHROW(Exception) : _f(f) {
     if (!_f) KEXCEPSTREAM << "Library attempted to be loaded does not exist: " << _f.full();
     LPSTR lib = _strdup(_f.real().c_str());
     _handle = LoadLibrary(lib);
@@ -68,23 +68,23 @@ class SharedLibrary {
 template <class F>
 class SharedFunction {
  private:
-  F *_funcP;
-  SharedLibrary &_lib;
+  F* _funcP;
+  SharedLibrary& _lib;
 
  public:
-  SharedFunction(SharedLibrary &lib, std::string const &f) KTHROW(Exception) : _lib(lib) {
+  SharedFunction(SharedLibrary& lib, std::string const& f) KTHROW(Exception) : _lib(lib) {
     LPSTR func = _strdup(f.c_str());
-    _funcP = (F *)GetProcAddress(_lib._handle, func);
+    _funcP = (F*)GetProcAddress(_lib._handle, func);
     if (!_funcP) KEXCEPSTREAM << "Cannot load symbol create " << GetLastError();
   }
 
-  F *pointer() { return _funcP; }
+  F* pointer() { return _funcP; }
 };
 
 template <class T>
 class SharedClass {
-  typedef T *construct_t();
-  typedef void destruct_t(T *t);
+  typedef T* construct_t();
+  typedef void destruct_t(T* t);
 
  private:
   SharedLibrary _lib;
@@ -92,16 +92,16 @@ class SharedClass {
   SharedFunction<destruct_t> _d;
 
  public:
-  SharedClass(mkn::kul::File const &f, std::string const &c, std::string const &d) KTHROW(Exception)
+  SharedClass(mkn::kul::File const& f, std::string const& c, std::string const& d) KTHROW(Exception)
       : _lib(f), _c(_lib, c), _d(_lib, d) {}
   virtual ~SharedClass() {}
 
  protected:
-  void construct(T *&t) KTHROW(Exception) {
+  void construct(T*& t) KTHROW(Exception) {
     t = _c.pointer()();
     if (!t) KEXCEPSTREAM << "Dynamically loaded class was not created";
   }
-  void destruct(T *&t) {
+  void destruct(T*& t) {
     _d.pointer()(t);
     t = nullptr;
     if (t) KEXCEPSTREAM << "Dynamically loaded class was not destroyed";

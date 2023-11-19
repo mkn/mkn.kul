@@ -39,14 +39,14 @@ namespace kul {
 namespace bon {
 class Exception : public mkn::kul::Exception {
  public:
-  Exception(char const *f, const size_t &l, std::string const &s) : mkn::kul::Exception(f, l, s) {}
+  Exception(char const* f, const size_t& l, std::string const& s) : mkn::kul::Exception(f, l, s) {}
 };
 
 enum class TYPE { OBJ = 0, STR, INT };
 
 class ob {
  private:
-  static void BUILD(std::stringstream *tree, size_t size, ob &o) {
+  static void BUILD(std::stringstream* tree, size_t size, ob& o) {
     o.v = tree[0].str();
     if (size == 1) return;
     if (size == 2)
@@ -56,7 +56,7 @@ class ob {
       BUILD(tree, size - 1, o.c.back());
     }
   }
-  static ob BUILD(std::stringstream *tree, size_t size) {
+  static ob BUILD(std::stringstream* tree, size_t size) {
     ob o;
     BUILD(tree, size, o);
     return o;
@@ -65,13 +65,13 @@ class ob {
  public:
   std::string v, a;
   std::vector<ob> c;
-  static ob BUILD(std::vector<std::stringstream> &tree) { return BUILD(tree.data(), tree.size()); }
+  static ob BUILD(std::vector<std::stringstream>& tree) { return BUILD(tree.data(), tree.size()); }
   std::string to_string() const {
     std::stringstream ss;
     ss << v;
-    std::function<void(const ob &)> recurse = [&](const ob &o) {
+    std::function<void(const ob&)> recurse = [&](const ob& o) {
       if (o.c.empty()) ss << " : " << o.a;
-      for (const auto &oc : o.c) recurse(oc);
+      for (const auto& oc : o.c) recurse(oc);
     };
     recurse(*this);
     return ss.str();
@@ -88,7 +88,7 @@ class ob {
       if (keys.empty()) return node;
       return get_with_keys_for_node(node[keys.back()], 1);
     };
-    std::function<void(const ob &)> recurse = [&](const ob &o) {
+    std::function<void(const ob&)> recurse = [&](const ob& o) {
       if (o.a.empty() && o.v.empty() && o.c.empty()) return;
 
       if (o.a.empty()) {
@@ -101,7 +101,7 @@ class ob {
         auto val = get_with_keys();
         auto vals = mkn::kul::String::ESC_SPLIT(o.a, ',');
         if (vals.empty()) val = o.a;
-        for (const auto &v : vals) {
+        for (const auto& v : vals) {
           auto p = mkn::kul::String::ESC_SPLIT(v, ':');
           if (p.size() == 2) {
             mkn::kul::String::TRIM(p);
@@ -110,7 +110,7 @@ class ob {
             KEXCEPTION("FAIL");
         }
       }
-      for (const auto &oc : o.c) recurse(oc);
+      for (const auto& oc : o.c) recurse(oc);
     };
     recurse(*this);
     YAML::Emitter out;
@@ -144,7 +144,7 @@ YAML::Node from(std::string s) {
   }
   if (tri > 1) c_check();
   std::vector<YAML::Node> nodes;
-  for (const auto &o : obs) nodes.emplace_back(o.to_yaml());
+  for (const auto& o : obs) nodes.emplace_back(o.to_yaml());
   return YAML::Node(nodes);
 }
 

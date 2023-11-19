@@ -42,7 +42,7 @@ namespace kul {
 namespace time {
 class Exception : public mkn::kul::Exception {
  public:
-  Exception(char const *f, const int l, std::string const &s) : mkn::kul::Exception(f, l, s) {}
+  Exception(char const* f, const int l, std::string const& s) : mkn::kul::Exception(f, l, s) {}
 };
 }  // namespace time
 
@@ -85,15 +85,15 @@ class DateTime {
     std::strftime(buffer, 80, f.c_str(), &ti);
     return std::string(buffer);
   }
-  static const std::string AS(std::string const &epoch,
-                              std::string const &f = "%Y-%m-%d-%H:%M:%S") {
+  static const std::string AS(std::string const& epoch,
+                              std::string const& f = "%Y-%m-%d-%H:%M:%S") {
     uint64_t e = 0;
     std::stringstream ss(epoch);
     ss >> e;
     if (!e) KEXCEPT(time::Exception, "Invalid time used :" + epoch);
     return AS(e, f);
   }
-  static const std::string NOW(std::string const &f = "%Y-%m-%d-%H:%M:%S") {
+  static const std::string NOW(std::string const& f = "%Y-%m-%d-%H:%M:%S") {
     return AS(std::time(NULL), f);
   }
 };

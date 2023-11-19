@@ -34,8 +34,8 @@ std::vector<mkn::kul::Dir> mkn::kul::Dir::dirs(bool incHidden) const KTHROW(fs::
   if (!is()) KEXCEPT(fs::Exception, "Directory : \"" + path() + "\" does not exist");
   std::vector<Dir> dirs;
 
-  DIR *dir = opendir(real().c_str());
-  struct dirent *entry = readdir(dir);
+  DIR* dir = opendir(real().c_str());
+  struct dirent* entry = readdir(dir);
   while (entry != NULL) {
     std::string d(entry->d_name);
     mkn::kul::Dir dd(JOIN(real(), entry->d_name));

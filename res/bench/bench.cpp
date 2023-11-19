@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "benchmark/benchmark_api.h"
 #endif
 
-void createDeleteFile(benchmark::State &state) {
+void createDeleteFile(benchmark::State& state) {
   while (state.KeepRunning()) {
     mkn::kul::File f("tmp.tmp");
     f.mk();
@@ -49,7 +49,7 @@ void createDeleteFile(benchmark::State &state) {
 }
 BENCHMARK(createDeleteFile)->Unit(benchmark::kMicrosecond);
 
-void parseStringAsCommandLineArguments(benchmark::State &state) {
+void parseStringAsCommandLineArguments(benchmark::State& state) {
   while (state.KeepRunning()) {
     std::vector<std::string> v;
     mkn::kul::cli::asArgs("/path/to \"words in quotes\" words\\ not\\ in\\ quotes end", v);
@@ -57,7 +57,7 @@ void parseStringAsCommandLineArguments(benchmark::State &state) {
 }
 BENCHMARK(parseStringAsCommandLineArguments)->Unit(benchmark::kMicrosecond);
 
-void splitStringByChar(benchmark::State &state) {
+void splitStringByChar(benchmark::State& state) {
   while (state.KeepRunning()) {
     std::vector<std::string> v;
     mkn::kul::String::SPLIT("split - by - char - dash", '-', v);
@@ -65,7 +65,7 @@ void splitStringByChar(benchmark::State &state) {
 }
 BENCHMARK(splitStringByChar)->Unit(benchmark::kMicrosecond);
 
-void splitStringByString(benchmark::State &state) {
+void splitStringByString(benchmark::State& state) {
   while (state.KeepRunning()) {
     std::vector<std::string> v;
     mkn::kul::String::SPLIT("split - by - char - dash", "-", v);
@@ -73,7 +73,7 @@ void splitStringByString(benchmark::State &state) {
 }
 BENCHMARK(splitStringByString)->Unit(benchmark::kMicrosecond);
 
-void splitStringByEscapedChar(benchmark::State &state) {
+void splitStringByEscapedChar(benchmark::State& state) {
   while (state.KeepRunning()) {
     std::vector<std::string> v;
     mkn::kul::String::ESC_SPLIT("split \\- by - char - dash", '-', v);
@@ -86,7 +86,7 @@ auto lambda = [](uint a, uint b) {
   (void)c;
 };
 
-void concurrentThreadPool(benchmark::State &state) {
+void concurrentThreadPool(benchmark::State& state) {
   while (state.KeepRunning()) {
     mkn::kul::ConcurrentThreadPool<> ctp(3, 1);
     for (size_t i = 0; i < 10000; i++) ctp.async(std::bind(lambda, 2, 4));
@@ -95,7 +95,7 @@ void concurrentThreadPool(benchmark::State &state) {
 }
 BENCHMARK(concurrentThreadPool)->Unit(benchmark::kMicrosecond);
 
-void chroncurrentThreadPool(benchmark::State &state) {
+void chroncurrentThreadPool(benchmark::State& state) {
   while (state.KeepRunning()) {
     mkn::kul::ChroncurrentThreadPool<> ctp(3, 1);
     for (size_t i = 0; i < 10000; i++) ctp.async(std::bind(lambda, 2, 4));
@@ -104,7 +104,7 @@ void chroncurrentThreadPool(benchmark::State &state) {
 }
 BENCHMARK(chroncurrentThreadPool)->Unit(benchmark::kMicrosecond);
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv) {
   ::benchmark::Initialize(&argc, argv);
   ::benchmark::RunSpecifiedBenchmarks();
 }

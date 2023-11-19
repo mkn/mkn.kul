@@ -33,8 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 void mkn::kul::Dir::rm() const {
   if (is()) {
-    for (const auto &a : files()) a.rm();
-    for (const auto &a : dirs()) a.rm();
+    for (const auto& a : files()) a.rm();
+    for (const auto& a : dirs()) a.rm();
     _rmdir(path().c_str());
   }
 }
@@ -56,13 +56,15 @@ bool mkn::kul::Dir::is() const {
 }
 bool mkn::kul::Dir::mk() const {
   if (path().empty()) return false;
-  mkn::kul::Dir const &prnt(parent());
+  mkn::kul::Dir const& prnt(parent());
   if (_p != prnt.path() && !prnt.is()) parent().mk();
   return CreateDirectory(locl().c_str(), NULL);
 }
 bool mkn::kul::Dir::root() const { return is() && real().size() == 3; }
 
-bool mkn::kul::File::is() const { return !name().empty() && (bool)std::ifstream(_d.join(_n).c_str()); }
+bool mkn::kul::File::is() const {
+  return !name().empty() && (bool)std::ifstream(_d.join(_n).c_str());
+}
 bool mkn::kul::File::rm() const {
   if (is()) {
     _unlink(_d.join(_n).c_str());
@@ -72,7 +74,7 @@ bool mkn::kul::File::rm() const {
 }
 
 bool mkn::kul::File::mk() const {
-  FILE *pFile;
+  FILE* pFile;
   fopen_s(&pFile, full().c_str(), "w");
   if (pFile != NULL) {
     fclose(pFile);
@@ -98,7 +100,7 @@ namespace mkn {
 namespace kul {
 namespace os {
 
-inline uint16_t exec(std::string const &cmd, bool q = false) {
+inline uint16_t exec(std::string const& cmd, bool q = false) {
   if (q) {
     return system(std::string(cmd + " > nul").c_str());
   }
@@ -121,12 +123,12 @@ inline mkn::kul::Dir home() {
   if (h.size()) return mkn::kul::Dir(h);
   return mkn::kul::Dir(std::string(env::GET("HOMEDRIVE")) + std::string(env::GET("HOMEPATH")));
 }
-inline mkn::kul::Dir home(std::string const &app) { return mkn::kul::Dir(home().join(app)); }
+inline mkn::kul::Dir home(std::string const& app) { return mkn::kul::Dir(home().join(app)); }
 
 }  // namespace user
 
 namespace env {
-inline bool CWD(mkn::kul::Dir const &d) { return _chdir(d.path().c_str()) != -1; }
+inline bool CWD(mkn::kul::Dir const& d) { return _chdir(d.path().c_str()) != -1; }
 }  // namespace env
 }  // namespace kul
 }  // namespace mkn

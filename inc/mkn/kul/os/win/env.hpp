@@ -62,17 +62,17 @@ inline std::string EOL() {
 #endif
 }
 
-inline bool EXISTS(char const *c) {
+inline bool EXISTS(char const* c) {
   bool set = 0;
-  char *r = 0;
+  char* r = 0;
   size_t len;
   _dupenv_s(&r, &len, c);
   set = r;
   if (len) free(r);
   return set;
 }
-inline std::string GET(char const *c, std::string default_ = "") {
-  char *r;
+inline std::string GET(char const* c, std::string default_ = "") {
+  char* r;
   size_t len;
   _dupenv_s(&r, &len, c);
   if (len) {
@@ -83,7 +83,7 @@ inline std::string GET(char const *c, std::string default_ = "") {
   return default_;
 }
 
-inline void SET(char const *var, char const *val) {
+inline void SET(char const* var, char const* val) {
   _putenv(std::string(std::string(var) + "=" + std::string(val)).c_str());
 }
 
@@ -96,7 +96,7 @@ inline std::string CWD() {
   return str;
 }
 
-inline bool CWD(std::string const &c) { return _chdir(c.c_str()) != -1; }
+inline bool CWD(std::string const& c) { return _chdir(c.c_str()) != -1; }
 
 }  // namespace env
 }  // namespace kul

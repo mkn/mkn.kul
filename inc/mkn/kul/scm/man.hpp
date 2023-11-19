@@ -41,11 +41,11 @@ namespace scm {
 
 class Manager {
  public:
-  static Manager &INSTANCE() {
+  static Manager& INSTANCE() {
     static Manager instance;
     return instance;
   }
-  const SCM &get(std::string const &s) KTHROW(NotFoundException) {
+  const SCM& get(std::string const& s) KTHROW(NotFoundException) {
     if (SCMs.count(s) > 0) return *(*SCMs.find(s)).second;
     KEXCEPT(NotFoundException, "Source Control Management for " + s + " is not implemented");
   }
@@ -54,10 +54,10 @@ class Manager {
   Manager() {
     git.reset(new Git());
     // svn.reset(new Svn());
-    SCMs.insert(std::pair<std::string, SCM *>("git", git.get()));
+    SCMs.insert(std::pair<std::string, SCM*>("git", git.get()));
     // SCMs.insert(std::pair<std::string, SCM *>("svn", svn.get()));
   }
-  hash::map::S2T<SCM *> SCMs;
+  hash::map::S2T<SCM*> SCMs;
   std::unique_ptr<SCM> git;
   // std::unique_ptr<SCM> svn;
 };

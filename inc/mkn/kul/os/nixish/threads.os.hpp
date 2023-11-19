@@ -90,29 +90,28 @@ class Thread : public threading::AThread {
  private:
   std::function<void()> func;
   pthread_t thr;
-  static void *threadFunction(void *th) {
-    ((Thread *)th)->act();
+  static void* threadFunction(void* th) {
+    ((Thread*)th)->act();
     return 0;
   }
   void act() {
     try {
       func();
-    } catch (const std::exception &e) {
+    } catch (const std::exception& e) {
       ep = std::current_exception();
     }
     f = 1;
   }
 
  public:
-  Thread(const std::function<void()> &_func) : func(_func) {}
+  Thread(const std::function<void()>& _func) : func(_func) {}
   template <class T>
-  Thread(const T &t) : func(std::bind((void (T::*)()) & T::operator(), t)) {}
+  Thread(const T& t) : func(std::bind((void(T::*)()) & T::operator(), t)) {}
   template <class T>
-  Thread(const std::reference_wrapper<T> &r)
-      : func(std::bind((void (T::*)()) & T::operator(), r)) {}
+  Thread(const std::reference_wrapper<T>& r) : func(std::bind((void(T::*)()) & T::operator(), r)) {}
   template <class T>
-  Thread(const std::reference_wrapper<const T> &r)
-      : func(std::bind((void (T::*)() const) & T::operator(), r)) {}
+  Thread(const std::reference_wrapper<const T>& r)
+      : func(std::bind((void(T::*)() const) & T::operator(), r)) {}
 
   virtual ~Thread() {}
   bool detach() { return pthread_detach(thr); }

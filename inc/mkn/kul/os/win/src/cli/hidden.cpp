@@ -38,7 +38,7 @@ if (!t.empty()) std::cout << t << std::endl;
 HANDLE hStdin = GetStdHandle(STD_INPUT_HANDLE);
 DWORD mode = 0;
 GetConsoleMode(hStdin, &mode);
-SetConsoleMode(hStdin, mode &(~ENABLE_ECHO_INPUT));
+SetConsoleMode(hStdin, mode&(~ENABLE_ECHO_INPUT));
 std::string s;
 std::getline(std::cin, s);
 SetConsoleMode(hStdin, mode);

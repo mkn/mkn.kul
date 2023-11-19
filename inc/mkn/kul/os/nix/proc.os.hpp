@@ -48,9 +48,9 @@ namespace this_proc {
 
 class ProcParser {
  private:
-  static inline int PARSE_LINE(char *line);
-  static inline void VIRTUAL(uint64_t &mem);
-  static inline void PHYSICAL(uint64_t &mem);  // Note: this value is in KB!
+  static inline int PARSE_LINE(char* line);
+  static inline void VIRTUAL(uint64_t& mem);
+  static inline void PHYSICAL(uint64_t& mem);  // Note: this value is in KB!
 
   friend uint64_t virtualMemory();
   friend uint64_t physicalMemory();

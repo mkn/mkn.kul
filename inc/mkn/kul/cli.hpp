@@ -47,7 +47,7 @@ namespace mkn {
 namespace kul {
 namespace cli {
 
-inline const std::string receive(std::string const &t = "") {
+inline const std::string receive(std::string const& t = "") {
   if (!t.empty()) std::cout << t << std::endl;
   std::string s;
   std::getline(std::cin, s);
@@ -56,22 +56,23 @@ inline const std::string receive(std::string const &t = "") {
 
 class Exception : public mkn::kul::Exception {
  public:
-  Exception(char const *f, uint16_t const &l, std::string const &s) : mkn::kul::Exception(f, l, s) {}
+  Exception(char const* f, uint16_t const& l, std::string const& s)
+      : mkn::kul::Exception(f, l, s) {}
 };
 
 class ArgNotFoundException : public Exception {
  public:
-  ArgNotFoundException(char const *f, uint16_t const &l, std::string const &s)
+  ArgNotFoundException(char const* f, uint16_t const& l, std::string const& s)
       : Exception(f, l, s) {}
 };
 
 class Cmd {
  private:
-  char const *c;
+  char const* c;
 
  public:
-  Cmd(char const *_c) : c(_c) {}
-  char const *command() const { return c; }
+  Cmd(char const* _c) : c(_c) {}
+  char const* command() const { return c; }
 };
 
 // deprecated : use mkn::kul::env::Var::Mode
@@ -81,9 +82,9 @@ enum EnvVarMode { APPE = 0, PREP, REPL };
 class EnvVar {
  public:
   EnvVar(const std::string _n, const std::string _v, const EnvVarMode _m) : n(_n), v(_v), m(_m) {}
-  EnvVar(const EnvVar &e) : n(e.n), v(e.v), m(e.m) {}
-  char const *name() const { return n.c_str(); }
-  char const *value() const { return v.c_str(); }
+  EnvVar(const EnvVar& e) : n(e.n), v(e.v), m(e.m) {}
+  char const* name() const { return n.c_str(); }
+  char const* value() const { return v.c_str(); }
   EnvVarMode mode() const { return m; }
   const std::string toString() const {
     std::string var(value());
@@ -98,7 +99,7 @@ class EnvVar {
     }
     return var;
   }
-  EnvVar &operator=(EnvVar &&e) {
+  EnvVar& operator=(EnvVar&& e) {
     std::swap(m, e.m);
     std::swap(n, e.n);
     std::swap(v, e.v);
@@ -117,16 +118,16 @@ class Arg : public Cmd {
   static constexpr char INVALID_CHAR = ' ';
 
  public:
-  Arg(const char _d, char const *dd, ArgType _t, bool m = false) : Cmd(dd), man(m), d(_d), t(_t) {}
-  Arg(const char _d, char const *dd, bool m = false) : Cmd(dd), man(m), d(_d) {}
+  Arg(const char _d, char const* dd, ArgType _t, bool m = false) : Cmd(dd), man(m), d(_d), t(_t) {}
+  Arg(const char _d, char const* dd, bool m = false) : Cmd(dd), man(m), d(_d) {}
 
-  Arg(char const *dd, ArgType _t, bool m = false) : Cmd(dd), man(m), t(_t) {}
-  Arg(char const *dd, bool m = false) : Cmd(dd), man(m) {}
+  Arg(char const* dd, ArgType _t, bool m = false) : Cmd(dd), man(m), t(_t) {}
+  Arg(char const* dd, bool m = false) : Cmd(dd), man(m) {}
 
   bool mandatory() const { return man; }
   char dash() const { return d; }
-  char const *dashdash() const { return command(); }
-  const ArgType &type() const { return t; }
+  char const* dashdash() const { return command(); }
+  const ArgType& type() const { return t; }
 
  private:
   bool man;
@@ -137,52 +138,52 @@ class Arg : public Cmd {
 class Args {
  public:
   Args() {}
-  Args(const std::vector<Cmd> &_cmds, const std::vector<Arg> &_args) : cmds(_cmds), args(_args) {}
+  Args(const std::vector<Cmd>& _cmds, const std::vector<Arg>& _args) : cmds(_cmds), args(_args) {}
 
-  void arg(const Arg &a) { args.push_back(a); }
-  void cmd(const Cmd &c) { cmds.push_back(c); }
-  const Cmd &commands(char const *c) const {
-    for (const Cmd &cmd : cmds)
+  void arg(const Arg& a) { args.push_back(a); }
+  void cmd(const Cmd& c) { cmds.push_back(c); }
+  const Cmd& commands(char const* c) const {
+    for (const Cmd& cmd : cmds)
       if (strcmp(cmd.command(), c) == 0) return cmd;
     KEXCEPT(ArgNotFoundException, "No command " + std::string(c) + " found");
   }
-  const Arg &dashes(const char c) const {
-    for (const Arg &a : arguments())
+  const Arg& dashes(const char c) const {
+    for (const Arg& a : arguments())
       if (a.dash() == c) return a;
     KEXCEPT(ArgNotFoundException, "No argument " + std::string(1, c) + " found");
   }
-  const Arg &doubleDashes(char const *c) const {
-    for (const Arg &a : arguments())
+  const Arg& doubleDashes(char const* c) const {
+    for (const Arg& a : arguments())
       if (strcmp(a.command(), c) == 0) return a;
     KEXCEPT(ArgNotFoundException, "No argument " + std::string(c) + " found");
   }
-  const std::vector<Cmd> &commands() const { return cmds; }
-  const std::vector<Arg> &arguments() const { return args; }
-  std::string const &get(std::string const &s) const {
+  const std::vector<Cmd>& commands() const { return cmds; }
+  const std::vector<Arg>& arguments() const { return args; }
+  std::string const& get(std::string const& s) const {
     if (has(s)) return vals.at(s);
     KEXCEPT(ArgNotFoundException, "No value " + s + " found");
   }
   bool empty() const { return vals.size() == 0; }
-  bool has(std::string const &s) const { return vals.count(s); }
+  bool has(std::string const& s) const { return vals.count(s); }
   size_t size() const { return vals.size(); }
-  bool erase(std::string const &key) { return vals.erase(key); }
-  void process(uint16_t const &argc, char *argv[], uint16_t first = 1)
+  bool erase(std::string const& key) { return vals.erase(key); }
+  void process(uint16_t const& argc, char* argv[], uint16_t first = 1)
       KTHROW(ArgNotFoundException) {
-    for (const Arg &a1 : arguments())
-      for (const Arg &a2 : arguments()) {
+    for (const Arg& a1 : arguments())
+      for (const Arg& a2 : arguments()) {
         if (&a1 == &a2) continue;
         if ((a1.dash() != ' ') &&
             (a1.dash() == a2.dash() || strcmp(a1.dashdash(), a2.dashdash()) == 0))
           KEXCEPT(Exception, "Duplicate argument detected");
       }
-    for (const Cmd &c1 : commands())
-      for (const Cmd &c2 : commands()) {
+    for (const Cmd& c1 : commands())
+      for (const Cmd& c2 : commands()) {
         if (&c1 == &c2) continue;
         if (strcmp(c1.command(), c2.command()) == 0)
           KEXCEPT(Exception, "Duplicate argument detected");
       }
 
-    Arg *arg = 0;
+    Arg* arg = 0;
     uint16_t valExpected = 0;
     std::string valExpectedFor, c, t;
 
@@ -205,13 +206,13 @@ class Args {
         c = c.substr(c.find("--") + 2);
         valExpectedFor = c;
         if (c.find("=") == std::string::npos) {
-          arg = const_cast<Arg *>(&doubleDashes(c.c_str()));
+          arg = const_cast<Arg*>(&doubleDashes(c.c_str()));
           valExpected = arg->type();
           if (!valExpected) vals[arg->dashdash()] = "";
           continue;
         }
         valExpectedFor = c.substr(0, c.find("="));
-        arg = const_cast<Arg *>(&doubleDashes(valExpectedFor.c_str()));
+        arg = const_cast<Arg*>(&doubleDashes(valExpectedFor.c_str()));
         valExpected = arg->type();
         if (valExpected == 0)
           KEXCEPT(Exception, "Found = when no value is expected for arg " + valExpectedFor);
@@ -223,13 +224,13 @@ class Args {
         if (c.find("=") != std::string::npos) {
           if (c.substr(0, c.find("=")).size() > 1)
             KEXCEPT(Exception, "Cannot mix flag and non-flag arguments");
-          arg = const_cast<Arg *>(&dashes(c.at(0)));
+          arg = const_cast<Arg*>(&dashes(c.at(0)));
           vals[arg->dashdash()] = c.substr(c.find("=") + 1);
           valExpected = 0;
         } else if (c.length() > 1) {
           std::string a = c;
           for (size_t i = 0; i < c.length(); i++) {
-            arg = const_cast<Arg *>(&dashes(a.at(0)));
+            arg = const_cast<Arg*>(&dashes(a.at(0)));
             if (i + 1 == c.length())
               valExpected = arg->type();
             else if (arg->type() == ArgType::STRING)
@@ -238,7 +239,7 @@ class Args {
             if (a.length() > 1) a = a.substr(1);
           }
         } else {
-          arg = const_cast<Arg *>(&dashes(c.at(0)));
+          arg = const_cast<Arg*>(&dashes(c.at(0)));
           valExpected = arg->type();
           vals[arg->dashdash()] = "";
         }
@@ -253,7 +254,7 @@ class Args {
     }
     if (valExpected == 1)
       KEXCEPT(Exception, "Value expected for argument: \"" + valExpectedFor + "\"");
-    for (const Arg &a : args)
+    for (const Arg& a : args)
       if (a.mandatory()) get(a.dashdash());
   }
 #if defined(_MKN_WITH_IO_CEREAL_)
@@ -268,9 +269,9 @@ class Args {
 #include "mkn/kul/serial/cli.arg.end.hpp"
 };
 
-inline void asArgs(std::string const &cmd, std::vector<std::string> &args);
+inline void asArgs(std::string const& cmd, std::vector<std::string>& args);
 
-inline std::vector<std::string> asArgs(std::string const &cmd) {
+inline std::vector<std::string> asArgs(std::string const& cmd) {
   std::vector<std::string> args;
   asArgs(cmd, args);
   return args;

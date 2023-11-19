@@ -31,20 +31,20 @@ profile:
   - name: test
     parent: lib
     inc: .
-    main: test/test.cpp
+    main: tst/test.cpp
     mode: none
     dep: google.test
     if_arg:
       win_shared: -DGTEST_LINKED_AS_SHARED_LIBRARY=1
 
-  - name: bench
-    parent: lib
-    main: test/bench.cpp
-    dep: google.benchmark
-
   - name: usage
     parent: lib
-    main: test/usage.cpp
+    main: tst/usage.cpp
+
+  - name: bench
+    parent: lib
+    dep: google.benchmark
+    test: res/bench/(\w).cpp
 
   - name: format
     mod: |

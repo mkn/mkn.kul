@@ -58,7 +58,7 @@ namespace kul {
 
 namespace this_proc {
 inline int32_t id() { return getpid(); }
-inline void kill(const int32_t &e) { ::kill(mkn::kul::this_proc::id(), e); }
+inline void kill(const int32_t& e) { ::kill(mkn::kul::this_proc::id(), e); }
 }  // namespace this_proc
 
 class Process : public mkn::kul::AProcess {
@@ -66,7 +66,7 @@ class Process : public mkn::kul::AProcess {
   int inFd[2], outFd[2], errFd[2], popPip[3];
   int cStat;  // child status
 
-  inline int16_t recall(int16_t const &_s) {
+  inline int16_t recall(int16_t const& _s) {
     int ret;
     while ((ret = (_s)) < 0x0 && (errno == EINTR)) {
     }
@@ -74,10 +74,10 @@ class Process : public mkn::kul::AProcess {
   }
 
  public:
-  Process(std::string const &cmd, const bool &_wfe = true) : mkn::kul::AProcess(cmd, _wfe) {}
-  Process(std::string const &cmd, std::string const &path, const bool &_wfe = true)
+  Process(std::string const& cmd, const bool& _wfe = true) : mkn::kul::AProcess(cmd, _wfe) {}
+  Process(std::string const& cmd, std::string const& path, const bool& _wfe = true)
       : mkn::kul::AProcess(cmd, path, _wfe) {}
-  Process(std::string const &cmd, mkn::kul::Dir const &_d, const bool &_wfe = true)
+  Process(std::string const& cmd, mkn::kul::Dir const& _d, const bool& _wfe = true)
       : mkn::kul::AProcess(cmd, (_d ? _d.real() : _d.path()), _wfe) {}
   bool kill(int16_t k = 6) {
     if (started()) {
@@ -90,7 +90,7 @@ class Process : public mkn::kul::AProcess {
 
  protected:
   int16_t inline child();
-  virtual void inline expand(std::string &) const;
+  virtual void inline expand(std::string&) const;
   void inline waitForStatus();
   void inline waitExit() KTHROW(mkn::kul::proc::ExitException);
   void inline tearDown();

@@ -34,12 +34,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // void kul_real_se_handler(EXCEPTION_POINTERS* pExceptionInfo){
 
-std::string const &tid(mkn::kul::this_thread::id());
+std::string const& tid(mkn::kul::this_thread::id());
 uint16_t sig = pExceptionInfo->ExceptionRecord->ExceptionCode;
 if (pExceptionInfo->ExceptionRecord->ExceptionCode == EXCEPTION_ACCESS_VIOLATION)
   kul_sig_function_handler(sig = 11);
 
-if ( !mkn::kul::SignalStatic::INSTANCE().q) {
+if (!mkn::kul::SignalStatic::INSTANCE().q) {
   HANDLE process = GetCurrentProcess();
   SymInitialize(process, NULL, TRUE);
 
@@ -75,8 +75,8 @@ if ( !mkn::kul::SignalStatic::INSTANCE().q) {
   stack_frame.AddrFrame.Mode = AddrModeFlat;
   stack_frame.AddrStack.Mode = AddrModeFlat;
 
-  SYMBOL_INFO *symbol;
-  symbol = (SYMBOL_INFO *)calloc(sizeof(SYMBOL_INFO) + 256 * sizeof(char), 1);
+  SYMBOL_INFO* symbol;
+  symbol = (SYMBOL_INFO*)calloc(sizeof(SYMBOL_INFO) + 256 * sizeof(char), 1);
   symbol->MaxNameLen = 255;
   symbol->SizeOfStruct = sizeof(SYMBOL_INFO);
   std::cout << "[bt] Stacktrace:" << std::endl;
