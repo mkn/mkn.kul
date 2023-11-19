@@ -36,10 +36,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace mkn {
 namespace kul {
 
-template<typename T = std::size_t>
+template <typename T = std::size_t>
 struct Apply {
-  template<size_t i>
-  constexpr auto operator()(){ return std::integral_constant<T, i>{}; }
+  template <size_t i>
+  constexpr auto operator()() {
+    return std::integral_constant<T, i>{};
+  }
 };
 
 template <typename Apply, size_t... Is>
@@ -55,17 +57,15 @@ constexpr auto apply_N(Apply&& f) {
 
 template <size_t N, typename Fn>
 constexpr void for_N(Fn&& fn) {
-/*
-    for_N<2>([](auto ic) {
-        constexpr auto i = ic();
-        // ...
-    });
-*/
+  /*
+      for_N<2>([](auto ic) {
+          constexpr auto i = ic();
+          // ...
+      });
+  */
 
-  std::apply([&](auto ... ics)  { (fn(ics), ...);}, apply_N<N>(Apply{}));
+  std::apply([&](auto... ics) { (fn(ics), ...); }, apply_N<N>(Apply{}));
 }
-
-
 
 }  // namespace kul
 }  // namespace mkn

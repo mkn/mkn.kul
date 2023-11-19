@@ -30,10 +30,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 // IWYU pragma: private, include "mkn/kul/cli.hpp"
 
-void mkn::kul::cli::asArgs(const std::string& cmd, std::vector<std::string>& args) {
+void mkn::kul::cli::asArgs(std::string const& cmd, std::vector<std::string>& args) {
   std::string arg;
   bool openQuotesS = false, openQuotesD = false, backSlashed = false;
-  for (const char c : cmd) {
+  for (char const c : cmd) {
     if (backSlashed) {
       backSlashed = false;
       arg += c;

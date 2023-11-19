@@ -51,7 +51,8 @@ namespace ipc {
 
 class Exception : public mkn::kul::Exception {
  public:
-  Exception(char const *f, uint16_t const &l, std::string const &s) : mkn::kul::Exception(f, l, s) {}
+  Exception(char const* f, uint16_t const& l, std::string const& s)
+      : mkn::kul::Exception(f, l, s) {}
 };
 
 class Server {
@@ -59,7 +60,7 @@ class Server {
   int16_t lp;
   const std::string uuid;
   HANDLE hPipe;
-  TCHAR *pchRequest = 0;
+  TCHAR* pchRequest = 0;
 
   void start() KTHROW(Exception) {
     DWORD dwThreadId = 0;
@@ -76,11 +77,12 @@ class Server {
                             0,                           // client time-out
                             NULL);                       // default security attribute
     if (hPipe == INVALID_HANDLE_VALUE)
-      KEXCEPT(mkn::kul::ipc::Exception, "CreateNamedPipe failed: " + std::to_string(GetLastError()));
+      KEXCEPT(mkn::kul::ipc::Exception,
+              "CreateNamedPipe failed: " + std::to_string(GetLastError()));
   }
 
  protected:
-  virtual void handle(std::string const &s) { KOUT(INF) << s; }
+  virtual void handle(std::string const& s) { KOUT(INF) << s; }
 
  public:
   virtual ~Server() {
@@ -89,7 +91,7 @@ class Server {
   void listen() KTHROW(Exception) {
     while (lp) {
       HANDLE hHeap = GetProcessHeap();
-      pchRequest = (TCHAR *)HeapAlloc(hHeap, 0, KUL_IPC_BUFFER * sizeof(TCHAR));
+      pchRequest = (TCHAR*)HeapAlloc(hHeap, 0, KUL_IPC_BUFFER * sizeof(TCHAR));
       bool fConnected =
           ConnectNamedPipe(hPipe, NULL) ? TRUE : (GetLastError() == ERROR_PIPE_CONNECTED);
       if (!fConnected) continue;
@@ -109,12 +111,13 @@ class Server {
     }
     CloseHandle(hPipe);
   }
-  Server(const int16_t &lp = -1) KTHROW(Exception)
+  Server(int16_t const& lp = -1) KTHROW(Exception)
       : lp(lp),
-        uuid(_MKN_KUL_IPC_UUID_PREFIX_ + std::string("pid\\") + std::to_string(mkn::kul::this_proc::id())) {
+        uuid(_MKN_KUL_IPC_UUID_PREFIX_ + std::string("pid\\") +
+             std::to_string(mkn::kul::this_proc::id())) {
     start();
   }
-  Server(std::string const &ui, const int16_t &lp = -1) KTHROW(Exception)
+  Server(std::string const& ui, int16_t const& lp = -1) KTHROW(Exception)
       : uuid(_MKN_KUL_IPC_UUID_PREFIX_ + ui), lp(lp) {
     start();
   }
@@ -156,17 +159,20 @@ class Client {
 
  public:
   virtual ~Client() { stop(); }
-  Client(std::string const &ui) KTHROW(Exception) : uuid(_MKN_KUL_IPC_UUID_PREFIX_ + ui) { start(); }
-  Client(const int16_t &pid) KTHROW(Exception)
+  Client(std::string const& ui) KTHROW(Exception) : uuid(_MKN_KUL_IPC_UUID_PREFIX_ + ui) {
+    start();
+  }
+  Client(int16_t const& pid) KTHROW(Exception)
       : uuid(_MKN_KUL_IPC_UUID_PREFIX_ + std::string("pid\\") + std::to_string(pid)) {
     start();
   }
-  virtual void send(std::string const &m) const KTHROW(Exception) {
+  virtual void send(std::string const& m) const KTHROW(Exception) {
     DWORD cbToWrite, cbWritten;
     LPTSTR lpvMessage = _strdup(m.c_str());
     cbToWrite = (lstrlen(lpvMessage) + 1) * sizeof(TCHAR);
     if (!WriteFile(hPipe, lpvMessage, cbToWrite, &cbWritten, NULL))
-      KEXCEPT(mkn::kul::ipc::Exception, "WriteFile to pipe failed: " + std::to_string(GetLastError()));
+      KEXCEPT(mkn::kul::ipc::Exception,
+              "WriteFile to pipe failed: " + std::to_string(GetLastError()));
   }
 };
 

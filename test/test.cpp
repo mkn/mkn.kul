@@ -48,10 +48,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 auto tryCatch = [](std::vector<std::function<void()>> funcs, bool katch) {
-  for (const auto &func : funcs) try {
+  for (const auto& func : funcs) try {
       func();
       ASSERT_TRUE(!katch);
-    } catch (const mkn::kul::Exception &e) {
+    } catch (const mkn::kul::Exception& e) {
       if (!katch) KOUT(NON) << e.debug();
       ASSERT_TRUE(katch);
     }
@@ -66,7 +66,7 @@ auto tryCatch = [](std::vector<std::function<void()>> funcs, bool katch) {
 #include "test/string.ipp"
 #include "test/span.ipp"
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
   KOUT(NON) << __FILE__;
   ::testing::InitGoogleMock(&argc, argv);
   return RUN_ALL_TESTS();

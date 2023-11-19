@@ -77,22 +77,21 @@ class Thread : public threading::AThread {
   void act() {
     try {
       func();
-    } catch (const std::exception &e) {
+    } catch (std::exception const& e) {
       ep = std::current_exception();
     }
     f = 1;
   }
 
  public:
-  Thread(const std::function<void()> &func) : func(func) {}
+  Thread(std::function<void()> const& func) : func(func) {}
   template <class T>
-  Thread(const T &t) : func(std::bind((void (T::*)()) & T::operator(), t)) {}
+  Thread(const T& t) : func(std::bind((void(T::*)()) & T::operator(), t)) {}
   template <class T>
-  Thread(const std::reference_wrapper<T> &r)
-      : func(std::bind((void (T::*)()) & T::operator(), r)) {}
+  Thread(std::reference_wrapper<T> const& r) : func(std::bind((void(T::*)()) & T::operator(), r)) {}
   template <class T>
-  Thread(const std::reference_wrapper<const T> &r)
-      : func(std::bind((void (T::*)() const) & T::operator(), r)) {}
+  Thread(std::reference_wrapper<const T> const& r)
+      : func(std::bind((void(T::*)() const) & T::operator(), r)) {}
   virtual ~Thread() {}
   void join() {
     if (!s) run();
@@ -115,7 +114,7 @@ class Thread : public threading::AThread {
 
 namespace threading {
 inline DWORD WINAPI threadFunction(LPVOID th) {
-  reinterpret_cast<Thread *>(th)->act();
+  reinterpret_cast<Thread*>(th)->act();
   return 0;
 }
 }  // namespace threading

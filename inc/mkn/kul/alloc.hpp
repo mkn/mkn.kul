@@ -39,6 +39,7 @@ namespace mkn::kul {
 template <typename T, std::int32_t alignment = 32>
 class AlignedAllocator {
   using This = AlignedAllocator<T, alignment>;
+
  public:
   using pointer = T*;
   using reference = T&;
@@ -55,8 +56,8 @@ class AlignedAllocator {
     if (n == 0) return nullptr;
 
     auto size = n * sizeof(T);
-    std::uint32_t diff = size  % alignment;
-    if(diff > 0) diff = alignment - diff;
+    std::uint32_t diff = size % alignment;
+    if (diff > 0) diff = alignment - diff;
 
     void* p = std::aligned_alloc(alignment, size + diff);
     if (!p) throw std::bad_alloc();
@@ -71,17 +72,13 @@ class AlignedAllocator {
     deallocate(p);
   }
 
-
-  bool operator!=(This const& that) const {
-      return !(*this == that);
-  }
+  bool operator!=(This const& that) const { return !(*this == that); }
 
   bool operator==(This const& /*that*/) const {
-      return true; // stateless
+    return true;  // stateless
   }
 };
 
 }  // namespace mkn::kul
 
 #endif /*_MKN_KUL_ALLOC_HPP_*/
-
