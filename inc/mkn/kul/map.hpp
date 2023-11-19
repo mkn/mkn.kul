@@ -91,7 +91,7 @@ class Map {
   auto find(K const& key) const { return _map.find(key); }
 
   void clear() { _map.clear(); }
-  // auto empty() { return size() == 0; }
+  auto empty() const { return _map.empty(); }
 
  private:
   std::unordered_map<K, V> _map;
@@ -147,14 +147,15 @@ class Set : public google::sparse_hash_set<T, HashFcn, EqualKey> {
   void setDeletedKey(key_type const& key) { Hash::set_deleted_key(key); }
   void clear() { Hash::clear(); }
   std::pair<iterator, bool> insert(const T obj) { return Hash::insert(obj); }
-  T& operator[](key_type const& key) { return Hash::operator[](key); }
+
   size_type erase(key_type const& key) { return Hash::erase(key); }
   iterator begin() { return Hash::begin(); }
   iterator end() { return Hash::end(); }
   const_iterator begin() const { return Hash::begin(); }
   const_iterator end() const { return Hash::end(); }
   size_type size() const { return Hash::size(); }
-  const key_type getDeletedKey() const { return Hash::deleted_key(); }
+  auto empty() const { return size() == 0; }
+  key_type getDeletedKey() const { return Hash::deleted_key(); }
   size_type count(key_type const& key) const { return Hash::count(key); }
 };
 
@@ -172,12 +173,21 @@ class Map : public google::sparse_hash_map<K, V, HashFcn, EqualKey> {
   typedef typename map::iterator iterator;
   typedef typename map::const_iterator const_iterator;
 
+  auto& at(key_type const& k) { return (*map::find(k)).second; }
+  auto& at(key_type const& k) const { return (*map::find(k)).second; }
+
+  auto& emplace(key_type const& k, V const& v) {
+    map::emplace(k, v);
+    return *this;
+  }
+
   void setDeletedKey(key_type const& key) { map::set_deleted_key(key); }
   void setEmptyKey(key_type const& key) { map::set_empty_key(key); }
   void clear() { map::clear(); }
   std::pair<iterator, bool> insert(std::pair<K, V> const& obj) { return map::insert(obj); }
   std::pair<iterator, bool> insert(const K k, V v) { return insert(std::pair<K, V>(k, v)); }
   V& operator[](key_type const& key) { return map::operator[](key); }
+  auto& operator[](key_type const& k) const { return map::at(k); }
   size_type erase(key_type const& key) { return map::erase(key); }
   iterator begin() { return map::begin(); }
   iterator end() { return map::end(); }
@@ -187,7 +197,7 @@ class Map : public google::sparse_hash_map<K, V, HashFcn, EqualKey> {
   const_iterator end() const { return map::end(); }
   const_iterator find(key_type const& key) const { return map::find(key); }
   size_type count(key_type const& key) const { return map::count(key); }
-  const key_type getDeletedKey() const { return map::deleted_key(); }
+  key_type getDeletedKey() const { return map::deleted_key(); }
 };
 
 namespace map {
@@ -215,14 +225,15 @@ class Set : public google::dense_hash_set<T, HashFcn, EqualKey> {
   void clear() { Hash::clear(); }
   void setDeletedKey(key_type const& key) { Hash::set_deleted_key(key); }
   std::pair<iterator, bool> insert(const T obj) { return Hash::insert(obj); }
-  T& operator[](key_type const& key) { return Hash::operator[](key); }
+
   size_type erase(key_type const& key) { return Hash::erase(key); }
   iterator begin() { return Hash::begin(); }
   iterator end() { return Hash::end(); }
   const_iterator begin() const { return Hash::begin(); }
   const_iterator end() const { return Hash::end(); }
   size_type size() const { return Hash::size(); }
-  const key_type getDeletedKey() const { return Hash::deleted_key(); }
+  auto empty() const { return size() == 0; }
+  key_type getDeletedKey() const { return Hash::deleted_key(); }
   size_type count(key_type const& key) const { return Hash::count(key); }
 };
 
@@ -240,21 +251,26 @@ class Map : public google::dense_hash_map<K, V, HashFcn, EqualKey> {
   typedef typename map::iterator iterator;
   typedef typename map::const_iterator const_iterator;
 
+  auto& at(key_type const& k) { return (*map::find(k)).second; }
+  auto& at(key_type const& k) const { return (*map::find(k)).second; }
+
   void setDeletedKey(key_type const& key) { map::set_deleted_key(key); }
   void setEmptyKey(key_type const& key) { map::set_empty_key(key); }
   void clear() { map::clear(); }
   std::pair<iterator, bool> insert(std::pair<K, V> const& obj) { return map::insert(obj); }
   std::pair<iterator, bool> insert(const K k, V v) { return insert(std::pair<K, V>(k, v)); }
   V& operator[](key_type const& key) { return map::operator[](key); }
+  auto& operator[](key_type const& k) const { return map::at(k); }
   size_type erase(key_type const& key) { return map::erase(key); }
   iterator begin() { return map::begin(); }
   iterator end() { return map::end(); }
   iterator find(key_type const& key) { return map::find(key); }
   size_type size() const { return map::size(); }
+  auto empty() const { return size() == 0; }
   const_iterator begin() const { return map::begin(); }
   const_iterator end() const { return map::end(); }
   const_iterator find(key_type const& key) const { return map::find(key); }
-  const key_type getDeletedKey() const { return map::deleted_key(); }
+  key_type getDeletedKey() const { return map::deleted_key(); }
   size_type count(key_type const& key) const { return map::count(key); }
 };
 
