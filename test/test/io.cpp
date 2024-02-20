@@ -1,5 +1,9 @@
 
 
+#include "test_common.hpp"
+
+#include "mkn/kul/io.hpp"
+
 TEST(IO_Test, ReadFileLine) {
   mkn::kul::io::Reader r("LICENSE.md");
   char const* c = r.readLine();
@@ -10,7 +14,7 @@ TEST(IO_Test, ReadFileLine) {
 }
 TEST(IO_Test, ReadFile) {
   char c[20] = {0};
-  bzero(c, 20);
+  bzero(c);
   mkn::kul::File file("LICENSE.md");
   if (!file) KEXCEPT(mkn::kul::Exception, "ReadFile: FileNotFound: ") << file.full();
   mkn::kul::io::Reader r("LICENSE.md");
@@ -37,7 +41,7 @@ TEST(IO_Test, ReadBinaryFileLine) {
 }
 TEST(IO_Test, ReadBinaryFile) {
   char c[20] = {0};
-  bzero(c, 20);
+  bzero(c);
   mkn::kul::io::BinaryReader r("LICENSE.md");
   r.read(c, 20);
   std::string s1 = c;

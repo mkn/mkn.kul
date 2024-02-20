@@ -1,5 +1,9 @@
 
 
+#include "test_common.hpp"
+
+#include "mkn/kul/proc.hpp"
+
 TEST(Process_Test, LaunchProcess) {
   mkn::kul::Process p("bash");
   p << "-c"

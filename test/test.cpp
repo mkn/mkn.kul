@@ -29,45 +29,9 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
-#include "mkn/kul/assert.hpp"
-#include "mkn/kul/cli.hpp"
-#include "mkn/kul/io.hpp"
-#include "mkn/kul/log.hpp"
-#include "mkn/kul/math.hpp"
-#include "mkn/kul/os.hpp"
-#include "mkn/kul/proc.hpp"
-#include "mkn/kul/threads.hpp"
-#include "mkn/kul/span.hpp"
-#include "mkn/kul/tuple.hpp"
-
-#ifdef _WIN32
-#define bzero ZeroMemory
-#endif
-
-auto tryCatch = [](std::vector<std::function<void()>> funcs, bool katch) {
-  for (const auto& func : funcs) try {
-      func();
-      ASSERT_TRUE(!katch);
-    } catch (const mkn::kul::Exception& e) {
-      if (!katch) KOUT(NON) << e.debug();
-      ASSERT_TRUE(katch);
-    }
-};
-
-#include "test/cli.ipp"
-#include "test/except.ipp"
-#include "test/io.ipp"
-#include "test/math.ipp"
-#include "test/os.ipp"
-#include "test/proc.ipp"
-#include "test/string.ipp"
-#include "test/span.ipp"
-
 int main(int argc, char* argv[]) {
-  KOUT(NON) << __FILE__;
-  ::testing::InitGoogleMock(&argc, argv);
+  ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }

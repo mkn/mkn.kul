@@ -1,4 +1,9 @@
 
+
+#include "test_common.hpp"
+
+#include "mkn/kul/span.hpp"
+
 TEST(Span, init) {
   {
     std::vector<double> v{1, 2, 3};

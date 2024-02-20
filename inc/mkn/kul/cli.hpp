@@ -197,7 +197,7 @@ class Args {
         std::stringstream ss;
         for (std::size_t i = j + 1; i < argc; ++i) ss << argv[i] << " ";
         rest_ = ss.str();
-        if(rest_.size()) rest_.pop_back();
+        if (rest_.size()) rest_.pop_back();
         break;  // assumes end
       }
       if (c.compare("---") == 0) KEXCEPT(Exception, "Illegal argument ---");

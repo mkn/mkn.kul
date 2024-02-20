@@ -1,5 +1,10 @@
 
 
+#include "test_common.hpp"
+
+#include "mkn/kul/os.hpp"
+#include "mkn/kul/proc.hpp"
+
 TEST(OperatingSystemTests, HasRAMUsageSupport) {
   ASSERT_TRUE(mkn::kul::this_proc::physicalMemory());
   ASSERT_TRUE(mkn::kul::this_proc::virtualMemory());

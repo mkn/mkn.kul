@@ -1,5 +1,9 @@
 
 
+#include "test_common.hpp"
+
+#include "mkn/kul/except.hpp"
+
 TEST(Exception, String) {
   std::string full = "FAILURE";
   try {
