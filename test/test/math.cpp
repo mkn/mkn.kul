@@ -1,5 +1,9 @@
 
 
+#include "test_common.hpp"
+
+#include "mkn/kul/math.hpp"
+
 template <typename T>
 void do_math() {
   T beta = 2;

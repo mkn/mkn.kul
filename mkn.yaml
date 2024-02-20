@@ -32,6 +32,7 @@ profile:
     parent: lib
     inc: .
     main: test/test.cpp
+    src: test/test
     mode: none
     dep: google.test
     if_arg:

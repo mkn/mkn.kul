@@ -1,5 +1,9 @@
 
 
+#include "test_common.hpp"
+
+#include "mkn/kul/string.hpp"
+
 TEST(StringOperations, SplitByChar) {
   std::vector<std::string> v;
   mkn::kul::String::SPLIT("split - by - char - dash", '-', v);
@@ -37,18 +41,21 @@ TEST(StringOperations, String_2_UInt16_t_invalid_tooLarge) {
        }},
       true);
 }
+
 TEST(StringOperations, String_2_UInt16_t_invalid_tooNegative) {
   tryCatch(
       {// tooNegative
        []() { mkn::kul::String::UINT16("-1"); }},
       true);
 }
+
 TEST(StringOperations, String_2_UInt16_t_invalid_hasLetters) {
   tryCatch({// contains letters * 3
             []() { mkn::kul::String::UINT16("a2c"); }, []() { mkn::kul::String::UINT16("1bc"); },
             []() { mkn::kul::String::UINT16("ab3"); }},
            true);
 }
+
 TEST(StringOperations, String_2_UInt16_t_valid) {
   tryCatch(
       {// valid
@@ -64,6 +71,7 @@ TEST(StringOperations, String_2_Int16_t_invalid_tooLarge) {
        }},
       true);
 }
+
 TEST(StringOperations, String_2_Int16_t_invalid_tooNegative) {
   tryCatch(
       {// tooNegative
@@ -72,12 +80,14 @@ TEST(StringOperations, String_2_Int16_t_invalid_tooNegative) {
        }},
       true);
 }
+
 TEST(StringOperations, String_2_Int16_t_invalid_hasLetters) {
   tryCatch({// contains letters * 3
             []() { mkn::kul::String::INT16("a2c"); }, []() { mkn::kul::String::INT16("1bc"); },
             []() { mkn::kul::String::INT16("ab3"); }},
            true);
 }
+
 TEST(StringOperations, String_2_Int16_t_valid) {
   tryCatch({// valid
             []() { mkn::kul::String::INT16("100"); }, []() { mkn::kul::String::INT16("-100"); }},
@@ -94,18 +104,21 @@ TEST(StringOperations, String_2_UInt32_t_invalid_tooLarge) {
        }},
       true);
 }
+
 TEST(StringOperations, String_2_UInt32_t_invalid_tooNegative) {
   tryCatch(
       {// tooNegative
        []() { mkn::kul::String::UINT32(std::to_string(-1)); }},
       true);
 }
+
 TEST(StringOperations, String_2_UInt32_t_invalid_hasLetters) {
   tryCatch({// contains letters * 3
             []() { mkn::kul::String::UINT32("a2c"); }, []() { mkn::kul::String::UINT32("1bc"); },
             []() { mkn::kul::String::UINT32("ab3"); }},
            true);
 }
+
 TEST(StringOperations, String_2_UInt32_t_valid) {
   tryCatch(
       {// valid
@@ -123,6 +136,7 @@ TEST(StringOperations, String_2_Int32_t_invalid_tooLarge) {
        }},
       true);
 }
+
 TEST(StringOperations, String_2_Int32_t_invalid_tooNegative) {
   tryCatch(
       {// tooNegative
@@ -133,6 +147,7 @@ TEST(StringOperations, String_2_Int32_t_invalid_tooNegative) {
        }},
       true);
 }
+
 TEST(StringOperations, String_2_Int32_t_invalid_hasLetters) {
   tryCatch({// contains letters * 3
             []() { mkn::kul::String::INT32("a2c"); }, []() { mkn::kul::String::INT32("1bc"); },
@@ -154,6 +169,7 @@ TEST(StringOperations, String_2_UInt64_t_invalid_tooLarge) {
        }},
       true);
 }
+
 TEST(StringOperations, String_2_UInt64_t_invalid_tooNegative) {
   tryCatch(
       {// tooNegative
@@ -163,12 +179,14 @@ TEST(StringOperations, String_2_UInt64_t_invalid_tooNegative) {
        }},
       true);
 }
+
 TEST(StringOperations, String_2_UInt64_t_invalid_hasLetters) {
   tryCatch({// contains letters * 3
             []() { mkn::kul::String::UINT64("a2c"); }, []() { mkn::kul::String::UINT64("1bc"); },
             []() { mkn::kul::String::UINT64("ab3"); }},
            true);
 }
+
 TEST(StringOperations, String_2_UInt64_t_valid) {
   tryCatch(
       {// valid
@@ -189,6 +207,7 @@ TEST(StringOperations, String_2_Int64_t_invalid) {
             []() { mkn::kul::String::INT64("ab3"); }},
            true);
 }
+
 TEST(StringOperations, String_2_Int64_t_valid) {
   tryCatch(
       {// valid
