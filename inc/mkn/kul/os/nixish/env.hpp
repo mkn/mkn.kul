@@ -43,6 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <algorithm>
 #include <fstream>
 #include <thread>
+#include <cassert>
 
 #include <limits.h>
 
@@ -65,7 +66,13 @@ inline std::string GET(char const* c, std::string default_ = "") {
   char const* r = getenv(c);
   return std::string(r ? r : default_);
 }
-inline void SET(char const* var, char const* val) { setenv(var, val, 1); }
+inline void SET(char const* var, char const* val = nullptr) {
+  assert(var);
+  if (val and strlen(val) > 0)
+    setenv(var, val, 1);
+  else
+    unsetenv(var);
+}
 inline char SEP() { return ':'; }
 
 inline std::string CWD() {

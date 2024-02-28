@@ -41,7 +41,7 @@ Used by macros KOUT and KLOG : see inc/usage.hpp
 
 Key             KUL_GIT_CO
 Type            string
-Default         ""
+Default         "--depth 10 --recursive --shallow-submodules"
 Description - Add string to git clone as arguments
 
 Key             KUL_SVN_CO
