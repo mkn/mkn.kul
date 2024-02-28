@@ -117,7 +117,8 @@ class Git : public SCM {
       KTHROW(Exception) override {
     Dir dr(d, true);
     mkn::kul::Process p("git");
-    p << "clone" << mkn::kul::env::GET("KUL_GIT_CO") << r;
+    std::string defaults = "--depth 10 --recursive --shallow-submodules";
+    p << "clone" << mkn::kul::env::GET("KUL_GIT_CO", defaults) << r;
     if (!v.empty()) p.arg("-b").arg(v);
     try {
       p.arg(d).start();
