@@ -52,7 +52,7 @@ struct Assert {
   }
 };
 
-void abort_if(bool b) {
+void inline abort_if(bool b) {
   if (b) std::abort();
 }
 

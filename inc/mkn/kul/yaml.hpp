@@ -163,7 +163,7 @@ class File : public Item {
   }
   virtual ~File() {}
   std::string const& file() const { return f; }
-  const virtual Validator validator() const = 0;
+  virtual Validator validator() const = 0;
 
  protected:
   void reload() KTHROW(Exception) {
@@ -178,7 +178,7 @@ class File : public Item {
   File(std::string const& f) KTHROW(Exception) : f(f) { reload(); }
 
  private:
-  const std::string f;  // file
+  std::string const f;  // file
 };
 }  // namespace yaml
 }  // namespace kul
