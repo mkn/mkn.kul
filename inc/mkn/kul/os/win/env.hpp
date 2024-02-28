@@ -84,7 +84,7 @@ inline std::string GET(char const* c, std::string default_ = "") {
 }
 
 inline void SET(char const* var, char const* val = nullptr) {
-  if (val and strlen(val) > 0)
+  if (val && strlen(val) > 0)
     _putenv(std::string(std::string(var) + "=" + std::string(val)).c_str());
   else  // unset
     _putenv(std::string(std::string(var) + "=").c_str());
