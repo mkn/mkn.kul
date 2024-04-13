@@ -36,36 +36,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace mkn::kul {
 
-template <std::size_t Is, typename Tuple>
-struct Element {
-  using C = std::tuple_element_t<Is, Tuple>;
-  using T = typename C::value_type;  // const containers do not have const value_types
-  using value_type = std::conditional_t<std::is_const_v<C>, T const&, T&>;
-};
-
 template <typename Tuple, std::size_t... Is>
-constexpr auto tuple_element_value_type_refs_(Tuple, std::index_sequence<Is...> const&&)
-    -> std::tuple<typename Element<Is, Tuple>::value_type...>;
-
-template <typename... Args>
-auto constexpr tuple_element_value_type_refs()
-    -> decltype(tuple_element_value_type_refs_(std::tuple<Args...>{},
-                                               std::make_index_sequence<sizeof...(Args)>{}));
-
-template <typename Tuple, std::size_t... Is>
-constexpr auto get_tuple_element_value_type_refs_(Tuple& tup, std::size_t index,
+constexpr auto _tuple_element_value_type_refs_(Tuple& tup, std::size_t index,
                                                   std::index_sequence<Is...> const&&) {
   return std::forward_as_tuple(std::get<Is>(tup)[index]...);
 }
 template <typename Tuple>
-auto constexpr get_tuple_element_value_type_refs(Tuple& tuple, std::size_t index) {
-  return get_tuple_element_value_type_refs_(tuple, index,
+auto constexpr _tuple_element_value_type_refs(Tuple& tuple, std::size_t index) {
+  return _tuple_element_value_type_refs_(tuple, index,
                                             std::make_index_sequence<std::tuple_size_v<Tuple>>{});
 }
 
 template <typename... Args>
 struct Zipit {
-  auto operator*() { return get_tuple_element_value_type_refs(args, idx); }
+  auto operator*() { return _tuple_element_value_type_refs(args, idx); }
   bool operator==(Zipit const& that) const { return idx == that.idx; }
   bool operator!=(Zipit const& that) const { return !(*(this) == that); }
   auto& operator++() {
