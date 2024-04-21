@@ -72,7 +72,7 @@ struct Zipper {
 };
 
 template <typename... Args>
-auto zip(Args&... args) {
+auto zip(Args&&... args) {
   return Zipper<Args...>{std::forward_as_tuple(args...)};
 }
 
