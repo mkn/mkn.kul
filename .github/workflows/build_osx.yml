@@ -10,10 +10,10 @@ jobs:
   build:
     runs-on: macos-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
-    - name: "Build/Test" # contains slash so use quotes otherwise UB
+    - name: "Build/Test"
       run: |
-        curl -Lo mkn https://github.com/mkn/mkn/releases/download/latest/mkn_osx
+        curl -Lo mkn https://github.com/mkn/mkn/releases/download/latest/mkn_arm_osx
         chmod +x mkn
         KLOG=3 ./mkn clean build run -dtOp test -a "-std=c++17 -fPIC"

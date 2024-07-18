@@ -1,5 +1,5 @@
 /**
-Copyright (c) 2020, Philip Deegan.
+Copyright (c) 2024, Philip Deegan.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -36,25 +36,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <numeric>
 #include <algorithm>
 
+#include "mkn/kul/span.hpp"
+
 namespace mkn {
 namespace kul {
-
-#define PRINT_LINE() std::cout << __LINE__ << std::endl
-
-namespace func {
-template <typename...>
-using check = void;
-}
-
-template <typename T, typename data_fn = void, typename size_fn = void>
-struct is_span_like : std::false_type {};
-
-template <typename T>
-struct is_span_like<T, func::check<decltype(std::declval<T>().data())>,
-                    func::check<decltype(std::declval<T>().size())>> : std::true_type {};
-
-template <typename T>
-auto constexpr is_span_like_v = is_span_like<T>::value;
 
 template <typename Container, typename Function>
 void for_each(Container& container, Function&& function) {

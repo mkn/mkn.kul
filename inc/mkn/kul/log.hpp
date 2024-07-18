@@ -255,7 +255,7 @@ class DBoMessage : public Message {
 #define KLOG_ERR mkn::kul::LogMessage(__FILE__, __func__, __LINE__, mkn::kul::log::mode::ERR)
 #define KLOG(sev) KLOG_##sev
 
-#if !defined(NDEBUG)
+#if !defined(NDEBUG) || defined(KUL_FORCE_DBG_LOGS)
 #define KLOG_DBG mkn::kul::DBgMessage(__FILE__, __func__, __LINE__, mkn::kul::log::mode::DBG)
 #define KLOG_OTH mkn::kul::DBgMessage(__FILE__, __func__, __LINE__, mkn::kul::log::mode::OTH)
 #define KLOG_TRC mkn::kul::DBgMessage(__FILE__, __func__, __LINE__, mkn::kul::log::mode::TRC)
