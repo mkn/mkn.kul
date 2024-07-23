@@ -39,7 +39,7 @@ namespace mkn {
 namespace kul {
 struct Assert {
   template <typename T>
-  Assert(T t) {
+  Assert(T const& t) {
     (void)t;
 #if !defined(NDEBUG)
     if (!(t)) {
@@ -52,8 +52,12 @@ struct Assert {
   }
 };
 
-void inline abort_if(bool b) {
+void inline abort_if(bool const& b) {
   if (b) std::abort();
+}
+
+void inline abort_if_not(bool const& b) {
+  if (!b) std::abort();
 }
 
 }  // namespace kul

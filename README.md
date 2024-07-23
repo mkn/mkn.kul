@@ -1,9 +1,4 @@
 
-| Operating system  | Build Status |
-| ------------- | -------------
-| Linux/Mac  | [![Linux/Mac Build](https://travis-ci.org/mkn/mkn.kul.svg?branch=master)](https://travis-ci.org/mkn/mkn.kul)  |
-| Windows  | [![Windows Build](https://ci.appveyor.com/api/projects/status/77rab4l5pkqc0p47/branch/master?svg=true)](https://ci.appveyor.com/project/dekken/mkn-kul) |
-
 
 # mkn.kul
 
