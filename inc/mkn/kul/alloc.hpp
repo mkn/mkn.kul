@@ -31,6 +31,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _MKN_KUL_ALLOC_HPP_
 #define _MKN_KUL_ALLOC_HPP_
 
+#include <new>
+#include <cstdint>
 #include <cstddef>
 #include <cstdlib>
 
