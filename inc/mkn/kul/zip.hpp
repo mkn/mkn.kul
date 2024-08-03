@@ -1,5 +1,5 @@
 /**
-Copyright (c) 2023, Philip Deegan.
+Copyright (c) 2024, Philip Deegan.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -38,13 +38,13 @@ namespace mkn::kul {
 
 template <typename Tuple, std::size_t... Is>
 constexpr auto _tuple_element_value_type_refs_(Tuple& tup, std::size_t index,
-                                                  std::index_sequence<Is...> const&&) {
+                                               std::index_sequence<Is...> const&&) {
   return std::forward_as_tuple(std::get<Is>(tup)[index]...);
 }
 template <typename Tuple>
 auto constexpr _tuple_element_value_type_refs(Tuple& tuple, std::size_t index) {
   return _tuple_element_value_type_refs_(tuple, index,
-                                            std::make_index_sequence<std::tuple_size_v<Tuple>>{});
+                                         std::make_index_sequence<std::tuple_size_v<Tuple>>{});
 }
 
 template <typename... Args>

@@ -1,5 +1,5 @@
 /**
-Copyright (c) 2023, Philip Deegan.
+Copyright (c) 2024, Philip Deegan.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace mkn {
 namespace kul {
-namespace bon {
+namespace bon {  // Better Object Notation (basically json but without quotes)
 class Exception : public mkn::kul::Exception {
  public:
   Exception(char const* f, size_t const& l, std::string const& s) : mkn::kul::Exception(f, l, s) {}
