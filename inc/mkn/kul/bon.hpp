@@ -90,10 +90,10 @@ class ob {
 
     mkn::kul::String::TRIM(o.a);
     mkn::kul::String::TRIM(o.v);
-    if (o.v.ends_with(":")) {
-      o.v = o.v.substr(0, o.v.size() - 1);
-      mkn::kul::String::TRIM(o.v);
-    }
+    if (o.v.back() == ':')) {
+        o.v = o.v.substr(0, o.v.size() - 1);
+        mkn::kul::String::TRIM(o.v);
+      }
 
     for (auto const& n : node.nodes) {
       o.c.emplace_back().p = &o;
