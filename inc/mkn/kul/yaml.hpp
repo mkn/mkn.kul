@@ -40,11 +40,15 @@ or via cli
 #ifndef _MKN_KUL_YAML_HPP_
 #define _MKN_KUL_YAML_HPP_
 
-#include "mkn/kul/dbg.hpp"
 #include "mkn/kul/io.hpp"
+#include "mkn/kul/dbg.hpp"
 #include "mkn/kul/map.hpp"
 
 #include "yaml-cpp/yaml.h"
+
+#include <string>
+#include <vector>
+#include <cstdint>
 
 namespace mkn {
 namespace kul {
@@ -55,19 +59,13 @@ class NodeValidator;
 
 class Exception : public mkn::kul::Exception {
  public:
-  Exception(char const* f, uint16_t const& l, std::string const& s)
+  Exception(char const* f, std::uint16_t const& l, std::string const& s)
       : mkn::kul::Exception(f, l, s) {}
 };
 
 enum NodeType { NON = 0, STRING, LIST, MAP };
 
 class NodeValidator {
- private:
-  bool m;
-  NodeType typ;
-  std::string nam;
-  std::vector<NodeValidator> kids;
-
  public:
   NodeValidator(std::string const& n, bool m = 0) : m(m), typ(STRING), nam(n) {}
   NodeValidator(std::string const& n, std::vector<NodeValidator> const& c, bool m,
@@ -77,6 +75,12 @@ class NodeValidator {
   bool mandatory() const { return this->m; }
   std::string const& name() const { return this->nam; }
   NodeType const& type() const { return this->typ; }
+
+ private:
+  bool const m;
+  NodeType const typ;
+  std::string const nam;
+  std::vector<NodeValidator> kids;
 };
 
 class Item {
@@ -122,19 +126,16 @@ class Item {
 };
 
 class Validator {
- private:
-  const std::vector<NodeValidator> kids;
-
  public:
   Validator(std::vector<NodeValidator> const& kids) : kids(kids) {}
   std::vector<NodeValidator> const& children() const { return this->kids; }
   void validate(YAML::Node const& n) { Item::VALIDATE(n, children()); }
+
+ private:
+  const std::vector<NodeValidator> kids;
 };
 
 class String : public Item {
- private:
-  const std::string s;
-
  public:
   String(std::string const& s) KTHROW(Exception) : s(s) {
     try {
@@ -147,6 +148,9 @@ class String : public Item {
     Item::VALIDATE(root(), v.children());
     return r;
   }
+
+ private:
+  std::string const s;
 };
 
 class File : public Item {

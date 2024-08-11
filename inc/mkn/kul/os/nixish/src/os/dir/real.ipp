@@ -40,3 +40,14 @@ std::string mkn::kul::Dir::REAL(std::string const& s) KTHROW(fs::Exception) {
   }
   KEXCEPT(fs::Exception, "Directory \"" + s + "\" does not exist");
 }
+
+std::optional<std::string> mkn::kul::Dir::REAL_OR_NULL(std::string const& s) KTHROW(fs::Exception) {
+  char* expanded = realpath(s.c_str(), NULL);
+  if (expanded) {
+    std::string dir(expanded);
+    free(expanded);
+    if (dir.size() > PATH_MAX) KEXCEPT(fs::Exception, "Directory path too large");
+    return dir;
+  }
+  return std::nullopt;
+}

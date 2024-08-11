@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _MKN_KUL_OS_HPP_
 
 #include <vector>
+#include <optional>
 
 #include "mkn/kul/cpu.hpp"
 #include "mkn/kul/env.hpp"
@@ -97,7 +98,7 @@ class Dir : public fs::Item {
     }
   }
   static inline std::string ESC(std::string s);
-  static std::string PRNT(std::string const& s) {
+  static std::string PRNT(std::string const& s) {  // parent
     std::string const& p = s.substr(0, s.rfind(SEP()) + 1);
     return mkn::kul::Dir(p).root() ? p : s.substr(0, s.rfind(SEP()));
   }
@@ -152,6 +153,7 @@ class Dir : public fs::Item {
   static std::string JOIN(std::string const& a, std::string const& b) { return a + SEP() + b; }
 
   static inline std::string REAL(std::string const& s) KTHROW(fs::Exception);
+  static inline std::optional<std::string> REAL_OR_NULL(std::string const& s) KTHROW(fs::Exception);
 
 #ifdef _WIN32
   static std::string SEP() { return std::string("\\"); }
@@ -217,10 +219,7 @@ class File : public fs::Item {
         this->_d = Dir(n.substr(0, n.rfind(Dir::SEP())));
         this->_n = this->_n.substr(n.rfind(Dir::SEP()) + 1);
       } else {
-        try {
-          this->_d = Dir(Dir::PRNT(Dir::REAL(this->_n)), m);
-        } catch (mkn::kul::fs::Exception const& e) {
-        }
+        if (auto const& _N = Dir::REAL_OR_NULL(this->_n)) this->_d = Dir(Dir::PRNT(*_N), m);
       }
     }
   }

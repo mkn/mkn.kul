@@ -34,118 +34,154 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "mkn/kul/cli.hpp"
 #include "mkn/kul/yaml.hpp"
 
+#include <string>
+#include <cstdint>
+#include <functional>
+
 namespace mkn {
 namespace kul {
 namespace bon {  // Better Object Notation (basically json but without quotes)
 class Exception : public mkn::kul::Exception {
  public:
-  Exception(char const* f, size_t const& l, std::string const& s) : mkn::kul::Exception(f, l, s) {}
+  Exception(char const* f, std::size_t const& l, std::string const& s)
+      : mkn::kul::Exception(f, l, s) {}
 };
 
 enum class TYPE { OBJ = 0, STR, INT };
 
+struct BonParsableNode {
+  BonParsableNode* const p = nullptr;
+  std::stringstream ss{};
+
+  auto& emplace_back() { return nodes.emplace_back(this); }
+
+  std::vector<BonParsableNode> nodes;
+};
+
 class ob {
- private:
-  static void BUILD(std::stringstream* tree, size_t size, ob& o) {
-    o.v = tree[0].str();
-    if (size == 1) return;
-    if (size == 2)
-      o.a = tree[1].str();
-    else {
-      o.c.emplace_back();
-      BUILD(tree, size - 1, o.c.back());
-    }
-  }
-  static ob BUILD(std::stringstream* tree, size_t size) {
+ public:
+  static ob BUILD(BonParsableNode const& root) {
     ob o;
-    BUILD(tree, size, o);
+    BUILD(root, o);
     return o;
   }
 
- public:
-  std::string v, a;
-  std::vector<ob> c;
-  static ob BUILD(std::vector<std::stringstream>& tree) { return BUILD(tree.data(), tree.size()); }
-  std::string to_string() const {
-    std::stringstream ss;
-    ss << v;
-    std::function<void(ob const&)> recurse = [&](ob const& o) {
-      if (o.c.empty()) ss << " : " << o.a;
-      for (const auto& oc : o.c) recurse(oc);
-    };
-    recurse(*this);
-    return ss.str();
-  }
   YAML::Node to_yaml() const {
     YAML::Node node;
-    std::vector<std::string> keys;
-    std::function<YAML::Node(YAML::Node, size_t)> get_with_keys_for_node = [&](YAML::Node n,
-                                                                               size_t i) {
-      if (i < keys.size()) return get_with_keys_for_node(n[keys[i]], i + 1);
-      return n;
-    };
-    auto get_with_keys = [&]() {
-      if (keys.empty()) return node;
-      return get_with_keys_for_node(node[keys.back()], 1);
-    };
-    std::function<void(ob const&)> recurse = [&](ob const& o) {
-      if (o.a.empty() && o.v.empty() && o.c.empty()) return;
-
-      if (o.a.empty()) {
-        auto p = mkn::kul::String::ESC_SPLIT(o.v, ':');
-        if (p.size() == 2) keys.emplace_back(p[0]);
-        auto val = get_with_keys();
-        val = p[1];
-      } else if (o.c.empty()) {
-        keys.emplace_back(o.v);
-        auto val = get_with_keys();
-        auto vals = mkn::kul::String::ESC_SPLIT(o.a, ',');
-        if (vals.empty()) val = o.a;
-        for (const auto& v : vals) {
-          auto p = mkn::kul::String::ESC_SPLIT(v, ':');
-          if (p.size() == 2) {
-            mkn::kul::String::TRIM(p);
-            val[p[0]] = p[1];
-          } else
-            KEXCEPTION("FAIL");
-        }
-      }
-      for (const auto& oc : o.c) recurse(oc);
-    };
-    recurse(*this);
+    for (auto const& oc : c) recurse(node, oc);
     YAML::Emitter out;
     out << node;
     return node;
   }
+
+  std::string v, a;
+  std::vector<ob> c;
+  ob* p = nullptr;
+
+ private:
+  static void BUILD(BonParsableNode const& node, ob& o) {
+    KLOG(INF) << node.ss.str() << " " << o.p;
+
+    if (!node.nodes.size())
+      o.a = node.ss.str();
+    else
+      o.v = node.ss.str();
+
+    mkn::kul::String::TRIM(o.a);
+    mkn::kul::String::TRIM(o.v);
+    if (o.v.ends_with(":")) {
+      o.v = o.v.substr(0, o.v.size() - 1);
+      mkn::kul::String::TRIM(o.v);
+    }
+
+    for (auto const& n : node.nodes) {
+      o.c.emplace_back().p = &o;
+      BUILD(n, o.c.back());
+    }
+  }
+
+  void recurse(YAML::Node& n, ob const& o) const {
+    if (o.a.empty() && o.v.empty() && o.c.empty()) return;
+
+    if (o.c.size()) {
+      auto n1 = n[o.v];
+      for (auto const& oc : o.c) recurse(n1, oc);
+      return;  // children or values
+    }
+
+    auto vals = mkn::kul::String::ESC_SPLIT(o.a, ',');
+    if (o.a.find(":") == std::string::npos) {  // list
+
+      for (std::size_t i = 0; i < vals.size(); ++i) {
+        auto p = mkn::kul::String::ESC_SPLIT(vals[i], ':');
+        KLOG(INF) << p[0];
+        if (p.size() == 1) {
+          mkn::kul::String::TRIM(p);
+          n.push_back(p[0]);
+        } else
+          KEXCEPTION("FAIL");
+      }
+    } else  // map
+      for (auto const& v : vals) {
+        auto p = mkn::kul::String::ESC_SPLIT(v, ':');
+        if (p.size() == 2) {
+          mkn::kul::String::TRIM(p);
+          n[p[0]] = p[1];
+        } else
+          KEXCEPTION("FAIL");
+      }
+  };
 };
 
-YAML::Node from(std::string s) {
+YAML::Node from(std::string const& s) {
   if (s[0] != '{' || s[s.size() - 1] != '}') KEXCEPTION("FAIL");
+
   std::string r = s;
-  size_t tri = -1;
   std::vector<ob> obs;
-  std::vector<std::stringstream> tree(0);
+  BonParsableNode root;
+  std::vector<YAML::Node> nodes;
+  std::size_t open = 0;
+  BonParsableNode* curr = &root;
+
   auto subtree = [&]() {
-    tree.emplace_back();
-    tri++;
+    curr = &curr->emplace_back();
+    ++open;
     return true;
   };
+
   auto c_check = [&]() {
-    obs.emplace_back(ob::BUILD(tree));
-    tree.clear();
-    tri = -1;
-    subtree();
+    --open;
+
+    if (open) {
+      curr = curr->p;
+      return true;
+    }
+    obs.emplace_back(ob::BUILD(root));
     return true;
   };
+
+  auto next = [&]() {
+    if (curr->p->nodes.size()) curr = &curr->p->emplace_back();
+    return curr->p->nodes.size() > 0;
+  };
+
   for (size_t i = 0; i < r.size(); i++) {
     if (r[i] == '}' && c_check()) continue;
     if (r[i] == '{' && subtree()) continue;
-    tree[tri] << r[i];
+    if (r[i] == ',' && next()) continue;
+    if (curr->nodes.size())
+      curr->nodes.back().ss << r[i];
+    else
+      curr->ss << r[i];
   }
-  if (tri > 1) c_check();
-  std::vector<YAML::Node> nodes;
+
+  if (open) c_check();
   for (auto const& o : obs) nodes.emplace_back(o.to_yaml());
-  return YAML::Node(nodes);
+  auto const ret = YAML::Node(nodes);
+  YAML::Emitter out;
+  out << ret;
+  KLOG(INF) << out.c_str();
+  return ret;
 }
 
 }  // namespace bon
