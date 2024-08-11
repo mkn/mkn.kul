@@ -33,9 +33,20 @@ std::string mkn::kul::Dir::REAL(std::string const& s) KTHROW(fs::Exception) {
   char* expanded = _fullpath(NULL, s.c_str(), _MAX_PATH);
   if (expanded) {
     std::string dir(expanded);
-    delete expanded;
+    free(expanded);
     if (dir.size() && dir[dir.size() - 1] == '\\') dir.pop_back();
     return dir;
   }
   KEXCEPT(fs::Exception, "Item: \"" + s + "\" does not exist");
+}
+
+std::optional<std::string> mkn::kul::Dir::REAL_OR_NULL(std::string const& s) KTHROW(fs::Exception) {
+  char* expanded = _fullpath(NULL, s.c_str(), _MAX_PATH);
+  if (expanded) {
+    std::string dir(expanded);
+    free(expanded);
+    if (dir.size() && dir[dir.size() - 1] == '\\') dir.pop_back();
+    return dir;
+  }
+  return std::nullopt;
 }
