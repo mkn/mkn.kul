@@ -50,11 +50,12 @@ class Exception : public mkn::kul::Exception {
 enum class TYPE { OBJ = 0, STR, INT };
 
 struct BonParsableNode {
+  BonParsableNode(BonParsableNode* const _p = nullptr) : p{_p} {}
+
+  BonParsableNode& emplace_back() { return nodes.emplace_back(this); }
+
   BonParsableNode* const p = nullptr;
   std::stringstream ss{};
-
-  auto& emplace_back() { return nodes.emplace_back(this); }
-
   std::vector<BonParsableNode> nodes;
 };
 
