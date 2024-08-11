@@ -35,6 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "mkn/kul/yaml.hpp"
 
 #include <string>
+#include <cassert>
 #include <cstdint>
 #include <functional>
 
