@@ -33,6 +33,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "mkn/kul/string.hpp"
 
+#include <string>
+#include <sstream>
+
 #if KUL_IS_WIN
 #include "mkn/kul/os/win/env.hpp"
 #else
@@ -42,6 +45,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace mkn {
 namespace kul {
 namespace env {
+
+template <typename T>
+auto GET_AS(std::string const& s, T const& def) {
+  if (EXISTS(s.c_str())) {
+    T t;
+    std::stringstream ss(GET(s.c_str()));
+    if (ss.fail()) KTHROW(Exception);
+    ss >> t;
+    return t;
+  }
+  return def;
+}
 
 class Var {
  public:
