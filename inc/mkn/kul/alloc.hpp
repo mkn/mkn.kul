@@ -100,9 +100,7 @@ class Allocator {
 
   T* allocate(std::size_t const n) const {
     if (n == 0) return nullptr;
-    void* p = ::operator new(n * sizeof(T));
-    if (!p) throw std::bad_alloc();
-    return static_cast<T*>(p);
+    return static_cast<T*>(::operator new(n * sizeof(T)));
   }
 
   void deallocate(T* const p) noexcept {

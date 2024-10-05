@@ -44,6 +44,10 @@ template <typename T>
 std::vector<T, Allocator<T>>& as_super(std::vector<T, NonConstructingAllocator<T>>& v) {
   return *reinterpret_cast<std::vector<T, Allocator<T>>*>(&v);
 }
+template <typename T>
+std::vector<T, Allocator<T>> const& as_super(std::vector<T, NonConstructingAllocator<T>> const& v) {
+  return *reinterpret_cast<std::vector<T, Allocator<T>> const*>(&v);
+}
 
 }  // namespace mkn::kul
 
