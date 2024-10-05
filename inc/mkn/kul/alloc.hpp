@@ -35,6 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cstdint>
 #include <cstddef>
 #include <cstdlib>
+#include <type_traits>
 
 namespace mkn::kul {
 
@@ -79,6 +80,55 @@ class AlignedAllocator {
   bool operator==(This const& /*that*/) const {
     return true;  // stateless
   }
+};
+
+template <typename T>
+class Allocator {
+  using This = Allocator<T>;
+
+ public:
+  using pointer = T*;
+  using reference = T&;
+  using value_type = T;
+  using size_type = std::size_t;
+  using difference_type = std::ptrdiff_t;
+
+  template <typename U>
+  struct rebind {
+    using other = Allocator<U>;
+  };
+
+  T* allocate(std::size_t const n) const {
+    if (n == 0) return nullptr;
+    void* p = ::operator new(n * sizeof(T));
+    if (!p) throw std::bad_alloc();
+    return static_cast<T*>(p);
+  }
+
+  void deallocate(T* const p) noexcept {
+    if (p) ::operator delete(p);
+  }
+  void deallocate(T* const p, std::size_t /*n*/) noexcept {  // needed from std::
+    if (p) ::operator delete(p);
+  }
+  bool operator!=(This const& that) const { return !(*this == that); }
+  bool operator==(This const& /*that*/) const {
+    return true;  // stateless
+  }
+};
+
+template <typename T>
+class NonConstructingAllocator : public Allocator<T> {
+ public:
+  template <typename U>
+  struct rebind {
+    using other = NonConstructingAllocator<U>;
+  };
+
+  template <typename U, typename... Args>
+  void construct(U* /*ptr*/, Args&&... /*args*/) {}  // nothing
+  template <typename U>
+  void construct(U* /*ptr*/) noexcept(std::is_nothrow_default_constructible<U>::value) {}
 };
 
 }  // namespace mkn::kul
