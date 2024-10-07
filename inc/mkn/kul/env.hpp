@@ -51,7 +51,7 @@ auto GET_AS(std::string const& s, T const& def) {
   if (EXISTS(s.c_str())) {
     T t;
     std::stringstream ss(GET(s.c_str()));
-    if (ss.fail()) KTHROW(Exception);
+    if (ss.fail()) KEXCEPTION("mkn::kul::env::GET_AS failed");
     ss >> t;
     return t;
   }
@@ -62,16 +62,16 @@ class Var {
  public:
   enum Mode { APPE = 0, PREP, REPL };
 
-  Var(const std::string _n, const std::string _v, const Mode _m) : n(_n), v(_v), m(_m) {}
+  Var(std::string const _n, std::string const _v, Mode const _m) : n(_n), v(_v), m(_m) {}
   Var(Var const& e) : n(e.n), v(e.v), m(e.m) {}
   char const* name() const { return n.c_str(); }
   char const* value() const { return v.c_str(); }
   Mode mode() const { return m; }
-  const std::string toString() const {
+  std::string const toString() const {
     std::string var(value());
     mkn::kul::String::REPLACE_ALL(var, EOL(), "");
     mkn::kul::String::TRIM(var);
-    const std::string ev(env::GET(name()));
+    std::string const ev(env::GET(name()));
     if (!ev.empty()) {
       if (mode() == Mode::PREP)
         var = var + mkn::kul::env::SEP() + ev;
