@@ -31,14 +31,25 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _MKN_KUL_VECTOR_HPP_
 #define _MKN_KUL_VECTOR_HPP_
 
+#include "alloc.hpp"
 #include "mkn/kul/alloc.hpp"
 
 #include <vector>
+#include <type_traits>
 
 namespace mkn::kul {
 
-template <typename T, typename A = void>  // A ignored but there for std::vector interop
+template <typename T>  // A ignored but there for std::vector interop
+using Vector = std::vector<T, Allocator<T>>;
+
+template <typename T>  // A ignored but there for std::vector interop
 using NonConstructingVector = std::vector<T, NonConstructingAllocator<T>>;
+
+template <typename T, std::size_t S = 4096>
+using NonConstructingHugePageVector = std::vector<T, NonConstructingHugePageAllocator<T, S>>;
+
+template <typename T, std::size_t S = 4096>
+using HugePageVector = std::vector<T, HugePageAllocator<T, S>>;
 
 template <typename T>
 std::vector<T, Allocator<T>>& as_super(std::vector<T, NonConstructingAllocator<T>>& v) {
@@ -51,26 +62,27 @@ std::vector<T, Allocator<T>> const& as_super(std::vector<T, NonConstructingAlloc
 
 }  // namespace mkn::kul
 
-template <typename T, typename A0, typename A1 = void>
-bool operator==(std::vector<T, A0> const& v0, mkn::kul::NonConstructingVector<T, A1> const& v1) {
+template <typename T, typename A0, typename A1,
+          std::enable_if_t<std::is_base_of_v<mkn::kul::Allocator<T>, A1>, bool> = 0>
+bool operator==(std::vector<T, A0> const& v0, std::vector<T, A1> const& v1) {
   if (v0.size() != v1.size()) return false;
   for (std::size_t i = 0; i < v0.size(); i++)
     if (v0[i] != v1[i]) return false;
   return true;
 }
 
-template <typename T, typename A0, typename A1 = void>
-bool operator==(mkn::kul::NonConstructingVector<T, A1> const& v0, std::vector<T, A0> const& v1) {
+template <typename T, typename A0>
+bool operator==(mkn::kul::Vector<T> const& v0, std::vector<T, A0> const& v1) {
   return v1 == v0;
 }
 
-template <typename T, typename A0, typename A1 = void>
-bool operator!=(std::vector<T, A0> const& v0, mkn::kul::NonConstructingVector<T, A1> const& v1) {
+template <typename T, typename A0>
+bool operator!=(std::vector<T, A0> const& v0, mkn::kul::Vector<T> const& v1) {
   return !(v0 == v1);
 }
 
-template <typename T, typename A0, typename A1 = void>
-bool operator!=(mkn::kul::NonConstructingVector<T, A1> const& v0, std::vector<T, A0> const& v1) {
+template <typename T, typename A0>
+bool operator!=(mkn::kul::Vector<T> const& v0, std::vector<T, A0> const& v1) {
   return !(v0 == v1);
 }
 

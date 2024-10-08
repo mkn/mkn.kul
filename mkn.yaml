@@ -1,4 +1,4 @@
-#! clean build -dtOp test
+#! clean build -dtKOp test
 
 # mkn.kul - Kommon Usage Library
 #   Cross platform wrapper for systems operations / IO / threads / processes
@@ -28,15 +28,20 @@ profile:
         nix: ./src/os/nixish
     arg: -D_MKN_KUL_COMPILED_LIB_
 
-  - name: test
+
+  - name: _test
     parent: lib
     inc: .
-    main: test/test.cpp
-    src: test/test
     mode: none
     dep: google.test
     if_arg:
       win_shared: -DGTEST_LINKED_AS_SHARED_LIBRARY=1
+
+  - name: test
+    parent: _test
+    main: test/test.cpp
+    src: test/test
+    mode: none
 
   - name: bench
     parent: lib
