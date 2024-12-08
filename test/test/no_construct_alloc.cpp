@@ -123,11 +123,14 @@ void do_compare() {
   using namespace mkn::kul;
   wash.template operator()<std::vector<T>>("std::vector<T>");
   wash.template operator()<NonConstructingVector<T>>("NonConstructingVector<T>");
+
+#if __has_include(<sys/mman.h>)
   wash.template operator()<HugePageVector<T>>("HugePageVector<T>");
   wash.template operator()<NonConstructingHugePageVector<T>>("NonConstructingHugePageVector<T>");
+#endif  // __has_include(<sys/mman.h>)
 }
 
-TEST(NoConstructAllocator, copies) { do_compare<double>(); }
+TEST(NoConstructAllocator, copies) { do_compare<S<>>(); }
 
 // int main(int argc, char* argv[]) {
 //   ::testing::InitGoogleTest(&argc, argv);

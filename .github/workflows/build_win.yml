@@ -1,5 +1,9 @@
 name: windows-latest
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 on:
   push:
     branches: [ master ]
@@ -23,4 +27,4 @@ jobs:
       run: | # /bin/link interferes with cl/link.exe
         bash -c "rm /bin/link"
         bash -c "curl -Lo mkn.exe https://github.com/mkn/mkn/releases/download/latest/mkn.exe"
-        bash -c 'KLOG=3 ./mkn clean build run -dtKOp test -a "-EHsc -std:c++17"'
+        bash -c 'KLOG=3 ./mkn clean build run -dtKOp test -a "-EHsc -std:c++20"'

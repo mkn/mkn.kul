@@ -2,7 +2,7 @@
 
 # mkn.kul - Kommon Usage Library
 #   Cross platform wrapper for systems operations / IO / threads / processes
-#   Default profile "lib" is header only, use "-compiled" for library options
+#   Default profile "lib" is header only, use "*-compiled" for library options
 #
 
 name: mkn.kul
