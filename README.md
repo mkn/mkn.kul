@@ -2,7 +2,7 @@
 
 # mkn.kul
 
-**Cross platform C++ wrapper for threading/process management/io/logging/signal handling and stack walking.**
+**Cross platform C++20 wrapper for threading/process management/io/logging/signal handling and stack walking.**
 
 Supported Architectures/Operating Systems:
 

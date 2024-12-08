@@ -1,5 +1,9 @@
 name: ubuntu-latest
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 on:
   push:
     branches: [ master ]
@@ -16,4 +20,4 @@ jobs:
       run: |
         curl -Lo mkn https://github.com/mkn/mkn/releases/download/latest/mkn_nix
         chmod +x mkn
-        KLOG=3 ./mkn clean build run -dtOp test -a "-std=c++17 -fPIC"
+        KLOG=3 ./mkn clean build run -dtOp test -a "-std=c++20 -fPIC"

@@ -28,11 +28,65 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#ifndef _MKN_KUL_ALLOC_HPP_
-#define _MKN_KUL_ALLOC_HPP_
+#ifndef _MKN_KUL_ALLOC_ALIGNED_HPP_
+#define _MKN_KUL_ALLOC_ALIGNED_HPP_
+
+#if __has_include(<sys/mman.h>)
 
 #include "mkn/kul/alloc/base.hpp"
-#include "mkn/kul/alloc/aligned.hpp"  // active if available
-#include "mkn/kul/alloc/huge.hpp"     // active if available
 
-#endif /*_MKN_KUL_ALLOC_HPP_*/
+#include <new>
+#include <cstddef>
+#include <cstdlib>
+#include <type_traits>
+
+namespace mkn::kul {
+
+template <typename T, std::int32_t alignment = 32>
+class AlignedAllocator : public Allocator<T> {
+  using This = AlignedAllocator<T, alignment>;
+
+ public:
+  using pointer = T*;
+  using reference = T&;
+  using value_type = T;
+  using size_type = std::size_t;
+  using difference_type = std::ptrdiff_t;
+
+  template <typename U>
+  struct rebind {
+    using other = AlignedAllocator<U, alignment>;
+  };
+
+  T* allocate(std::size_t const n) const {
+    if (n == 0) return nullptr;
+
+    auto size = n * sizeof(T);
+    std::uint32_t diff = size % alignment;
+    if (diff > 0) diff = alignment - diff;
+
+    void* p = std::aligned_alloc(alignment, size + diff);
+    if (!p) throw std::bad_alloc();
+
+    return static_cast<T*>(p);
+  }
+
+  void deallocate(T* const p) noexcept {
+    if (p) std::free(p);
+  }
+  void deallocate(T* const p, std::size_t /*n*/) noexcept {  // needed from std::
+    deallocate(p);
+  }
+
+  bool operator!=(This const& that) const { return !(*this == that); }
+
+  bool operator==(This const& /*that*/) const {
+    return true;  // stateless
+  }
+};
+
+}  // namespace mkn::kul
+
+#endif  // __has_include(<sys/mman.h>)
+
+#endif /*_MKN_KUL_ALLOC_ALIGNED_HPP_*/
