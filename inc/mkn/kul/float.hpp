@@ -28,51 +28,21 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#ifndef _MKN_KUL_ASSERT_HPP_
-#define _MKN_KUL_ASSERT_HPP_
+#ifndef _MKN_KUL_FLOAT_HPP_
+#define _MKN_KUL_FLOAT_HPP_
 
 #include <cstdlib>
 
-#include "mkn/kul/signal.hpp"
+namespace mkn::kul {
 
-namespace mkn {
-namespace kul {
-struct Assert {
-  template <typename T>
-  Assert(T const& t) {
-    (void)t;
-#if !defined(NDEBUG)
-    if (!(t)) {
-      auto tid = mkn::kul::this_thread::id();
-      KOUT(NON) << tid << " : Stacktrace:";
-      for (auto const& s : mkn::kul::this_thread::stacktrace()) KOUT(NON) << tid << " : " << s;
-      exit(111);
-    }
-#endif
-  }
-};
-
-void inline abort_if(bool const b) {
-  if (b) std::abort();
+auto inline float_equals(float const a, float const b, float const diff = 1e-6) {
+  return std::abs(a - b) < diff;
 }
 
-void inline abort_if_not(bool const b) {
-  if (!b) std::abort();
+auto inline float_equals(double const a, double const b, double const diff = 1e-12) {
+  return std::abs(a - b) < diff;
 }
 
-}  // namespace kul
-}  // namespace mkn
+}  // namespace mkn::kul
 
-#if !defined(KASSERT)
-#define KASSERT(b) \
-  mkn::kul::Assert { (b) }
-#endif
-
-#if defined(KASSERT_REPLACE_ASSERT)
-#ifdef assert
-#undef assert
-#endif
-#define assert(b) KASSERT(b)
-#endif
-
-#endif /* _MKN_KUL_ASSERT_HPP_ */
+#endif /* _MKN_KUL_FLOAT_HPP_ */
