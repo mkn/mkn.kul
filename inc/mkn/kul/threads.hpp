@@ -403,11 +403,12 @@ class ConcurrentThreadPool : public ConcurrentThreadQueue<void()> {
   ConcurrentThreadPool& operator=(ConcurrentThreadPool const&&) = delete;
 
  public:
-  ConcurrentThreadPool(size_t const& max = 1, bool strt = 0, uint64_t const& nWait = 1000000)
+  template<typename...Args>
+  ConcurrentThreadPool(size_t const& max = 1, bool strt = 0, uint64_t const& nWait = 1000000, Args&&... args)
       : ConcurrentThreadQueue(max, 0, nWait) {
-    for (size_t i = 0; i < max; i++) {
+    for (size_t i = 0; i < max; ++i) {
       auto n = std::to_string(i);
-      _p.insert(n, std::make_shared<PT>());
+      _p.insert(n, std::make_shared<PT>(nWait, args...));
       _k.insert(n, std::make_shared<mkn::kul::Thread>(std::ref(*_p[n].get())));
     }
     _p.setDeletedKey("");
@@ -509,7 +510,7 @@ class ChroncurrentThreadPool : public ConcurrentThreadPool<void(), AutoChronPool
  public:
   ChroncurrentThreadPool(size_t const& max = 1, bool strt = 0, uint64_t const& nWait = 1000000,
                          uint64_t const& scale = 1000)
-      : ConcurrentThreadPool(max, 0, nWait), m_scale(scale) {
+      : ConcurrentThreadPool(max, 0, nWait, scale), m_scale(scale) {
     if (m_scale > nWait) KEXCEPTION("Time scale cannot be larger than wait period");
     if (strt) start();
   }
