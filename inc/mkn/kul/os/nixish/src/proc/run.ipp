@@ -73,6 +73,10 @@ void mkn::kul::Process::run() KTHROW(mkn::kul::proc::Exception) {
         if (FD_ISSET(popPip[1], &childOutFds)) {
           bool b = 0;
           do {
+#if defined(_MKN_KUL_PROC_LOOP_NSLEEP_) && (_MKN_KUL_PROC_LOOP_NSLEEP_ > 0)
+            mkn::kul::this_thread::nSleep(_MKN_KUL_PROC_LOOP_NSLEEP_);
+#endif
+
             memset(cOut, 0, sizeof(cOut));
             ret = recall(read(popPip[1], cOut, sizeof(cOut)));
             cOut[ret > 0 ? ret : 0] = 0;
@@ -89,6 +93,10 @@ void mkn::kul::Process::run() KTHROW(mkn::kul::proc::Exception) {
         if (FD_ISSET(popPip[2], &childOutFds)) {
           bool b = 0;
           do {
+#if defined(_MKN_KUL_PROC_LOOP_NSLEEP_) && (_MKN_KUL_PROC_LOOP_NSLEEP_ > 0)
+            mkn::kul::this_thread::nSleep(_MKN_KUL_PROC_LOOP_NSLEEP_);
+#endif
+
             memset(cErr, 0, sizeof(cErr));
             ret = recall(read(popPip[2], cErr, sizeof(cErr)));
             cErr[ret > 0 ? ret : 0] = 0;
