@@ -74,7 +74,7 @@ class ExitException : public mkn::kul::proc::Exception {
 class Call {
  private:
   std::string cwd;
-  const std::string d;
+  std::string const d;
   std::string const& s;
   mkn::kul::hash::map::S2S oldEvs;
   void setCWD() {
@@ -108,7 +108,7 @@ class AProcess {
   bool f = 0, s = 0;
   bool const wfe = 1;
   int32_t pec = -1, pi = 0;
-  const std::string d;
+  std::string const d;
   std::function<void(std::string const&)> e, o;
   std::vector<std::string> argv;
   mkn::kul::hash::map::S2S evs;
@@ -153,7 +153,7 @@ class AProcess {
 
  public:
   template <class T>
-  AProcess& arg(const T& a) {
+  AProcess& arg(T const& a) {
     std::stringstream ss;
     ss << a;
     if (ss.str().size()) argv.push_back(ss.str());
@@ -195,24 +195,27 @@ class AProcess {
 inline std::ostream& operator<<(std::ostream& s, AProcess const& p) { return s << p.toString(); }
 
 class ProcessCapture {
- private:
-  std::stringstream so, se;
-
- protected:
-  ProcessCapture() {}
-  ProcessCapture(ProcessCapture const& pc) : so(pc.so.str()), se(pc.se.str()) {}
-  virtual void out(std::string const& s) { so << s; }
-  virtual void err(std::string const& s) { se << s; }
-
  public:
+  ProcessCapture() {}
   ProcessCapture(AProcess& p) { setProcess(p); }
+  ProcessCapture(ProcessCapture const& pc) : so(pc.so.str()), se(pc.se.str()) {}
+
   virtual ~ProcessCapture() {}
-  const std::string outs() const { return so.str(); }
-  const std::string errs() const { return se.str(); }
+
+  std::string const outs() const { return so.str(); }
+  std::string const errs() const { return se.str(); }
+
   void setProcess(AProcess& p) {
     p.setOut(std::bind(&ProcessCapture::out, std::ref(*this), std::placeholders::_1));
     p.setErr(std::bind(&ProcessCapture::err, std::ref(*this), std::placeholders::_1));
   }
+
+ protected:
+  virtual void out(std::string const& s) { so << s; }
+  virtual void err(std::string const& s) { se << s; }
+
+ private:
+  std::stringstream so, se;
 };
 }  // namespace kul
 }  // namespace mkn
