@@ -64,8 +64,7 @@ class HugePageAllocator : public Allocator<T> {
     if (n > std::numeric_limits<std::size_t>::max() / sizeof(T)) throw std::bad_alloc();
     void* p = nullptr;
 
-    if(posix_memalign(&p, huge_page_size, n * sizeof(T)) != 0)
-      throw std::bad_alloc{};
+    if (posix_memalign(&p, huge_page_size, n * sizeof(T)) != 0) throw std::bad_alloc{};
 
 #ifdef MADV_HUGEPAGE
     madvise(p, n * sizeof(T), MADV_HUGEPAGE);
@@ -97,8 +96,7 @@ class NonConstructingHugePageAllocator : public NonConstructingAllocator<T> {
   T* allocate(std::size_t n) {
     if (n > std::numeric_limits<std::size_t>::max() / sizeof(T)) throw std::bad_alloc();
     void* p = nullptr;
-    if(posix_memalign(&p, huge_page_size, n * sizeof(T)) != 0)
-      throw std::bad_alloc{};
+    if (posix_memalign(&p, huge_page_size, n * sizeof(T)) != 0) throw std::bad_alloc{};
 
 #ifdef MADV_HUGEPAGE
     madvise(p, n * sizeof(T), MADV_HUGEPAGE);

@@ -1,5 +1,5 @@
 /**
-Copyright (c) 2024, Philip Deegan.
+Copyright (c) 2025, Philip Deegan.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -45,7 +45,7 @@ void mkn::kul::cli::asArgs(std::string const& cmd, std::vector<std::string>& arg
           if (arg.size() > 0) args.push_back(arg);  //     ||    || || || || ||    ||
           arg.clear();                              //     ||||| ||||| ||||| ||    |||||
           continue;                                 //        || ||    || || ||    ||
-        }                                           //     ||||| ||    || || ||||| |||||
+        }  //     ||||| ||    || || ||||| |||||
         break;
       case '"':
         if (openQuotesD && !openQuotesS) {
