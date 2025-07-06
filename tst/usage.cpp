@@ -1,5 +1,5 @@
 /**
-Copyright (c) 2024, Philip Deegan.
+Copyright (c) 2025, Philip Deegan.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -147,7 +147,7 @@ class Catch {
 
 class Test {
  private:
-  const std::string s;
+  std::string const s;
 
  public:
   Test(int argc, char* argv[]) : s("LAMBDAS ALLOWED IN SIGNAL") {
@@ -308,7 +308,9 @@ class Test {
 
     mkn::kul::Mutex mutex;
     {
-      { mkn::kul::ScopeLock lock(mutex); }
+      {
+        mkn::kul::ScopeLock lock(mutex);
+      }
       mkn::kul::ScopeLock lock(mutex);
     }
     {
