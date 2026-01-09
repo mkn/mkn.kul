@@ -31,16 +31,29 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _MKN_KUL_ALLOC_ALIGNED_HPP_
 #define _MKN_KUL_ALLOC_ALIGNED_HPP_
 
-#if __has_include(<sys/mman.h>)
-
 #include "mkn/kul/alloc/base.hpp"
 
 #include <new>
-#include <cstddef>
+#include <cstdint>
 #include <cstdlib>
-#include <type_traits>
 
 namespace mkn::kul {
+
+inline void* aligned_alloc(std::size_t const size, std::size_t const alignment) {
+#if KUL_IS_WIN
+  return _aligned_malloc(size, alignment);
+#else
+  return std::aligned_alloc(alignment, size);
+#endif
+}
+
+inline void aligned_free(void* ptr) {
+#if KUL_IS_WIN
+  _aligned_free(ptr);
+#else
+  std::free(ptr);
+#endif
+}
 
 template <typename T, std::int32_t alignment = 32>
 class AlignedAllocator : public Allocator<T> {
@@ -65,14 +78,14 @@ class AlignedAllocator : public Allocator<T> {
     std::uint32_t diff = size % alignment;
     if (diff > 0) diff = alignment - diff;
 
-    void* p = std::aligned_alloc(alignment, size + diff);
+    void* p = aligned_alloc(size + diff, alignment);
     if (!p) throw std::bad_alloc();
 
     return static_cast<T*>(p);
   }
 
   void deallocate(T* const p) noexcept {
-    if (p) std::free(p);
+    if (p) aligned_free(p);
   }
   void deallocate(T* const p, std::size_t /*n*/) noexcept {  // needed from std::
     deallocate(p);
@@ -86,7 +99,5 @@ class AlignedAllocator : public Allocator<T> {
 };
 
 }  // namespace mkn::kul
-
-#endif  // __has_include(<sys/mman.h>)
 
 #endif /*_MKN_KUL_ALLOC_ALIGNED_HPP_*/

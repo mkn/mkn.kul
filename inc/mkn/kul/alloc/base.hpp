@@ -32,9 +32,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _MKN_KUL_ALLOC_BASE_HPP_
 
 #include <new>
-#include <cstdint>
 #include <cstddef>
 #include <cstdlib>
+#include <utility>
 #include <type_traits>
 
 namespace mkn::kul {
