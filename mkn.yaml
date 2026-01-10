@@ -1,4 +1,4 @@
-#! clean build -dtKOp test run -p test,usage
+#! clean build -dtKOp test run -p test,usage -W 9
 
 # mkn.kul - Kommon Usage Library
 #   Cross platform wrapper for systems operations / IO / threads / processes

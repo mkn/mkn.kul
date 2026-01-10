@@ -34,10 +34,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // bool mkn::kul::this_thread::main(){
 
-std::shared_ptr<void> const hThreadSnapshot(CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0),
-                                            CloseHandle);
-if (hThreadSnapshot.get() == INVALID_HANDLE_VALUE)
+HANDLE const rawSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0);
+if (rawSnapshot == INVALID_HANDLE_VALUE)
   KEXCEPT(mkn::kul::threading::Exception, "GetMainThreadId failed");
+std::shared_ptr<void> const hThreadSnapshot(rawSnapshot, CloseHandle);
 THREADENTRY32 tEntry;
 tEntry.dwSize = sizeof(THREADENTRY32);
 DWORD result = 0;

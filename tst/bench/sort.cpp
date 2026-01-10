@@ -1,10 +1,10 @@
 // #include "mkn/kul/log.hpp"
 
-#include <thread>
+#include "mkn/kul/sort.hpp"
+
 #include <random>
 #include <cstdlib>
-
-#include "mkn/kul/sort.hpp"
+#include <algorithm>
 
 #if __has_include("benchmark/benchmark.h")
 #include "benchmark/benchmark.h"
@@ -24,7 +24,7 @@ struct SortFixture : public benchmark::Fixture {
   void TearDown(::benchmark::State const& /*state*/) override {}
 
   void solve(::benchmark::State& state) {
-    std::uint32_t size = state.range(0);
+    std::int64_t size = state.range(0);
 
     auto gen = [&]() {
       std::random_device rd;
@@ -35,7 +35,7 @@ struct SortFixture : public benchmark::Fixture {
     std::vector<T> vec(size);
 
     std::uniform_real_distribution<T> dist{0, 10000};
-    for (std::size_t i = 0; i < size; ++i) vec[i] = dist(gen);
+    for (std::int64_t i = 0; i < size; ++i) vec[i] = dist(gen);
 
     for (auto _ : state)
       if constexpr (std)

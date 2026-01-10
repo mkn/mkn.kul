@@ -74,7 +74,14 @@ class HugePageAllocator : public Allocator<T> {
     if (p == nullptr) throw std::bad_alloc();
     return static_cast<T*>(p);
   }
-  void deallocate(T* p, std::size_t n) { std::free(p); }
+
+  void deallocate(T* const p) noexcept {
+    if (p) std::free(p);
+  }
+  void deallocate(T* const p, std::size_t /*n*/) noexcept {  // needed from std::
+    deallocate(p);
+  }
+
   bool operator!=(This const& that) const { return !(*this == that); }
   bool operator==(This const& /*that*/) const {
     return true;  // stateless
@@ -107,7 +114,12 @@ class NonConstructingHugePageAllocator : public NonConstructingAllocator<T> {
     return static_cast<T*>(p);
   }
 
-  void deallocate(T* p, std::size_t n) { std::free(p); }
+  void deallocate(T* const p) noexcept {
+    if (p) std::free(p);
+  }
+  void deallocate(T* const p, std::size_t /*n*/) noexcept {  // needed from std::
+    deallocate(p);
+  }
 
   template <typename U, typename... Args>
   void construct(U* ptr, Args&&... args) {

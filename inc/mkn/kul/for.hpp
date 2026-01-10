@@ -31,11 +31,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _MKN_KUL_FOR_HPP_
 #define _MKN_KUL_FOR_HPP_
 
+#include <array>
 #include <tuple>
 #include <vector>
-#include <cassert>
+#include <utility>
 #include <cstdint>
+#include <cassert>
 #include <stdexcept>
+#include <type_traits>
 
 namespace mkn::kul {
 
@@ -116,7 +119,7 @@ constexpr auto for_N_any(Fn&& fn) {
 }
 
 template <typename F>
-auto generate_from(F&& f, std::size_t from, std::size_t to) {
+auto generate_from(F&& f, std::size_t const from, std::size_t const to) {
   assert(from <= to);
   using value_type = std::decay_t<std::invoke_result_t<F&, std::size_t const&>>;
   std::vector<value_type> v;
@@ -127,18 +130,28 @@ auto generate_from(F&& f, std::size_t from, std::size_t to) {
 }
 
 template <typename F>
-auto generate_from(F&& f, std::size_t count) {
+auto generate_from(F&& f, std::size_t const count) {
   return generate_from(std::forward<F>(f), 0, count);
+}
+
+template <typename Type, typename F, typename Container>
+auto _generate_container_from(F&& f, Container& container) {
+  using value_type = std::decay_t<std::invoke_result_t<F, Type>>;
+  std::vector<value_type> vec;
+  vec.reserve(container.size());
+  for (auto& v : container) vec.emplace_back(f(v));
+  return vec;
+}
+
+template <typename F, typename Container>
+auto generate_from(F&& f, Container& container) {
+  return _generate_container_from<typename Container::value_type&>(std::forward<F>(f), container);
 }
 
 template <typename F, typename Container>
 auto generate_from(F&& f, Container const& container) {
-  using T = typename Container::value_type;
-  using value_type = std::decay_t<std::invoke_result_t<F&, T&>>;
-  std::vector<value_type> v1;
-  if (container.size() > 0) v1.reserve(container.size());
-  for (auto& v : container) v1.emplace_back(f(v));
-  return v1;
+  return _generate_container_from<typename Container::value_type const&>(std::forward<F>(f),
+                                                                         container);
 }
 
 template <typename F, typename T>

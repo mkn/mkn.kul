@@ -60,11 +60,12 @@ class Allocator {
   T* allocate(std::size_t const n) const { return static_cast<T*>(::operator new(n * sizeof(T))); }
 
   void deallocate(T* const p) noexcept {
-    if (p) ::operator delete(p);
+    if (p) std::free(p);
   }
   void deallocate(T* const p, std::size_t /*n*/) noexcept {  // needed from std::
-    if (p) ::operator delete(p);
+    deallocate(p);
   }
+
   bool operator!=(This const& that) const { return !(*this == that); }
   bool operator==(This const& /*that*/) const {
     return true;  // stateless
