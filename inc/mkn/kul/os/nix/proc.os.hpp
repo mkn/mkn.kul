@@ -1,5 +1,5 @@
 /**
-Copyright (c) 2024, Philip Deegan.
+Copyright (c) 2026, Philip Deegan.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -33,14 +33,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _MKN_KUL_OS_NIX_PROC_OS_HPP_
 #define _MKN_KUL_OS_NIX_PROC_OS_HPP_
 
-#include <assert.h>
+#include <cassert>
+#include <cstdint>
 #include <fcntl.h>
-#include <signal.h>
-#include <stdio.h>
 #include <stdlib.h>
-#include <sys/wait.h>
 #include <unistd.h>
-#include <stdexcept>
+#include <sys/wait.h>
 
 namespace mkn {
 namespace kul {

@@ -1,5 +1,5 @@
 /**
-Copyright (c) 2024, Philip Deegan.
+Copyright (c) 2026, Philip Deegan.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -66,7 +66,7 @@ class Logger {
 
  protected:
   std::function<void(std::string const&)> e, o;
-  const std::string modeTxt(log::mode const& m) const {
+  std::string const modeTxt(log::mode const& m) const {
     std::string s("NON");
     if (m == 1)
       s = "INF";
@@ -159,7 +159,7 @@ class ALogMan {
   }
   void err(std::string const& s) { logger->err(s + mkn::kul::os::EOL()); }
   std::string str(char const* f, char const* fn, uint16_t const& l, log::mode const& _m,
-                  std::string const& s = "", const std::string fmt = __MKN_KUL_LOG_FRMT__) {
+                  std::string const& s = "", std::string const fmt = __MKN_KUL_LOG_FRMT__) {
     std::string st(fmt);
     logger->str(f, fn, l, s, _m, st);
     return st;
@@ -188,7 +188,7 @@ class Message {
 
  public:
   template <class T>
-  Message& operator<<(const T& s) {
+  Message& operator<<(T const& s) {
     ss << s;
     return *this;
   }
@@ -239,7 +239,7 @@ class DBoMessage : public Message {
   ~DBoMessage() { KUL_DEBUG_DO(LogMan::INSTANCE().out(m, ss.str())); }
   DBoMessage(log::mode const& _m = mkn::kul::log::mode::NON) : Message(_m) {}
   template <class T>
-  DBoMessage& operator<<([[maybe_unused]] const T& s) {
+  DBoMessage& operator<<([[maybe_unused]] T const& s) {
     KUL_DEBUG_DO(ss << s;)
     return *this;
   }

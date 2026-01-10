@@ -1,5 +1,5 @@
 /**
-Copyright (c) 2024, Philip Deegan.
+Copyright (c) 2026, Philip Deegan.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -132,7 +132,7 @@ class Validator {
   void validate(YAML::Node const& n) { Item::VALIDATE(n, children()); }
 
  private:
-  const std::vector<NodeValidator> kids;
+  std::vector<NodeValidator> const kids;
 };
 
 class String : public Item {

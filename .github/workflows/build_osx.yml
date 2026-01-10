@@ -20,4 +20,4 @@ jobs:
       run: |
         curl -Lo mkn https://github.com/mkn/mkn/releases/download/latest/mkn_arm_osx
         chmod +x mkn
-        KLOG=3 ./mkn clean build run -dtOp test -a "-std=c++20 -fPIC"
+        KLOG=3 ./mkn clean build run -dtOp test,usage -a "-std=c++20 -fPIC"

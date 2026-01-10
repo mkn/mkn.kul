@@ -1,4 +1,4 @@
-#! clean build -dtKOp test
+#! clean build -dtKOp test run -p test,usage
 
 # mkn.kul - Kommon Usage Library
 #   Cross platform wrapper for systems operations / IO / threads / processes
@@ -39,18 +39,18 @@ profile:
 
   - name: test
     parent: _test
-    main: test/test.cpp
-    src: test/test
+    main: tst/test.cpp
+    src: tst/test
     mode: none
 
   - name: bench
     parent: lib
-    main: test/bench.cpp
+    main: tst/bench/bench.cpp
     dep: google.benchmark
 
   - name: usage
     parent: lib
-    main: test/usage.cpp
+    main: tst/usage.cpp
 
   - name: format
     mod: |

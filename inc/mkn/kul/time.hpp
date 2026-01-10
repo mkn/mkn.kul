@@ -1,5 +1,5 @@
 /**
-Copyright (c) 2024, Philip Deegan.
+Copyright (c) 2026, Philip Deegan.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -67,13 +67,13 @@ class Now {
 
 class DateTime {
  private:
-  static const std::string MILLIS() {
+  static std::string const MILLIS() {
     std::string s(std::to_string(Now::MILLIS()));
     return s.substr(s.length() - 3);
   }
 
  public:
-  static const std::string AS(const std::time_t t, std::string f = "%Y-%m-%d-%H:%M:%S") {
+  static std::string const AS(std::time_t const t, std::string f = "%Y-%m-%d-%H:%M:%S") {
     mkn::kul::String::REPLACE(f, "%i", MILLIS());
     char buffer[80];
     struct tm ti;
@@ -85,7 +85,7 @@ class DateTime {
     std::strftime(buffer, 80, f.c_str(), &ti);
     return std::string(buffer);
   }
-  static const std::string AS(std::string const& epoch,
+  static std::string const AS(std::string const& epoch,
                               std::string const& f = "%Y-%m-%d-%H:%M:%S") {
     uint64_t e = 0;
     std::stringstream ss(epoch);
@@ -93,7 +93,7 @@ class DateTime {
     if (!e) KEXCEPT(time::Exception, "Invalid time used :" + epoch);
     return AS(e, f);
   }
-  static const std::string NOW(std::string const& f = "%Y-%m-%d-%H:%M:%S") {
+  static std::string const NOW(std::string const& f = "%Y-%m-%d-%H:%M:%S") {
     return AS(std::time(NULL), f);
   }
 };

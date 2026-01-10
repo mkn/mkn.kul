@@ -1,5 +1,5 @@
 /**
-Copyright (c) 2024, Philip Deegan.
+Copyright (c) 2026, Philip Deegan.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -31,15 +31,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _MKN_KUL_STRING_HPP_
 #define _MKN_KUL_STRING_HPP_
 
+#include "mkn/kul/except.hpp"
+
+#include <cmath>
+#include <string>
+#include <vector>
 #include <string.h>
 #include <algorithm>
-#include <cmath>
-#include <iostream>
-#include <string>
 #include <unordered_map>
-#include <vector>
-
-#include "mkn/kul/except.hpp"
 
 namespace mkn {
 namespace kul {

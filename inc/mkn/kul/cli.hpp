@@ -1,5 +1,5 @@
 /**
-Copyright (c) 2024, Philip Deegan.
+Copyright (c) 2026, Philip Deegan.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -37,8 +37,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cstdint>
 
 #include "mkn/kul/env.hpp"
-#include "mkn/kul/except.hpp"
 #include "mkn/kul/map.hpp"
+#include "mkn/kul/except.hpp"
 #include "mkn/kul/os/cli.hpp"
 #include "mkn/kul/serial.hpp"
 #include "mkn/kul/string.hpp"
@@ -47,7 +47,7 @@ namespace mkn {
 namespace kul {
 namespace cli {
 
-inline const std::string receive(std::string const& t = "") {
+inline std::string const receive(std::string const& t = "") {
   if (!t.empty()) std::cout << t << std::endl;
   std::string s;
   std::getline(std::cin, s);
@@ -81,16 +81,16 @@ enum EnvVarMode { APPE = 0, PREP, REPL };
 // deprecated : use mkn::kul::env::Var
 class EnvVar {
  public:
-  EnvVar(const std::string _n, const std::string _v, const EnvVarMode _m) : n(_n), v(_v), m(_m) {}
+  EnvVar(std::string const _n, std::string const _v, EnvVarMode const _m) : n(_n), v(_v), m(_m) {}
   EnvVar(EnvVar const& e) : n(e.n), v(e.v), m(e.m) {}
   char const* name() const { return n.c_str(); }
   char const* value() const { return v.c_str(); }
   EnvVarMode mode() const { return m; }
-  const std::string toString() const {
+  std::string const toString() const {
     std::string var(value());
     mkn::kul::String::REPLACE_ALL(var, mkn::kul::env::EOL(), "");
     mkn::kul::String::TRIM(var);
-    const std::string ev(env::GET(name()));
+    std::string const ev(env::GET(name()));
     if (!ev.empty()) {
       if (mode() == EnvVarMode::PREP)
         var = var + mkn::kul::env::SEP() + ev;

@@ -1,5 +1,5 @@
 /**
-Copyright (c) 2024, Philip Deegan.
+Copyright (c) 2026, Philip Deegan.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -57,11 +57,11 @@ namespace hash {
 template <class K, class V>
 class Map {
  public:
-  Map& emplace(const K& k, const V& v) {
+  Map& emplace(K const& k, V const& v) {
     _map.emplace(k, v);
     return *this;
   }
-  Map& insert(const K& k, const V& v) {
+  Map& insert(K const& k, V const& v) {
     _map.insert(std::make_pair(k, v));
     return *this;
   }
@@ -69,8 +69,7 @@ class Map {
     _map.insert(pair);
     return *this;
   }
-  void setDeletedKey(K const&) { /* ununused, but here for interoperability with sparsehash */
-  }
+  void setDeletedKey(K const&) { /* ununused, but here for interoperability with sparsehash */ }
 
   auto& at(K const& k) { return _map.at(k); }
   auto& at(K const& k) const { return _map.at(k); }
@@ -146,7 +145,7 @@ class Set : public google::sparse_hash_set<T, HashFcn, EqualKey> {
   void setEmptyKey(key_type const& key) { Hash::set_empty_key(key); }
   void setDeletedKey(key_type const& key) { Hash::set_deleted_key(key); }
   void clear() { Hash::clear(); }
-  std::pair<iterator, bool> insert(const T obj) { return Hash::insert(obj); }
+  std::pair<iterator, bool> insert(T const obj) { return Hash::insert(obj); }
 
   size_type erase(key_type const& key) { return Hash::erase(key); }
   iterator begin() { return Hash::begin(); }
@@ -185,7 +184,7 @@ class Map : public google::sparse_hash_map<K, V, HashFcn, EqualKey> {
   void setEmptyKey(key_type const& key) { map::set_empty_key(key); }
   void clear() { map::clear(); }
   std::pair<iterator, bool> insert(std::pair<K, V> const& obj) { return map::insert(obj); }
-  std::pair<iterator, bool> insert(const K k, V v) { return insert(std::pair<K, V>(k, v)); }
+  std::pair<iterator, bool> insert(K const k, V v) { return insert(std::pair<K, V>(k, v)); }
   V& operator[](key_type const& key) { return map::operator[](key); }
   auto& operator[](key_type const& k) const { return map::at(k); }
   size_type erase(key_type const& key) { return map::erase(key); }
@@ -203,7 +202,7 @@ class Map : public google::sparse_hash_map<K, V, HashFcn, EqualKey> {
 namespace map {
 template <class T>
 using S2T = Map<std::string, T, std::hash<std::string>, StdStringComparator,
-                libc_allocator_with_realloc<std::pair<const std::string, T> > >;
+                libc_allocator_with_realloc<std::pair<std::string const, T> > >;
 using S2S = S2T<std::string>;
 }  // namespace map
 }  // namespace hash
@@ -224,7 +223,7 @@ class Set : public google::dense_hash_set<T, HashFcn, EqualKey> {
   void setEmptyKey(key_type const& key) { Hash::set_empty_key(key); }
   void clear() { Hash::clear(); }
   void setDeletedKey(key_type const& key) { Hash::set_deleted_key(key); }
-  std::pair<iterator, bool> insert(const T obj) { return Hash::insert(obj); }
+  std::pair<iterator, bool> insert(T const obj) { return Hash::insert(obj); }
 
   size_type erase(key_type const& key) { return Hash::erase(key); }
   iterator begin() { return Hash::begin(); }
@@ -258,7 +257,7 @@ class Map : public google::dense_hash_map<K, V, HashFcn, EqualKey> {
   void setEmptyKey(key_type const& key) { map::set_empty_key(key); }
   void clear() { map::clear(); }
   std::pair<iterator, bool> insert(std::pair<K, V> const& obj) { return map::insert(obj); }
-  std::pair<iterator, bool> insert(const K k, V v) { return insert(std::pair<K, V>(k, v)); }
+  std::pair<iterator, bool> insert(K const k, V v) { return insert(std::pair<K, V>(k, v)); }
   V& operator[](key_type const& key) { return map::operator[](key); }
   auto& operator[](key_type const& k) const { return map::at(k); }
   size_type erase(key_type const& key) { return map::erase(key); }
@@ -277,7 +276,7 @@ class Map : public google::dense_hash_map<K, V, HashFcn, EqualKey> {
 namespace map {
 template <class T>
 using S2T = Map<std::string, T, std::hash<std::string>, StdStringComparator,
-                libc_allocator_with_realloc<std::pair<const std::string, T> > >;
+                libc_allocator_with_realloc<std::pair<std::string const, T> > >;
 using S2S = S2T<std::string>;
 
 }  // namespace map

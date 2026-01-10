@@ -1,5 +1,7 @@
+// IWYU pragma: private, include "mkn/kul/alloc.hpp"
+
 /**
-Copyright (c) 2022, Philip Deegan.
+Copyright (c) 2026, Philip Deegan.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without

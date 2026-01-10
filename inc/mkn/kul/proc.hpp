@@ -1,5 +1,5 @@
 /**
-Copyright (c) 2024, Philip Deegan.
+Copyright (c) 2026, Philip Deegan.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -31,14 +31,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _MKN_KUL_PROC_HPP_
 #define _MKN_KUL_PROC_HPP_
 
-#include <functional>
-#include <iostream>
-#include <sstream>
-#include <vector>
-
+#include "mkn/kul/os.hpp"
 #include "mkn/kul/cli.hpp"
-#include "mkn/kul/log.hpp"
 #include "mkn/kul/map.hpp"
+
+#include <vector>
+#include <sstream>
+#include <iostream>
+#include <functional>
 
 namespace mkn {
 namespace kul {

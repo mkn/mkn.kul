@@ -1,5 +1,5 @@
 /**
-Copyright (c) 2024, Philip Deegan.
+Copyright (c) 2026, Philip Deegan.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -31,7 +31,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _MKN_KUL_SCM_HPP_
 #define _MKN_KUL_SCM_HPP_
 
-#include "mkn/kul/map.hpp"
 #include "mkn/kul/os.hpp"
 #include "mkn/kul/proc.hpp"
 #include "mkn/kul/string.hpp"
@@ -117,8 +116,8 @@ class Git : public SCM {
       KTHROW(Exception) override {
     Dir dr(d, true);
     mkn::kul::Process p("git");
-    std::string defaults = "--depth 10 --recursive --shallow-submodules";
-    p << "clone" << mkn::kul::env::GET("KUL_GIT_CO", defaults) << r;
+    std::string const defaults = "--depth 10 --recursive --shallow-submodules";
+    p << "clone" << mkn::kul::env::GET("MKN_KUL_GIT_CO", defaults) << r;
     if (!v.empty()) p.arg("-b").arg(v);
     try {
       p.arg(d).start();
@@ -224,12 +223,12 @@ class Git : public SCM {
   }
 };
 
-/*
+#if 0  // todo
 class Svn : public SCM {
  public:
   std::string co(std::string const&d, std::string const&r, const
 std::string &v) const KTHROW(Exception) { Dir dr(d, true); mkn::kul::Process p("svn",
-d); p.arg("checkout").arg(mkn::kul::env::GET("KUL_SVN_CO")); if (v.empty()) p.arg(r);
+d); p.arg("checkout").arg(mkn::kul::env::GET("MKN_KUL_SVN_CO")); if (v.empty()) p.arg(r);
     else
       p.arg(r + "/" + v);
     try {
@@ -264,7 +263,7 @@ const KTHROW(Exception) { KEXCEPT(Exception, "SCM ERROR - SVN NOT IMPLEMENTED");
 ERROR - SVN NOT IMPLEMENTED"); } void diff(std::string const&d) const {
 KEXCEPT(Exception, "SCM ERROR - SVN NOT IMPLEMENTED"); }
 };
-*/
+#endif
 
 }  // namespace scm
 }  // namespace kul

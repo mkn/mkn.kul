@@ -1,5 +1,5 @@
 /**
-Copyright (c) 2024, Philip Deegan.
+Copyright (c) 2026, Philip Deegan.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -31,10 +31,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _MKN_KUL_OS_HPP_
 #define _MKN_KUL_OS_HPP_
 
-#include <vector>
-#include <optional>
-
-#include "mkn/kul/cpu.hpp"
 #include "mkn/kul/env.hpp"
 #include "mkn/kul/except.hpp"
 #include "mkn/kul/string.hpp"
@@ -44,6 +40,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #else
 #include "mkn/kul/os/nixish/os.top.hpp"
 #endif
+
+#include <vector>
+#include <optional>
 
 namespace mkn {
 namespace kul {
@@ -60,7 +59,7 @@ class Exception : public mkn::kul::Exception {
 
 class TimeStamps {
  private:
-  const uint64_t _a, _c, _m;
+  uint64_t const _a, _c, _m;
   TimeStamps(uint64_t const& a, uint64_t const& c, uint64_t const& m) : _a(a), _c(c), _m(m) {}
 
  public:
@@ -128,10 +127,10 @@ class Dir : public fs::Item {
   inline bool mk() const;
   inline bool root() const;
 
-  const std::string join(std::string const& s) const {
+  std::string const join(std::string const& s) const {
     return _p.size() == 0 ? s : root() ? path() + s : JOIN(path(), s);
   }
-  const std::string name() const {
+  std::string const name() const {
     return root() ? path() : path().substr(path().rfind(SEP()) + 1);
   }
   std::string const& path() const { return _p; }
@@ -316,7 +315,7 @@ namespace env {
 
 inline std::string WHERE(char const* c) {
   for (auto const& s : mkn::kul::String::SPLIT(env::GET("PATH"), mkn::kul::env::SEP())) {
-    const mkn::kul::Dir d(s);
+    mkn::kul::Dir const d(s);
     if (d)
       for (auto const& f : d.files())
         if (f.name().compare(c) == 0) return f.real();

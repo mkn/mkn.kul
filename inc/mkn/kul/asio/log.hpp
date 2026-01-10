@@ -1,5 +1,5 @@
 /**
-Copyright (c) 2024, Philip Deegan.
+Copyright (c) 2026, Philip Deegan.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -93,7 +93,7 @@ class Message {
 
  public:
   template <class T>
-  Message& operator<<(const T& s) {
+  Message& operator<<(T const& s) {
     ss << s;
     return *this;
   }

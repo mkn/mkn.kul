@@ -1,5 +1,5 @@
 /**
-Copyright (c) 2024, Philip Deegan.
+Copyright (c) 2026, Philip Deegan.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace mkn {
 namespace kul {
 namespace this_thread {
-inline const std::string id() {
+inline std::string const id() {
   std::ostringstream os;
   os << std::hex << pthread_self();
   return os.str();
@@ -106,11 +106,11 @@ class Thread : public threading::AThread {
  public:
   Thread(std::function<void()> const& _func) : func(_func) {}
   template <class T>
-  Thread(const T& t) : func(std::bind((void(T::*)()) & T::operator(), t)) {}
+  Thread(T const& t) : func(std::bind((void(T::*)()) & T::operator(), t)) {}
   template <class T>
   Thread(std::reference_wrapper<T> const& r) : func(std::bind((void(T::*)()) & T::operator(), r)) {}
   template <class T>
-  Thread(std::reference_wrapper<const T> const& r)
+  Thread(std::reference_wrapper<T const> const& r)
       : func(std::bind((void(T::*)() const) & T::operator(), r)) {}
 
   virtual ~Thread() {}

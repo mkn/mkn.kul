@@ -1,5 +1,5 @@
 /**
-Copyright (c) 2024, Philip Deegan.
+Copyright (c) 2026, Philip Deegan.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -30,15 +30,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #define KUL_FORCE_TRACE
 
-#include <iomanip>
-#include "mkn/kul/asio/log.hpp"
-#include "mkn/kul/assert.hpp"
+// #include <iomanip>
+// #include "mkn/kul/asio/log.hpp"
+// #include "mkn/kul/assert.hpp"
 #include "mkn/kul/cli.hpp"
 #include "mkn/kul/dbg.hpp"
 #include "mkn/kul/io.hpp"
 #include "mkn/kul/ipc.hpp"
 #include "mkn/kul/log.hpp"
-#include "mkn/kul/math.hpp"
+// #include "mkn/kul/math.hpp"
 #include "mkn/kul/os.hpp"
 #include "mkn/kul/proc.hpp"
 #include "mkn/kul/signal.hpp"
@@ -46,8 +46,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "mkn/kul/string.hpp"
 #include "mkn/kul/threads.hpp"
 #include "mkn/kul/time.hpp"
-#include "mkn/kul/tuple.hpp"
-#include "mkn/kul/wstring.hpp"
+// #include "mkn/kul/tuple.hpp"
+// #include "mkn/kul/wstring.hpp"
+#include "mkn/kul/cpu.hpp"
 
 namespace mkn {
 namespace kul {
@@ -147,7 +148,7 @@ class Catch {
 
 class Test {
  private:
-  const std::string s;
+  std::string const s;
 
  public:
   Test(int argc, char* argv[]) : s("LAMBDAS ALLOWED IN SIGNAL") {
@@ -308,7 +309,9 @@ class Test {
 
     mkn::kul::Mutex mutex;
     {
-      { mkn::kul::ScopeLock lock(mutex); }
+      {
+        mkn::kul::ScopeLock lock(mutex);
+      }
       mkn::kul::ScopeLock lock(mutex);
     }
     {

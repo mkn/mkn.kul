@@ -1,5 +1,5 @@
 /**
-Copyright (c) 2024, Philip Deegan.
+Copyright (c) 2026, Philip Deegan.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -119,7 +119,7 @@ inline std::string EOL() {
 namespace user {
 
 inline mkn::kul::Dir home() {
-  const std::string h(env::GET("HOME"));
+  std::string const h(env::GET("HOME"));
   if (h.size()) return mkn::kul::Dir(h);
   return mkn::kul::Dir(std::string(env::GET("HOMEDRIVE")) + std::string(env::GET("HOMEPATH")));
 }
