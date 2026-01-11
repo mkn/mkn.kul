@@ -37,8 +37,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <utility>
 #include <cassert>
 #include <algorithm>
-#include <stdexcept>
 #include <type_traits>
+
 #include "mkn/kul/except.hpp"
 
 namespace mkn::kul {
@@ -65,17 +65,17 @@ auto constexpr static to_bool = [](auto const& v) { return bool{v}; };
 
 template <typename Container, typename Fn = decltype(to_bool)>
 auto constexpr all(Container const& container, Fn fn = to_bool) {
-  return std::all_of(container.begin(), container.end(), fn);
+  return std::all_of(std::begin(container), std::end(container), fn);
 }
 
 template <typename Container, typename Fn = decltype(to_bool)>
 auto constexpr any(Container const& container, Fn fn = to_bool) {
-  return std::any_of(container.begin(), container.end(), fn);
+  return std::any_of(std::begin(container), std::end(container), fn);
 }
 
 template <typename Container, typename Fn = decltype(to_bool)>
 auto constexpr none(Container const& container, Fn fn = to_bool) {
-  return std::none_of(container.begin(), container.end(), fn);
+  return std::none_of(std::begin(container), std::end(container), fn);
 }
 
 template <typename T = std::size_t>
@@ -158,7 +158,8 @@ template <typename F>
 auto generate_from(F&& f, std::size_t const from, std::size_t const to) {
   if (from > to)
     KEXCEPTION(
-        "RuntimeError: mkn::kul::generate_from(F&&, from, to) - 'from' must be less than 'to'");
+        "RuntimeError: mkn::kul::generate_from(F&&, from, to) - 'from' must be less than or equal "
+        "to 'to'");
   using value_type = std::decay_t<std::invoke_result_t<F&, std::size_t const&>>;
   std::vector<value_type> v;
   std::size_t count = to - from;
