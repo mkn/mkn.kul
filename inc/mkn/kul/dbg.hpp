@@ -62,12 +62,12 @@ class StackTrace {
 #endif  // MKN_KUL_TRACE_OR_VOID
 
 #ifndef MKN_KUL_STACK_TRACE
-#define MKN_KUL_STACK_TRACE return mkn::kul::dbg::StackTrace(__PRETTY_FUNCTION__);
+#define MKN_KUL_STACK_TRACE return mkn::kul::dbg::StackTrace(__PRETTY_FUNCTION__)
 #endif  // MKN_KUL_STACK_TRACE
 
 #ifndef MKN_KUL_DBG_FUNC_ENTER
 #define MKN_KUL_DBG_FUNC_ENTER \
-  mkn::kul::dbg::FunctionScope s_dbg_functionScopeDBG(__FILE__, __func__, __LINE__);
+  mkn::kul::dbg::FunctionScope s_dbg_functionScopeDBG(__FILE__, __func__, __LINE__)
 #endif  // MKN_KUL_DBG_FUNC_ENTER
 
 #ifndef MKN_KUL_DBG_FUNC_ON_ENTER
@@ -81,7 +81,7 @@ class StackTrace {
 #define MKN_KUL_DBG_FUNC_ON_EXIT                                                                \
   KOUT(INF) << mkn::kul::LogMan::INSTANCE().str(m_fi, m_fu, m_li, mkn::kul::log::mode::INF, "", \
                                                 "[%M]: %T - %D : %F:%L fn(%N)")                 \
-            << " - Function time: " << (mkn::kul::Now::MICROS() - m_start) << " μs";
+            << " - Function time: " << (mkn::kul::Now::MICROS() - m_start) << " μs"
 #endif  // MKN_KUL_DBG_FUNC_ON_EXIT
 
 #else  //
@@ -105,10 +105,10 @@ class FunctionScope {
 #if defined(MKN_KUL_FORCE_TRACE) || !defined(NDEBUG)
   FunctionScope(char const* fi, char const* fu, uint16_t const& li)
       : m_start(mkn::kul::Now::MICROS()), m_li(li), m_fi(fi), m_fu(fu) {
-    MKN_KUL_DBG_FUNC_ON_ENTER
+    MKN_KUL_DBG_FUNC_ON_ENTER;
   }
 #endif  // defined(MKN_KUL_FORCE_TRACE) || !defined(NDEBUG)
-  ~FunctionScope() { MKN_KUL_DBG_FUNC_ON_EXIT }
+  ~FunctionScope() { MKN_KUL_DBG_FUNC_ON_EXIT; }
 };
 
 }  // namespace dbg
