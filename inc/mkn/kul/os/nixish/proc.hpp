@@ -1,5 +1,5 @@
 /**
-Copyright (c) 2024, Philip Deegan.
+Copyright (c) 2026, Philip Deegan.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -41,9 +41,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "mkn/kul/log.hpp"
 #include "mkn/kul/os.hpp"
 
-#if KUL_IS_NIX
+#if MKN_KUL_IS_NIX
 #include "mkn/kul/os/nix/proc.os.hpp"
-#elif KUL_IS_BSD
+#elif MKN_KUL_IS_BSD
 #include "mkn/kul/os/bsd/proc.os.hpp"
 #else
 #error unresolved

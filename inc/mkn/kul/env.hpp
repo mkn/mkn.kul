@@ -1,5 +1,5 @@
 /**
-Copyright (c) 2024, Philip Deegan.
+Copyright (c) 2026, Philip Deegan.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -36,11 +36,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string>
 #include <sstream>
 
-#if KUL_IS_WIN
+#if MKN_KUL_IS_WIN
 #include "mkn/kul/os/win/env.hpp"
 #else
 #include "mkn/kul/os/nixish/env.hpp"
-#endif /*KUL_IS_WIN*/
+#endif /*MKN_KUL_IS_WIN*/
 
 namespace mkn {
 namespace kul {

@@ -1,5 +1,5 @@
 /**
-Copyright (c) 2024, Philip Deegan.
+Copyright (c) 2026, Philip Deegan.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -28,10 +28,10 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+// IWYU pragma: private, include "mkn/kul/defs.hpp"
+
 #ifndef _MKN_KUL_OS_WIN_DEF_HPP_
 #define _MKN_KUL_OS_WIN_DEF_HPP_
-
-#include "mkn/kul/defs.hpp"
 
 #ifndef __MKN_KUL_OS__
 #define __MKN_KUL_OS__ win

@@ -1,5 +1,7 @@
+// IWYU pragma: private, include "mkn/kul/alloc.hpp"
+
 /**
-Copyright (c) 2022, Philip Deegan.
+Copyright (c) 2026, Philip Deegan.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -40,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace mkn::kul {
 
 inline void* aligned_alloc(std::size_t const size, std::size_t const alignment) {
-#if KUL_IS_WIN
+#if MKN_KUL_IS_WIN
   return _aligned_malloc(size, alignment);
 #else
   return std::aligned_alloc(alignment, size);
@@ -48,7 +50,7 @@ inline void* aligned_alloc(std::size_t const size, std::size_t const alignment) 
 }
 
 inline void aligned_free(void* ptr) {
-#if KUL_IS_WIN
+#if MKN_KUL_IS_WIN
   _aligned_free(ptr);
 #else
   std::free(ptr);

@@ -1,5 +1,5 @@
 /**
-Copyright (c) 2024, Philip Deegan.
+Copyright (c) 2026, Philip Deegan.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -28,26 +28,21 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#define KUL_FORCE_TRACE
+#define MKN_KUL_FORCE_TRACE
 
-#include <iomanip>
-#include "mkn/kul/asio/log.hpp"
-#include "mkn/kul/assert.hpp"
-#include "mkn/kul/cli.hpp"
-#include "mkn/kul/dbg.hpp"
 #include "mkn/kul/io.hpp"
+#include "mkn/kul/os.hpp"
+#include "mkn/kul/cli.hpp"
+#include "mkn/kul/cpu.hpp"
+#include "mkn/kul/dbg.hpp"
 #include "mkn/kul/ipc.hpp"
 #include "mkn/kul/log.hpp"
-#include "mkn/kul/math.hpp"
-#include "mkn/kul/os.hpp"
 #include "mkn/kul/proc.hpp"
-#include "mkn/kul/signal.hpp"
 #include "mkn/kul/span.hpp"
+#include "mkn/kul/time.hpp"
+#include "mkn/kul/signal.hpp"
 #include "mkn/kul/string.hpp"
 #include "mkn/kul/threads.hpp"
-#include "mkn/kul/time.hpp"
-#include "mkn/kul/tuple.hpp"
-#include "mkn/kul/wstring.hpp"
 
 namespace mkn {
 namespace kul {
@@ -147,11 +142,11 @@ class Catch {
 
 class Test {
  private:
-  const std::string s;
+  std::string const s;
 
  public:
   Test(int argc, char* argv[]) : s("LAMBDAS ALLOWED IN SIGNAL") {
-    KUL_DBG_FUNC_ENTER;
+    MKN_KUL_DBG_FUNC_ENTER;
     Catch c;
     mkn::kul::Signal sig;  // Windows: each thread requires own handler, static
                            // singleton otherwise so only ever one.
@@ -308,7 +303,9 @@ class Test {
 
     mkn::kul::Mutex mutex;
     {
-      { mkn::kul::ScopeLock lock(mutex); }
+      {
+        mkn::kul::ScopeLock lock(mutex);
+      }
       mkn::kul::ScopeLock lock(mutex);
     }
     {

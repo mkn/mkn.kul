@@ -1,5 +1,5 @@
 /**
-Copyright (c) 2024, Philip Deegan.
+Copyright (c) 2026, Philip Deegan.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -31,12 +31,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _MKN_KUL_EXCEPT_HPP_
 #define _MKN_KUL_EXCEPT_HPP_
 
-#include <cstdint>
-#include <iostream>
-#include <sstream>
-#include <stdexcept>
-
 #include "mkn/kul/defs.hpp"
+
+#include <cstdint>
+#include <sstream>
+#include <iostream>
+#include <stdexcept>
 
 namespace mkn {
 namespace kul {
@@ -80,7 +80,7 @@ class Exception : public std::runtime_error {
   char const* file() const { return _f; }
   uint16_t const& line() const { return _l; }
   std::exception_ptr const& cause() const { return _ep; }
-  const std::string stack() const {
+  std::string const stack() const {
     std::stringstream ss;
     if (_ep) {
       try {
@@ -97,7 +97,7 @@ class Exception : public std::runtime_error {
     return ss.str();
   }
   template <class T>
-  Exception& operator<<(const T& s) {
+  Exception& operator<<(T const& s) {
     std::stringstream msg;
     msg << s;
     err += msg.str();
@@ -106,8 +106,8 @@ class Exception : public std::runtime_error {
 
  protected:
   char const* _f;
-  const uint16_t _l;
-  const std::exception_ptr _ep;
+  uint16_t const _l;
+  std::exception_ptr const _ep;
   std::string err;
 
   Exception& operator=(Exception& e) = delete;
@@ -132,7 +132,7 @@ class Exit : public Exception {
   uint16_t const& code() const { return _e; }
 
  private:
-  const uint16_t _e;
+  uint16_t const _e;
 
   Exit& operator=(Exit& e) = delete;
   Exit& operator=(Exit&& e) = delete;

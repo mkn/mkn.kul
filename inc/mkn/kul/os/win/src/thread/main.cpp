@@ -1,5 +1,5 @@
 /**
-Copyright (c) 2024, Philip Deegan.
+Copyright (c) 2026, Philip Deegan.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -34,10 +34,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // bool mkn::kul::this_thread::main(){
 
-const std::shared_ptr<void> hThreadSnapshot(CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0),
+std::shared_ptr<void> const hThreadSnapshot(CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0),
                                             CloseHandle);
-if (hThreadSnapshot.get() == INVALID_HANDLE_VALUE)
-  KEXCEPT(mkn::kul::threading::Exception, "GetMainThreadId failed");
+if (hThreadSnapshot.get() == INVALID_HANDLE_VALUE) {
+  DWORD const gle = GetLastError();
+  KEXCEPTSTR(mkn::kul::threading::Exception)
+      << "CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD) failed, GetLastError=" << gle;
+}
+
 THREADENTRY32 tEntry;
 tEntry.dwSize = sizeof(THREADENTRY32);
 DWORD result = 0;

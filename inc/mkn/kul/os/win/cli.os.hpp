@@ -1,5 +1,5 @@
 /**
-Copyright (c) 2024, Philip Deegan.
+Copyright (c) 2026, Philip Deegan.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -44,7 +44,7 @@ namespace cli {
 inline std::string hidden(std::string const& t) {
 #include "mkn/kul/os/win/src/cli/hidden.cpp"
 }
-inline void show(){
+inline void show() {
 #include "mkn/kul/os/win/src/cli/show.cpp"
 }
 #else

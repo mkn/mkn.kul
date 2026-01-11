@@ -9,9 +9,8 @@
 #include "mkn/kul/log.hpp"
 #include "mkn/kul/except.hpp"
 
-
 template <typename T, std::size_t N>
-void bzero(T(&ar)[N]) {
+void bzero(T (&ar)[N]) {
   std::fill_n(&ar[0], N, 0);
 }
 

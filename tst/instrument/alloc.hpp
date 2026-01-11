@@ -25,14 +25,14 @@ struct S {
 
 template <typename V>
 auto copy_construct(V const& v) {
-  KUL_DBG_FUNC_ENTER;
+  MKN_KUL_DBG_FUNC_ENTER;
   V out{v};
   return out;
 }
 
 template <typename V>
 auto copy_operator_equal(V const& v) {
-  KUL_DBG_FUNC_ENTER;
+  MKN_KUL_DBG_FUNC_ENTER;
   V out;
   out.reserve(v.capacity());
   out = v;
@@ -41,7 +41,7 @@ auto copy_operator_equal(V const& v) {
 
 template <typename V>
 auto copy_operator_equal_super(V const& v) {
-  KUL_DBG_FUNC_ENTER;
+  MKN_KUL_DBG_FUNC_ENTER;
   V out;
   out.reserve(v.capacity());
   mkn::kul::as_super(out) = mkn::kul::as_super(v);
@@ -50,7 +50,7 @@ auto copy_operator_equal_super(V const& v) {
 
 template <typename V>
 auto copy_manual(V const& v) {
-  KUL_DBG_FUNC_ENTER;
+  MKN_KUL_DBG_FUNC_ENTER;
   V out;
   out.reserve(v.capacity());
   out.resize(v.size());
@@ -60,12 +60,12 @@ auto copy_manual(V const& v) {
 
 template <typename V>
 auto make_vector(std::size_t const& size) {
-  KUL_DBG_FUNC_ENTER;
+  MKN_KUL_DBG_FUNC_ENTER;
   return V(size);
 }
 template <typename V0, typename V1>
 auto make_vector_from(V1 const& v1) {
-  KUL_DBG_FUNC_ENTER;
+  MKN_KUL_DBG_FUNC_ENTER;
   V0 v(v1.size());
   std::copy(v1.begin(), v1.end(), v.begin());
   return v;

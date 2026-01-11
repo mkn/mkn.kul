@@ -1,5 +1,5 @@
 /**
-Copyright (c) 2024, Philip Deegan.
+Copyright (c) 2026, Philip Deegan.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -33,11 +33,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _MKN_KUL_OS_DEF_HPP_
 #define _MKN_KUL_OS_DEF_HPP_
 
-#if KUL_IS_NIX
+#if MKN_KUL_IS_NIX
 #include "mkn/kul/os/nix/def.hpp"
-#elif KUL_IS_BSD
+#elif MKN_KUL_IS_BSD
 #include "mkn/kul/os/bsd/def.hpp"
-#elif KUL_IS_WIN
+#elif MKN_KUL_IS_WIN
 #include "mkn/kul/os/win/def.hpp"
 #else
 #error unresolved

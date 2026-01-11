@@ -39,12 +39,12 @@ Used by macros KOUT and KLOG : see inc/usage.hpp
         KLOG >= 3 is disabled with -DNDEBUG
 
 
-Key             KUL_GIT_CO
+Key             MKN_KUL_GIT_CO
 Type            string
 Default         "--depth 10 --recursive --shallow-submodules"
 Description - Add string to git clone as arguments
 
-Key             KUL_SVN_CO
+Key             MKN_KUL_SVN_CO
 Type            string
 Default         ""
 Description - Add string to svn checkout as arguments
