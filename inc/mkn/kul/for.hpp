@@ -127,7 +127,7 @@ constexpr auto for_N(Fn& fn) {
           else if constexpr (M == for_N_R_mode::forward_tuple)
             return std::forward_as_tuple(fn(ics)...);
           else
-            throw std::runtime_error("unknown return mode");
+            []<bool flag = false>() { static_assert(flag, "unknown return mode"); }();
         },
         apply_N<N>(Apply{}));
   } else
