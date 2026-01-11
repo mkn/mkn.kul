@@ -25,7 +25,7 @@ static inline
 template <typename T, typename K, typename Y = T>
 static inline
     typename std::enable_if<std::is_same<T, float>::value || std::is_same<T, double>::value>::type
-    scale(size_t const n, std::atomic<K> const alpha, T* x) {
+    scale(size_t const n, std::atomic<K> const& alpha, T* x) {
   detail::scale(n, alpha.load(), x);
 }
 
