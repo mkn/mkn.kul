@@ -1,5 +1,5 @@
 /**
-Copyright (c) 2022, Philip Deegan.
+Copyright (c) 2026, Philip Deegan.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _MKN_KUL_ALLOC_HPP_
 
 #include "mkn/kul/alloc/base.hpp"
-#include "mkn/kul/alloc/aligned.hpp"  // active if available
-#include "mkn/kul/alloc/huge.hpp"     // active if available
+#include "mkn/kul/alloc/aligned.hpp"
+#include "mkn/kul/alloc/huge.hpp"  // active if available
 
 #endif /*_MKN_KUL_ALLOC_HPP_*/

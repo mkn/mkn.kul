@@ -1,5 +1,5 @@
 /**
-Copyright (c) 2024, Philip Deegan.
+Copyright (c) 2026, Philip Deegan.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -53,63 +53,64 @@ class StackTrace {
   std::vector<std::string> const& stack() const { return _stk; }
 };
 
-#if !defined(NDEBUG) || defined(KUL_FORCE_TRACE)
+#if !defined(NDEBUG) || defined(MKN_KUL_FORCE_TRACE)
 
 #define __MKN_KUL_TRACE__ 1
 
-#ifndef KUL_TRACE_OR_VOID
-#define KUL_TRACE_OR_VOID mkn::kul::dbg::StackTrace
-#endif  // KUL_TRACE_OR_VOID
+#ifndef MKN_KUL_TRACE_OR_VOID
+#define MKN_KUL_TRACE_OR_VOID mkn::kul::dbg::StackTrace
+#endif  // MKN_KUL_TRACE_OR_VOID
 
-#ifndef KUL_STACK_TRACE
-#define KUL_STACK_TRACE return mkn::kul::dbg::StackTrace(__PRETTY_FUNCTION__);
-#endif  // KUL_STACK_TRACE
+#ifndef MKN_KUL_STACK_TRACE
+#define MKN_KUL_STACK_TRACE return mkn::kul::dbg::StackTrace(__PRETTY_FUNCTION__);
+#endif  // MKN_KUL_STACK_TRACE
 
-#ifndef KUL_DBG_FUNC_ENTER
-#define KUL_DBG_FUNC_ENTER \
+#ifndef MKN_KUL_DBG_FUNC_ENTER
+#define MKN_KUL_DBG_FUNC_ENTER \
   mkn::kul::dbg::FunctionScope s_dbg_functionScopeDBG(__FILE__, __func__, __LINE__);
-#endif  // KUL_DBG_FUNC_ENTER
+#endif  // MKN_KUL_DBG_FUNC_ENTER
 
-#ifndef KUL_DBG_FUNC_ON_ENTER
-#define KUL_DBG_FUNC_ON_ENTER                                                                   \
+#ifndef MKN_KUL_DBG_FUNC_ON_ENTER
+#define MKN_KUL_DBG_FUNC_ON_ENTER                                                               \
   KOUT(INF) << mkn::kul::LogMan::INSTANCE().str(m_fi, m_fu, m_li, mkn::kul::log::mode::INF, "", \
                                                 "[%M]: %T - %D : %F:%L fn(%N)")                 \
             << " - ENTERED";
-#endif  // KUL_DBG_FUNC_ON_ENTER
+#endif  // MKN_KUL_DBG_FUNC_ON_ENTER
 
-#ifndef KUL_DBG_FUNC_ON_EXIT
-#define KUL_DBG_FUNC_ON_EXIT                                                                    \
+#ifndef MKN_KUL_DBG_FUNC_ON_EXIT
+#define MKN_KUL_DBG_FUNC_ON_EXIT                                                                \
   KOUT(INF) << mkn::kul::LogMan::INSTANCE().str(m_fi, m_fu, m_li, mkn::kul::log::mode::INF, "", \
                                                 "[%M]: %T - %D : %F:%L fn(%N)")                 \
             << " - Function time: " << (mkn::kul::Now::MICROS() - m_start) << " μs";
-#endif  // KUL_DBG_FUNC_ON_EXIT
+#endif  // MKN_KUL_DBG_FUNC_ON_EXIT
 
 #else  //
 
 #define __MKN_KUL_TRACE__ 0
-#define KUL_TRACE_OR_VOID void
-#define KUL_STACK_TRACE
-#define KUL_DBG_FUNC_ENTER
-#define KUL_DBG_FUNC_ON_ENTER
-#define KUL_DBG_FUNC_ON_EXIT
+#define MKN_KUL_TRACE_OR_VOID void
+#define MKN_KUL_STACK_TRACE
+#define MKN_KUL_DBG_FUNC_ENTER
+#define MKN_KUL_DBG_FUNC_ON_ENTER
+#define MKN_KUL_DBG_FUNC_ON_EXIT
 
-#endif  // defined(KUL_FORCE_TRACE) || !defined(NDEBUG)
+#endif  // defined(MKN_KUL_FORCE_TRACE) || !defined(NDEBUG)
 
 class FunctionScope {
  private:
-#if defined(KUL_FORCE_TRACE) || !defined(NDEBUG)
+#if defined(MKN_KUL_FORCE_TRACE) || !defined(NDEBUG)
   uint64_t m_start = 0, m_li = 0;
   char const *m_fi = nullptr, *m_fu = nullptr;
-#endif  // defined(KUL_FORCE_TRACE) || !defined(NDEBUG)
+#endif  // defined(MKN_KUL_FORCE_TRACE) || !defined(NDEBUG)
  public:
-#if defined(KUL_FORCE_TRACE) || !defined(NDEBUG)
+#if defined(MKN_KUL_FORCE_TRACE) || !defined(NDEBUG)
   FunctionScope(char const* fi, char const* fu, uint16_t const& li)
       : m_start(mkn::kul::Now::MICROS()), m_li(li), m_fi(fi), m_fu(fu) {
-    KUL_DBG_FUNC_ON_ENTER
+    MKN_KUL_DBG_FUNC_ON_ENTER
   }
-#endif  // defined(KUL_FORCE_TRACE) || !defined(NDEBUG)
-  ~FunctionScope() { KUL_DBG_FUNC_ON_EXIT }
+#endif  // defined(MKN_KUL_FORCE_TRACE) || !defined(NDEBUG)
+  ~FunctionScope() { MKN_KUL_DBG_FUNC_ON_EXIT }
 };
+
 }  // namespace dbg
 }  // namespace kul
 }  // namespace mkn

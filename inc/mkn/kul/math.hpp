@@ -1,5 +1,5 @@
 /**
-Copyright (c) 2024, Philip Deegan.
+Copyright (c) 2026, Philip Deegan.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -48,7 +48,7 @@ class Exception : public mkn::kul::Exception {
 };
 
 template <class T>
-T abs(const T& f) {
+T abs(T const& f) {
   return f < 0 ? f * -1 : f;
 }
 

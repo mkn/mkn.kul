@@ -1,5 +1,5 @@
 /**
-Copyright (c) 2024, Philip Deegan.
+Copyright (c) 2026, Philip Deegan.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -34,67 +34,67 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define KSTRINGIFY(x) #x
 #define KTOSTRING(x) KSTRINGIFY(x)
 
-#ifdef KUL_SHARED
+#ifdef MKN_KUL_SHARED
 #if defined _WIN32 || defined __CYGWIN__
-#ifdef KUL_EXPORT
+#ifdef MKN_KUL_EXPORT
 #ifdef __GNUC__
-#define KUL_PUBLISH __attribute__((dllexport))
+#define MKN_KUL_PUBLISH __attribute__((dllexport))
 #else
-#define KUL_PUBLISH __declspec(dllexport)
+#define MKN_KUL_PUBLISH __declspec(dllexport)
 #endif
 #else
 #ifdef __GNUC__
-#define KUL_PUBLISH __attribute__((dllimport))
+#define MKN_KUL_PUBLISH __attribute__((dllimport))
 #else
-#define KUL_PUBLISH __declspec(dllimport)
+#define MKN_KUL_PUBLISH __declspec(dllimport)
 #endif
 #endif
 #else
 #if __GNUC__ >= 4
-#define KUL_PUBLISH __attribute__((visibility("default")))
-#define KUL_PRIVATE __attribute__((visibility("hidden")))
+#define MKN_KUL_PUBLISH __attribute__((visibility("default")))
+#define MKN_KUL_PRIVATE __attribute__((visibility("hidden")))
 #endif
 #endif
-#endif  // KUL_SHARED
+#endif  // MKN_KUL_SHARED
 
-#ifndef KUL_PUBLISH
-#define KUL_PUBLISH
+#ifndef MKN_KUL_PUBLISH
+#define MKN_KUL_PUBLISH
 #endif
 
-#ifndef KUL_PRIVATE
-#define KUL_PRIVATE
+#ifndef MKN_KUL_PRIVATE
+#define MKN_KUL_PRIVATE
 #endif
 
 #if defined(__APPLE__) || defined(__NetBSD__) || defined(__FreeBSD__)
-#define KUL_IS_BSD 1
+#define MKN_KUL_IS_BSD 1
 #endif
 
 #if defined(_WIN32)
-#define KUL_IS_WIN 1
+#define MKN_KUL_IS_WIN 1
 #endif
 
-#ifndef KUL_IS_WIN
-#define KUL_IS_WIN 0
+#ifndef MKN_KUL_IS_WIN
+#define MKN_KUL_IS_WIN 0
 #endif
 
-#ifndef KUL_IS_BSD
-#define KUL_IS_BSD 0
+#ifndef MKN_KUL_IS_BSD
+#define MKN_KUL_IS_BSD 0
 #endif
 
-#if !KUL_IS_WIN && !KUL_IS_BSD
-#define KUL_IS_NIX 1
+#if !MKN_KUL_IS_WIN && !MKN_KUL_IS_BSD
+#define MKN_KUL_IS_NIX 1
 #endif
 
-#ifndef KUL_IS_NIX
-#define KUL_IS_NIX 0
+#ifndef MKN_KUL_IS_NIX
+#define MKN_KUL_IS_NIX 0
 #endif
 
 #if !defined(NDEBUG) || defined(KUL_FORCE_DEBUG_DO)
-#define KUL_DEBUG_DO(...) __VA_ARGS__
-#define KUL_DEBUG_DO_ELSE(...)
+#define MKN_KUL_DEBUG_DO(...) __VA_ARGS__
+#define MKN_KUL_DEBUG_DO_ELSE(...)
 #else
-#define KUL_DEBUG_DO(...)
-#define KUL_DEBUG_DO_ELSE(...) __VA_ARGS__
+#define MKN_KUL_DEBUG_DO(...)
+#define MKN_KUL_DEBUG_DO_ELSE(...) __VA_ARGS__
 #endif
 
 #include "mkn/kul/os/def.hpp"

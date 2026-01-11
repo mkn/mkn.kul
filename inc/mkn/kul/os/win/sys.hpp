@@ -1,5 +1,5 @@
 /**
-Copyright (c) 2024, Philip Deegan.
+Copyright (c) 2026, Philip Deegan.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -49,7 +49,7 @@ class SharedLibrary {
  private:
   bool _loaded = 0;
   HINSTANCE _handle;
-  const mkn::kul::File _f;
+  mkn::kul::File const _f;
 
  public:
   SharedLibrary(mkn::kul::File const& f) KTHROW(Exception) : _f(f) {
@@ -62,7 +62,7 @@ class SharedLibrary {
   ~SharedLibrary() {
     if (_loaded) FreeLibrary(_handle);
   }
-  const mkn::kul::File file() const { return _f; }
+  mkn::kul::File const file() const { return _f; }
 };
 
 template <class F>

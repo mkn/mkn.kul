@@ -1,5 +1,7 @@
+// IWYU pragma: private, include "mkn/kul/alloc.hpp"
+
 /**
-Copyright (c) 2022, Philip Deegan.
+Copyright (c) 2026, Philip Deegan.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -61,8 +63,9 @@ class Allocator {
     if (p) ::operator delete(p);
   }
   void deallocate(T* const p, std::size_t /*n*/) noexcept {  // needed from std::
-    if (p) ::operator delete(p);
+    deallocate(p);
   }
+
   bool operator!=(This const& that) const { return !(*this == that); }
   bool operator==(This const& /*that*/) const {
     return true;  // stateless
@@ -78,11 +81,6 @@ class NonConstructingAllocator : public Allocator<T> {
   struct rebind {
     using other = NonConstructingAllocator<U>;
   };
-
-  T* allocate(std::size_t const n) const {
-    // if (n == 0) return nullptr;
-    return static_cast<T*>(malloc(n * sizeof(T)));
-  }
 
   template <typename U, typename... Args>
   void construct(U* ptr, Args&&... args) {

@@ -1,5 +1,5 @@
 /**
-Copyright (c) 2024, Philip Deegan.
+Copyright (c) 2026, Philip Deegan.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "mkn/kul/defs.hpp"
 
-#if KUL_IS_WIN
+#if MKN_KUL_IS_WIN
 #include "mkn/kul/os/win/signal.hpp"
 #else
 #include "mkn/kul/os/nixish/signal.hpp"

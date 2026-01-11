@@ -1,5 +1,5 @@
 /**
-Copyright (c) 2024, Philip Deegan.
+Copyright (c) 2026, Philip Deegan.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -37,8 +37,6 @@ namespace mkn {
 namespace kul {
 namespace scm {
 
-// "make_unique is not yet ubiquitous (C++14)"
-
 class Manager {
  public:
   static Manager& INSTANCE() {
@@ -51,12 +49,7 @@ class Manager {
   }
 
  private:
-  Manager() {
-    git.reset(new Git());
-    // svn.reset(new Svn());
-    SCMs.insert(std::pair<std::string, SCM*>("git", git.get()));
-    // SCMs.insert(std::pair<std::string, SCM *>("svn", svn.get()));
-  }
+  Manager() { SCMs.emplace("git", (git = std::make_unique<Git>()).get()); }
   hash::map::S2T<SCM*> SCMs;
   std::unique_ptr<SCM> git;
   // std::unique_ptr<SCM> svn;

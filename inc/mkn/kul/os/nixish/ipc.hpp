@@ -1,5 +1,5 @@
 /**
-Copyright (c) 2024, Philip Deegan.
+Copyright (c) 2026, Philip Deegan.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -76,7 +76,7 @@ class IPCCall {
 class Server : public IPCCall {
  private:
   int16_t lp;
-  const mkn::kul::File uuid;
+  mkn::kul::File const uuid;
 
   void start() KTHROW(Exception) {
     uuid.dir().mk();
@@ -120,7 +120,7 @@ class Server : public IPCCall {
 
 class Client : public IPCCall {
  private:
-  const mkn::kul::File uuid;
+  mkn::kul::File const uuid;
 
   void start() KTHROW(Exception) {
     fd = open(uuid.full().c_str(), O_WRONLY);

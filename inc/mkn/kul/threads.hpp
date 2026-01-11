@@ -1,5 +1,5 @@
 /**
-Copyright (c) 2024, Philip Deegan.
+Copyright (c) 2026, Philip Deegan.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -69,7 +69,7 @@ class ThreadQueue {
  public:
   ThreadQueue(std::function<void()> const& _func) : th(std::ref(*this)), func(_func) {}
   template <class T>
-  ThreadQueue(const T& t) : th(std::ref(*this)), func(std::bind(&T::operator(), t)) {}
+  ThreadQueue(T const& t) : th(std::ref(*this)), func(std::bind(&T::operator(), t)) {}
   template <class T>
   ThreadQueue(std::reference_wrapper<T> const& ref)
       : th(std::ref(*this)), func(std::bind(&T::operator(), ref)) {}
@@ -100,7 +100,7 @@ class ThreadQueue {
     th.detach();
   }
   void interrupt() KTHROW(mkn::kul::threading::InterruptionException) {}
-  const std::vector<std::exception_ptr> exceptionPointers() { return ePs; }
+  std::vector<std::exception_ptr> const exceptionPointers() { return ePs; }
   bool started() { return s; }
   bool finished() { return f; }
 };
@@ -145,7 +145,7 @@ class PredicatedThreadQueue : public ThreadQueue {
   PredicatedThreadQueue(std::function<void()> const& _func, P& pr)
       : ThreadQueue(_func), p(pr), ps(p.size()) {}
   template <class T>
-  PredicatedThreadQueue(const T& t, P& pr) : ThreadQueue(t), p(pr), ps(p.size()) {}
+  PredicatedThreadQueue(T const& t, P& pr) : ThreadQueue(t), p(pr), ps(p.size()) {}
   template <class T>
   PredicatedThreadQueue(std::reference_wrapper<T> const& ref, P& pr)
       : ThreadQueue(ref), p(pr), ps(p.size()) {}
@@ -157,19 +157,19 @@ class ConcurrentThreadQueue {
 
  protected:
   size_t _cur = 0, _max = 1;
-  const uint64_t m_nWait;
+  uint64_t const m_nWait;
   std::atomic<bool> _block, _detatched, _up;
-  std::queue<std::unique_ptr<std::pair<std::function<F>, std::function<void(const E&)>>>> _q;
+  std::queue<std::unique_ptr<std::pair<std::function<F>, std::function<void(E const&)>>>> _q;
   mkn::kul::hash::map::S2T<std::shared_ptr<mkn::kul::Thread>> _k;
-  mkn::kul::hash::map::S2T<std::function<void(const E&)>> _e;
+  mkn::kul::hash::map::S2T<std::function<void(E const&)>> _e;
 
   mkn::kul::Thread _thread;
   mkn::kul::Mutex _mmutex, _qmutex;
 
-  void _KTHROW(std::exception_ptr const& ep, std::function<void(const E&)> const& func) {
+  void _KTHROW(std::exception_ptr const& ep, std::function<void(E const&)> const& func) {
     try {
       std::rethrow_exception(ep);
-    } catch (const E& e) {
+    } catch (E const& e) {
       func(e);
     }
   }
@@ -271,11 +271,11 @@ class ConcurrentThreadQueue {
   }
 
   bool async(std::function<F>&& function,
-             std::function<void(const E&)>&& exception = std::function<void(const E&)>()) {
+             std::function<void(E const&)>&& exception = std::function<void(E const&)>()) {
     if (_block) return false;
     {
-      auto pair = std::unique_ptr<std::pair<std::function<F>, std::function<void(const E&)>>>(
-          new std::pair<std::function<F>, std::function<void(const E&)>>(function, exception));
+      auto pair = std::unique_ptr<std::pair<std::function<F>, std::function<void(E const&)>>>(
+          new std::pair<std::function<F>, std::function<void(E const&)>>(function, exception));
       mkn::kul::ScopeLock l(_qmutex);
       _q.push(std::move(pair));
     }
@@ -297,7 +297,7 @@ class PoolThread {
   friend class ConcurrentThreadPool;
 
  protected:
-  const uint64_t m_nWait;
+  uint64_t const m_nWait;
   std::atomic<bool> m_ready, m_run;
   std::function<void()> m_function;
   mkn::kul::Mutex _mutex;
@@ -403,8 +403,9 @@ class ConcurrentThreadPool : public ConcurrentThreadQueue<void()> {
   ConcurrentThreadPool& operator=(ConcurrentThreadPool const&&) = delete;
 
  public:
-  template<typename...Args>
-  ConcurrentThreadPool(size_t const& max = 1, bool strt = 0, uint64_t const& nWait = 1000000, Args&&... args)
+  template <typename... Args>
+  ConcurrentThreadPool(size_t const& max = 1, bool strt = 0, uint64_t const& nWait = 1000000,
+                       Args&&... args)
       : ConcurrentThreadQueue(max, 0, nWait) {
     for (size_t i = 0; i < max; ++i) {
       auto n = std::to_string(i);
