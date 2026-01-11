@@ -6,7 +6,7 @@
 #
 
 name: mkn.kul
-
+version: 11_JAN_2026
 parent: lib
 
 profile:
