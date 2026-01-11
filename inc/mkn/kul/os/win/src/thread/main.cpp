@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 std::shared_ptr<void> const hThreadSnapshot(CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0),
                                             CloseHandle);
-if (rawSnapshot == INVALID_HANDLE_VALUE) {
+if (hThreadSnapshot.get() == INVALID_HANDLE_VALUE) {
   DWORD const gle = GetLastError();
   KEXCEPTSTR(mkn::kul::threading::Exception)
       << "CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD) failed, GetLastError=" << gle;
