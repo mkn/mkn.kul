@@ -254,6 +254,7 @@ class ConcurrentThreadQueue {
 
       for (; _cur < _max; _cur++) {
         mkn::kul::ScopeLock l(_qmutex);
+        if (_q.empty()) break;
         auto& f_ptr(_q.front());
         auto& f(*f_ptr.get());
         std::stringstream ss;
@@ -325,6 +326,7 @@ class PoolThread {
 
  public:
   PoolThread(uint64_t const& nWait = 1000000) : m_nWait(nWait), m_ready(1), m_run(1) {}
+
   virtual ~PoolThread() {}
   virtual void operator()() {
     while (m_run) {
@@ -455,8 +457,6 @@ class ConcurrentThreadPool : public ConcurrentThreadQueue<void()> {
         _k[n]->join();
         _e.erase(n);
         _k.erase(n);
-        _p.erase(n);
-        _p.insert(n, std::make_shared<PT>());
         _k.insert(n, std::make_shared<mkn::kul::Thread>(std::ref(*_p[n].get())));
         _k[n]->run();
       }
