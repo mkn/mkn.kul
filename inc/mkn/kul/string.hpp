@@ -34,9 +34,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "mkn/kul/except.hpp"
 
 #include <cmath>
+#include <cctype>
+#include <cerrno>
 #include <string>
 #include <vector>
-#include <string.h>
+#include <cstdint>
+#include <cstdlib>
+#include <cstring>
+#include <sstream>
+#include <utility>
 #include <algorithm>
 #include <unordered_map>
 

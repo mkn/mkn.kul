@@ -155,68 +155,6 @@ template <class F, class E = mkn::kul::Exception>
 class ConcurrentThreadQueue {
   friend class mkn::kul::Thread;
 
- protected:
-  size_t _cur = 0, _max = 1;
-  uint64_t const m_nWait;
-  std::atomic<bool> _block, _detatched, _up;
-  std::queue<std::unique_ptr<std::pair<std::function<F>, std::function<void(E const&)>>>> _q;
-  mkn::kul::hash::map::S2T<std::shared_ptr<mkn::kul::Thread>> _k;
-  mkn::kul::hash::map::S2T<std::function<void(E const&)>> _e;
-
-  mkn::kul::Thread _thread;
-  mkn::kul::Mutex _mmutex, _qmutex;
-
-  void _KTHROW(std::exception_ptr const& ep, std::function<void(E const&)> const& func) {
-    try {
-      std::rethrow_exception(ep);
-    } catch (E const& e) {
-      func(e);
-    }
-  }
-  virtual void operator()() {
-    while (_up) {
-      this_thread::nSleep(m_nWait);
-      {
-        mkn::kul::ScopeLock l(_qmutex);
-        if (_q.empty()) continue;
-      }
-
-      for (; _cur < _max; _cur++) {
-        mkn::kul::ScopeLock l(_qmutex);
-        auto& f_ptr(_q.front());
-        auto& f(*f_ptr.get());
-        std::stringstream ss;
-        ss << &f;
-        auto k(ss.str());
-        _k.insert(k, std::make_shared<mkn::kul::Thread>(f.first));
-        _e.insert(k, f.second);
-        _k[k]->run();
-        _q.pop();
-      }
-
-      mkn::kul::hash::set::String del;
-      for (auto const& t : _k) {
-        if (t.second->finished()) {
-          t.second->join();
-          if (t.second->exception() != std::exception_ptr()) {
-            if (_e.count(t.first))
-              _KTHROW(t.second->exception(), _e[t.first]);
-            else if (!_detatched)
-              std::rethrow_exception(t.second->exception());
-          }
-          del.insert(t.first);
-          _cur--;
-        }
-      }
-      for (auto const& s : del) _k.erase(s) && _e.erase(s);
-    }
-  }
-
-  ConcurrentThreadQueue(ConcurrentThreadQueue const&) = delete;
-  ConcurrentThreadQueue(ConcurrentThreadQueue const&&) = delete;
-  ConcurrentThreadQueue& operator=(ConcurrentThreadQueue const&) = delete;
-  ConcurrentThreadQueue& operator=(ConcurrentThreadQueue const&&) = delete;
-
  public:
   ConcurrentThreadQueue(size_t const& max = 1, bool strt = 0, uint64_t const& nWait = 1000000)
       : _max(max), m_nWait(nWait), _block(0), _detatched(0), _up(0), _thread(std::ref(*this)) {
@@ -287,6 +225,68 @@ class ConcurrentThreadQueue {
   void rethrow() {
     if (_thread.exception()) std::rethrow_exception(_thread.exception());
   }
+
+ protected:
+  size_t _cur = 0, _max = 1;
+  uint64_t const m_nWait;
+  std::atomic<bool> _block, _detatched, _up;
+  std::queue<std::unique_ptr<std::pair<std::function<F>, std::function<void(E const&)>>>> _q;
+  mkn::kul::hash::map::S2T<std::shared_ptr<mkn::kul::Thread>> _k;
+  mkn::kul::hash::map::S2T<std::function<void(E const&)>> _e;
+
+  mkn::kul::Thread _thread;
+  mkn::kul::Mutex _mmutex, _qmutex;
+
+  void _KTHROW(std::exception_ptr const& ep, std::function<void(E const&)> const& func) {
+    try {
+      std::rethrow_exception(ep);
+    } catch (E const& e) {
+      func(e);
+    }
+  }
+  virtual void operator()() {
+    while (_up) {
+      this_thread::nSleep(m_nWait);
+      {
+        mkn::kul::ScopeLock l(_qmutex);
+        if (_q.empty()) continue;
+      }
+
+      for (; _cur < _max; _cur++) {
+        mkn::kul::ScopeLock l(_qmutex);
+        auto& f_ptr(_q.front());
+        auto& f(*f_ptr.get());
+        std::stringstream ss;
+        ss << &f;
+        auto k(ss.str());
+        _k.insert(k, std::make_shared<mkn::kul::Thread>(f.first));
+        _e.insert(k, f.second);
+        _k[k]->run();
+        _q.pop();
+      }
+
+      mkn::kul::hash::set::String del;
+      for (auto const& t : _k) {
+        if (t.second->finished()) {
+          t.second->join();
+          if (t.second->exception() != std::exception_ptr()) {
+            if (_e.count(t.first))
+              _KTHROW(t.second->exception(), _e[t.first]);
+            else if (!_detatched)
+              std::rethrow_exception(t.second->exception());
+          }
+          del.insert(t.first);
+          _cur--;
+        }
+      }
+      for (auto const& s : del) _k.erase(s) && _e.erase(s);
+    }
+  }
+
+  ConcurrentThreadQueue(ConcurrentThreadQueue const&) = delete;
+  ConcurrentThreadQueue(ConcurrentThreadQueue const&&) = delete;
+  ConcurrentThreadQueue& operator=(ConcurrentThreadQueue const&) = delete;
+  ConcurrentThreadQueue& operator=(ConcurrentThreadQueue const&&) = delete;
 };
 
 template <class E, class PT>
@@ -336,72 +336,6 @@ class PoolThread {
 
 template <class E = mkn::kul::Exception, class PT = mkn::kul::PoolThread>
 class ConcurrentThreadPool : public ConcurrentThreadQueue<void()> {
- protected:
-  mkn::kul::hash::map::S2T<std::shared_ptr<PT>> _p;
-
-  virtual bool operate() {
-    bool qEmpty = 0;
-    {
-      mkn::kul::ScopeLock l(_qmutex);
-      qEmpty = _q.empty();
-    }
-    if (!qEmpty) {
-      mkn::kul::ScopeLock l(_qmutex);
-      for (size_t i = 0; i < _max; i++) {
-        auto const n = std::to_string(i);
-        auto& f_ptr(_q.front());
-        auto& f(*f_ptr.get());
-        if (!_p[n]->if_ready_set(f.first)) continue;
-        _e[n] = f.second;
-        _q.pop();
-        if (_q.empty()) break;
-      }
-    }
-
-    std::vector<std::string> del;
-    {
-      if (!_up) return false;
-      mkn::kul::ScopeLock l(_mmutex);
-      for (auto const& t : _k) {
-        if (t.second->started() && t.second->finished()) {
-          if (t.second->exception() != std::exception_ptr()) {
-            if (_e.count(t.first))
-              _KTHROW(t.second->exception(), _e[t.first]);
-            else if (!_detatched)
-              std::rethrow_exception(t.second->exception());
-            del.push_back(t.first);
-            _p[t.first]->stop();
-          }
-        }
-      }
-    }
-    {
-      mkn::kul::ScopeLock l(_mmutex);
-      if (!_up) return false;
-      for (auto const& n : del) {
-        _k[n]->join();
-        _e.erase(n);
-        _k.erase(n);
-        _p.erase(n);
-        _p.insert(n, std::make_shared<PT>());
-        _k.insert(n, std::make_shared<mkn::kul::Thread>(std::ref(*_p[n].get())));
-        _k[n]->run();
-      }
-    }
-    return qEmpty;
-  }
-  virtual void operator()() override {
-    while (_up) {
-      this_thread::nSleep(m_nWait);
-      operate();
-    }
-  }
-
-  ConcurrentThreadPool(ConcurrentThreadPool const&) = delete;
-  ConcurrentThreadPool(ConcurrentThreadPool const&&) = delete;
-  ConcurrentThreadPool& operator=(ConcurrentThreadPool const&) = delete;
-  ConcurrentThreadPool& operator=(ConcurrentThreadPool const&&) = delete;
-
  public:
   template <typename... Args>
   ConcurrentThreadPool(size_t const& max = 1, bool strt = 0, uint64_t const& nWait = 1000000,
@@ -474,12 +408,75 @@ class ConcurrentThreadPool : public ConcurrentThreadQueue<void()> {
     }
     return *this;
   }
+
+ protected:
+  mkn::kul::hash::map::S2T<std::shared_ptr<PT>> _p;
+
+  virtual bool operate() {
+    bool qEmpty = 0;
+    {
+      mkn::kul::ScopeLock l(_qmutex);
+      qEmpty = _q.empty();
+    }
+    if (!qEmpty) {
+      mkn::kul::ScopeLock l(_qmutex);
+      for (size_t i = 0; i < _max; i++) {
+        auto const n = std::to_string(i);
+        auto& f_ptr(_q.front());
+        auto& f(*f_ptr.get());
+        if (!_p[n]->if_ready_set(f.first)) continue;
+        _e[n] = f.second;
+        _q.pop();
+        if (_q.empty()) break;
+      }
+    }
+
+    std::vector<std::string> del;
+    {
+      if (!_up) return false;
+      mkn::kul::ScopeLock l(_mmutex);
+      for (auto const& t : _k) {
+        if (t.second->started() && t.second->finished()) {
+          if (t.second->exception() != std::exception_ptr()) {
+            if (_e.count(t.first))
+              _KTHROW(t.second->exception(), _e[t.first]);
+            else if (!_detatched)
+              std::rethrow_exception(t.second->exception());
+            del.push_back(t.first);
+            _p[t.first]->stop();
+          }
+        }
+      }
+    }
+    {
+      mkn::kul::ScopeLock l(_mmutex);
+      if (!_up) return false;
+      for (auto const& n : del) {
+        _k[n]->join();
+        _e.erase(n);
+        _k.erase(n);
+        _p.erase(n);
+        _p.insert(n, std::make_shared<PT>());
+        _k.insert(n, std::make_shared<mkn::kul::Thread>(std::ref(*_p[n].get())));
+        _k[n]->run();
+      }
+    }
+    return qEmpty;
+  }
+  virtual void operator()() override {
+    while (_up) {
+      this_thread::nSleep(m_nWait);
+      operate();
+    }
+  }
+
+  ConcurrentThreadPool(ConcurrentThreadPool const&) = delete;
+  ConcurrentThreadPool(ConcurrentThreadPool const&&) = delete;
+  ConcurrentThreadPool& operator=(ConcurrentThreadPool const&) = delete;
+  ConcurrentThreadPool& operator=(ConcurrentThreadPool const&&) = delete;
 };
 
 class AutoChronPoolThread : public PoolThread {
- protected:
-  uint64_t m_scale = 0;
-
  public:
   AutoChronPoolThread(uint64_t const& nWait = 1000000, uint64_t const& scale = 1000)
       : PoolThread(nWait), m_scale(scale) {
@@ -496,18 +493,13 @@ class AutoChronPoolThread : public PoolThread {
       nWait = (m_nWait / (m_scale / (fails + 1)));
     }
   }
+
+ protected:
+  uint64_t m_scale = 0;
 };
 
 template <class E = mkn::kul::Exception>
 class ChroncurrentThreadPool : public ConcurrentThreadPool<void(), AutoChronPoolThread> {
- protected:
-  uint64_t m_scale = 0;
-
-  ChroncurrentThreadPool(ChroncurrentThreadPool const&) = delete;
-  ChroncurrentThreadPool(ChroncurrentThreadPool&&) = delete;
-  ChroncurrentThreadPool& operator=(ChroncurrentThreadPool const&) = delete;
-  ChroncurrentThreadPool& operator=(ChroncurrentThreadPool&&) = delete;
-
  public:
   ChroncurrentThreadPool(size_t const& max = 1, bool strt = 0, uint64_t const& nWait = 1000000,
                          uint64_t const& scale = 1000)
@@ -526,6 +518,14 @@ class ChroncurrentThreadPool : public ConcurrentThreadPool<void(), AutoChronPool
       nWait = (m_nWait / (m_scale / (fails + 1)));
     }
   }
+
+ protected:
+  uint64_t m_scale = 0;
+
+  ChroncurrentThreadPool(ChroncurrentThreadPool const&) = delete;
+  ChroncurrentThreadPool(ChroncurrentThreadPool&&) = delete;
+  ChroncurrentThreadPool& operator=(ChroncurrentThreadPool const&) = delete;
+  ChroncurrentThreadPool& operator=(ChroncurrentThreadPool&&) = delete;
 };
 
 }  // namespace kul

@@ -35,7 +35,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <tuple>
 #include <vector>
 #include <utility>
-#include <cstdint>
 #include <cassert>
 #include <algorithm>
 #include <stdexcept>
@@ -103,7 +102,7 @@ enum class for_N_R_mode {
   forward_tuple,
 };
 
-template <std::uint16_t N, auto M = for_N_R_mode::make_tuple, typename Fn>
+template <std::size_t N, auto M = for_N_R_mode::make_tuple, typename Fn>
 constexpr auto for_N(Fn& fn) {
   /*  // how to use
       for_N<2>([](auto ic) {
@@ -114,7 +113,7 @@ constexpr auto for_N(Fn& fn) {
 
   static_assert(std::is_same_v<decltype(M), for_N_R_mode>);
   using return_type =
-      std::decay_t<std::invoke_result_t<Fn, std::integral_constant<std::uint16_t, 0>>>;
+      std::decay_t<std::invoke_result_t<Fn, std::integral_constant<std::size_t, 0>>>;
   constexpr bool returns = !std::is_same_v<return_type, void>;
 
   if constexpr (returns) {
@@ -134,22 +133,22 @@ constexpr auto for_N(Fn& fn) {
     std::apply([&](auto... ics) { (fn(ics), ...); }, apply_N<N>(Apply{}));
 }
 
-template <std::uint16_t N, auto M = for_N_R_mode::make_tuple, typename Fn>
+template <std::size_t N, auto M = for_N_R_mode::make_tuple, typename Fn>
 constexpr auto for_N(Fn&& fn) {
   return for_N<N, M>(fn);
 }
 
-template <std::uint16_t N, typename Fn>
+template <std::size_t N, typename Fn>
 constexpr auto for_N_make_array(Fn&& fn) {
   return for_N<N, for_N_R_mode::make_array>(fn);
 }
 
-template <std::uint16_t N, typename Fn>
+template <std::size_t N, typename Fn>
 constexpr auto for_N_all(Fn&& fn) {
   return all(for_N<N, for_N_R_mode::make_array>(fn));
 }
 
-template <std::uint16_t N, typename Fn>
+template <std::size_t N, typename Fn>
 constexpr auto for_N_any(Fn&& fn) {
   return any(for_N<N, for_N_R_mode::make_array>(fn));
 }

@@ -36,7 +36,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 HANDLE const rawSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0);
 if (rawSnapshot == INVALID_HANDLE_VALUE)
-  KEXCEPT(mkn::kul::threading::Exception, "GetMainThreadId failed");
+  KEXCEPTSTR(mkn::kul::threading::Exception)
+      << "CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD) failed, GetLastError=" << GetLastError();
 std::shared_ptr<void> const hThreadSnapshot(rawSnapshot, CloseHandle);
 THREADENTRY32 tEntry;
 tEntry.dwSize = sizeof(THREADENTRY32);
