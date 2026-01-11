@@ -35,7 +35,7 @@ dot(size_t const n, T const* x, K const* y) {
 
 template <typename T, typename K, typename Y = T>
 static inline typename std::enable_if<std::is_same<T, float>::value>::type scale(
-    size_t const n, std::atomic<K> const alpha, T* x) {
+    size_t const n, std::atomic<K> const& alpha, T* x) {
   cblas_sscal(n, alpha.load(), x, 1);
 }
 template <typename T, typename K, typename Y = T>
@@ -47,7 +47,7 @@ static inline typename std::enable_if<std::is_same<T, float>::value>::type scale
 
 template <typename T, typename K, typename Y = T>
 static inline typename std::enable_if<std::is_same<T, double>::value>::type scale(
-    size_t const n, std::atomic<K> const alpha, T* x) {
+    size_t const n, std::atomic<K> const& alpha, T* x) {
   cblas_dscal(n, alpha.load(), x, 1);
 }
 template <typename T, typename K, typename Y = T>

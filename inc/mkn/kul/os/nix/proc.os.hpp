@@ -33,9 +33,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _MKN_KUL_OS_NIX_PROC_OS_HPP_
 #define _MKN_KUL_OS_NIX_PROC_OS_HPP_
 
-#include <cassert>
+#include <cstdio>
 #include <cstdint>
 #include <fcntl.h>
+#include <cstring>
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/wait.h>

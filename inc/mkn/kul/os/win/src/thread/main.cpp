@@ -35,9 +35,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // bool mkn::kul::this_thread::main(){
 
 HANDLE const rawSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0);
-if (rawSnapshot == INVALID_HANDLE_VALUE)
+if (rawSnapshot == INVALID_HANDLE_VALUE) {
+  DWORD const gle = GetLastError();
   KEXCEPTSTR(mkn::kul::threading::Exception)
-      << "CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD) failed, GetLastError=" << GetLastError();
+      << "CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD) failed, GetLastError=" << gle;
+}
 std::shared_ptr<void> const hThreadSnapshot(rawSnapshot, CloseHandle);
 THREADENTRY32 tEntry;
 tEntry.dwSize = sizeof(THREADENTRY32);

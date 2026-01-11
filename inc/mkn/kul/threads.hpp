@@ -100,7 +100,7 @@ class ThreadQueue {
     th.detach();
   }
   void interrupt() KTHROW(mkn::kul::threading::InterruptionException) {}
-  std::vector<std::exception_ptr> const exceptionPointers() { return ePs; }
+  std::vector<std::exception_ptr> const& exceptionPointers() const { return ePs; }
   bool started() { return s; }
   bool finished() { return f; }
 };

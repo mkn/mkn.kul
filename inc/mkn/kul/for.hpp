@@ -39,6 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <algorithm>
 #include <stdexcept>
 #include <type_traits>
+#include "mkn/kul/except.hpp"
 
 namespace mkn::kul {
 
@@ -155,7 +156,9 @@ constexpr auto for_N_any(Fn&& fn) {
 
 template <typename F>
 auto generate_from(F&& f, std::size_t const from, std::size_t const to) {
-  assert(from <= to);
+  if (from > to)
+    KEXCEPTION(
+        "RuntimeError: mkn::kul::generate_from(F&&, from, to) - 'from' must be less than 'to'");
   using value_type = std::decay_t<std::invoke_result_t<F&, std::size_t const&>>;
   std::vector<value_type> v;
   std::size_t count = to - from;
@@ -171,7 +174,7 @@ auto generate_from(F&& f, std::size_t const count) {
 
 template <typename Type, typename F, typename Container>
 auto _generate_container_from(F&& f, Container& container) {
-  using value_type = std::decay_t<std::invoke_result_t<F, Type>>;
+  using value_type = std::decay_t<std::invoke_result_t<F&, Type>>;
   std::vector<value_type> vec;
   vec.reserve(container.size());
   for (auto& v : container) vec.emplace_back(f(v));
