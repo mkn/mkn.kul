@@ -30,22 +30,48 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 // IWYU pragma: private, include "mkn/kul/cli.hpp"
 
+namespace {
+//
+std::size_t sub_string_to_next_occurrence(std::string const& cmd, std::size_t const s,
+                                          std::string const& needle) {
+  std::string const rest = cmd.substr(s);
+  auto const pos = rest.find(needle);
+  if (pos == std::string::npos)
+    KEXCEPT(mkn::kul::Exception, "Error: CLI Arg parsing unclosed quotes!");
+  return pos;
+}
+
+}  // namespace
+
 void mkn::kul::cli::asArgs(std::string const& cmd, std::vector<std::string>& args) {
   std::string arg;
   bool openQuotesS = false, openQuotesD = false, backSlashed = false;
-  for (char const c : cmd) {
+
+  for (std::size_t i = 0; i < cmd.size(); ++i) {
+    auto const c = cmd[i];
+
     if (backSlashed) {
       backSlashed = false;
       arg += c;
       continue;
+
+    } else if (openQuotesD) {
+      auto const pos = sub_string_to_next_occurrence(cmd, i, "\"");
+      arg = cmd.substr(i, pos);
+      if (arg.size() > 0) args.push_back(arg);
+      i += arg.size();
+      arg.clear();
+      openQuotesD = false;
+      continue;
     }
+
     switch (c) {
       case ' ':
-        if (!openQuotesD && !openQuotesS) {         //     ||||| ||||| ||||| ||||| |||||
-          if (arg.size() > 0) args.push_back(arg);  //     ||    || || || || ||    ||
-          arg.clear();                              //     ||||| ||||| ||||| ||    |||||
-          continue;                                 //        || ||    || || ||    ||
-        }                                           //     ||||| ||    || || ||||| |||||
+        if (!openQuotesD && !openQuotesS) {
+          if (arg.size() > 0) args.push_back(arg);
+          arg.clear();
+          continue;
+        }
         break;
       case '"':
         if (openQuotesD && !openQuotesS) {
