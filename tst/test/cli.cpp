@@ -22,3 +22,11 @@ TEST(CLI_Test, ParseCommandPythonExample) {
   EXPECT_EQ("-c", v[1]);
   EXPECT_EQ("import sys; print('lol ' + dir(sys)", v[2]);
 }
+
+TEST(CLI_Test, ParseWeirdPythonExample) {
+  std::vector<std::string> v = mkn::kul::cli::asArgs("python3 -c lol\"import sys\"lol");
+  ASSERT_EQ(3ull, v.size());
+  EXPECT_EQ("python3", v[0]);
+  EXPECT_EQ("-c", v[1]);
+  EXPECT_EQ("lolimport syslol", v[2]);
+}

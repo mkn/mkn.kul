@@ -38,7 +38,7 @@ std::size_t sub_string_to_next_occurrence(std::string const& cmd, std::size_t co
   auto const pos = rest.find(needle);
   if (pos == std::string::npos)
     KEXCEPT(mkn::kul::Exception, "Error: CLI Arg parsing unclosed quotes!");
-  return pos;
+  return pos + s;
 }
 
 }  // namespace
@@ -57,10 +57,8 @@ void mkn::kul::cli::asArgs(std::string const& cmd, std::vector<std::string>& arg
 
     } else if (openQuotesD) {
       auto const pos = sub_string_to_next_occurrence(cmd, i, "\"");
-      arg = cmd.substr(i, pos);
-      if (arg.size() > 0) args.push_back(arg);
-      i += arg.size();
-      arg.clear();
+      arg += cmd.substr(i, pos - i);
+      i = pos;
       openQuotesD = false;
       continue;
     }
