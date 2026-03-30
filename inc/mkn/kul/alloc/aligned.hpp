@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _MKN_KUL_ALLOC_ALIGNED_HPP_
 #define _MKN_KUL_ALLOC_ALIGNED_HPP_
 
+#include "mkn/kul/defs.hpp"
 #include "mkn/kul/alloc/base.hpp"
 
 #include <new>
