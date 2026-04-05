@@ -31,8 +31,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _MKN_KUL_DEFS_HPP_
 #define _MKN_KUL_DEFS_HPP_
 
-#define KSTRINGIFY(x) #x
-#define KTOSTRING(x) KSTRINGIFY(x)
+#define _MKN_KUL_STR(x) #x
+#define MKN_KUL_STR(x) _MKN_KUL_STR(x)
+#define _MKN_KUL_STR_CAT(x, y) x##y
+#define MKN_KUL_STR_CAT(x, y) _MKN_KUL_STR_CAT(x, y)
 
 #ifdef MKN_KUL_SHARED
 #if defined _WIN32 || defined __CYGWIN__

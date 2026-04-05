@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _MKN_KUL_DBG_HPP_
 
 #include "mkn/kul/log.hpp"
+#include "mkn/kul/defs.hpp"
 
 namespace mkn {
 namespace kul {
@@ -65,24 +66,17 @@ class StackTrace {
 #define MKN_KUL_STACK_TRACE return mkn::kul::dbg::StackTrace(__PRETTY_FUNCTION__)
 #endif  // MKN_KUL_STACK_TRACE
 
+#ifndef MKN_KUL_LOG_SCOPE
+#define MKN_KUL_LOG_SCOPE(s)                                              \
+  mkn::kul::dbg::FunctionScope MKN_KUL_STR_CAT(_mkn_dbg_scope, __LINE__)( \
+      __FILE__, std::string{__func__} + ":" + s, __LINE__)
+#endif  // MKN_KUL_LOG_SCOPE
+
 #ifndef MKN_KUL_DBG_FUNC_ENTER
-#define MKN_KUL_DBG_FUNC_ENTER \
-  mkn::kul::dbg::FunctionScope s_dbg_functionScopeDBG(__FILE__, __func__, __LINE__)
+#define MKN_KUL_DBG_FUNC_ENTER                                                                \
+  mkn::kul::dbg::FunctionScope MKN_KUL_STR_CAT(_mkn_func_scope, __LINE__)(__FILE__, __func__, \
+                                                                          __LINE__)
 #endif  // MKN_KUL_DBG_FUNC_ENTER
-
-#ifndef MKN_KUL_DBG_FUNC_ON_ENTER
-#define MKN_KUL_DBG_FUNC_ON_ENTER                                                               \
-  KOUT(INF) << mkn::kul::LogMan::INSTANCE().str(m_fi, m_fu, m_li, mkn::kul::log::mode::INF, "", \
-                                                "[%M]: %T - %D : %F:%L fn(%N)")                 \
-            << " - ENTERED";
-#endif  // MKN_KUL_DBG_FUNC_ON_ENTER
-
-#ifndef MKN_KUL_DBG_FUNC_ON_EXIT
-#define MKN_KUL_DBG_FUNC_ON_EXIT                                                                \
-  KOUT(INF) << mkn::kul::LogMan::INSTANCE().str(m_fi, m_fu, m_li, mkn::kul::log::mode::INF, "", \
-                                                "[%M]: %T - %D : %F:%L fn(%N)")                 \
-            << " - Function time: " << (mkn::kul::Now::MICROS() - m_start) << " μs"
-#endif  // MKN_KUL_DBG_FUNC_ON_EXIT
 
 #else  //
 
@@ -90,26 +84,35 @@ class StackTrace {
 #define MKN_KUL_TRACE_OR_VOID void
 #define MKN_KUL_STACK_TRACE
 #define MKN_KUL_DBG_FUNC_ENTER
-#define MKN_KUL_DBG_FUNC_ON_ENTER
-#define MKN_KUL_DBG_FUNC_ON_EXIT
+#define MKN_KUL_LOG_SCOPE(...)
 
 #endif  // defined(MKN_KUL_FORCE_TRACE) || !defined(NDEBUG)
+
+#if __MKN_KUL_TRACE__
 
 class FunctionScope {
- private:
-#if defined(MKN_KUL_FORCE_TRACE) || !defined(NDEBUG)
-  uint64_t m_start = 0, m_li = 0;
-  char const *m_fi = nullptr, *m_fu = nullptr;
-#endif  // defined(MKN_KUL_FORCE_TRACE) || !defined(NDEBUG)
  public:
-#if defined(MKN_KUL_FORCE_TRACE) || !defined(NDEBUG)
-  FunctionScope(char const* fi, char const* fu, uint16_t const& li)
+  FunctionScope(char const* fi, std::string const& fu, uint16_t const& li)
       : m_start(mkn::kul::Now::MICROS()), m_li(li), m_fi(fi), m_fu(fu) {
-    MKN_KUL_DBG_FUNC_ON_ENTER;
+#if MKN_KUL_TRACE_SHOW_ENTRY
+    KOUT(INF) << mkn::kul::LogMan::INSTANCE().str(
+        m_fi, m_fu.c_str(), m_li, mkn::kul::log::mode::INF, "", "[%M]: %T - %D : %F:%L fn(%N)");
+#endif
   }
-#endif  // defined(MKN_KUL_FORCE_TRACE) || !defined(NDEBUG)
-  ~FunctionScope() { MKN_KUL_DBG_FUNC_ON_EXIT; }
+  ~FunctionScope() {
+    KOUT(INF) << mkn::kul::LogMan::INSTANCE().str(m_fi, m_fu.c_str(), m_li,
+                                                  mkn::kul::log::mode::INF, "",
+                                                  "[%M]: %T - %D : %F:%L fn(%N)")
+              << " - Function time: " << (mkn::kul::Now::MICROS() - m_start) << " μs";
+  }
+
+ private:
+  uint64_t m_start = 0, m_li = 0;
+  char const* m_fi = nullptr;
+  std::string m_fu;
 };
+
+#endif  // __MKN_KUL_TRACE__
 
 }  // namespace dbg
 }  // namespace kul
