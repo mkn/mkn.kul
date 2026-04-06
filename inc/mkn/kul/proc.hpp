@@ -31,6 +31,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _MKN_KUL_PROC_HPP_
 #define _MKN_KUL_PROC_HPP_
 
+#ifndef _MKN_KUL_PROC_LOOP_NSLEEP_
+#define _MKN_KUL_PROC_LOOP_NSLEEP_ 1000000
+#endif /* _MKN_KUL_PROC_LOOP_NSLEEP_ */
+
 #include "mkn/kul/os.hpp"
 #include "mkn/kul/cli.hpp"
 #include "mkn/kul/log.hpp"  // IWYU pragma: keep
