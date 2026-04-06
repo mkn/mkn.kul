@@ -29,6 +29,10 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#ifndef _MKN_KUL_PROC_LOOP_NSLEEP_
+#error  // define as 0 to disable
+#endif
+
 // This file is included by other files and is not in itself syntactically
 // correct.
 
@@ -166,7 +170,7 @@ if (this->waitForExit()) {
   bSuccess = FALSE;
   bool alive = true;
   do {
-#if defined(_MKN_KUL_PROC_LOOP_NSLEEP_) && (_MKN_KUL_PROC_LOOP_NSLEEP_ > 0)
+#if _MKN_KUL_PROC_LOOP_NSLEEP_
     mkn::kul::this_thread::nSleep(_MKN_KUL_PROC_LOOP_NSLEEP_);
 #endif
     alive = WaitForSingleObject(piProcInfo.hProcess, 11) == WAIT_TIMEOUT;

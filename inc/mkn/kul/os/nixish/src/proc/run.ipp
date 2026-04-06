@@ -30,6 +30,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 // IWYU pragma: private, include "mkn/kul/proc.hpp"
 
+#ifndef _MKN_KUL_PROC_LOOP_NSLEEP_
+#error  // define as 0 to disable
+#endif
+
 void mkn::kul::Process::run() KTHROW(mkn::kul::proc::Exception) {
   {
     int16_t ret = 0;
@@ -66,14 +70,14 @@ void mkn::kul::Process::run() KTHROW(mkn::kul::proc::Exception) {
       char cOut[30024] = {'\0'};
       char cErr[30024] = {'\0'};
       do {
-#if defined(_MKN_KUL_PROC_LOOP_NSLEEP_) && (_MKN_KUL_PROC_LOOP_NSLEEP_ > 0)
+#if _MKN_KUL_PROC_LOOP_NSLEEP_
         mkn::kul::this_thread::nSleep(_MKN_KUL_PROC_LOOP_NSLEEP_);
 #endif
         alive = ::kill(pid(), 0) == 0;
         if (FD_ISSET(popPip[1], &childOutFds)) {
           bool b = 0;
           do {
-#if defined(_MKN_KUL_PROC_LOOP_NSLEEP_) && (_MKN_KUL_PROC_LOOP_NSLEEP_ > 0)
+#if _MKN_KUL_PROC_LOOP_NSLEEP_
             mkn::kul::this_thread::nSleep(_MKN_KUL_PROC_LOOP_NSLEEP_);
 #endif
 
@@ -93,7 +97,7 @@ void mkn::kul::Process::run() KTHROW(mkn::kul::proc::Exception) {
         if (FD_ISSET(popPip[2], &childOutFds)) {
           bool b = 0;
           do {
-#if defined(_MKN_KUL_PROC_LOOP_NSLEEP_) && (_MKN_KUL_PROC_LOOP_NSLEEP_ > 0)
+#if _MKN_KUL_PROC_LOOP_NSLEEP_
             mkn::kul::this_thread::nSleep(_MKN_KUL_PROC_LOOP_NSLEEP_);
 #endif
 
