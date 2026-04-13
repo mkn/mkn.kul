@@ -95,13 +95,13 @@ class FunctionScope {
   FunctionScope(char const* fi, std::string const& fu, uint16_t const& li)
       : m_start(mkn::kul::Now::MICROS()), m_li(li), m_fi(fi), m_fu(fu) {
 #if MKN_KUL_TRACE_SHOW_ENTRY
-    KOUT(INF) << mkn::kul::LogMan::INSTANCE().str(
-        m_fi, m_fu.c_str(), m_li, mkn::kul::log::mode::INF, "", "[%M]: %T - %D : %F:%L fn(%N)");
+    KOUT(TRC) << mkn::kul::LogMan::INSTANCE().str(
+        m_fi, m_fu.c_str(), m_li, mkn::kul::log::mode::TRC, "", "[%M]: %T - %D : %F:%L fn(%N)");
 #endif
   }
   ~FunctionScope() {
-    KOUT(INF) << mkn::kul::LogMan::INSTANCE().str(m_fi, m_fu.c_str(), m_li,
-                                                  mkn::kul::log::mode::INF, "",
+    KOUT(TRC) << mkn::kul::LogMan::INSTANCE().str(m_fi, m_fu.c_str(), m_li,
+                                                  mkn::kul::log::mode::TRC, "",
                                                   "[%M]: %T - %D : %F:%L fn(%N)")
               << " - Function time: " << (mkn::kul::Now::MICROS() - m_start) << " μs";
   }
