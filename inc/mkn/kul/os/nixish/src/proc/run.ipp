@@ -30,8 +30,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 // IWYU pragma: private, include "mkn/kul/proc.hpp"
 
+#include "mkn/kul/defs.hpp"
 #ifndef _MKN_KUL_PROC_LOOP_NSLEEP_
 #error  // define as 0 to disable
+#endif
+
+#ifndef __MKN_KUL_PROCESS_BUFFER__
+#define __MKN_KUL_PROCESS_BUFFER__ 64000
 #endif
 
 void mkn::kul::Process::run() KTHROW(mkn::kul::proc::Exception) {
@@ -67,8 +72,8 @@ void mkn::kul::Process::run() KTHROW(mkn::kul::proc::Exception) {
       close(inFd[1]);
       bool alive = true;
 
-      char cOut[30024] = {'\0'};
-      char cErr[30024] = {'\0'};
+      char cOut[__MKN_KUL_PROCESS_BUFFER__] = {'\0'};
+      char cErr[__MKN_KUL_PROCESS_BUFFER__] = {'\0'};
       do {
 #if _MKN_KUL_PROC_LOOP_NSLEEP_
         mkn::kul::this_thread::nSleep(_MKN_KUL_PROC_LOOP_NSLEEP_);
@@ -82,7 +87,9 @@ void mkn::kul::Process::run() KTHROW(mkn::kul::proc::Exception) {
 #endif
 
             memset(cOut, 0, sizeof(cOut));
-            ret = recall(read(popPip[1], cOut, sizeof(cOut)));
+            ret = recall(read(popPip[1], cOut, sizeof(cOut) - 1));
+            if (ret >= __MKN_KUL_PROCESS_BUFFER__)
+              error(__LINE__, "ret >= __MKN_KUL_PROCESS_BUFFER__: " + std::to_string(ret));
             cOut[ret > 0 ? ret : 0] = 0;
             if (ret < 0) {
               if (b && ((errno != EAGAIN) || (errno != EWOULDBLOCK)))
@@ -102,7 +109,9 @@ void mkn::kul::Process::run() KTHROW(mkn::kul::proc::Exception) {
 #endif
 
             memset(cErr, 0, sizeof(cErr));
-            ret = recall(read(popPip[2], cErr, sizeof(cErr)));
+            ret = recall(read(popPip[2], cErr, sizeof(cErr) - 1));
+            if (ret >= __MKN_KUL_PROCESS_BUFFER__)
+              error(__LINE__, "ret >= __MKN_KUL_PROCESS_BUFFER__: " + std::to_string(ret));
             cErr[ret > 0 ? ret : 0] = 0;
             if (ret < 0) {
               if (b && ((errno != EAGAIN) || (errno != EWOULDBLOCK)))
