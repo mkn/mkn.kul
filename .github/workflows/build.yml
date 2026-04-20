@@ -1,4 +1,4 @@
-name: windows-latest
+name: build
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -11,7 +11,29 @@ on:
     branches: [ master ]
 
 jobs:
-  build:
+  ubuntu:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: "Build/Test"
+      run: |
+        curl -fL --retry 3 --retry-delay 2 -o mkn https://github.com/mkn/mkn/releases/download/latest/mkn_nix
+        chmod +x mkn
+        KLOG=3 ./mkn clean build run -dtOp test,usage -a "-std=c++20 -fPIC" -W 9
+
+  macos:
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: "Build/Test"
+      run: |
+        curl -fL --retry 3 --retry-delay 2 -o mkn https://github.com/mkn/mkn/releases/download/latest/mkn_arm_osx
+        chmod +x mkn
+        KLOG=3 ./mkn clean build run -dtOp test,usage -a "-std=c++20 -fPIC" -W 9
+
+  windows:
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v4

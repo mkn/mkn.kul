@@ -41,7 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 void mkn::kul::Process::run() KTHROW(mkn::kul::proc::Exception) {
   {
-    int16_t ret = 0;
+    int32_t ret = 0;
     if ((ret = pipe(inFd)) < 0) error(__LINE__, "Failed to pipe in");
     if ((ret = pipe(outFd)) < 0) error(__LINE__, "Failed to pipe out");
     if ((ret = pipe(errFd)) < 0) error(__LINE__, "Failed to pipe err");
@@ -50,7 +50,7 @@ void mkn::kul::Process::run() KTHROW(mkn::kul::proc::Exception) {
   this->preStart();
   pid(fork());
   if (pid() > 0) {
-    int16_t ret = 0;
+    int32_t ret = 0;
     if (this->waitForExit()) {  // parent
       popPip[0] = inFd[1];
       popPip[1] = outFd[0];
@@ -134,21 +134,21 @@ void mkn::kul::Process::run() KTHROW(mkn::kul::proc::Exception) {
     close(errFd[0]);
 
     int16_t ret = 0;  // check rets
-    int8_t retry = __MKN_KUL_PROC_DUP_RETRY__;
+    int16_t retry = __MKN_KUL_PROC_DUP_RETRY__;
     if (retry < 1) retry = 1;
 
     close(0);
-    for (uint8_t i = 0; i < retry; i++)
+    for (uint16_t i = 0; i < retry; ++i)
       if ((ret = dup(inFd[0])) >= 0) break;
     if (ret < 0) error(__LINE__, "dup in call failed");
 
     close(1);
-    for (uint8_t i = 0; i < retry; i++)
+    for (uint16_t i = 0; i < retry; ++i)
       if ((ret = dup(outFd[1])) >= 0) break;
     if (ret < 0) error(__LINE__, "dup out call failed");
 
     close(2);
-    for (uint8_t i = 0; i < retry; i++)
+    for (uint16_t i = 0; i < retry; ++i)
       if ((ret = dup(errFd[1])) >= 0) break;
     if (ret < 0) error(__LINE__, "dup err call failed");
 
