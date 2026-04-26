@@ -84,15 +84,19 @@ class Git : public SCM {
     mkn::kul::ProcessCapture pc(p);
     p << "ls-remote"
       << "--symref" << repo << "HEAD";
-    ;
     try {
-      KLOG(DBG) << mkn::kul::String::LINES(pc.outs())[0];
+      KLOG(TRC) << p;
       p.start();
     } catch (mkn::kul::proc::ExitException const& e) {
       KEXCEPT(Exception, "SCM ERROR - Checking local branch") << p.toString();
     }
-    auto ret = mkn::kul::String::SPLIT(mkn::kul::String::LINES(pc.outs())[0], "/").back();
-    return ret.substr(0, ret.size() - 5);  // HEAD+tab
+    auto const lines = mkn::kul::String::LINES(pc.outs());
+    if (lines.empty()) return {};
+    KLOG(TRC) << lines[0];
+    // "ref: refs/heads/master\tHEAD" -> "master"
+    auto ret = mkn::kul::String::SPLIT(lines[0], "/").back();
+    auto const tab = ret.find('\t');
+    return tab != std::string::npos ? ret.substr(0, tab) : ret;
     // e.g. git ls-remote --symref git@github.com:user/repo HEAD
   };
 
