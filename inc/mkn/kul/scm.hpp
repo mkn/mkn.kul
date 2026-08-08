@@ -75,8 +75,8 @@ class SCM {
   virtual std::string defaultRemoteBranch(std::string const& repo) const = 0;
 };
 
-// review https://gist.github.com/aleksey-bykov/1273f4982c317c92d532
 namespace scm {
+
 class Git : public SCM {
  public:
   std::string defaultRemoteBranch(std::string const& repo) const override {
@@ -85,14 +85,12 @@ class Git : public SCM {
     p << "ls-remote"
       << "--symref" << repo << "HEAD";
     try {
-      KLOG(TRC) << p;
       p.start();
     } catch (mkn::kul::proc::ExitException const& e) {
       KEXCEPT(Exception, "SCM ERROR - Checking local branch") << p.toString();
     }
     auto const lines = mkn::kul::String::LINES(pc.outs());
     if (lines.empty()) return {};
-    KLOG(TRC) << lines[0];
     // "ref: refs/heads/master\tHEAD" -> "master"
     auto ret = mkn::kul::String::SPLIT(lines[0], "/").back();
     auto const tab = ret.find('\t');

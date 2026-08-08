@@ -205,7 +205,9 @@ class File : public fs::Item {
 
  public:
   File() : _n(), _d() {}
-  File(std::string const& n, bool m = false) : _n(Dir::LOCL(n)), _d(env::CWD()) {
+  File(std::string const& n, bool m = false) : _n(Dir::LOCL(n)) {
+    // _d starts empty so is() stats _n as-given (Dir::join returns it unprefixed),
+    // correctly resolving both absolute and CWD-relative input before any CWD default is applied.
     if (is()) {
       try {
         this->_n = Dir::REAL(this->_n);
@@ -213,13 +215,13 @@ class File : public fs::Item {
         this->_n = this->_n.substr(_d.path().size() + 1);
       } catch (mkn::kul::fs::Exception const& e) {
       }
+    } else if (n.find(Dir::SEP()) != std::string::npos) {
+      this->_d = Dir(n.substr(0, n.rfind(Dir::SEP())));
+      this->_n = this->_n.substr(n.rfind(Dir::SEP()) + 1);
+    } else if (auto const& _N = Dir::REAL_OR_NULL(this->_n)) {
+      this->_d = Dir(Dir::PRNT(*_N), m);
     } else {
-      if (n.find(Dir::SEP()) != std::string::npos) {
-        this->_d = Dir(n.substr(0, n.rfind(Dir::SEP())));
-        this->_n = this->_n.substr(n.rfind(Dir::SEP()) + 1);
-      } else {
-        if (auto const& _N = Dir::REAL_OR_NULL(this->_n)) this->_d = Dir(Dir::PRNT(*_N), m);
-      }
+      this->_d = Dir(env::CWD());
     }
   }
   File(char const* n, bool m = false) : File(std::string(n), m) {}
