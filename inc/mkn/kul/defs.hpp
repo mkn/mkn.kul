@@ -67,6 +67,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define MKN_KUL_PRIVATE
 #endif
 
+#if defined(__GNUC__) || defined(__clang__)
+#define MKN_KUL_SIG_HIDDEN __attribute__((visibility("hidden")))
+#endif
+
+#ifndef MKN_KUL_SIG_HIDDEN
+#define MKN_KUL_SIG_HIDDEN
+#endif
+
 #if defined(__APPLE__) || defined(__NetBSD__) || defined(__FreeBSD__)
 #define MKN_KUL_IS_BSD 1
 #endif
