@@ -28,8 +28,8 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#ifndef _MKN_KUL_SCM_MAN_HPP_
-#define _MKN_KUL_SCM_MAN_HPP_
+#ifndef MKN_KUL_SCM_MAN_HPP_
+#define MKN_KUL_SCM_MAN_HPP_
 
 #include "mkn/kul/scm.hpp"
 
@@ -58,4 +58,4 @@ class Manager {
 }  // namespace scm
 }  // namespace kul
 }  // namespace mkn
-#endif /* _MKN_KUL_SCM_MAN_HPP_ */
+#endif /* MKN_KUL_SCM_MAN_HPP_ */

@@ -1,57 +1,47 @@
 #! clean build -dtKOp test run -p test,usage -W 9
 
-# mkn.kul - Kommon Usage Library
-#   Cross platform wrapper for systems operations / IO / threads / processes
-#   Default profile "lib" is header only, use "*-compiled" for library options
-#
-
 name: mkn.kul
 
-parent: lib
+parent: include
 
 profile:
-  - name: include
-    inc: ./inc
+- name: include
+  inc: ./inc
 
-  - name: lib
-    parent: include
-    if_link:
-      nix: -pthread
+- name: _test
+  parent: include
+  inc: .
+  mode: none
+  dep: google.test
+  if_arg:
+    win_shared: -DGTEST_LINKED_AS_SHARED_LIBRARY=1
 
-  - name: lib-compiled
-    parent: include
-    src: |
-      ./src/all
-      ./src/os/${OS}
-    if_src:
-        bsd: ./src/os/nixish
-        nix: ./src/os/nixish
-    arg: -D_MKN_KUL_COMPILED_LIB_
+- name: test
+  parent: _test
+  main: tst/test.cpp
+  src: tst/test
+  mode: none
 
+- name: bench
+  parent: include
+  main: tst/bench/bench.cpp
+  dep: google.benchmark
 
-  - name: _test
-    parent: lib
-    inc: .
-    mode: none
-    dep: google.test
-    if_arg:
-      win_shared: -DGTEST_LINKED_AS_SHARED_LIBRARY=1
+- name: usage
+  parent: include
+  main: tst/usage.cpp
 
-  - name: test
-    parent: _test
-    main: tst/test.cpp
-    src: tst/test
-    mode: none
+- name: format
+  mod: |
+    clang.format{init{style: file, types: hpp cpp ipp, paths: .}}
 
-  - name: bench
-    parent: lib
-    main: tst/bench/bench.cpp
-    dep: google.benchmark
-
-  - name: usage
-    parent: lib
-    main: tst/usage.cpp
-
-  - name: format
-    mod: |
-      clang.format{init{style: file, types: hpp cpp ipp, paths: .}}
+- name: clang.tidy
+  parent: _test
+  src: tst
+  main: tst/usage.cpp
+  dep: parse.yaml
+  mod:
+  - name: clang.tidy
+    version: master
+    init:
+      args: -std=c++20

@@ -28,8 +28,8 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#ifndef _MKN_KUL_FOR_HPP_
-#define _MKN_KUL_FOR_HPP_
+#ifndef MKN_KUL_FOR_HPP_
+#define MKN_KUL_FOR_HPP_
 
 #include <array>
 #include <tuple>
@@ -199,14 +199,14 @@ auto generate_from(F&& f, std::vector<T>&& v) {
 }
 
 template <std::size_t Idx, typename F, typename Type, std::size_t Size>
-auto constexpr generate_array__(F& f, std::array<Type, Size> const& arr) {
+auto constexpr generate_array_at_(F& f, std::array<Type, Size> const& arr) {
   return f(arr[Idx]);
 }
 
 template <typename Type, std::size_t Size, typename F, std::size_t... Is>
 auto constexpr generate_array_(F& f, std::array<Type, Size> const& arr,
                                std::integer_sequence<std::size_t, Is...>) {
-  return std::array{generate_array__<Is>(f, arr)...};
+  return std::array{generate_array_at_<Is>(f, arr)...};
 }
 
 template <typename F, typename Type, std::size_t Size>
@@ -216,4 +216,4 @@ auto constexpr generate_from(F&& f, std::array<Type, Size> const& arr) {
 
 }  // namespace mkn::kul
 
-#endif /* _MKN_KUL_FOR_HPP_ */
+#endif /* MKN_KUL_FOR_HPP_ */

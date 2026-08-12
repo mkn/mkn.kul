@@ -30,8 +30,8 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#ifndef _MKN_KUL_ALLOC_HUGE_HPP_
-#define _MKN_KUL_ALLOC_HUGE_HPP_
+#ifndef MKN_KUL_ALLOC_HUGE_HPP_
+#define MKN_KUL_ALLOC_HUGE_HPP_
 
 #if __has_include(<sys/mman.h>)
 
@@ -63,7 +63,7 @@ class HugePageAllocator : public Allocator<T> {
   constexpr HugePageAllocator(HugePageAllocator<U> const&) noexcept {}
 
   T* allocate(std::size_t n) {
-    if (n > std::numeric_limits<std::size_t>::max() / sizeof(T)) throw std::bad_alloc();
+    if (n > (std::numeric_limits<std::size_t>::max)() / sizeof(T)) throw std::bad_alloc();
     void* p = nullptr;
 
     if (posix_memalign(&p, huge_page_size, n * sizeof(T)) != 0) throw std::bad_alloc{};
@@ -103,7 +103,7 @@ class NonConstructingHugePageAllocator : public NonConstructingAllocator<T> {
   constexpr NonConstructingHugePageAllocator(NonConstructingHugePageAllocator<U> const&) noexcept {}
 
   T* allocate(std::size_t n) {
-    if (n > std::numeric_limits<std::size_t>::max() / sizeof(T)) throw std::bad_alloc();
+    if (n > (std::numeric_limits<std::size_t>::max)() / sizeof(T)) throw std::bad_alloc();
     void* p = nullptr;
     if (posix_memalign(&p, huge_page_size, n * sizeof(T)) != 0) throw std::bad_alloc{};
 
@@ -139,4 +139,4 @@ class NonConstructingHugePageAllocator : public NonConstructingAllocator<T> {
 
 #endif  // __has_include(<sys/mman.h>)
 
-#endif /*_MKN_KUL_ALLOC_HUGE_HPP_*/
+#endif /*MKN_KUL_ALLOC_HUGE_HPP_*/

@@ -3,6 +3,7 @@
 #include "test_common.hpp"
 
 #include "mkn/kul/proc.hpp"
+#include "tst/run_main.hpp"
 
 TEST(Process_Test, LaunchProcess) {
   mkn::kul::Process p("bash");
@@ -10,12 +11,11 @@ TEST(Process_Test, LaunchProcess) {
     << "\"seq"
     << "1"
     << "10\"";
-  try {  // windows can fail
+  mkn::kul::tst::run_main([&] {  // windows can fail
     p.start();
     KOUT(NON) << "Process exit code: " << p.exitCode();
     EXPECT_EQ(p.exitCode(), 0);
-  } catch (...) {
-  }
+  });
 }
 
 TEST(Process_Test, CaptureProcess) {
@@ -26,7 +26,7 @@ TEST(Process_Test, CaptureProcess) {
     << "\"seq"
     << "1"
     << "10\"";
-  try {  // windows can fail
+  mkn::kul::tst::run_main([&] {  // windows can fail
     p.start();
     lines = pc.outs();
     ASSERT_TRUE(lines.size());
@@ -35,6 +35,5 @@ TEST(Process_Test, CaptureProcess) {
     for (auto s : mkn::kul::String::LINES(lines)) {
       EXPECT_EQ(s, std::to_string(++i));
     }
-  } catch (...) {
-  }
+  });
 }

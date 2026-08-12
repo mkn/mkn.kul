@@ -14,7 +14,7 @@ jobs:
   ubuntu:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
 
     - name: "Build/Test"
       run: |
@@ -25,7 +25,7 @@ jobs:
   macos:
     runs-on: macos-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
 
     - name: "Build/Test"
       run: |
@@ -36,7 +36,7 @@ jobs:
   windows:
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
 
     - uses: ilammy/msvc-dev-cmd@v1
       with:
@@ -48,5 +48,5 @@ jobs:
         MKN_CL_PREFERRED: 1
       run: | # /bin/link interferes with cl/link.exe
         bash -c "rm /bin/link"
-        bash -c "curl -Lo mkn.exe https://github.com/mkn/mkn/releases/download/latest/mkn.exe"
+        bash -c "curl -fL --retry 3 --retry-delay 2 -o mkn.exe https://github.com/mkn/mkn/releases/download/latest/mkn.exe"
         bash -c 'KLOG=3 ./mkn clean build run -dtKOp test,usage -a "-EHsc -std:c++20"'

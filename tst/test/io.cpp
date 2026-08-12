@@ -16,7 +16,7 @@ TEST(IO_Test, ReadFile) {
   char c[20] = {0};
   bzero(c);
   mkn::kul::File file("LICENSE.md");
-  if (!file) KEXCEPT(mkn::kul::Exception, "ReadFile: FileNotFound: ") << file.full();
+  if (!file) KEXCEPT(mkn::kul::Exception, "ReadFile: FileNotFound: ", file.full());
   mkn::kul::io::Reader r("LICENSE.md");
   r.read(c, 20);
   std::string s1 = c;

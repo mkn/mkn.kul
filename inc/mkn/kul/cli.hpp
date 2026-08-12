@@ -28,8 +28,8 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#ifndef _MKN_KUL_CLI_HPP_
-#define _MKN_KUL_CLI_HPP_
+#ifndef MKN_KUL_CLI_HPP_
+#define MKN_KUL_CLI_HPP_
 
 #include <iostream>
 #include <string>
@@ -73,43 +73,6 @@ class Cmd {
  public:
   Cmd(char const* _c) : c(_c) {}
   char const* command() const { return c; }
-};
-
-// deprecated : use mkn::kul::env::Var::Mode
-enum EnvVarMode { APPE = 0, PREP, REPL };
-
-// deprecated : use mkn::kul::env::Var
-class EnvVar {
- public:
-  EnvVar(std::string const _n, std::string const _v, EnvVarMode const _m) : n(_n), v(_v), m(_m) {}
-  EnvVar(EnvVar const& e) : n(e.n), v(e.v), m(e.m) {}
-  char const* name() const { return n.c_str(); }
-  char const* value() const { return v.c_str(); }
-  EnvVarMode mode() const { return m; }
-  std::string const toString() const {
-    std::string var(value());
-    mkn::kul::String::REPLACE_ALL(var, mkn::kul::env::EOL(), "");
-    mkn::kul::String::TRIM(var);
-    std::string const ev(env::GET(name()));
-    if (!ev.empty()) {
-      if (mode() == EnvVarMode::PREP)
-        var = var + mkn::kul::env::SEP() + ev;
-      else if (mode() == EnvVarMode::APPE)
-        var = ev + mkn::kul::env::SEP() + var;
-    }
-    return var;
-  }
-  EnvVar& operator=(EnvVar&& e) {
-    std::swap(m, e.m);
-    std::swap(n, e.n);
-    std::swap(v, e.v);
-    return *this;
-  }
-
- private:
-  std::string n;
-  std::string v;
-  EnvVarMode m;
 };
 
 enum ArgType { FLAG = 0, STRING, MAYBE };
@@ -279,7 +242,74 @@ class Args {
 #include "mkn/kul/serial/cli.arg.end.hpp"
 };
 
-inline void asArgs(std::string const& cmd, std::vector<std::string>& args);
+namespace {
+std::size_t sub_string_to_next_occurrence(std::string const& cmd, std::size_t const s,
+                                          std::string const& needle) {
+  std::string const rest = cmd.substr(s);
+  auto const pos = rest.find(needle);
+  if (pos == std::string::npos)
+    KEXCEPT(mkn::kul::Exception, "Error: CLI Arg parsing unclosed quotes!");
+  return pos + s;
+}
+}  // namespace
+
+inline void asArgs(std::string const& cmd, std::vector<std::string>& args) {
+  std::string arg;
+  bool openQuotesS = false, openQuotesD = false, backSlashed = false;
+
+  for (std::size_t i = 0; i < cmd.size(); ++i) {
+    auto const c = cmd[i];
+
+    if (backSlashed) {
+      backSlashed = false;
+      arg += c;
+      continue;
+
+    } else if (openQuotesD) {
+      auto const pos = sub_string_to_next_occurrence(cmd, i, "\"");
+      arg += cmd.substr(i, pos - i);
+      i = pos;
+      openQuotesD = false;
+      continue;
+    }
+
+    switch (c) {
+      case ' ':
+        if (!openQuotesD && !openQuotesS) {
+          if (arg.size() > 0) args.push_back(arg);
+          arg.clear();
+          continue;
+        }
+        break;
+      case '"':
+        if (openQuotesD && !openQuotesS) {
+          openQuotesD = false;
+          args.push_back(arg);
+          arg.clear();
+        } else {
+          openQuotesD = true;
+        }
+        continue;
+      case '\'':
+        if (openQuotesS && !openQuotesD) {
+          openQuotesS = false;
+          args.push_back(arg);
+          arg.clear();
+        } else {
+          openQuotesS = true;
+        }
+        continue;
+      case '\\':
+        if (!openQuotesS && !openQuotesD) {
+          backSlashed = true;
+          continue;
+        }
+        break;
+    }
+    arg += c;
+  }
+  if (arg.size() > 0) args.push_back(arg);
+}
 
 inline std::vector<std::string> asArgs(std::string const& cmd) {
   std::vector<std::string> args;
@@ -291,10 +321,6 @@ inline std::vector<std::string> asArgs(std::string const& cmd) {
 }  // namespace kul
 }  // namespace mkn
 
-#ifndef _MKN_KUL_COMPILED_LIB_
-#include "mkn/kul/src/cli/asArgs.ipp"
-#endif
-
 #include "mkn/kul/serial/cli.bottom.hpp"
 
-#endif /* _MKN_KUL_CLI_HPP_ */
+#endif /* MKN_KUL_CLI_HPP_ */

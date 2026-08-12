@@ -28,8 +28,8 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#ifndef _MKN_KUL_SYS_HPP_
-#define _MKN_KUL_SYS_HPP_
+#ifndef MKN_KUL_SYS_HPP_
+#define MKN_KUL_SYS_HPP_
 
 #include "mkn/kul/os.hpp"
 
@@ -53,4 +53,4 @@ class Exception : public mkn::kul::Exception {
 #include "mkn/kul/os/nixish/sys.hpp"
 #endif
 
-#endif /* _MKN_KUL_SYS_HPP_ */
+#endif /* MKN_KUL_SYS_HPP_ */

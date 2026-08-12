@@ -1,5 +1,5 @@
-#ifndef _MKN_TEST_INSTRUMENT_ALLOC_HPP_
-#define _MKN_TEST_INSTRUMENT_ALLOC_HPP_
+#ifndef MKN_TEST_INSTRUMENT_ALLOC_HPP_
+#define MKN_TEST_INSTRUMENT_ALLOC_HPP_
 
 #include "mkn/kul/dbg.hpp"
 #include "mkn/kul/vector.hpp"
@@ -71,4 +71,4 @@ auto make_vector_from(V1 const& v1) {
   return v;
 }
 
-#endif /*_MKN_TEST_INSTRUMENT_ALLOC_HPP_*/
+#endif /*MKN_TEST_INSTRUMENT_ALLOC_HPP_*/

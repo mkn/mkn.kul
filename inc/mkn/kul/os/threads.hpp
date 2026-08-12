@@ -30,72 +30,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 // IWYU pragma: private, include "mkn/kul/threads.hpp"
 
-#ifndef _MKN_KUL_OS_THREADS_HPP_
-#define _MKN_KUL_OS_THREADS_HPP_
+#ifndef MKN_KUL_OS_THREADS_HPP_
+#define MKN_KUL_OS_THREADS_HPP_
 
 #include "mkn/kul/defs.hpp"
+#include "mkn/kul/except.hpp"
+#include "mkn/kul/os/any/threads/def.hpp"
 
-#include <atomic>
-#include <chrono>
 #include <functional>
 #include <memory>
 #include <queue>
 #include <thread>
 
-#include "mkn/kul/defs.hpp"
-#include "mkn/kul/except.hpp"
-
-namespace mkn {
-namespace kul {
-namespace this_thread {
-inline void sleep(unsigned long const& millis) {
-  std::this_thread::sleep_for(std::chrono::milliseconds(millis));
-}
-inline void uSleep(unsigned long const& micros) {
-  std::this_thread::sleep_for(std::chrono::microseconds(micros));
-}
-inline void nSleep(unsigned long const& nanos) {
-  std::this_thread::sleep_for(std::chrono::nanoseconds(nanos));
-}
-}  // namespace this_thread
-
 // class ThreadQueue;
 // template<class P> class PredicatedThreadQueue;
-
-namespace threading {
-class Exception : public mkn::kul::Exception {
- public:
-  Exception(char const* f, uint16_t const& l, std::string const& s)
-      : mkn::kul::Exception(f, l, s) {}
-};
-class InterruptionException : public Exception {
- public:
-  InterruptionException(char const* f, uint16_t const& l, std::string const& s)
-      : Exception(f, l, s) {}
-};
-
-class AThread {
- protected:
-  std::atomic<bool> f, s;
-  std::exception_ptr ep;
-
-  AThread() : f(1), s(0) {}
-  virtual void run() KTHROW(mkn::kul::threading::Exception) = 0;
-
- public:
-  virtual ~AThread() {}
-  virtual void join() = 0;
-  bool started() const { return s; }
-  bool finished() const { return f; }
-  auto& exception() const { return ep; }
-  void rethrow() {
-    if (ep) std::rethrow_exception(ep);
-  }
-};
-
-}  // namespace threading
-}  // namespace kul
-}  // namespace mkn
 
 #if defined(_WIN32)
 #include "mkn/kul/os/win/threads.os.hpp"
@@ -103,4 +51,4 @@ class AThread {
 #include "mkn/kul/os/nixish/threads.os.hpp"
 #endif
 
-#endif  // _MKN_KUL_OS_THREADS_HPP_
+#endif  // MKN_KUL_OS_THREADS_HPP_

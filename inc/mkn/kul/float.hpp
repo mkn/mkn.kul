@@ -28,8 +28,8 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#ifndef _MKN_KUL_FLOAT_HPP_
-#define _MKN_KUL_FLOAT_HPP_
+#ifndef MKN_KUL_FLOAT_HPP_
+#define MKN_KUL_FLOAT_HPP_
 
 #include <cstdlib>
 
@@ -45,4 +45,4 @@ auto inline float_equals(double const a, double const b, double const diff = 1e-
 
 }  // namespace mkn::kul
 
-#endif /* _MKN_KUL_FLOAT_HPP_ */
+#endif /* MKN_KUL_FLOAT_HPP_ */

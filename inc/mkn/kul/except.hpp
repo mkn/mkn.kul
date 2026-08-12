@@ -28,18 +28,19 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#ifndef _MKN_KUL_EXCEPT_HPP_
-#define _MKN_KUL_EXCEPT_HPP_
+#ifndef MKN_KUL_EXCEPT_HPP_
+#define MKN_KUL_EXCEPT_HPP_
 
 #include "mkn/kul/defs.hpp"
+#include "mkn/kul/std/string.hpp"
 
 #include <cstdint>
+#include <memory>
 #include <sstream>
 #include <iostream>
 #include <stdexcept>
 
-namespace mkn {
-namespace kul {
+namespace mkn::kul {
 
 // For function signatures
 #if __cplusplus > 199711L
@@ -60,22 +61,26 @@ namespace kul {
 
 class Exception : public std::runtime_error {
  public:
-  Exception(char const* f, uint16_t const& l, std::string const& s = "")
-      : std::runtime_error(s), _f(f), _l(l), _ep(std::current_exception()), err(s) {}
-  Exception(Exception const& e)
-      : std::runtime_error(e), _f(e.file()), _l(e.line()), _ep(e._ep), err(e.err) {}
-  Exception(Exception const&& e)
-      : std::runtime_error(e), _f(e.file()), _l(e.line()), _ep(e._ep), err(e.err) {}
   virtual ~Exception() KNOTHROW {}
+
+  Exception(char const* f, uint16_t const& l, std::string const& s = "")
+      : std::runtime_error(s),
+        _f(f),
+        _l(l),
+        _ep(std::current_exception()),
+        err(std::make_shared<std::string const>(s)) {}
+
+  Exception(Exception const& e) = default;
+  Exception(Exception&& e) = default;
 
   std::string debug() const {
     std::stringstream ss;
-    ss << (_f ? _f : "<UNKNOWN FILE>") << " : " << _l << " : " << err;
+    ss << (_f ? _f : "<UNKNOWN FILE>") << " : " << _l << " : " << *err;
     return ss.str();
   }
 
-  char const* what() const noexcept override { return err.c_str(); }
-  std::string str() const noexcept { return err; }
+  char const* what() const noexcept override { return err->c_str(); }
+  std::string const& str() const noexcept { return *err; }
 
   char const* file() const { return _f; }
   uint16_t const& line() const { return _l; }
@@ -96,19 +101,12 @@ class Exception : public std::runtime_error {
     ss << debug();
     return ss.str();
   }
-  template <class T>
-  Exception& operator<<(T const& s) {
-    std::stringstream msg;
-    msg << s;
-    err += msg.str();
-    return *this;
-  }
 
  protected:
   char const* _f;
   uint16_t const _l;
-  std::exception_ptr const _ep;
-  std::string err;
+  std::exception_ptr _ep;
+  std::shared_ptr<std::string const> err;
 
   Exception& operator=(Exception& e) = delete;
   Exception& operator=(Exception&& e) = delete;
@@ -125,14 +123,15 @@ inline std::ostream& operator<<(std::ostream& s, Exception const& e) {
 
 class Exit : public Exception {
  public:
-  Exit(char const* f, uint16_t const& l, std::string const& s, uint16_t const& e)
+  Exit(char const* f, uint16_t const& l, std::string const& s, int const& e)
       : Exception(f, l, s), _e(e) {}
-  Exit(Exit const& e) : Exception(e), _e(e._e) {}
+  Exit(Exit const& e) = default;
+  Exit(Exit&& e) = default;
 
-  uint16_t const& code() const { return _e; }
+  int const& code() const { return _e; }
 
  private:
-  uint16_t const _e;
+  int const _e;
 
   Exit& operator=(Exit& e) = delete;
   Exit& operator=(Exit&& e) = delete;
@@ -140,14 +139,13 @@ class Exit : public Exception {
   Exit& operator=(Exit const&& e) = delete;
 };
 
-}  // namespace kul
-}  // namespace mkn
+}  // namespace mkn::kul
 
-#define KEXCEPT(e, m) throw e(__FILE__, __LINE__, m)
+#define KEXCEPT(e, ...) throw e(__FILE__, __LINE__, ::mkn::kul::to_str(__VA_ARGS__))
 #define KEXCEPTSTR(e) throw e(__FILE__, __LINE__, "")
-#define KEXCEPTION(m) throw Exception(__FILE__, __LINE__, m)
-#define KEXCEPSTREAM throw Exception(__FILE__, __LINE__, "")
+#define KEXCEPTION(...) \
+  throw ::mkn::kul::Exception(__FILE__, __LINE__, ::mkn::kul::to_str(__VA_ARGS__))
 
-#define KEXIT(e, m) throw mkn::kul::Exit(__FILE__, __LINE__, m, e)
+#define KEXIT(e, ...) throw mkn::kul::Exit(__FILE__, __LINE__, ::mkn::kul::to_str(__VA_ARGS__), e)
 
-#endif /* _MKN_KUL_EXCEPT_HPP_ */
+#endif /* MKN_KUL_EXCEPT_HPP_ */

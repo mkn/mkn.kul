@@ -30,8 +30,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 // IWYU pragma: private, include "mkn/kul/os.hpp"
 
-#ifndef _MKN_KUL_OS_NIXISH_OS_BOT_HPP_
-#define _MKN_KUL_OS_NIXISH_OS_BOT_HPP_
+#ifndef MKN_KUL_OS_NIXISH_OS_BOT_HPP_
+#define MKN_KUL_OS_NIXISH_OS_BOT_HPP_
 
 void mkn::kul::Dir::rm() const {
   if (is()) {
@@ -91,6 +91,67 @@ uint64_t mkn::kul::File::size() const {
   return r;
 }
 
+std::vector<mkn::kul::Dir> mkn::kul::Dir::dirs(bool incHidden) const KTHROW(fs::Exception) {
+  if (!is()) KEXCEPT(fs::Exception, "Directory : \"" + path() + "\" does not exist");
+  std::vector<Dir> dirs;
+
+  DIR* dir = opendir(real().c_str());
+  struct dirent* entry = readdir(dir);
+  while (entry != NULL) {
+    std::string d(entry->d_name);
+    mkn::kul::Dir dd(JOIN(real(), entry->d_name));
+    if (d.compare(".") != 0 && d.compare("..") != 0 &&
+        !(d.substr(0, 1).compare(".") == 0 && !incHidden) && dd.is())
+      dirs.push_back(dd);
+    entry = readdir(dir);
+  }
+  closedir(dir);
+
+  return dirs;
+}
+
+std::vector<mkn::kul::File> mkn::kul::Dir::files(bool recursive) const KTHROW(fs::Exception) {
+  if (!is()) KEXCEPT(fs::Exception, "Directory : \"" + path() + "\" does not exist");
+
+  std::vector<File> fs;
+  DIR* dir = opendir(path().c_str());
+  struct dirent* entry = readdir(dir);
+  while (entry != NULL) {
+    if (!mkn::kul::Dir(JOIN(real(), entry->d_name)).is()) fs.push_back(File(entry->d_name, *this));
+    entry = readdir(dir);
+  }
+  closedir(dir);
+  if (recursive) {
+    for (mkn::kul::Dir const& d : dirs()) {
+      std::vector<mkn::kul::File> const& tFs = d.files(true);
+      fs.insert(fs.end(), tFs.begin(), tFs.end());
+    }
+  }
+  return fs;
+}
+
+std::string mkn::kul::Dir::REAL(std::string const& s) KTHROW(fs::Exception) {
+  char* expanded = realpath(s.c_str(), NULL);
+  if (expanded) {
+    std::string dir(expanded);
+    free(expanded);
+    if (dir.size() > PATH_MAX) KEXCEPT(fs::Exception, "Directory path too large");
+    return dir;
+  }
+  KEXCEPT(fs::Exception, "Directory \"" + s + "\" does not exist");
+}
+
+std::optional<std::string> mkn::kul::Dir::REAL_OR_NULL(std::string const& s) KTHROW(fs::Exception) {
+  char* expanded = realpath(s.c_str(), NULL);
+  if (expanded) {
+    std::string dir(expanded);
+    free(expanded);
+    if (dir.size() > PATH_MAX) KEXCEPT(fs::Exception, "Directory path too large");
+    return dir;
+  }
+  return std::nullopt;
+}
+
 namespace mkn {
 namespace kul {
 namespace os {
@@ -104,8 +165,6 @@ inline int exec(std::string const& cmd, bool q = false) {
   if (r < 0) return r;
   return WEXITSTATUS(r);
 }
-inline std::string EOL() { return "\n"; }
-
 }  // namespace os
 
 namespace user {
@@ -123,10 +182,4 @@ inline bool CWD(mkn::kul::Dir const& d) { return chdir(d.path().c_str()) != -1; 
 }  // namespace kul
 }  // namespace mkn
 
-#ifndef _MKN_KUL_COMPILED_LIB_
-#include "mkn/kul/os/nixish/src/os/dir/dirs.ipp"
-#include "mkn/kul/os/nixish/src/os/dir/files.ipp"
-#include "mkn/kul/os/nixish/src/os/dir/real.ipp"
-#endif  //_MKN_KUL_COMPILED_LIB_
-
-#endif /* _MKN_KUL_OS_NIXISH_OS_BOT_HPP_ */
+#endif /* MKN_KUL_OS_NIXISH_OS_BOT_HPP_ */

@@ -28,8 +28,8 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#ifndef _MKN_KUL_THREADS_HPP_
-#define _MKN_KUL_THREADS_HPP_
+#ifndef MKN_KUL_THREADS_HPP_
+#define MKN_KUL_THREADS_HPP_
 
 #include "mkn/kul/map.hpp"
 #include "mkn/kul/os/threads.hpp"
@@ -62,7 +62,7 @@ class ThreadQueue {
       std::shared_ptr<mkn::kul::Thread> at = std::make_shared<mkn::kul::Thread>(func);
       at->run();
       ts.push_back(at);
-      this_thread::nSleep(__MKN_KUL_THREAD_SPAWN_WAIT__);
+      this_thread::nSleep(MKN_KUL_THREAD_SPAWN_WAIT);
     }
   }
 
@@ -122,7 +122,7 @@ class PredicatedThreadQueue : public ThreadQueue {
         std::shared_ptr<mkn::kul::Thread> at = std::make_shared<mkn::kul::Thread>(func);
         at->run();
         ts.push_back(at);
-        this_thread::nSleep(__MKN_KUL_THREAD_SPAWN_WAIT__);
+        this_thread::nSleep(MKN_KUL_THREAD_SPAWN_WAIT);
       }
       std::shared_ptr<mkn::kul::Thread> const* del = 0;
       for (auto const& t : ts) {
@@ -237,7 +237,7 @@ class ConcurrentThreadQueue {
   mkn::kul::Thread _thread;
   mkn::kul::Mutex _mmutex, _qmutex;
 
-  void _KTHROW(std::exception_ptr const& ep, std::function<void(E const&)> const& func) {
+  void kthrow_(std::exception_ptr const& ep, std::function<void(E const&)> const& func) {
     try {
       std::rethrow_exception(ep);
     } catch (E const& e) {
@@ -272,7 +272,7 @@ class ConcurrentThreadQueue {
           t.second->join();
           if (t.second->exception() != std::exception_ptr()) {
             if (_e.count(t.first))
-              _KTHROW(t.second->exception(), _e[t.first]);
+              kthrow_(t.second->exception(), _e[t.first]);
             else if (!_detatched)
               std::rethrow_exception(t.second->exception());
           }
@@ -352,8 +352,14 @@ class ConcurrentThreadPool : public ConcurrentThreadQueue<void()> {
     if (strt) start();
   }
   virtual ~ConcurrentThreadPool() {
-    stop();
-    join();
+    try {
+      stop();
+      join();
+    } catch (std::exception const& e) {
+      std::cerr << e.what() << std::endl;
+    } catch (...) {
+      std::cerr << "UNKNOWN EXCEPTION CAUGHT" << std::endl;
+    }
   }
   virtual ConcurrentThreadPool& start() override {
     if (!_up) {
@@ -441,7 +447,7 @@ class ConcurrentThreadPool : public ConcurrentThreadQueue<void()> {
         if (t.second->started() && t.second->finished()) {
           if (t.second->exception() != std::exception_ptr()) {
             if (_e.count(t.first))
-              _KTHROW(t.second->exception(), _e[t.first]);
+              kthrow_(t.second->exception(), _e[t.first]);
             else if (!_detatched)
               std::rethrow_exception(t.second->exception());
             del.push_back(t.first);
@@ -531,4 +537,4 @@ class ChroncurrentThreadPool : public ConcurrentThreadPool<void(), AutoChronPool
 }  // namespace kul
 }  // namespace mkn
 
-#endif /* _MKN_KUL_THREADS_HPP_ */
+#endif /* MKN_KUL_THREADS_HPP_ */

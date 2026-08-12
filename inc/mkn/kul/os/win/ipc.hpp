@@ -28,11 +28,11 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#ifndef _MKN_KUL_OS_WIN_IPC_HPP_
-#define _MKN_KUL_OS_WIN_IPC_HPP_
+#ifndef MKN_KUL_OS_WIN_IPC_HPP_
+#define MKN_KUL_OS_WIN_IPC_HPP_
 
-#ifndef _MKN_KUL_IPC_UUID_PREFIX_
-#define _MKN_KUL_IPC_UUID_PREFIX_ "\\\\.\\pipe\\"
+#ifndef MKN_KUL_IPC_UUID_PREFIX_
+#define MKN_KUL_IPC_UUID_PREFIX_ "\\\\.\\pipe\\"
 #endif
 
 #include "mkn/kul/proc.hpp"
@@ -113,12 +113,12 @@ class Server {
   }
   Server(int16_t const& lp = -1) KTHROW(Exception)
       : lp(lp),
-        uuid(_MKN_KUL_IPC_UUID_PREFIX_ + std::string("pid\\") +
+        uuid(MKN_KUL_IPC_UUID_PREFIX_ + std::string("pid\\") +
              std::to_string(mkn::kul::this_proc::id())) {
     start();
   }
   Server(std::string const& ui, int16_t const& lp = -1) KTHROW(Exception)
-      : uuid(_MKN_KUL_IPC_UUID_PREFIX_ + ui), lp(lp) {
+      : uuid(MKN_KUL_IPC_UUID_PREFIX_ + ui), lp(lp) {
     start();
   }
 };
@@ -159,11 +159,11 @@ class Client {
 
  public:
   virtual ~Client() { stop(); }
-  Client(std::string const& ui) KTHROW(Exception) : uuid(_MKN_KUL_IPC_UUID_PREFIX_ + ui) {
+  Client(std::string const& ui) KTHROW(Exception) : uuid(MKN_KUL_IPC_UUID_PREFIX_ + ui) {
     start();
   }
   Client(int16_t const& pid) KTHROW(Exception)
-      : uuid(_MKN_KUL_IPC_UUID_PREFIX_ + std::string("pid\\") + std::to_string(pid)) {
+      : uuid(MKN_KUL_IPC_UUID_PREFIX_ + std::string("pid\\") + std::to_string(pid)) {
     start();
   }
   virtual void send(std::string const& m) const KTHROW(Exception) {
@@ -180,4 +180,4 @@ class Client {
 }  // namespace kul
 }  // namespace mkn
 
-#endif /* _MKN_KUL_OS_WIN_IPC_HPP_ */
+#endif /* MKN_KUL_OS_WIN_IPC_HPP_ */

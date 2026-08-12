@@ -28,8 +28,8 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#ifndef _MKN_KUL_OS_WIN_OS_BOT_HPP_
-#define _MKN_KUL_OS_WIN_OS_BOT_HPP_
+#ifndef MKN_KUL_OS_WIN_OS_BOT_HPP_
+#define MKN_KUL_OS_WIN_OS_BOT_HPP_
 
 void mkn::kul::Dir::rm() const {
   if (is()) {
@@ -96,6 +96,86 @@ uint64_t mkn::kul::File::size() const {
   return r;
 }
 
+std::vector<mkn::kul::Dir> mkn::kul::Dir::dirs(bool incHidden) const KTHROW(fs::Exception) {
+  if (!is()) KEXCEPT(fs::Exception, "Directory : \"" + path() + "\" does not exist");
+  std::vector<Dir> dirs;
+
+  WIN32_FIND_DATA fdFile;
+  HANDLE hFind = NULL;
+  char sPath[2048];
+  sprintf_s(sPath, "%s\\*.*", path().c_str());
+  if ((hFind = FindFirstFile(sPath, &fdFile)) == INVALID_HANDLE_VALUE)
+    KEXCEPT(fs::Exception, "Directory : \"" + path() + "\" does not exist");
+  do {
+    if (strcmp(fdFile.cFileName, ".") != 0 && strcmp(fdFile.cFileName, "..") != 0) {
+      sprintf_s(sPath, "%s\\%s", path().c_str(), fdFile.cFileName);
+      if (fdFile.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+        if (!incHidden && std::string(sPath)
+                                  .substr(std::string(sPath).rfind(mkn::kul::Dir::SEP()) + 1)
+                                  .substr(0, 1)
+                                  .compare(".") == 0)
+          continue;
+        dirs.push_back(Dir(sPath));
+      }
+    }
+  } while (FindNextFile(hFind, &fdFile));
+  FindClose(hFind);
+
+  return dirs;
+}
+
+std::vector<mkn::kul::File> mkn::kul::Dir::files(bool recursive) const KTHROW(fs::Exception) {
+  if (!is()) KEXCEPT(fs::Exception, "Directory : \"" + path() + "\" does not exist");
+
+  std::vector<File> fs;
+  WIN32_FIND_DATA fdFile;
+  HANDLE hFind = NULL;
+  char sPath[2048];
+  sprintf_s(sPath, "%s\\*.*", path().c_str());
+  if ((hFind = FindFirstFile(sPath, &fdFile)) == INVALID_HANDLE_VALUE)
+    KEXCEPT(fs::Exception, "Directory : \"" + path() + "\" does not exist");
+
+  do {
+    if (strcmp(fdFile.cFileName, ".") != 0 && strcmp(fdFile.cFileName, "..") != 0) {
+      sprintf_s(sPath, "%s\\%s", path().c_str(), fdFile.cFileName);
+      if (!(fdFile.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
+        std::string f(sPath);
+        fs.push_back(File(f.substr(f.rfind(mkn::kul::Dir::SEP()) + 1), *this));
+      }
+    }
+  } while (FindNextFile(hFind, &fdFile));
+  FindClose(hFind);
+  if (recursive) {
+    for (Dir const& d : dirs()) {
+      std::vector<File> tFiles = d.files(true);
+      fs.insert(fs.end(), tFiles.begin(), tFiles.end());
+    }
+  }
+  return fs;
+}
+
+std::string mkn::kul::Dir::REAL(std::string const& s) KTHROW(fs::Exception) {
+  char* expanded = _fullpath(NULL, s.c_str(), _MAX_PATH);
+  if (expanded) {
+    std::string dir(expanded);
+    free(expanded);
+    if (dir.size() && dir[dir.size() - 1] == '\\') dir.pop_back();
+    return dir;
+  }
+  KEXCEPT(fs::Exception, "Item: \"" + s + "\" does not exist");
+}
+
+std::optional<std::string> mkn::kul::Dir::REAL_OR_NULL(std::string const& s) KTHROW(fs::Exception) {
+  char* expanded = _fullpath(NULL, s.c_str(), _MAX_PATH);
+  if (expanded) {
+    std::string dir(expanded);
+    free(expanded);
+    if (dir.size() && dir[dir.size() - 1] == '\\') dir.pop_back();
+    return dir;
+  }
+  return std::nullopt;
+}
+
 namespace mkn {
 namespace kul {
 namespace os {
@@ -106,14 +186,6 @@ inline uint16_t exec(std::string const& cmd, bool q = false) {
   }
   return system(cmd.c_str());
 }
-inline std::string EOL() {
-#if (_MSC_VER >= 1800)
-  return "\n";
-#else
-  return "\r\n";
-#endif  // _MSC_VER
-}
-
 }  // namespace os
 
 namespace user {
@@ -133,10 +205,4 @@ inline bool CWD(mkn::kul::Dir const& d) { return _chdir(d.path().c_str()) != -1;
 }  // namespace kul
 }  // namespace mkn
 
-#ifndef _MKN_KUL_COMPILED_LIB_
-#include "mkn/kul/os/win/src/os/dir/dirs.ipp"
-#include "mkn/kul/os/win/src/os/dir/files.ipp"
-#include "mkn/kul/os/win/src/os/dir/real.ipp"
-#endif  //_MKN_KUL_COMPILED_LIB_
-
-#endif /* _MKN_KUL_OS_WIN_OS_BOT_HPP_ */
+#endif /* MKN_KUL_OS_WIN_OS_BOT_HPP_ */

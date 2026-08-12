@@ -30,8 +30,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 // IWYU pragma: private, include "mkn/kul/proc.hpp"
 
-#ifndef _MKN_KUL_OS_NIX_PROC_OS_HPP_
-#define _MKN_KUL_OS_NIX_PROC_OS_HPP_
+#ifndef MKN_KUL_OS_NIX_PROC_OS_HPP_
+#define MKN_KUL_OS_NIX_PROC_OS_HPP_
 
 #include <cstdio>
 #include <cstdint>
@@ -56,6 +56,36 @@ class ProcParser {
   friend uint64_t totalMemory();
 };
 
+int ProcParser::PARSE_LINE(char* line) {
+  int i = strlen(line);
+  while (*line < '0' || *line > '9') line++;
+  line[i - 3] = '\0';
+  i = atoi(line);
+  return i;
+}
+void ProcParser::VIRTUAL(uint64_t& mem) {
+  FILE* file = fopen("/proc/self/status", "r");
+  char line[128];
+  while (fgets(line, 128, file) != NULL) {
+    if (strncmp(line, "VmSize:", 7) == 0) {
+      mem += PARSE_LINE(line);
+      break;
+    }
+  }
+  fclose(file);
+}
+void ProcParser::PHYSICAL(uint64_t& mem) {
+  FILE* file = fopen("/proc/self/status", "r");
+  char line[128];
+  while (fgets(line, 128, file) != NULL) {
+    if (strncmp(line, "VmRSS:", 6) == 0) {
+      mem += PARSE_LINE(line);
+      break;
+    }
+  }
+  fclose(file);
+}
+
 inline uint64_t virtualMemory() {
   uint64_t v = 0;
   ProcParser::VIRTUAL(v);
@@ -77,10 +107,4 @@ inline uint16_t cpuLoad() { return 0; }
 }  // namespace kul
 }  // namespace mkn
 
-#ifndef _MKN_KUL_COMPILED_LIB_
-#include "mkn/kul/os/nix/src/proc//xparse_line.ipp"
-#include "mkn/kul/os/nix/src/proc//xphysical.ipp"
-#include "mkn/kul/os/nix/src/proc//xvirtual.ipp"
-#endif
-
-#endif /* _MKN_KUL_OS_NIX_PROC_OS_HPP_ */
+#endif /* MKN_KUL_OS_NIX_PROC_OS_HPP_ */

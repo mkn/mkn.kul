@@ -1,6 +1,9 @@
+
+#include "tst/instrument/alloc.hpp"
+#include "tst/run_main.hpp"
+
 #include <stdexcept>
 #include <string_view>
-#include "test/instrument/alloc.hpp"
 
 std::string_view constexpr RUN =
     R"(
@@ -15,4 +18,6 @@ void go() {
   if (std_vec2[0][0] != 0) throw std::runtime_error("do not optimize out");
 }
 
-int main() { go<S<8>>(); }
+int main() {
+  return mkn::kul::tst::run_main([] { go<S<8>>(); });
+}

@@ -28,31 +28,16 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#ifndef _MKN_KUL_OS_WIN_THREADS_OS_HPP_
-#define _MKN_KUL_OS_WIN_THREADS_OS_HPP_
+#ifndef MKN_KUL_OS_WIN_THREADS_OS_HPP_
+#define MKN_KUL_OS_WIN_THREADS_OS_HPP_
 
 #include <TlHelp32.h>
 #include <Windows.h>
 
+#include "mkn/kul/os/win/threads/def.hpp"
+
 namespace mkn {
 namespace kul {
-namespace this_thread {
-inline std::string const id() {
-  std::ostringstream os;
-  os << std::hex << std::hash<std::thread::id>()(std::this_thread::get_id());
-  return os.str();
-}
-
-inline bool main() {
-#include "mkn/kul/os/win/src/thread/main.cpp"
-}
-
-inline void kill() {
-  HANDLE h = GetCurrentThread();
-  TerminateThread(h, 0);
-  CloseHandle(h);
-}
-}  // namespace this_thread
 
 class Mutex {
  private:
@@ -121,4 +106,4 @@ inline DWORD WINAPI threadFunction(LPVOID th) {
 
 }  // namespace kul
 }  // namespace mkn
-#endif /* _MKN_KUL_OS_WIN_THREADS_OS_HPP_ */
+#endif /* MKN_KUL_OS_WIN_THREADS_OS_HPP_ */

@@ -30,8 +30,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 // IWYU pragma: private, include "mkn/kul/signal.hpp"
 
-#ifndef _MKN_KUL_OS_NIXISH_SIGNAL_HPP_
-#define _MKN_KUL_OS_NIXISH_SIGNAL_HPP_
+#ifndef MKN_KUL_OS_NIXISH_SIGNAL_HPP_
+#define MKN_KUL_OS_NIXISH_SIGNAL_HPP_
 
 #include "mkn/kul/defs.hpp"
 #include "mkn/kul/log.hpp"
@@ -72,7 +72,31 @@ inline void kul_sig_handler(int s, siginfo_t* info, void* v);
 namespace mkn {
 namespace kul {
 namespace this_thread {
-#include "mkn/kul/os/nixish/src/signal/stacktrace.ipp"
+
+inline std::vector<std::string> stacktrace(ucontext_t* /*uc*/ = nullptr, int /*start*/ = 2) {
+  bool euaddr = mkn::kul::env::WHICH("eu-addr2line");
+
+  std::vector<std::string> v;
+
+  if (!euaddr) {
+    v.emplace_back("eu-addr2line not found, install elfutils");
+    return v;
+  }
+
+  constexpr size_t SIZE = 256;
+  int i;
+  void* buffer[SIZE];
+
+  int nptrs = backtrace(buffer, SIZE);
+
+  for (i = 1; i < nptrs; ++i) {
+    char syscom[1024];
+    syscom[0] = '\0';
+    snprintf(syscom, 1024, "eu-addr2line '%p' --pid=%d > /dev/stderr\n", buffer[i], getpid());
+    if (system(syscom) != 0) fprintf(stderr, "eu-addr2line failed\n");
+  }
+  return v;
+}
 
 inline void print_stacktrace() {
   for (auto const& s : stacktrace()) std::cout << s << std::endl;
@@ -133,8 +157,22 @@ class Signal {
 }  // namespace kul
 }  // namespace mkn
 
-#ifndef _MKN_KUL_COMPILED_LIB_
-#include "mkn/kul/os/nixish/src/signal/handler.ipp"
-#endif
+inline void kul_sig_handler(int s, siginfo_t* info, void* v) {
+  if (info->si_pid == 0 || info->si_pid == mkn::kul::this_proc::id()) {
+    if (s == SIGABRT)
+      for (auto& f : mkn::kul::SignalStatic::INSTANCE().ab) f(s);
+    if (s == SIGINT)
+      for (auto& f : mkn::kul::SignalStatic::INSTANCE().in) f(s);
+    if (s == SIGSEGV)
+      for (auto& f : mkn::kul::SignalStatic::INSTANCE().se) f(s);
+    if (s == SIGSEGV && !mkn::kul::SignalStatic::INSTANCE().q) {
+      auto tid = mkn::kul::this_thread::id();
+      ucontext_t* uc = (ucontext_t*)v;
+      printf("[bt] Stacktrace:\n");
+      for (auto const& st : mkn::kul::this_thread::stacktrace(uc)) KOUT(NON) << tid << " : " << st;
+    }
+    exit(s);
+  }
+}
 
-#endif /* _MKN_KUL_OS_NIXISH_SIGNAL_HPP_ */
+#endif /* MKN_KUL_OS_NIXISH_SIGNAL_HPP_ */

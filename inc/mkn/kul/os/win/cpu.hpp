@@ -28,8 +28,8 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#ifndef _MKN_KUL_OS_WIN_CPU_HPP_
-#define _MKN_KUL_OS_WIN_CPU_HPP_
+#ifndef MKN_KUL_OS_WIN_CPU_HPP_
+#define MKN_KUL_OS_WIN_CPU_HPP_
 
 #include <windows.h>
 
@@ -48,4 +48,4 @@ inline uint16_t threads() { return std::thread::hardware_concurrency(); }
 }  // namespace kul
 }  // namespace mkn
 
-#endif /* _MKN_KUL_OS_WIN_CPU_HPP_ */
+#endif /* MKN_KUL_OS_WIN_CPU_HPP_ */

@@ -30,8 +30,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 // IWYU pragma: private, include "mkn/kul/env.hpp"
 
-#ifndef _MKN_KUL_OS_NIXISH_ENV_HPP_
-#define _MKN_KUL_OS_NIXISH_ENV_HPP_
+#ifndef MKN_KUL_OS_NIXISH_ENV_HPP_
+#define MKN_KUL_OS_NIXISH_ENV_HPP_
 
 #include <dirent.h>
 #include <pwd.h>
@@ -53,13 +53,13 @@ namespace env {
 
 inline std::string EOL() { return "\r\n"; }
 
-#if defined(_MKN_KUL_MAX_PATH_)
-constexpr size_t KUL_MAX_PATH = _MKN_KUL_MAX_PATH_;
+#if defined(MKN_KUL_MAX_PATH_)
+constexpr size_t KUL_MAX_PATH = MKN_KUL_MAX_PATH_;
 #elif defined(PATH_MAX)
 constexpr size_t KUL_MAX_PATH = PATH_MAX;
 #else
 #error  // could not set KUL_MAX_PATH
-#endif  /*_MKN_KUL_MAX_PATH_*/
+#endif  /*MKN_KUL_MAX_PATH_*/
 
 inline bool EXISTS(char const* c) { return getenv(c); }
 inline std::string GET(char const* c, std::string default_ = "") {
@@ -89,4 +89,4 @@ inline bool CWD(std::string const& c) { return chdir(c.c_str()) != -1; }
 }  // namespace kul
 }  // namespace mkn
 
-#endif /* _MKN_KUL_OS_NIXISH_ENV_HPP_ */
+#endif /* MKN_KUL_OS_NIXISH_ENV_HPP_ */

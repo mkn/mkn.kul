@@ -28,25 +28,26 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#ifndef _MKN_KUL_LOG_HPP_
-#define _MKN_KUL_LOG_HPP_
+#ifndef MKN_KUL_LOG_HPP_
+#define MKN_KUL_LOG_HPP_
 
-#include "mkn/kul/os.hpp"
-#include "mkn/kul/defs.hpp"
+#include "mkn/kul/env.hpp"
 #include "mkn/kul/time.hpp"
 #include "mkn/kul/except.hpp"
-#include "mkn/kul/threads.hpp"
+#include "mkn/kul/os/def.hpp"
+#include "mkn/kul/threads/def.hpp"
 
 #include <memory>
 #include <string>
+#include <iostream>
 #include <functional>
 
-#ifndef __MKN_KUL_LOG_TIME_FRMT__
-#define __MKN_KUL_LOG_TIME_FRMT__ "%Y-%m-%d-%H:%M:%S:%i"
+#ifndef MKN_KUL_LOG_TIME_FRMT
+#define MKN_KUL_LOG_TIME_FRMT "%Y-%m-%d-%H:%M:%S:%i"
 #endif
 
-#ifndef __MKN_KUL_LOG_FRMT__
-#define __MKN_KUL_LOG_FRMT__ "[%M]: %T - %D : %F fn(%N)#%L - %S"
+#ifndef MKN_KUL_LOG_FRMT
+#define MKN_KUL_LOG_FRMT "[%M]: %T - %D : %F fn(%N)#%L - %S"
 #endif
 
 namespace mkn {
@@ -89,7 +90,7 @@ class Logger {
            log::mode const& m, std::string& str) {
     mkn::kul::String::REPLACE(str, "%M", modeTxt(m));
     mkn::kul::String::REPLACE(str, "%T", mkn::kul::this_thread::id());
-    mkn::kul::String::REPLACE(str, "%D", mkn::kul::DateTime::NOW(__MKN_KUL_LOG_TIME_FRMT__));
+    mkn::kul::String::REPLACE(str, "%D", mkn::kul::DateTime::NOW(MKN_KUL_LOG_TIME_FRMT));
     mkn::kul::String::REPLACE(str, "%F", f);
     mkn::kul::String::REPLACE(str, "%N", fn);
     mkn::kul::String::REPLACE(str, "%L", std::to_string(l));
@@ -99,17 +100,17 @@ class Logger {
     if (e)
       e(s);
     else
-      fprintf(stderr, "%s", s.c_str());
+      std::cerr << s;
   }
   virtual void out(std::string const& s) {
     if (o)
       o(s);
     else
-      printf("%s", s.c_str());
+      std::cout << s;
   }
   void log(char const* f, char const* fn, uint16_t const& l, std::string const& s,
            log::mode const& m) {
-    std::string st(__MKN_KUL_LOG_FRMT__);
+    std::string st(MKN_KUL_LOG_FRMT);
     str(f, fn, l, s, m, st);
     out(st + mkn::kul::os::EOL());
   }
@@ -161,7 +162,7 @@ class ALogMan {
   }
   void err(std::string const& s) { logger->err(s + mkn::kul::os::EOL()); }
   std::string str(char const* f, char const* fn, uint16_t const& l, log::mode const& _m,
-                  std::string const& s = "", std::string const fmt = __MKN_KUL_LOG_FRMT__) {
+                  std::string const& s = "", std::string const fmt = MKN_KUL_LOG_FRMT) {
     std::string st(fmt);
     logger->str(f, fn, l, s, _m, st);
     return st;
@@ -250,7 +251,7 @@ class DBoMessage : public Message {
 }  // namespace kul
 }  // namespace mkn
 
-#if !defined(_MKN_KUL_DISABLE_KLOG_DEF_) || _MKN_KUL_DISABLE_KLOG_DEF_ == 1
+#if !defined(MKN_KUL_DISABLE_KLOG_DEF_) || MKN_KUL_DISABLE_KLOG_DEF_ == 1
 
 #define KLOG_NON mkn::kul::LogMessage(__FILE__, __func__, __LINE__, mkn::kul::log::mode::NON)
 #define KLOG_INF mkn::kul::LogMessage(__FILE__, __func__, __LINE__, mkn::kul::log::mode::INF)
@@ -277,6 +278,6 @@ class DBoMessage : public Message {
 
 #define KERR mkn::kul::ErrMessage()
 
-#endif  //! defined(_MKN_KUL_DISABLE_KLOG_DEF_)
+#endif  //! defined(MKN_KUL_DISABLE_KLOG_DEF_)
 
-#endif /* _MKN_KUL_LOG_HPP_ */
+#endif /* MKN_KUL_LOG_HPP_ */

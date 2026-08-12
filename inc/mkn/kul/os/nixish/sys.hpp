@@ -30,16 +30,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 // IWYU pragma: private, include "mkn/kul/sys.hpp"
 
-#ifndef _MKN_KUL_OS_NIXISH_SYS_HPP_
-#define _MKN_KUL_OS_NIXISH_SYS_HPP_
+#ifndef MKN_KUL_OS_NIXISH_SYS_HPP_
+#define MKN_KUL_OS_NIXISH_SYS_HPP_
 
 #include "mkn/kul/log.hpp"
 
 #include <dlfcn.h>
 
-#ifndef __MKN_KUL_SYS_DLOPEN__
-#define __MKN_KUL_SYS_DLOPEN__ RTLD_NOW | RTLD_GLOBAL
-#endif  //__MKN_KUL_SYS_DLOPEN__
+#ifndef MKN_KUL_SYS_DLOPEN
+#define MKN_KUL_SYS_DLOPEN RTLD_NOW | RTLD_GLOBAL
+#endif  //MKN_KUL_SYS_DLOPEN
 
 namespace mkn {
 namespace kul {
@@ -59,9 +59,9 @@ class SharedLibrary {
 
  public:
   SharedLibrary(mkn::kul::File const& f) KTHROW(Exception) : _f(f) {
-    if (!_f) KEXCEPSTREAM << "Library attempted to be loaded does not exist: " << _f.full();
-    _handle = dlopen(_f.real().c_str(), __MKN_KUL_SYS_DLOPEN__);
-    if (!_handle) KEXCEPSTREAM << "Cannot load library: " << f << " - Error: " << dlerror();
+    if (!_f) KEXCEPTION("Library attempted to be loaded does not exist: ", _f.full());
+    _handle = dlopen(_f.real().c_str(), MKN_KUL_SYS_DLOPEN);
+    if (!_handle) KEXCEPTION("Cannot load library: ", f, " - Error: ", dlerror());
     _loaded = 1;
   }
   ~SharedLibrary() {
@@ -81,7 +81,7 @@ class SharedFunction {
   SharedFunction(SharedLibrary& lib, std::string const& f) KTHROW(Exception) : _lib(lib) {
     _funcP = (F*)dlsym(_lib._handle, f.c_str());
     char const* dlsym_error = dlerror();
-    if (dlsym_error) KEXCEPSTREAM << "Cannot load symbol create " << dlsym_error;
+    if (dlsym_error) KEXCEPTION("Cannot load symbol create ", dlsym_error);
   }
   ~SharedFunction() { dlerror(); }
   F* pointer() { return _funcP; }
@@ -105,12 +105,12 @@ class SharedClass {
  protected:
   void construct(T*& t) KTHROW(Exception) {
     t = _c.pointer()();
-    if (!t) KEXCEPSTREAM << "Dynamically loaded class was not created";
+    if (!t) KEXCEPTION("Dynamically loaded class was not created");
   }
   void destruct(T*& t) {
     _d.pointer()(t);
     t = nullptr;
-    if (t) KEXCEPSTREAM << "Dynamically loaded class was not destroyed";
+    if (t) KEXCEPTION("Dynamically loaded class was not destroyed");
   }
 };
 
@@ -118,4 +118,4 @@ class SharedClass {
 }  // namespace kul
 }  // namespace mkn
 
-#endif /* _MKN_KUL_OS_NIXISH_SYS_HPP_ */
+#endif /* MKN_KUL_OS_NIXISH_SYS_HPP_ */

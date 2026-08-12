@@ -40,8 +40,8 @@ REQUIRES
  *       T TEMPLATE
  **/
 
-#ifndef _MKN_KUL_MAP_HPP_
-#define _MKN_KUL_MAP_HPP_
+#ifndef MKN_KUL_MAP_HPP_
+#define MKN_KUL_MAP_HPP_
 
 #include <string>
 
@@ -287,4 +287,4 @@ using S2S = S2T<std::string>;
 
 #endif  //_MKN_WITH_GOOGLE_SPARSEHASH_
 
-#endif /* _MKN_KUL_MAP_HPP_ */
+#endif /* MKN_KUL_MAP_HPP_ */

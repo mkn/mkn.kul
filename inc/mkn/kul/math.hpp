@@ -28,14 +28,15 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#ifndef _MKN_KUL_MATH_HPP_
-#define _MKN_KUL_MATH_HPP_
+#ifndef MKN_KUL_MATH_HPP_
+#define MKN_KUL_MATH_HPP_
+
+#include "mkn/kul/except.hpp"
+#include "mkn/kul/std/ints.hpp"
+#include "mkn/kul/std/floats.hpp"
 
 #include <math.h>
 #include <numeric>
-#include <algorithm>
-
-#include "mkn/kul/dbg.hpp"
 
 namespace mkn {
 namespace kul {
@@ -53,14 +54,14 @@ T abs(T const& f) {
 }
 
 template <class T = float>
-T pow(float const& f, int16_t const& e = 2) {
+T pow(Float_t const& f, Int16_t const& e = 2) {
   T r = f < 0 ? -1 : 1;
   for (uint16_t i = 0; i < abs(e); i++) r *= f;
   return e < 0 ? 1 / r : r;
 }
 
 template <class T = float>
-T root(float const& f, int16_t const& r = 2, uint16_t const& it = 6, T g = 0) {
+T root(Float_t const& f, Int16_t const& r = 2, Int16_t const& it = 6, T g = 0) {
   if (r < 1) KEXCEPT(Exception, "Invalid root quotient, must be greater than abs(1)");
   if (g == 0) g = r >= f || r + r >= f ? 1 : (int)f / (r + r);
   for (uint16_t i = 0; i < it; i++) g = ((float)1 / r) * (((r - 1) * g) + (f / pow<T>(g, r - 1)));
@@ -81,15 +82,11 @@ Return sum(Container const& container, Return r = 0) {
 }  // namespace kul
 }  // namespace mkn
 
-#include <algorithm>
-#include <numeric>
-#include <type_traits>
-
 #include "mkn/kul/math/noop.hpp"
 
-#if defined(_MKN_KUL_USE_MKL)
+#if defined(MKN_KUL_USE_MKL)
 #include "mkl.h"
-#elif defined(_MKN_KUL_USE_CBLAS)
+#elif defined(MKN_KUL_USE_CBLAS)
 #if defined(__APPLE__)
 #include <Accelerate/Accelerate.h>
 #else
@@ -98,9 +95,9 @@ extern "C" {
 }
 #endif  // defined(__APPLE__)
 #endif
-#if defined(_MKN_KUL_USE_MKL) || defined(_MKN_KUL_USE_CBLAS)
+#if defined(MKN_KUL_USE_MKL) || defined(MKN_KUL_USE_CBLAS)
 #include "mkn/kul/math/blas.hpp"
 #else
 #include "mkn/kul/math/noblas.hpp"
 #endif
-#endif  // _MKN_KUL_MATH_HPP_
+#endif  // MKN_KUL_MATH_HPP_
