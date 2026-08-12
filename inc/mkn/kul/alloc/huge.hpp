@@ -63,7 +63,7 @@ class HugePageAllocator : public Allocator<T> {
   constexpr HugePageAllocator(HugePageAllocator<U> const&) noexcept {}
 
   T* allocate(std::size_t n) {
-    if (n > std::numeric_limits<std::size_t>::max() / sizeof(T)) throw std::bad_alloc();
+    if (n > (std::numeric_limits<std::size_t>::max)() / sizeof(T)) throw std::bad_alloc();
     void* p = nullptr;
 
     if (posix_memalign(&p, huge_page_size, n * sizeof(T)) != 0) throw std::bad_alloc{};
@@ -103,7 +103,7 @@ class NonConstructingHugePageAllocator : public NonConstructingAllocator<T> {
   constexpr NonConstructingHugePageAllocator(NonConstructingHugePageAllocator<U> const&) noexcept {}
 
   T* allocate(std::size_t n) {
-    if (n > std::numeric_limits<std::size_t>::max() / sizeof(T)) throw std::bad_alloc();
+    if (n > (std::numeric_limits<std::size_t>::max)() / sizeof(T)) throw std::bad_alloc();
     void* p = nullptr;
     if (posix_memalign(&p, huge_page_size, n * sizeof(T)) != 0) throw std::bad_alloc{};
 

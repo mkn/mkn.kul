@@ -48,5 +48,5 @@ jobs:
         MKN_CL_PREFERRED: 1
       run: | # /bin/link interferes with cl/link.exe
         bash -c "rm /bin/link"
-        bash -c "curl -Lo mkn.exe https://github.com/mkn/mkn/releases/download/latest/mkn.exe"
+        bash -c "curl -fL --retry 3 --retry-delay 2 -o mkn.exe https://github.com/mkn/mkn/releases/download/latest/mkn.exe"
         bash -c 'KLOG=3 ./mkn clean build run -dtKOp test,usage -a "-EHsc -std:c++20"'
