@@ -35,12 +35,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <Windows.h>
 
-#include <functional>
-#include <sstream>
+#include <memory>
 #include <string>
 #include <thread>
+#include <sstream>
+#include <functional>
 
 namespace mkn::kul::this_thread {
+
 inline std::string const id() {
   std::ostringstream os;
   os << std::hex << std::hash<std::thread::id>()(std::this_thread::get_id());
@@ -48,7 +50,26 @@ inline std::string const id() {
 }
 
 inline bool main() {
-#include "mkn/kul/os/win/src/thread/main.cpp"
+  std::shared_ptr<void> const hThreadSnapshot(CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0),
+                                              CloseHandle);
+  if (hThreadSnapshot.get() == INVALID_HANDLE_VALUE) {
+    DWORD const gle = GetLastError();
+    KEXCEPT(mkn::kul::threading::Exception,
+            "CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD) failed, GetLastError=", gle);
+  }
+
+  THREADENTRY32 tEntry;
+  tEntry.dwSize = sizeof(THREADENTRY32);
+  DWORD result = 0;
+  DWORD currentPID = GetCurrentProcessId();
+  for (BOOL success = Thread32First(hThreadSnapshot.get(), &tEntry);
+       !result && success && GetLastError() != ERROR_NO_MORE_FILES;
+       success = Thread32Next(hThreadSnapshot.get(), &tEntry))
+    if (tEntry.th32OwnerProcessID == currentPID) result = tEntry.th32ThreadID;
+
+  std::stringstream ss;
+  ss << std::this_thread::get_id();
+  return std::to_string(result) == ss.str();
 }
 
 inline void kill() {
@@ -56,6 +77,7 @@ inline void kill() {
   TerminateThread(h, 0);
   CloseHandle(h);
 }
+
 }  // namespace mkn::kul::this_thread
 
 #endif /* MKN_KUL_OS_WIN_THREADS_DEF_HPP_ */

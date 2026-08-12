@@ -33,10 +33,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef MKN_KUL_OS_ANY_PROC_ANY_PROC_HPP_
 #define MKN_KUL_OS_ANY_PROC_ANY_PROC_HPP_
 
+#include "mkn/kul/os.hpp"
 #include "mkn/kul/cli.hpp"
 #include "mkn/kul/env.hpp"
+#include "mkn/kul/log.hpp"
 #include "mkn/kul/map.hpp"
-#include "mkn/kul/os/def.hpp"
 #include "mkn/kul/except.hpp"
 #include "mkn/kul/os/any/proc/def.hpp"
 

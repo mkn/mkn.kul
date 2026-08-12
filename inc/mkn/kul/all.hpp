@@ -33,7 +33,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <tuple>
 #include <vector>
-#include <numeric>
 #include <algorithm>
 
 #include "mkn/kul/span.hpp"

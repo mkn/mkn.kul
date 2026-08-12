@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define MKN_KUL_SCM_HPP_
 
 #include "mkn/kul/os.hpp"
+#include "mkn/kul/log.hpp"
 #include "mkn/kul/proc.hpp"
 #include "mkn/kul/string.hpp"
 

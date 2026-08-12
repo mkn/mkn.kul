@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define MKN_KUL_EXCEPT_HPP_
 
 #include "mkn/kul/defs.hpp"
+#include "mkn/kul/std/string.hpp"
 
 #include <cstdint>
 #include <memory>
@@ -138,22 +139,13 @@ class Exit : public Exception {
   Exit& operator=(Exit const&& e) = delete;
 };
 
-namespace except {
-template <class... Args>
-inline std::string str(Args const&... args) {
-  std::ostringstream ss;
-  (ss << ... << args);
-  return ss.str();
-}
-}  // namespace except
-
 }  // namespace mkn::kul
 
-#define KEXCEPT(e, ...) throw e(__FILE__, __LINE__, ::mkn::kul::except::str(__VA_ARGS__))
+#define KEXCEPT(e, ...) throw e(__FILE__, __LINE__, ::mkn::kul::to_str(__VA_ARGS__))
 #define KEXCEPTSTR(e) throw e(__FILE__, __LINE__, "")
 #define KEXCEPTION(...) \
-  throw ::mkn::kul::Exception(__FILE__, __LINE__, ::mkn::kul::except::str(__VA_ARGS__))
+  throw ::mkn::kul::Exception(__FILE__, __LINE__, ::mkn::kul::to_str(__VA_ARGS__))
 
-#define KEXIT(e, m) throw mkn::kul::Exit(__FILE__, __LINE__, m, e)
+#define KEXIT(e, ...) throw mkn::kul::Exit(__FILE__, __LINE__, ::mkn::kul::to_str(__VA_ARGS__), e)
 
 #endif /* MKN_KUL_EXCEPT_HPP_ */
