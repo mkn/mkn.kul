@@ -54,12 +54,12 @@ class Exception : public mkn::kul::Exception {
 };
 
 inline std::streamsize checkedStreamSize(size_t const& l) KTHROW(Exception) {
-  if (l > static_cast<size_t>(std::numeric_limits<std::streamsize>::max()))
+  if (l > static_cast<size_t>((std::numeric_limits<std::streamsize>::max)()))
     KEXCEPT(Exception, "Length exceeds maximum stream size");
   return static_cast<std::streamsize>(l);
 }
 inline std::streamoff checkedStreamOff(size_t const& l) KTHROW(Exception) {
-  if (l > static_cast<size_t>(std::numeric_limits<std::streamoff>::max()))
+  if (l > static_cast<size_t>((std::numeric_limits<std::streamoff>::max)()))
     KEXCEPT(Exception, "Length exceeds maximum stream size");
   return static_cast<std::streamoff>(l);
 }
