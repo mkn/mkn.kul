@@ -31,8 +31,8 @@ TEST(ZipOperations, works) {
   EXPECT_EQ(result, expected);
 
   double acc = 0;
-  acc += std::accumulate(d0.begin(), d0.end(), 0);
-  acc += std::accumulate(d1.begin(), d1.end(), 0);
-  acc += std::accumulate(d2.begin(), d2.end(), 0);
+  acc += std::accumulate(d0.begin(), d0.end(), 0.0);
+  acc += std::accumulate(d1.begin(), d1.end(), 0.0);
+  acc += std::accumulate(d2.begin(), d2.end(), 0.0);
   EXPECT_EQ(result, acc);
 }

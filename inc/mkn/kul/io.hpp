@@ -28,13 +28,14 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#ifndef _MKN_KUL_IO_HPP_
-#define _MKN_KUL_IO_HPP_
+#ifndef MKN_KUL_IO_HPP_
+#define MKN_KUL_IO_HPP_
 
 #include <time.h>
 #include <cstdint>
 #include <cstring>
 #include <fstream>
+#include <limits>
 #include <memory>
 #include <stdexcept>
 
@@ -52,6 +53,17 @@ class Exception : public mkn::kul::Exception {
   Exception(char const* f, size_t const& l, std::string const& s) : mkn::kul::Exception(f, l, s) {}
 };
 
+inline std::streamsize checkedStreamSize(size_t const& l) KTHROW(Exception) {
+  if (l > static_cast<size_t>(std::numeric_limits<std::streamsize>::max()))
+    KEXCEPT(Exception, "Length exceeds maximum stream size");
+  return static_cast<std::streamsize>(l);
+}
+inline std::streamoff checkedStreamOff(size_t const& l) KTHROW(Exception) {
+  if (l > static_cast<size_t>(std::numeric_limits<std::streamoff>::max()))
+    KEXCEPT(Exception, "Length exceeds maximum stream size");
+  return static_cast<std::streamoff>(l);
+}
+
 class AReader {
  public:
   std::ifstream const& buffer() const { return f; }
@@ -64,7 +76,7 @@ class AReader {
   virtual char const* readLine() = 0;
   virtual size_t read(char* c, size_t const& l) = 0;
   virtual void seek(size_t const& l) = 0;
-  static void seek(std::ifstream& _f, size_t const& _l) { _f.seekg(_l); }
+  static void seek(std::ifstream& _f, size_t const& _l) { _f.seekg(checkedStreamOff(_l)); }
 
  protected:
   char const* readLine(std::ifstream& _f) {
@@ -97,7 +109,7 @@ class AReader {
     if (_f.good()) {
       std::vector<char> v;
       v.resize(l);
-      _f.read(&v[0], l);
+      _f.read(&v[0], checkedStreamSize(l));
       v.resize((size_t)_f.gcount());
       s1 = std::string(v.begin(), v.end());
       std::strcpy(c, s1.c_str());
@@ -134,7 +146,7 @@ class BinaryReader : public AReader {
   size_t read(char* c, size_t const& s) {
     size_t red = 0;
     try {
-      red = f.readsome(c, s);
+      red = f.readsome(c, checkedStreamSize(s));
       KLOG(INF) << red;
     } catch (std::ios_base::failure const& e) {
       KLOG(ERR) << e.what();
@@ -144,7 +156,7 @@ class BinaryReader : public AReader {
   size_t read(uint8_t* c, size_t const& s) {
     size_t red = 0;
     try {
-      red = f.readsome((char*)c, s);
+      red = f.readsome((char*)c, checkedStreamSize(s));
     } catch (std::ios_base::failure const& e) {
       KLOG(ERR) << e.what();
     }
@@ -169,11 +181,11 @@ class AWriter {
     return *this;
   }
   AWriter& write(char const* c, size_t len) {
-    f.write(c, len);
+    f.write(c, checkedStreamSize(len));
     return *this;
   }
   AWriter& write(uint8_t const* c, size_t len) {
-    f.write((char const*)(c), len);
+    f.write((char const*)(c), checkedStreamSize(len));
     return *this;
   }
   template <class T>
@@ -222,4 +234,4 @@ class BinaryWriter : public AWriter {
 }  // namespace io
 }  // namespace kul
 }  // namespace mkn
-#endif /* _MKN_KUL_IO_HPP_ */
+#endif /* MKN_KUL_IO_HPP_ */

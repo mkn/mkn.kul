@@ -28,8 +28,8 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#ifndef _MKN_KUL_SCM_HPP_
-#define _MKN_KUL_SCM_HPP_
+#ifndef MKN_KUL_SCM_HPP_
+#define MKN_KUL_SCM_HPP_
 
 #include "mkn/kul/os.hpp"
 #include "mkn/kul/proc.hpp"
@@ -87,7 +87,7 @@ class Git : public SCM {
     try {
       p.start();
     } catch (mkn::kul::proc::ExitException const& e) {
-      KEXCEPT(Exception, "SCM ERROR - Checking local branch") << p.toString();
+      KEXCEPT(Exception, "SCM ERROR - Checking local branch", p.toString());
     }
     auto const lines = mkn::kul::String::LINES(pc.outs());
     if (lines.empty()) return {};
@@ -270,4 +270,4 @@ KEXCEPT(Exception, "SCM ERROR - SVN NOT IMPLEMENTED"); }
 }  // namespace scm
 }  // namespace kul
 }  // namespace mkn
-#endif /* _MKN_KUL_SCM_HPP_ */
+#endif /* MKN_KUL_SCM_HPP_ */

@@ -28,8 +28,8 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#ifndef _MKN_KUL_OS_WIN_CLI_OS_HPP_
-#define _MKN_KUL_OS_WIN_CLI_OS_HPP_
+#ifndef MKN_KUL_OS_WIN_CLI_OS_HPP_
+#define MKN_KUL_OS_WIN_CLI_OS_HPP_
 
 #include <Windows.h>
 
@@ -40,19 +40,27 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace mkn {
 namespace kul {
 namespace cli {
-#ifndef _MKN_KUL_COMPILED_LIB_
+
 inline std::string hidden(std::string const& t) {
-#include "mkn/kul/os/win/src/cli/hidden.cpp"
+  if (!t.empty()) std::cout << t << std::endl;
+  HANDLE hStdin = GetStdHandle(STD_INPUT_HANDLE);
+  DWORD mode = 0;
+  GetConsoleMode(hStdin, &mode);
+  SetConsoleMode(hStdin, mode & (~ENABLE_ECHO_INPUT));
+  std::string s;
+  std::getline(std::cin, s);
+  SetConsoleMode(hStdin, mode);
+  return s;
 }
 inline void show() {
-#include "mkn/kul/os/win/src/cli/show.cpp"
+  HANDLE hStdin = GetStdHandle(STD_INPUT_HANDLE);
+  DWORD mode = 0;
+  GetConsoleMode(hStdin, &mode);
+  SetConsoleMode(hStdin, mode | (ENABLE_ECHO_INPUT));
 }
-#else
-std::string hidden(std::string const& t);
-void show();
-#endif
+
 }  // namespace cli
 }  // namespace kul
 }  // namespace mkn
 
-#endif /* _MKN_KUL_OS_WIN_CLI_OS_HPP_ */
+#endif /* MKN_KUL_OS_WIN_CLI_OS_HPP_ */

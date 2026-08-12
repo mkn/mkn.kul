@@ -1,6 +1,6 @@
 
-#ifndef _MKN_KUL_TESTS_CMN_HPP_
-#define _MKN_KUL_TESTS_CMN_HPP_
+#ifndef MKN_KUL_TESTS_CMN_HPP_
+#define MKN_KUL_TESTS_CMN_HPP_
 
 #include "gtest/gtest.h"
 
@@ -24,4 +24,4 @@ void inline tryCatch(std::vector<std::function<void()>> funcs, bool katch) {
     }
 };
 
-#endif /*_MKN_KUL_TESTS_CMN_HPP_*/
+#endif /*MKN_KUL_TESTS_CMN_HPP_*/

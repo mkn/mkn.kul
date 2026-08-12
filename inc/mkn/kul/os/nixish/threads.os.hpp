@@ -30,43 +30,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 // IWYU pragma: private, include "mkn/kul/threads.hpp"
 
-#ifndef _MKN_KUL_OS_NIXISH_THREADS_OS_HPP_
-#define _MKN_KUL_OS_NIXISH_THREADS_OS_HPP_
+#ifndef MKN_KUL_OS_NIXISH_THREADS_OS_HPP_
+#define MKN_KUL_OS_NIXISH_THREADS_OS_HPP_
 
 #include <pthread.h>
 #include <signal.h>
 #include <sys/syscall.h>
 #include <unistd.h>
 
-#if defined(__NetBSD__)
-#include <lwp.h>
-#endif
+#include "mkn/kul/os/nixish/threads/def.hpp"
 
 namespace mkn {
 namespace kul {
-namespace this_thread {
-inline std::string const id() {
-  std::ostringstream os;
-  os << std::hex << pthread_self();
-  return os.str();
-}
-
-// http://stackoverflow.com/questions/4867839/how-can-i-tell-if-pthread-self-is-the-main-first-thread-in-the-process
-inline bool main() {
-#if defined(__FreeBSD__)
-  return 0;
-#elif defined(__NetBSD__)
-  return _lwp_self();
-#elif defined(__OpenBSD__)
-  return 0;
-#elif defined(__APPLE__)
-  return 0;
-#else
-  return getpid() == syscall(SYS_gettid);
-#endif
-}
-inline void kill() { pthread_exit(0); }
-}  // namespace this_thread
 
 class Mutex {
  private:
@@ -134,4 +109,4 @@ class Thread : public threading::AThread {
 
 }  // namespace kul
 }  // namespace mkn
-#endif /* _MKN_KUL_OS_NIXISH_THREADS_OS_HPP_ */
+#endif /* MKN_KUL_OS_NIXISH_THREADS_OS_HPP_ */

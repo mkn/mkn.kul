@@ -28,8 +28,8 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#ifndef _MKN_KUL_DBG_HPP_
-#define _MKN_KUL_DBG_HPP_
+#ifndef MKN_KUL_DBG_HPP_
+#define MKN_KUL_DBG_HPP_
 
 #include "mkn/kul/log.hpp"
 #include "mkn/kul/defs.hpp"
@@ -56,7 +56,7 @@ class StackTrace {
 
 #if !defined(NDEBUG) || defined(MKN_KUL_FORCE_TRACE)
 
-#define __MKN_KUL_TRACE__ 1
+#define MKN_KUL_TRACE 1
 
 #ifndef MKN_KUL_TRACE_OR_VOID
 #define MKN_KUL_TRACE_OR_VOID mkn::kul::dbg::StackTrace
@@ -69,7 +69,7 @@ class StackTrace {
 #ifndef MKN_KUL_LOG_SCOPE
 #define MKN_KUL_LOG_SCOPE(s)                                              \
   mkn::kul::dbg::FunctionScope MKN_KUL_STR_CAT(_mkn_dbg_scope, __LINE__)( \
-      __FILE__, std::string{__func__} + ":" + s, __LINE__)
+      __FILE__, std::string{__func__} + ":" + (s), __LINE__)
 #endif  // MKN_KUL_LOG_SCOPE
 
 #ifndef MKN_KUL_DBG_FUNC_ENTER
@@ -80,7 +80,7 @@ class StackTrace {
 
 #else  //
 
-#define __MKN_KUL_TRACE__ 0
+#define MKN_KUL_TRACE 0
 #define MKN_KUL_TRACE_OR_VOID void
 #define MKN_KUL_STACK_TRACE
 #define MKN_KUL_DBG_FUNC_ENTER
@@ -88,7 +88,7 @@ class StackTrace {
 
 #endif  // defined(MKN_KUL_FORCE_TRACE) || !defined(NDEBUG)
 
-#if __MKN_KUL_TRACE__
+#if MKN_KUL_TRACE
 
 class FunctionScope {
  public:
@@ -112,10 +112,10 @@ class FunctionScope {
   std::string m_fu;
 };
 
-#endif  // __MKN_KUL_TRACE__
+#endif  // MKN_KUL_TRACE
 
 }  // namespace dbg
 }  // namespace kul
 }  // namespace mkn
 
-#endif /* _MKN_KUL_DBG_HPP_ */
+#endif /* MKN_KUL_DBG_HPP_ */

@@ -30,8 +30,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 // IWYU pragma: private, include "mkn/kul/os.hpp"
 
-#ifndef _MKN_KUL_OS_NIXISH_OS_TOP_HPP_
-#define _MKN_KUL_OS_NIXISH_OS_TOP_HPP_
+#ifndef MKN_KUL_OS_NIXISH_OS_TOP_HPP_
+#define MKN_KUL_OS_NIXISH_OS_TOP_HPP_
 
 #include <dirent.h>
 #include <pwd.h>
@@ -67,4 +67,4 @@ class KulTimeStampsResolver {
 }  // namespace kul
 }  // namespace mkn
 
-#endif /* _MKN_KUL_OS_NIXISH_OS_TOP_HPP_ */
+#endif /* MKN_KUL_OS_NIXISH_OS_TOP_HPP_ */

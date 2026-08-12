@@ -28,8 +28,8 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#ifndef _MKN_KUL_OS_WIN_ENV_HPP_
-#define _MKN_KUL_OS_WIN_ENV_HPP_
+#ifndef MKN_KUL_OS_WIN_ENV_HPP_
+#define MKN_KUL_OS_WIN_ENV_HPP_
 
 #include <direct.h>
 #include <io.h>
@@ -42,25 +42,21 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <algorithm>
 #include <fstream>
 
+#include "mkn/kul/os/def.hpp"
+
 namespace mkn {
 namespace kul {
 namespace env {
 
-#if defined(_MKN_KUL_MAX_PATH_)
-constexpr size_t KUL_MAX_PATH = _MKN_KUL_MAX_PATH_;
+#if defined(MKN_KUL_MAX_PATH_)
+constexpr size_t KUL_MAX_PATH = MKN_KUL_MAX_PATH_;
 #elif defined(_MAX_PATH)
 constexpr size_t KUL_MAX_PATH = _MAX_PATH;
 #else
 #error  // could not set KUL_MAX_PATH
-#endif  /*_MKN_KUL_MAX_PATH_*/
+#endif  /*MKN_KUL_MAX_PATH_*/
 
-inline std::string EOL() {
-#if (_MSC_VER >= 1800)
-  return "\n";
-#else
-  return "\r\n";
-#endif
-}
+inline std::string EOL() { return mkn::kul::os::EOL(); }
 
 inline bool EXISTS(char const* c) {
   bool set = 0;
@@ -105,4 +101,4 @@ inline bool CWD(std::string const& c) { return _chdir(c.c_str()) != -1; }
 }  // namespace kul
 }  // namespace mkn
 
-#endif /* _MKN_KUL_OS_WIN_ENV_HPP_ */
+#endif /* MKN_KUL_OS_WIN_ENV_HPP_ */

@@ -37,8 +37,8 @@ or via cli
     mkn build -w parse.yaml
 */
 
-#ifndef _MKN_KUL_YAML_HPP_
-#define _MKN_KUL_YAML_HPP_
+#ifndef MKN_KUL_YAML_HPP_
+#define MKN_KUL_YAML_HPP_
 
 #include "mkn/kul/io.hpp"
 #include "mkn/kul/dbg.hpp"
@@ -141,7 +141,7 @@ class String : public Item {
     try {
       r = YAML::Load(s);
     } catch (std::exception const& e) {
-      KEXCEPTION("YAML failed to parse\nError/String: " + std::string(e.what())) << "\n" << s;
+      KEXCEPTION("YAML failed to parse\nError/String: ", e.what(), "\n", s);
     }
   }
   YAML::Node const& validate(Validator const&& v) KTHROW(Exception) {
@@ -187,4 +187,4 @@ class File : public Item {
 }  // namespace yaml
 }  // namespace kul
 }  // namespace mkn
-#endif /* _MKN_KUL_YAML_HPP_ */
+#endif /* MKN_KUL_YAML_HPP_ */

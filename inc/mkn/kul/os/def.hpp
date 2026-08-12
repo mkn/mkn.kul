@@ -30,8 +30,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 // IWYU pragma: private, include "mkn/kul/defs.hpp"
 
-#ifndef _MKN_KUL_OS_DEF_HPP_
-#define _MKN_KUL_OS_DEF_HPP_
+#ifndef MKN_KUL_OS_DEF_HPP_
+#define MKN_KUL_OS_DEF_HPP_
 
 #if MKN_KUL_IS_NIX
 #include "mkn/kul/os/nix/def.hpp"
@@ -43,4 +43,4 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #error unresolved
 #endif
 
-#endif  // _MKN_KUL_OS_DEF_HPP_
+#endif  // MKN_KUL_OS_DEF_HPP_

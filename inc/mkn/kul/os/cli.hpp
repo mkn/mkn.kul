@@ -30,8 +30,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 // IWYU pragma: private, include "mkn/kul/cli.hpp"
 
-#ifndef _MKN_KUL_OS_CLI_HPP_
-#define _MKN_KUL_OS_CLI_HPP_
+#ifndef MKN_KUL_OS_CLI_HPP_
+#define MKN_KUL_OS_CLI_HPP_
 
 #include "mkn/kul/defs.hpp"
 
@@ -41,4 +41,4 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "mkn/kul/os/nixish/cli.os.hpp"
 #endif
 
-#endif  // _MKN_KUL_OS_CLI_HPP_
+#endif  // MKN_KUL_OS_CLI_HPP_

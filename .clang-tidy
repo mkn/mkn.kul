@@ -1,0 +1,5 @@
+---
+Checks: '-*,bugprone-*,cert-*,portability-*,-bugprone-throwing-static-initialization,-cert-err58-cpp'#
+HeaderFilterRegex: 'inc/mkn/kul/|tst/'
+...
+

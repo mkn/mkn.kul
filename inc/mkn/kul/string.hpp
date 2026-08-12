@@ -28,8 +28,8 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#ifndef _MKN_KUL_STRING_HPP_
-#define _MKN_KUL_STRING_HPP_
+#ifndef MKN_KUL_STRING_HPP_
+#define MKN_KUL_STRING_HPP_
 
 #include "mkn/kul/except.hpp"
 
@@ -147,7 +147,7 @@ class String {
   }
   static void ESC_SPLIT(std::string const& s, char const& d, std::vector<std::string>& v,
                         char const& e = '\\') {
-    std::string l = s, ds = std::string(1, d), es = std::string(1, e);
+    std::string l = s, es = std::string(1, e);
     std::string tmp = l;
     size_t pos = 0, esc = 0;
     while ((pos = l.find(d, esc)) != std::string::npos) {
@@ -314,4 +314,4 @@ class String {
 };
 }  // namespace kul
 }  // namespace mkn
-#endif /* _MKN_KUL_STRING_HPP_ */
+#endif /* MKN_KUL_STRING_HPP_ */

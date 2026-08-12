@@ -28,8 +28,8 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#ifndef _MKN_KUL_OS_HPP_
-#define _MKN_KUL_OS_HPP_
+#ifndef MKN_KUL_OS_HPP_
+#define MKN_KUL_OS_HPP_
 
 #include "mkn/kul/env.hpp"
 #include "mkn/kul/except.hpp"
@@ -161,10 +161,7 @@ class Dir : public fs::Item {
 #endif
   friend class File;
 
-  Dir& operator=(Dir const& d) {
-    this->_p = d._p;
-    return *this;
-  }
+  Dir& operator=(Dir const& d) = default;
   bool operator==(Dir const& d) const {
     if (is() && d.is()) return real().compare(d.real()) == 0;
     return path().compare(d.path()) == 0;
@@ -214,12 +211,13 @@ class File : public fs::Item {
         this->_d = Dir(Dir::PRNT(this->_n), m);
         this->_n = this->_n.substr(_d.path().size() + 1);
       } catch (mkn::kul::fs::Exception const& e) {
+        std::cerr << e.debug() << std::endl;
       }
     } else if (n.find(Dir::SEP()) != std::string::npos) {
       this->_d = Dir(n.substr(0, n.rfind(Dir::SEP())));
       this->_n = this->_n.substr(n.rfind(Dir::SEP()) + 1);
-    } else if (auto const& _N = Dir::REAL_OR_NULL(this->_n)) {
-      this->_d = Dir(Dir::PRNT(*_N), m);
+    } else if (auto const& real = Dir::REAL_OR_NULL(this->_n)) {
+      this->_d = Dir(Dir::PRNT(*real), m);
     } else {
       this->_d = Dir(env::CWD());
     }
@@ -300,7 +298,7 @@ namespace os {
 class PushDir {
  public:
   PushDir(mkn::kul::Dir const& d) {
-    if (!d) KEXCEPTION("PushDir directory does not exist: ") << d;
+    if (!d) KEXCEPTION("PushDir directory does not exist: ", d);
     cwd = mkn::kul::env::CWD();
     mkn::kul::env::CWD(d.real());
   }
@@ -337,4 +335,4 @@ inline bool WHICH(std::string const& s) { return WHERE(s.c_str()).size(); }
 #include "mkn/kul/os/nixish/os.bot.hpp"
 #endif
 
-#endif /* _MKN_KUL_OS_HPP_ */
+#endif /* MKN_KUL_OS_HPP_ */

@@ -30,8 +30,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 // IWYU pragma: private, include "mkn/kul/proc.hpp"
 
-#ifndef _MKN_KUL_OS_BSD_PROC_OS_HPP_
-#define _MKN_KUL_OS_BSD_PROC_OS_HPP_
+#ifndef MKN_KUL_OS_BSD_PROC_OS_HPP_
+#define MKN_KUL_OS_BSD_PROC_OS_HPP_
 
 #include <assert.h>
 #include <fcntl.h>
@@ -97,4 +97,4 @@ inline uint16_t cpuLoad() { return 0; }
 }  // namespace this_proc
 }  // namespace kul
 }  // namespace mkn
-#endif /* _MKN_KUL_OS_BSD_PROC_OS_HPP_ */
+#endif /* MKN_KUL_OS_BSD_PROC_OS_HPP_ */

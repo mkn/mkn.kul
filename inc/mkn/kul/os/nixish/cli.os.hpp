@@ -28,8 +28,8 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#ifndef _MKN_KUL_OS_NIXISH_CLI_OS_HPP_
-#define _MKN_KUL_OS_NIXISH_CLI_OS_HPP_
+#ifndef MKN_KUL_OS_NIXISH_CLI_OS_HPP_
+#define MKN_KUL_OS_NIXISH_CLI_OS_HPP_
 
 #include <termios.h>
 #include <unistd.h>
@@ -39,16 +39,27 @@ namespace mkn {
 namespace kul {
 namespace cli {
 
-inline std::string hidden(std::string const& t);
-inline void show();
+inline std::string hidden(std::string const& t) {
+  if (!t.empty()) std::cout << t << std::endl;
+  termios oldt;
+  tcgetattr(STDIN_FILENO, &oldt);
+  termios newt = oldt;
+  newt.c_lflag &= ~ECHO;
+  tcsetattr(STDIN_FILENO, TCSANOW, &newt);
+  std::string s;
+  std::getline(std::cin, s);
+  tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
+  return s;
+}
+inline void show() {
+  termios tty;
+  tcgetattr(STDIN_FILENO, &tty);
+  tty.c_lflag |= ECHO;
+  tcsetattr(STDIN_FILENO, TCSANOW, &tty);
+}
 
 }  // namespace cli
 }  // namespace kul
 }  // namespace mkn
 
-#ifndef _MKN_KUL_COMPILED_LIB_
-#include "mkn/kul/os/nixish/src/cli/hidden.ipp"
-#include "mkn/kul/os/nixish/src/cli/show.ipp"
-#endif
-
-#endif /* _MKN_KUL_OS_NIXISH_CLI_OS_HPP_ */
+#endif /* MKN_KUL_OS_NIXISH_CLI_OS_HPP_ */
