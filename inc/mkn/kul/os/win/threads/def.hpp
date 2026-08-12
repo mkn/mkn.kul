@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef MKN_KUL_OS_WIN_THREADS_DEF_HPP_
 #define MKN_KUL_OS_WIN_THREADS_DEF_HPP_
 
+#include <TlHelp32.h>
 #include <Windows.h>
 
 #include <memory>
