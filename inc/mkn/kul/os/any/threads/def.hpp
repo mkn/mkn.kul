@@ -33,7 +33,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef MKN_KUL_OS_ANY_THREADS_DEF_HPP_
 #define MKN_KUL_OS_ANY_THREADS_DEF_HPP_
 
+#include "mkn/kul/except.hpp"
+
+#include <atomic>
 #include <chrono>
+#include <exception>
 #include <thread>
 
 namespace mkn::kul::this_thread {
@@ -47,5 +51,39 @@ inline void nSleep(unsigned long const& nanos) {
   std::this_thread::sleep_for(std::chrono::nanoseconds(nanos));
 }
 }  // namespace mkn::kul::this_thread
+
+namespace mkn::kul::threading {
+
+class Exception : public mkn::kul::Exception {
+ public:
+  Exception(char const* f, uint16_t const& l, std::string const& s)
+      : mkn::kul::Exception(f, l, s) {}
+};
+class InterruptionException : public Exception {
+ public:
+  InterruptionException(char const* f, uint16_t const& l, std::string const& s)
+      : Exception(f, l, s) {}
+};
+
+class AThread {
+ protected:
+  std::atomic<bool> f, s;
+  std::exception_ptr ep;
+
+  AThread() : f(1), s(0) {}
+  virtual void run() KTHROW(mkn::kul::threading::Exception) = 0;
+
+ public:
+  virtual ~AThread() {}
+  virtual void join() = 0;
+  bool started() const { return s; }
+  bool finished() const { return f; }
+  auto& exception() const { return ep; }
+  void rethrow() {
+    if (ep) std::rethrow_exception(ep);
+  }
+};
+
+}  // namespace mkn::kul::threading
 
 #endif /* MKN_KUL_OS_ANY_THREADS_DEF_HPP_ */
