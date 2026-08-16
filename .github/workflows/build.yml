@@ -10,6 +10,10 @@ on:
   pull_request:
     branches: [ master ]
 
+env:
+  CURL_GET: curl -fL --retry 3 --retry-delay 2
+  PATH_GET: https://github.com/mkn/mkn/releases/download/latest
+
 jobs:
   ubuntu:
     runs-on: ubuntu-latest
@@ -18,7 +22,7 @@ jobs:
 
     - name: "Build/Test"
       run: |
-        curl -fL --retry 3 --retry-delay 2 -o mkn https://github.com/mkn/mkn/releases/download/latest/mkn_nix
+        $CURL_GET -o mkn ${PATH_GET}/mkn_nix
         chmod +x mkn
         KLOG=3 ./mkn clean build run -dtOp test,usage -a "-std=c++20 -fPIC" -W 9
 
@@ -29,7 +33,7 @@ jobs:
 
     - name: "Build/Test"
       run: |
-        curl -fL --retry 3 --retry-delay 2 -o mkn https://github.com/mkn/mkn/releases/download/latest/mkn_arm_osx
+        $CURL_GET -o mkn ${PATH_GET}/mkn_arm_osx
         chmod +x mkn
         KLOG=3 ./mkn clean build run -dtOp test,usage -a "-std=c++20 -fPIC" -W 9
 
@@ -48,5 +52,5 @@ jobs:
         MKN_CL_PREFERRED: 1
       run: | # /bin/link interferes with cl/link.exe
         bash -c "rm /bin/link"
-        bash -c "curl -fL --retry 3 --retry-delay 2 -o mkn.exe https://github.com/mkn/mkn/releases/download/latest/mkn.exe"
+        bash -c '$CURL_GET -o mkn.exe ${PATH_GET}/mkn.exe'
         bash -c 'KLOG=3 ./mkn clean build run -dtKOp test,usage -a "-EHsc -std:c++20"'
