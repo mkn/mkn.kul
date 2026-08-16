@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef MKN_KUL_SERIAL_HPP_
 #define MKN_KUL_SERIAL_HPP_
 
-#if defined(_MKN_WITH_IO_CEREAL_)
+#if defined(MKN_WITH_IO_CEREAL)
 #include <cereal/cereal.hpp>
 #include <cereal/types/base_class.hpp>
 #include <cereal/types/memory.hpp>
@@ -42,6 +42,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cereal/types/vector.hpp>
 
 #include <cereal/archives/portable_binary.hpp>
-#endif  //  _MKN_WITH_IO_CEREAL_
+#endif  //  MKN_WITH_IO_CEREAL
 
 #endif  // MKN_KUL_SERIAL_HPP_

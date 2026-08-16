@@ -40,6 +40,8 @@ or via cli
 #ifndef MKN_KUL_YAML_HPP_
 #define MKN_KUL_YAML_HPP_
 
+#if __has_include("yaml-cpp/yaml.h")
+
 #include "mkn/kul/io.hpp"
 #include "mkn/kul/dbg.hpp"
 #include "mkn/kul/map.hpp"
@@ -50,9 +52,7 @@ or via cli
 #include <vector>
 #include <cstdint>
 
-namespace mkn {
-namespace kul {
-namespace yaml {
+namespace mkn::kul::yaml {
 
 class Validator;
 class NodeValidator;
@@ -184,7 +184,9 @@ class File : public Item {
  private:
   std::string const f;  // file
 };
-}  // namespace yaml
-}  // namespace kul
-}  // namespace mkn
+
+}  // namespace mkn::kul::yaml
+
+#endif  // "yaml-cpp/yaml.h"
+
 #endif /* MKN_KUL_YAML_HPP_ */

@@ -30,7 +30,7 @@ TEST(IO_Test, ReadFile) {
 }
 
 // Travis has a tough time with this one
-#if defined(_MKN_TEST_BINARY_READING_)
+#if defined(MKN_TEST_BINARY_READING)
 TEST(IO_Test, ReadBinaryFileLine) {
   mkn::kul::io::BinaryReader r("LICENSE.md");
   char const* c = r.readLine();

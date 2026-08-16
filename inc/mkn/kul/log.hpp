@@ -28,13 +28,14 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#ifndef MKN_KUL_LOG_HPP_
-#define MKN_KUL_LOG_HPP_
+#ifndef MKN_KUL_LOG_HPP
+#define MKN_KUL_LOG_HPP
+
+#include "mkn/kul/defs.hpp"
 
 #include "mkn/kul/env.hpp"
 #include "mkn/kul/time.hpp"
 #include "mkn/kul/except.hpp"
-#include "mkn/kul/os/def.hpp"
 #include "mkn/kul/threads/def.hpp"
 
 #include <memory>
@@ -280,4 +281,4 @@ class DBoMessage : public Message {
 
 #endif  //! defined(MKN_KUL_DISABLE_KLOG_DEF_)
 
-#endif /* MKN_KUL_LOG_HPP_ */
+#endif /* MKN_KUL_LOG_HPP */

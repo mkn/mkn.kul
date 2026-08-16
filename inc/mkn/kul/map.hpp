@@ -45,7 +45,7 @@ REQUIRES
 
 #include <string>
 
-#ifndef _MKN_WITH_GOOGLE_SPARSEHASH_
+#ifndef MKN_WITH_GOOGLE_SPARSEHASH
 
 #include <unordered_map>
 #include <unordered_set>
@@ -285,6 +285,6 @@ using S2S = S2T<std::string>;
 }  // namespace kul
 }  // namespace mkn
 
-#endif  //_MKN_WITH_GOOGLE_SPARSEHASH_
+#endif  //MKN_WITH_GOOGLE_SPARSEHASH
 
 #endif /* MKN_KUL_MAP_HPP_ */

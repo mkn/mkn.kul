@@ -41,6 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cstdint>
 #include <cstdlib>
 #include <cstring>
+#include <optional>
 #include <sstream>
 #include <utility>
 #include <algorithm>
@@ -50,6 +51,12 @@ namespace mkn {
 namespace kul {
 
 enum STR_INT_RET { IS_SUCCESS = 0, IS_OVERFLOW, IS_UNDERFLOW, IS_INCONVERTIBLE };
+
+struct Between {
+  std::string remaining;
+  std::optional<std::string> found;
+  bool error = 0;
+};
 
 class StringException : public mkn::kul::Exception {
  public:
@@ -172,6 +179,23 @@ class String {
     std::transform(b.begin(), b.end(), b.begin(), ::tolower);
     return (a == b);
   }
+  static Between BETWEEN(std::string const& in, std::string lstr, std::string rstr) {
+    Between ret{in, {}, 0};
+
+    auto lpos = in.find(lstr), rpos = in.rfind(rstr);
+
+    if (lpos != std::string::npos) {
+      if (rpos == std::string::npos) {
+        ret.error = 1;
+        return ret;
+      }
+      ret.found = in.substr(lpos + 1, rpos - lpos - 1);
+      ret.remaining = in.substr(0, lpos) + in.substr(rpos + 1);
+    }
+
+    return ret;
+  }
+
   static std::vector<std::string> LINES(std::string const& s) {
     std::vector<std::string> v;
     LINES(s, v);

@@ -28,8 +28,8 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#ifndef MKN_KUL_ASIO_LOG_HPP_
-#define MKN_KUL_ASIO_LOG_HPP_
+#ifndef MKN_KUL_ASIO_LOG_HPP
+#define MKN_KUL_ASIO_LOG_HPP
 
 #include "mkn/kul/log.hpp"
 #include "mkn/kul/threads.hpp"
@@ -139,4 +139,5 @@ struct ErrMessage : public Message {
 }  // namespace asio
 }  // namespace kul
 }  // namespace mkn
-#endif /* MKN_KUL_LOG_HPP_ */
+
+#endif /* MKN_KUL_ASIO_LOG_HPP */
