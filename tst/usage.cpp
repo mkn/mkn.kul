@@ -244,7 +244,7 @@ class Test {
     mkn::kul::hash::map::S2S sparse;
     sparse.insert("LEFT", "RIGHT");
 
-#if defined(_MKN_WITH_GOOGLE_SPARSEHASH_)
+#if defined(MKN_WITH_GOOGLE_SPARSEHASH)
     {
       mkn::kul::dense::hash::map::S2S dense;
       dense.setEmptyKey("");  // unique non occuring key

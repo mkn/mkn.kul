@@ -17,6 +17,16 @@ public:
 };
 ```
 
+## struct `Between`
+
+```cpp
+struct Between {
+  std::string remaining;
+  std::optional<std::string> found;
+  bool error = 0;
+};
+```
+
 ## class `String`
 
 All methods are `static`.
@@ -52,6 +62,11 @@ public:
                                              char const& e = '\\');
 
   static bool NO_CASE_CMP(std::string a, std::string b);   // case-insensitive compare
+
+  // Extract the substring between the last occurrence of rstr and the first
+  // occurrence of lstr before it, removing both delimiters and the extracted
+  // text from the remainder. error is set if lstr is found but rstr is not.
+  static Between BETWEEN(std::string const& in, std::string lstr, std::string rstr);
 
   // Line splitting (splits on \n / \r\n)
   static std::vector<std::string> LINES(std::string const& s);

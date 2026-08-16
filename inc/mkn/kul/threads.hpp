@@ -31,6 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef MKN_KUL_THREADS_HPP_
 #define MKN_KUL_THREADS_HPP_
 
+#include "mkn/kul/defs.hpp"
 #include "mkn/kul/map.hpp"
 #include "mkn/kul/os/threads.hpp"
 

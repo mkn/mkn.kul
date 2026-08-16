@@ -30,8 +30,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 // IWYU pragma: private, include "mkn/kul/defs.hpp"
 
-#ifndef MKN_KUL_OS_NIX_DEF_HPP_
-#define MKN_KUL_OS_NIX_DEF_HPP_
+#ifndef MKN_KUL_OS_NIX_DEF_HPP
+#define MKN_KUL_OS_NIX_DEF_HPP
 
 #ifndef MKN_KUL_OS
 #define MKN_KUL_OS nix
@@ -47,4 +47,4 @@ namespace mkn::kul::os {
 inline std::string EOL() { return "\n"; }
 }  // namespace mkn::kul::os
 
-#endif /* MKN_KUL_OS_NIX_DEF_HPP_ */
+#endif /* MKN_KUL_OS_NIX_DEF_HPP */

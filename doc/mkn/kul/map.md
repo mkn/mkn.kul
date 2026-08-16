@@ -2,7 +2,7 @@
 
 **Namespace:** `mkn::kul::hash`
 
-By default wraps `std::unordered_map` / `std::unordered_set`. When `_MKN_WITH_GOOGLE_SPARSEHASH_` is defined, wraps `google::sparse_hash_map` / `google::sparse_hash_set` and an additional `mkn::kul::dense::hash` variant is provided.
+By default wraps `std::unordered_map` / `std::unordered_set`. When `MKN_WITH_GOOGLE_SPARSEHASH` is defined, wraps `google::sparse_hash_map` / `google::sparse_hash_set` and an additional `mkn::kul::dense::hash` variant is provided.
 
 ## class `Map<K, V>`
 

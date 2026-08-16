@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef MKN_KUL_SERIAL_CLI_ARG_END_HPP_
 #define MKN_KUL_SERIAL_CLI_ARG_END_HPP_
 
-#if defined(_MKN_WITH_IO_CEREAL_)
+#if defined(MKN_WITH_IO_CEREAL)
 
 template <class Archive>
 void save(Archive& ar) const {
@@ -56,6 +56,6 @@ void load(Archive& ar) {
   vals = convert_to_kul_map(_vals);
 }
 
-#endif  //  _MKN_WITH_IO_CEREAL_
+#endif  //  MKN_WITH_IO_CEREAL
 
 #endif  // MKN_KUL_SERIAL_CLI_ARG_END_HPP_

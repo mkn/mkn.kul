@@ -228,9 +228,9 @@ class Args {
     for (Arg const& a : args)
       if (a.mandatory()) get(a.dashdash());
   }
-#if defined(_MKN_WITH_IO_CEREAL_)
+#if defined(MKN_WITH_IO_CEREAL)
   friend class cereal::access;
-#endif  //  _MKN_WITH_IO_CEREAL_
+#endif  //  MKN_WITH_IO_CEREAL
  private:
   std::vector<Cmd> cmds;
   std::vector<Arg> args;
