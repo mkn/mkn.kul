@@ -36,6 +36,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <string>
 #include <sstream>
+#include <utility>
+#include <vector>
 
 #if MKN_KUL_IS_WIN
 #include "mkn/kul/os/win/env.hpp"
@@ -92,6 +94,60 @@ class Var {
   std::string n;
   std::string v;
   Mode m;
+};
+
+// RAII in-process env var override. Saves whatever each var held (or that it
+// was unset) on construction, restores that exact state on destruction - for
+// mutating the current process's env (e.g. before dlopen/LoadLibrary), as
+// opposed to mkn::kul::Process::var(), which only affects a spawned child.
+class PushEnv {
+  struct Entry {
+    std::string name, old;
+    bool had = false;
+  };
+
+ public:
+  // set name to value
+  PushEnv(std::string name, std::string const& value) { push(std::move(name), value.c_str()); }
+  // set var per its own mode (PREP/APPE/REPL against whatever it currently holds)
+  explicit PushEnv(Var const& var) { push(var.name(), var.toString().c_str()); }
+  explicit PushEnv(std::vector<Var> const& vars) {
+    for (auto const& var : vars) push(var.name(), var.toString().c_str());
+  }
+  // set each name to its paired value, e.g. Runner::RUN's envies vector
+  explicit PushEnv(std::vector<std::pair<std::string, std::string>> const& vars) {
+    for (auto const& name_value : vars) push(name_value.first, name_value.second.c_str());
+  }
+  // temporarily unset a single var / a batch of vars
+  explicit PushEnv(std::string name) { push(std::move(name), nullptr); }
+  explicit PushEnv(std::vector<std::string> const& names) {
+    for (auto const& name : names) push(name, nullptr);
+  }
+
+  PushEnv(PushEnv const&) = delete;
+  PushEnv& operator=(PushEnv const&) = delete;
+  PushEnv& operator=(PushEnv&&) = delete;
+
+  PushEnv(PushEnv&& o) noexcept : entries(std::move(o.entries)) { o.active = false; }
+
+  ~PushEnv() {
+    if (!active) return;
+    for (auto it = entries.rbegin(); it != entries.rend(); ++it)
+      SET(it->name.c_str(), it->had ? it->old.c_str() : nullptr);
+  }
+
+ private:
+  void push(std::string name, char const* val) {
+    Entry e;
+    e.had = EXISTS(name.c_str());
+    if (e.had) e.old = GET(name.c_str());
+    e.name = std::move(name);
+    SET(e.name.c_str(), val);
+    entries.push_back(std::move(e));
+  }
+
+  std::vector<Entry> entries;
+  bool active = true;
 };
 
 }  // namespace env

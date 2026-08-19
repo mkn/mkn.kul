@@ -40,11 +40,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string>
 
 #include "mkn/kul/defs.hpp"
-#include "mkn/kul/log.hpp"
+
 #include "mkn/kul/os.hpp"
+#include "mkn/kul/log.hpp"
 #include "mkn/kul/string.hpp"
-#include "mkn/kul/os/any/proc/any_proc.hpp"
 #include "mkn/kul/threads/def.hpp"
+#include "mkn/kul/os/any/proc/any_proc.hpp"
 
 // extern char **environ;
 
@@ -189,10 +190,9 @@ class Process : public mkn::kul::AProcess {
                          ss.str() + "." + std::to_string(pipeID);
 
     LPSTR lPipeOut = _strdup(pipeOut.c_str());
-    g_hChildStd_OUT_Wr =
-        ::CreateNamedPipeA(lPipeOut, PIPE_ACCESS_OUTBOUND | FILE_FLAG_OVERLAPPED,
-                           PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE | PIPE_WAIT, 1,
-                           proc::BUFFER_SIZE, proc::BUFFER_SIZE, 0, &sa);
+    g_hChildStd_OUT_Wr = ::CreateNamedPipeA(lPipeOut, PIPE_ACCESS_OUTBOUND | FILE_FLAG_OVERLAPPED,
+                                            PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE | PIPE_WAIT,
+                                            1, proc::BUFFER_SIZE, proc::BUFFER_SIZE, 0, &sa);
     if (!g_hChildStd_OUT_Wr) error(__LINE__, "CreatePipe failed");
     g_hChildStd_OUT_Rd = ::CreateFileA(lPipeOut, GENERIC_READ, 0, &sa, OPEN_EXISTING,
                                        FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED, 0);
@@ -201,10 +201,9 @@ class Process : public mkn::kul::AProcess {
       error(__LINE__, "SetHandleInformation failed");
 
     LPSTR lPipeErr = _strdup(pipeErr.c_str());
-    g_hChildStd_ERR_Wr =
-        ::CreateNamedPipeA(lPipeErr, PIPE_ACCESS_OUTBOUND | FILE_FLAG_OVERLAPPED,
-                           PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE | PIPE_WAIT, 1,
-                           proc::BUFFER_SIZE, proc::BUFFER_SIZE, 0, &sa);
+    g_hChildStd_ERR_Wr = ::CreateNamedPipeA(lPipeErr, PIPE_ACCESS_OUTBOUND | FILE_FLAG_OVERLAPPED,
+                                            PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE | PIPE_WAIT,
+                                            1, proc::BUFFER_SIZE, proc::BUFFER_SIZE, 0, &sa);
     if (!g_hChildStd_ERR_Wr) error(__LINE__, "CreatePipe failed");
     g_hChildStd_ERR_Rd = ::CreateFileA(lPipeErr, GENERIC_READ, 0, &sa, OPEN_EXISTING,
                                        FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED, 0);
@@ -273,11 +272,11 @@ class Process : public mkn::kul::AProcess {
         newEnv.push_back('\0');
       }
       // may not work
-      bSuccess = CreateProcess(NULL, szCmdline, NULL, NULL, TRUE, flags, (LPVOID)newEnv.c_str(), dir,
-                               &siStartInfo, &piProcInfo);
+      bSuccess = CreateProcess(NULL, szCmdline, NULL, NULL, TRUE, flags, (LPVOID)newEnv.c_str(),
+                               dir, &siStartInfo, &piProcInfo);
     } else
-      bSuccess =
-          CreateProcess(NULL, szCmdline, NULL, NULL, TRUE, flags, NULL, dir, &siStartInfo, &piProcInfo);
+      bSuccess = CreateProcess(NULL, szCmdline, NULL, NULL, TRUE, flags, NULL, dir, &siStartInfo,
+                               &piProcInfo);
 
     if (!bSuccess) error(__LINE__, "CreateProcess failed with last error: " + GetLastError());
 
