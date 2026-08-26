@@ -35,6 +35,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "mkn/kul/except.hpp"
 
 #include <functional>
+#include <map>
+#include <optional>
 #include <string>
 #include <utility>
 #include <vector>
@@ -91,7 +93,7 @@ class Context;
 
 // Read-only snapshot returned by Context::state() - one generator instead of
 // one virtual per field (projectDir/includes/dependents/buildMode/sourceFiles
-// /compileEnv).
+// /compileEnv/extra).
 struct ContextState {
   std::string projectDir;
   std::vector<std::pair<std::string, bool>> includes;
@@ -99,6 +101,19 @@ struct ContextState {
   Mode buildMode = Mode::NONE;
   std::vector<std::string> sourceFiles;
   CompileEnv compileEnv;
+
+  // Implementation-specific, not always present (e.g. "buildDir" is only set
+  // for apps that actually compile sources, not header-only ones).
+  std::map<std::string, std::string> extra;
+
+  std::optional<std::string> get(std::string const& key) const {
+    if (auto it = extra.find(key); it != extra.end()) return it->second;
+    return std::nullopt;
+  }
+  std::string get(std::string const& key, std::string const& fallback) const {
+    if (auto it = extra.find(key); it != extra.end()) return it->second;
+    return fallback;
+  }
 };
 
 // Tag base for CompilerState::add() - each concrete input is a plain-data
