@@ -75,7 +75,9 @@ jobs:
 
     - name: "Build/Test"
       shell: cmd
+      env:
+        KLOG: 5
       run: |
         bash -c '$CURL_GET -o mkn.exe ${PATH_GET}/mkn.exe'
         clang++ --version
-        KLOG=5 mkn.exe clean build run -dtKOp test,usage -x res/mkn/clang_win
+        mkn.exe clean build run -dtKOp test,usage -x res/mkn/clang_win
