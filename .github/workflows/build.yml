@@ -11,6 +11,7 @@ on:
     branches: [ master ]
 
 env:
+  KLOG: 3
   CURL_GET: curl -fL --retry 3 --retry-delay 2
   PATH_GET: https://github.com/mkn/mkn/releases/download/latest
 
@@ -32,7 +33,7 @@ jobs:
         $CURL_GET -o mkn ${PATH_GET}/${ASSET}
         chmod +x mkn
         [ "${{ matrix.cc }}" = "clang" ] && export CC=clang CXX=clang++
-        KLOG=3 ./mkn clean build run -dtOp test,usage -a "-std=c++20 -fPIC" -W 9
+        ./mkn clean build run -dtOp test,usage -a "-std=c++20 -fPIC" -W 9
 
   macos:
     runs-on: macos-latest
@@ -43,7 +44,7 @@ jobs:
       run: |
         $CURL_GET -o mkn ${PATH_GET}/mkn_arm_osx
         chmod +x mkn
-        KLOG=3 ./mkn clean build run -dtOp test,usage -a "-std=c++20 -fPIC" -W 9
+        ./mkn clean build run -dtOp test,usage -a "-std=c++20 -fPIC" -W 9
 
   windows:
     runs-on: windows-latest
@@ -61,7 +62,7 @@ jobs:
       run: | # /bin/link interferes with cl/link.exe
         bash -c "rm /bin/link"
         bash -c '$CURL_GET -o mkn.exe ${PATH_GET}/mkn.exe'
-        bash -c 'KLOG=3 ./mkn clean build run -dtKOp test,usage -a "-EHsc -std:c++20"'
+        bash -c './mkn clean build run -dtKOp test,usage -a "-EHsc -std:c++20"'
 
   windows_clang:
     runs-on: windows-latest
@@ -75,8 +76,6 @@ jobs:
 
     - name: "Build/Test"
       shell: cmd
-      env:
-        KLOG: 5
       run: |
         bash -c '$CURL_GET -o mkn.exe ${PATH_GET}/mkn.exe'
         clang++ --version
