@@ -207,6 +207,14 @@ class ClangCompiler : public GccCompiler {
   ClangCompiler(int const& v = 0) : GccCompiler(v) {}
   CCompiler_Type type() const override { return CCompiler_Type::CLANG; }
 
+  // On Windows, clang targets the MSVC ABI: its driver resolves "-lfoo" by
+  // searching for "foo.lib" (COFF/MSVC convention), not "libfoo.a" (GNU
+  // convention) - so the archive this produces must match that naming.
+  std::string staticLib(std::string const& lib) const override {
+    if (MKN_KUL_STR(MKN_KUL_OS) == std::string("win")) return lib + ".lib";
+    return GccCompiler::staticLib(lib);
+  }
+
  protected:
   std::string ccBinary() const override { return CC("clang"); }
   std::string cxxBinary() const override { return CXX("clang++"); }
