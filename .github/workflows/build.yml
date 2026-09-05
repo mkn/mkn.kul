@@ -16,14 +16,22 @@ env:
 
 jobs:
   ubuntu:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, ubuntu-26.04-arm]
+        cc: [gcc, clang]
     steps:
     - uses: actions/checkout@v6
 
     - name: "Build/Test"
       run: |
-        $CURL_GET -o mkn ${PATH_GET}/mkn_nix
+        ASSET=mkn_nix
+        [ "${{ matrix.os }}" = "ubuntu-26.04-arm" ] && ASSET=mkn_arm_linux
+        $CURL_GET -o mkn ${PATH_GET}/${ASSET}
         chmod +x mkn
+        [ "${{ matrix.cc }}" = "clang" ] && export CC=clang CXX=clang++
         KLOG=3 ./mkn clean build run -dtOp test,usage -a "-std=c++20 -fPIC" -W 9
 
   macos:
@@ -54,3 +62,20 @@ jobs:
         bash -c "rm /bin/link"
         bash -c '$CURL_GET -o mkn.exe ${PATH_GET}/mkn.exe'
         bash -c 'KLOG=3 ./mkn clean build run -dtKOp test,usage -a "-EHsc -std:c++20"'
+
+  windows_clang:
+    runs-on: windows-latest
+    continue-on-error: true
+    steps:
+    - uses: actions/checkout@v6
+
+    - uses: ilammy/msvc-dev-cmd@v1
+      with:
+        arch: amd64
+
+    - name: "Build/Test"
+      shell: cmd
+      run: |
+        bash -c '$CURL_GET -o mkn.exe ${PATH_GET}/mkn.exe'
+        clang++ --version
+        mkn.exe clean build run -dtKOp test,usage -x res/mkn/clang_win
