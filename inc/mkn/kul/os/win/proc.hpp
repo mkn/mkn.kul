@@ -278,7 +278,8 @@ class Process : public mkn::kul::AProcess {
       bSuccess = CreateProcess(NULL, szCmdline, NULL, NULL, TRUE, flags, NULL, dir, &siStartInfo,
                                &piProcInfo);
 
-    if (!bSuccess) error(__LINE__, "CreateProcess failed with last error: " + GetLastError());
+    if (!bSuccess)
+      error(__LINE__, "CreateProcess failed with last error: " + std::to_string(GetLastError()));
 
     pid(piProcInfo.dwProcessId);
 
