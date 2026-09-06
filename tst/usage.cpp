@@ -47,16 +47,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace mkn {
 namespace kul {
 
-class Test;
-
-class TestThreadObject {
- private:
+struct TestThreadObject {
   int i = 0;
 
- public:
   void print() { KLOG(INF) << "i = " << i; }
 
- protected:
   void operator()() {
     KLOG(INF) << "THREAD RUNNING";
     i++;
@@ -66,16 +61,12 @@ class TestThreadObject {
     KLOG(INF) << "CONST THREAD RUNNING";
     KLOG(INF) << "CONST THREAD FINISHED";
   }
-  friend class Test;
-  friend class mkn::kul::Thread;
 };
 
-class TestThreadQueueObject {
- protected:
+struct TestThreadQueueObject {
   int i = 0;
   Mutex& mutex;
 
- public:
   TestThreadQueueObject(Mutex& _mutex) : mutex(_mutex) {}
   void operator()() {
     mkn::kul::ScopeLock lock(mutex);
@@ -86,11 +77,9 @@ class TestThreadQueueObject {
   void print() { KLOG(INF) << "i = " << i; }
 };
 
-class TestThreadQueueQObject : public TestThreadQueueObject {
- private:
+struct TestThreadQueueQObject : public TestThreadQueueObject {
   std::queue<int>& q;
 
- public:
   TestThreadQueueQObject(Mutex& _mutex, std::queue<int>& _q)
       : TestThreadQueueObject(_mutex), q(_q) {}
   void operator()() {
