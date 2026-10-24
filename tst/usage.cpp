@@ -47,60 +47,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace mkn {
 namespace kul {
 
-struct TestThreadObject {
-  int i = 0;
-
-  void print() { KLOG(INF) << "i = " << i; }
-
-  void operator()() {
-    KLOG(INF) << "THREAD RUNNING";
-    i++;
-    KLOG(INF) << "THREAD FINISHED";
-  }
-  void operator()() const {
-    KLOG(INF) << "CONST THREAD RUNNING";
-    KLOG(INF) << "CONST THREAD FINISHED";
-  }
-};
-
-struct TestThreadQueueObject {
-  int i = 0;
-  Mutex& mutex;
-
-  TestThreadQueueObject(Mutex& _mutex) : mutex(_mutex) {}
-  void operator()() {
-    mkn::kul::ScopeLock lock(mutex);
-    KLOG(INF) << "THREAD RUNNING";
-    i++;
-    KLOG(INF) << "THREAD FINISHED";
-  }
-  void print() { KLOG(INF) << "i = " << i; }
-};
-
-struct TestThreadQueueQObject : public TestThreadQueueObject {
-  std::queue<int>& q;
-
-  TestThreadQueueQObject(Mutex& _mutex, std::queue<int>& _q)
-      : TestThreadQueueObject(_mutex), q(_q) {}
-  void operator()() {
-    mkn::kul::ScopeLock lock(mutex);
-    KLOG(INF) << "THREAD RUNNING";
-    i++;
-    q.pop();
-    KLOG(INF) << "THREAD FINISHED";
-  }
-  void print() { KLOG(INF) << "i = " << i; }
-};
-
-class TestConcQueueQObject {
- public:
-  TestConcQueueQObject() {}
-  void operator()() {
-    KLOG(INF) << "TestConcQueueQObject RUNNING";
-    mkn::kul::this_thread::sleep(10);
-  }
-};
-
 class TestIPCServer : public mkn::kul::ipc::Server {
  public:
   TestIPCServer() : mkn::kul::ipc::Server("uuid", 1) {}  // UUID     CHECKS ONCE
@@ -112,8 +58,7 @@ class TestIPC {
  public:
   void run() {
     TestIPCServer ipc;
-    mkn::kul::Thread t(std::ref(ipc));
-    t.run();
+    std::thread t([&ipc]() { ipc(); });
     mkn::kul::this_thread::sleep(1000);
     mkn::kul::ipc::Client("uuid").send("TestIPCClient");
     t.join();
@@ -267,65 +212,7 @@ class Test {
     }
 
     {
-      TestThreadObject tto1;
-      mkn::kul::Thread th(std::ref(tto1));
-      th.join();
-      tto1.print();
-      th.join();
-      tto1.print();
-
-      TestThreadObject tto2;
-      mkn::kul::Thread th2(std::cref(tto2));
-      th2.join();
-      tto2.print();
-
-      TestThreadObject tto3;
-      mkn::kul::Thread th3(tto3);
-      th3.join();
-      tto3.print();
-
-      mkn::kul::Thread([&tto1]() { tto1(); }).join();
-      tto1.print();
-      mkn::kul::Thread([tto1]() { tto1(); }).join();
-      tto1.print();
-    }
-
-    mkn::kul::Mutex mutex;
-    {
-      {
-        mkn::kul::ScopeLock lock(mutex);
-      }
-      mkn::kul::ScopeLock lock(mutex);
-    }
-    {
-      KOUT(NON) << "LAUNCHING THREAD POOL";
-      TestThreadQueueObject ttpo1(mutex);
-      mkn::kul::ThreadQueue tp1(std::ref(ttpo1));
-      tp1.setMax(4);
-      tp1.detach();
-      tp1.join();
-      ttpo1.print();
-
-      std::queue<int> q;
-      for (int i = 0; i < 10; i++) q.push(i);
-      KOUT(NON) << "LAUNCHING PREDICATED THREAD POOL";
-      TestThreadQueueQObject ttpo2(mutex, q);
-      mkn::kul::PredicatedThreadQueue<std::queue<int>> tp2(std::ref(ttpo2), q);
-      tp2.setMax(mkn::kul::cpu::threads());
-      tp2.detach();
-      tp2.join();
-      ttpo2.print();
-    }
-
-    TestConcQueueQObject tcqqo;
-    ConcurrentThreadQueue<void()> ctq(5, 1);
-    for (size_t i = 0; i < 10; i++)
-      ctq.async(std::bind(&TestConcQueueQObject::operator(), std::ref(tcqqo)));
-    mkn::kul::this_thread::sleep(500);
-    ctq.stop().join();
-
-    {
-      mkn::kul::ConcurrentThreadPool<> ctp(5, 1);
+      mkn::kul::ConcurrentThreadPool<> ctp(5);
       auto lambda = [](unsigned int a, unsigned int b) { KLOG(INF) << (a + b); };
       ctp.async(std::bind(lambda, 2, 4));
       auto lambdb = [](unsigned int a, unsigned int b) {
@@ -334,21 +221,6 @@ class Test {
       };
       auto lambex = [](mkn::kul::Exception const& e) { KLOG(ERR) << e.stack(); };
       ctp.async(std::bind(lambdb, 2, 4), std::bind(lambex, std::placeholders::_1));
-      mkn::kul::this_thread::sleep(500);
-      ctp.block().finish().join();
-    }
-
-    {
-      mkn::kul::ChroncurrentThreadPool<> ctp(5, 1);
-      auto lambda = [](unsigned int a, unsigned int b) { KLOG(INF) << (a + b); };
-      ctp.async(std::bind(lambda, 2, 4));
-      auto lambdb = [](unsigned int a, unsigned int b) {
-        KLOG(INF) << (a + b);
-        KEXCEPT(mkn::kul::Exception, "Exceptional!");
-      };
-      auto lambex = [](mkn::kul::Exception const& e) { KLOG(ERR) << e.stack(); };
-      ctp.async(std::bind(lambdb, 2, 4), std::bind(lambex, std::placeholders::_1));
-      mkn::kul::this_thread::sleep(500);
       ctp.block().finish().join();
     }
 

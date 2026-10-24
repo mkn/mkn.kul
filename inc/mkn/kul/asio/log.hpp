@@ -51,12 +51,12 @@ class Logger : public mkn::kul::Logger {
   friend class LogMan;
 
  private:
-  mkn::kul::ChroncurrentThreadPool<> ctp;
+  mkn::kul::ConcurrentThreadPool<> ctp;
   std::function<void(std::string const&)> defE, defO;
 
  public:
   Logger()
-      : ctp(1, 1),
+      : ctp(1),
         defE([&](std::string const& s) { mkn::kul::Logger::err(s); }),
         defO([&](std::string const& s) { mkn::kul::Logger::out(s); }) {}
   void err(std::string const& s) override {

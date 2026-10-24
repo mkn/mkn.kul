@@ -84,4 +84,4 @@ Platform detection and utility macros.
 | `signal.hpp` | `os/win/signal.hpp` | `os/nixish/signal.hpp` | `os/nixish/signal.hpp` |
 | `sys.hpp` | `os/win/sys.hpp` | `os/nixish/sys.hpp` | `os/nixish/sys.hpp` |
 | `proc.hpp` | `os/win/proc.hpp` | `os/nixish/proc.hpp` + `os/nix/proc.os.hpp` | similar |
-| `threads.hpp` | `os/win/threads.os.hpp` | `os/nixish/threads.os.hpp` | similar |
+| `threads/def.hpp` | `os/win/threads/def.hpp` | `os/nixish/threads/def.hpp` | `os/nixish/threads/def.hpp` |
