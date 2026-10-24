@@ -19,7 +19,7 @@ namespace mkn::kul::this_thread {
 }
 ```
 
-## class `ConcurrentThreadPool<E>`
+## class `ThreadPool<E>`
 
 A fixed set of worker threads pulling tasks from one queue. Idle workers block on a
 condition variable rather than polling, so an idle pool costs nothing whatever the
@@ -27,22 +27,22 @@ workload, and a queued task starts as soon as a worker is free.
 
 ```cpp
 template <class E = mkn::kul::Exception>
-class ConcurrentThreadPool {
+class ThreadPool {
 public:
   using Task    = std::function<void()>;
   using OnError = std::function<void(E const&)>;
 
-  ConcurrentThreadPool(std::size_t const& threads = 1, bool const& start = true);
-  virtual ~ConcurrentThreadPool();  // stop() + join()
+  ThreadPool(std::size_t const& threads = 1, bool const& start = true);
+  virtual ~ThreadPool();  // stop() + join()
 
   // false if blocked or stopped; tasks queued before start() run once started
   bool async(Task&& task, OnError&& onError = OnError());
 
-  ConcurrentThreadPool& start ();
-  ConcurrentThreadPool& block ();  // stop accepting new tasks
-  ConcurrentThreadPool& finish();  // wait for every queued task, then stop
-  ConcurrentThreadPool& stop  ();  // workers exit after their current task, queue dropped
-  ConcurrentThreadPool& join  ();  // wait for the workers to exit
+  ThreadPool& start ();
+  ThreadPool& block ();  // stop accepting new tasks
+  ThreadPool& finish();  // wait for every queued task, then stop
+  ThreadPool& stop  ();  // workers exit after their current task, queue dropped
+  ThreadPool& join  ();  // wait for the workers to exit
 
   bool               running  () const;
   std::exception_ptr exception() const;
@@ -57,7 +57,7 @@ public:
 - `stop()` may be called from a task or `onError`; `finish()` and `join()` must not be.
 
 ```cpp
-mkn::kul::ConcurrentThreadPool<> pool(4);
+mkn::kul::ThreadPool<> pool(4);
 for (auto const& file : files)
   pool.async([&file]() { compile(file); },
              [](mkn::kul::Exception const& e) { KERR << e.stack(); });

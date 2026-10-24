@@ -212,7 +212,7 @@ class Test {
     }
 
     {
-      mkn::kul::ConcurrentThreadPool<> ctp(5);
+      mkn::kul::ThreadPool<> ctp(5);
       auto lambda = [](unsigned int a, unsigned int b) { KLOG(INF) << (a + b); };
       ctp.async(std::bind(lambda, 2, 4));
       auto lambdb = [](unsigned int a, unsigned int b) {

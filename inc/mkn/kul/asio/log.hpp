@@ -51,7 +51,7 @@ class Logger : public mkn::kul::Logger {
   friend class LogMan;
 
  private:
-  mkn::kul::ConcurrentThreadPool<> ctp;
+  mkn::kul::ThreadPool<> ctp;
   std::function<void(std::string const&)> defE, defO;
 
  public:

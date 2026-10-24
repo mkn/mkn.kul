@@ -54,21 +54,21 @@ namespace mkn::kul {
 // onError may stop() the pool. Any other exception, or one thrown out of `onError`, is
 // kept (the first one) as the pool's exception() for rethrow(); the pool keeps running.
 template <class E = mkn::kul::Exception>
-class ConcurrentThreadPool {
+class ThreadPool {
  public:
   using Task = std::function<void()>;
   using OnError = std::function<void(E const&)>;
 
-  ConcurrentThreadPool(std::size_t const& threads = 1, bool const& strt = true)
+  ThreadPool(std::size_t const& threads = 1, bool const& strt = true)
       : _threads(threads) {
     if (strt) start();
   }
-  virtual ~ConcurrentThreadPool() { stop().join(); }
+  virtual ~ThreadPool() { stop().join(); }
 
-  ConcurrentThreadPool(ConcurrentThreadPool const&) = delete;
-  ConcurrentThreadPool(ConcurrentThreadPool&&) = delete;
-  ConcurrentThreadPool& operator=(ConcurrentThreadPool const&) = delete;
-  ConcurrentThreadPool& operator=(ConcurrentThreadPool&&) = delete;
+  ThreadPool(ThreadPool const&) = delete;
+  ThreadPool(ThreadPool&&) = delete;
+  ThreadPool& operator=(ThreadPool const&) = delete;
+  ThreadPool& operator=(ThreadPool&&) = delete;
 
   // false if the pool is blocked or stopped; tasks queued before start() run once started
   bool async(Task&& task, OnError&& onError = OnError()) {
@@ -81,7 +81,7 @@ class ConcurrentThreadPool {
     return true;
   }
 
-  ConcurrentThreadPool& start() {
+  ThreadPool& start() {
     std::lock_guard<std::mutex> lock(_mutex);
     if (_run) return *this;
     _run = true;
@@ -91,7 +91,7 @@ class ConcurrentThreadPool {
   }
 
   // stop accepting new tasks; queued and running ones are unaffected
-  ConcurrentThreadPool& block() {
+  ThreadPool& block() {
     std::lock_guard<std::mutex> lock(_mutex);
     _blocked = true;
     return *this;
@@ -99,7 +99,7 @@ class ConcurrentThreadPool {
 
   // waits until every queued task has run (or the pool was stopped), then stops - must not
   // be called from a task
-  ConcurrentThreadPool& finish() {
+  ThreadPool& finish() {
     {
       std::unique_lock<std::mutex> lock(_mutex);
       if (_run) _idle.wait(lock, [this]() { return !_run || (_queue.empty() && !_busy); });
@@ -109,7 +109,7 @@ class ConcurrentThreadPool {
 
   // stops the workers once their current task is done; queued tasks are dropped.
   // Safe to call from a task or onError, see join() for waiting on the workers.
-  ConcurrentThreadPool& stop() {
+  ThreadPool& stop() {
     {
       std::lock_guard<std::mutex> lock(_mutex);
       _run = false;
@@ -122,7 +122,7 @@ class ConcurrentThreadPool {
   }
 
   // waits for the workers to exit, which they do once stopped - must not be called from a task
-  ConcurrentThreadPool& join() {
+  ThreadPool& join() {
     std::vector<std::thread> workers;
     {
       std::lock_guard<std::mutex> lock(_mutex);

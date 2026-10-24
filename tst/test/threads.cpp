@@ -6,9 +6,9 @@
 #include <chrono>
 #include <future>
 
-using Pool = mkn::kul::ConcurrentThreadPool<>;
+using Pool = mkn::kul::ThreadPool<>;
 
-TEST(ConcurrentThreadPool, RunsEveryTask) {
+TEST(ThreadPool, RunsEveryTask) {
   std::atomic<size_t> n{0};
   Pool pool(4);
   for (size_t i = 0; i < 1000; ++i) EXPECT_TRUE(pool.async([&]() { ++n; }));
@@ -17,7 +17,7 @@ TEST(ConcurrentThreadPool, RunsEveryTask) {
   EXPECT_FALSE(pool.exception());
 }
 
-TEST(ConcurrentThreadPool, TasksQueuedBeforeStartRun) {
+TEST(ThreadPool, TasksQueuedBeforeStartRun) {
   std::atomic<size_t> n{0};
   Pool pool(2, false);
   for (size_t i = 0; i < 10; ++i) pool.async([&]() { ++n; });
@@ -25,7 +25,7 @@ TEST(ConcurrentThreadPool, TasksQueuedBeforeStartRun) {
   EXPECT_EQ(n, 10u);
 }
 
-TEST(ConcurrentThreadPool, RunsConcurrently) {
+TEST(ThreadPool, RunsConcurrently) {
   auto const start = std::chrono::steady_clock::now();
   Pool pool(4);
   for (size_t i = 0; i < 4; ++i)
@@ -34,7 +34,7 @@ TEST(ConcurrentThreadPool, RunsConcurrently) {
   EXPECT_LT(std::chrono::steady_clock::now() - start, std::chrono::milliseconds(300));
 }
 
-TEST(ConcurrentThreadPool, NoPollingLatency) {
+TEST(ThreadPool, NoPollingLatency) {
   // each task is queued only after the previous one ran, so any dispatch polling
   // interval would be paid every time
   Pool pool(1);
@@ -47,7 +47,7 @@ TEST(ConcurrentThreadPool, NoPollingLatency) {
   EXPECT_LT(std::chrono::steady_clock::now() - start, std::chrono::milliseconds(100));
 }
 
-TEST(ConcurrentThreadPool, OnErrorHandlesAndPoolContinues) {
+TEST(ThreadPool, OnErrorHandlesAndPoolContinues) {
   std::atomic<size_t> errors{0}, n{0};
   Pool pool(2);
   pool.async([]() { KEXCEPTION("handled"); }, [&](mkn::kul::Exception const&) { ++errors; });
@@ -58,7 +58,7 @@ TEST(ConcurrentThreadPool, OnErrorHandlesAndPoolContinues) {
   EXPECT_FALSE(pool.exception());
 }
 
-TEST(ConcurrentThreadPool, UnhandledExceptionIsKeptAndPoolContinues) {
+TEST(ThreadPool, UnhandledExceptionIsKeptAndPoolContinues) {
   std::atomic<size_t> n{0};
   Pool pool(1);
   pool.async([]() { KEXCEPTION("unhandled"); });
@@ -69,7 +69,7 @@ TEST(ConcurrentThreadPool, UnhandledExceptionIsKeptAndPoolContinues) {
   EXPECT_THROW(pool.rethrow(), mkn::kul::Exception);
 }
 
-TEST(ConcurrentThreadPool, OnErrorCanStopPool) {
+TEST(ThreadPool, OnErrorCanStopPool) {
   std::atomic<size_t> n{0};
   std::promise<void> release;
   auto gate = release.get_future().share();
@@ -85,7 +85,7 @@ TEST(ConcurrentThreadPool, OnErrorCanStopPool) {
   EXPECT_FALSE(pool.exception());
 }
 
-TEST(ConcurrentThreadPool, ThrowingOnErrorBecomesPoolException) {
+TEST(ThreadPool, ThrowingOnErrorBecomesPoolException) {
   Pool pool(1);
   pool.async([]() { KEXCEPTION("first"); },
              [](mkn::kul::Exception const& e) { throw e; });
@@ -93,28 +93,28 @@ TEST(ConcurrentThreadPool, ThrowingOnErrorBecomesPoolException) {
   EXPECT_THROW(pool.rethrow(), mkn::kul::Exception);
 }
 
-TEST(ConcurrentThreadPool, NonKulExceptionIsKept) {
+TEST(ThreadPool, NonKulExceptionIsKept) {
   Pool pool(1);
   pool.async([]() { throw std::runtime_error("std"); });
   pool.finish().join();
   EXPECT_THROW(pool.rethrow(), std::runtime_error);
 }
 
-TEST(ConcurrentThreadPool, BlockRejectsNewTasks) {
+TEST(ThreadPool, BlockRejectsNewTasks) {
   Pool pool(1);
   pool.block();
   EXPECT_FALSE(pool.async([]() {}));
   pool.finish().join();
 }
 
-TEST(ConcurrentThreadPool, StopFromTaskDoesNotDeadlock) {
+TEST(ThreadPool, StopFromTaskDoesNotDeadlock) {
   Pool pool(2);
   pool.async([&]() { pool.stop(); });
   pool.join();
   EXPECT_FALSE(pool.running());
 }
 
-TEST(ConcurrentThreadPool, StopDropsQueuedTasks) {
+TEST(ThreadPool, StopDropsQueuedTasks) {
   std::atomic<size_t> n{0};
   std::promise<void> release;
   auto gate = release.get_future().share();

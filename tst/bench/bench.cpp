@@ -88,7 +88,7 @@ auto lambda = [](uint a, uint b) {
 
 void concurrentThreadPool(benchmark::State& state) {
   while (state.KeepRunning()) {
-    mkn::kul::ConcurrentThreadPool<> ctp(3);
+    mkn::kul::ThreadPool<> ctp(3);
     for (size_t i = 0; i < 10000; i++) ctp.async(std::bind(lambda, 2, 4));
     ctp.block().finish().join();
   }
