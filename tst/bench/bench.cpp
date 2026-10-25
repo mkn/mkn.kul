@@ -88,21 +88,12 @@ auto lambda = [](uint a, uint b) {
 
 void concurrentThreadPool(benchmark::State& state) {
   while (state.KeepRunning()) {
-    mkn::kul::ConcurrentThreadPool<> ctp(3, 1);
+    mkn::kul::ThreadPool<> ctp(3);
     for (size_t i = 0; i < 10000; i++) ctp.async(std::bind(lambda, 2, 4));
     ctp.block().finish().join();
   }
 }
 BENCHMARK(concurrentThreadPool)->Unit(benchmark::kMicrosecond);
-
-void chroncurrentThreadPool(benchmark::State& state) {
-  while (state.KeepRunning()) {
-    mkn::kul::ChroncurrentThreadPool<> ctp(3, 1);
-    for (size_t i = 0; i < 10000; i++) ctp.async(std::bind(lambda, 2, 4));
-    ctp.block().finish().join();
-  }
-}
-BENCHMARK(chroncurrentThreadPool)->Unit(benchmark::kMicrosecond);
 
 int main(int argc, char** argv) {
   ::benchmark::Initialize(&argc, argv);

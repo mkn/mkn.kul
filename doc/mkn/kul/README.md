@@ -31,7 +31,7 @@
 | [`span.hpp`](span.md) | Containers | Non-owning `Span<T>`, multi-span `SpanSet<T>` |
 | [`string.hpp`](string.md) | Text | `String` utility: split, trim, replace, type conversion |
 | [`sys.hpp`](sys.md) | System | Dynamic library loading: `SharedLibrary`, `SharedFunction`, `SharedClass` |
-| [`threads.hpp`](threads.md) | Threading | `Thread`, `Mutex`, `ThreadQueue`, `ConcurrentThreadPool`, `this_thread::*` |
+| [`threads.hpp`](threads.md) | Threading | `ThreadPool`, `this_thread::*` |
 | [`time.hpp`](time.md) | Time | `Now::MILLIS/MICROS/NANOS`, `DateTime` formatting |
 | [`tuple.hpp`](tuple.md) | Meta | `Pointer<N,T>`, `PointerContainer`, `tuple_from`, `make_pointer_container` |
 | [`vector.hpp`](vector.md) | Containers | `Vector<T>` and friends with custom allocators; cross-allocator equality |
@@ -45,7 +45,6 @@ OS-specific implementations are selected at include time. The public API documen
 
 | Feature | Unix/BSD | Windows |
 |---------|----------|---------|
-| Threads | pthreads | Win32 `HANDLE` |
 | Signals | `sigaction` | SEH / `SetConsoleCtrlHandler` |
 | IPC | Unix-domain sockets | Named pipes |
 | Processes | `fork`/`exec` | `CreateProcess` |
