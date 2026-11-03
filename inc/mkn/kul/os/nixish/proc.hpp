@@ -64,6 +64,32 @@ inline void kill(int32_t const& e) { ::kill(mkn::kul::this_proc::id(), e); }
 }  // namespace this_proc
 
 class Process : public mkn::kul::AProcess {
+ public:
+  Process(std::string const& cmd, bool const& _wfe = true) : mkn::kul::AProcess(cmd, _wfe) {}
+  Process(std::string const& cmd, std::string const& path, bool const& _wfe = true)
+      : mkn::kul::AProcess(cmd, path, _wfe) {}
+  Process(std::string const& cmd, mkn::kul::Dir const& _d, bool const& _wfe = true)
+      : mkn::kul::AProcess(cmd, (_d ? _d.real() : _d.path()), _wfe) {}
+  bool kill(int16_t k = 6) {
+    if (started()) {
+      bool b = ::kill(pid(), k) == 0;
+      if (::kill(pid(), 0) == 0) setFinished();
+      return b;
+    }
+    return 0;
+  }
+
+ protected:
+  int inline child();
+  virtual void inline expand(std::string&) const;
+  void inline waitForStatus();
+  void inline waitExit() KTHROW(mkn::kul::proc::ExitException);
+  void inline tearDown();
+  void inline run() KTHROW(mkn::kul::proc::Exception);
+
+  virtual void finish() {}
+  virtual void preStart() {}
+
  private:
   // popPip aliases the parent's ends of the pipes below and is not closed itself
   int inFd[2]{-1, -1}, outFd[2]{-1, -1}, errFd[2]{-1, -1}, popPip[3]{-1, -1, -1};
@@ -103,32 +129,6 @@ class Process : public mkn::kul::AProcess {
     }
     return ret;
   }
-
- public:
-  Process(std::string const& cmd, bool const& _wfe = true) : mkn::kul::AProcess(cmd, _wfe) {}
-  Process(std::string const& cmd, std::string const& path, bool const& _wfe = true)
-      : mkn::kul::AProcess(cmd, path, _wfe) {}
-  Process(std::string const& cmd, mkn::kul::Dir const& _d, bool const& _wfe = true)
-      : mkn::kul::AProcess(cmd, (_d ? _d.real() : _d.path()), _wfe) {}
-  bool kill(int16_t k = 6) {
-    if (started()) {
-      bool b = ::kill(pid(), k) == 0;
-      if (::kill(pid(), 0) == 0) setFinished();
-      return b;
-    }
-    return 0;
-  }
-
- protected:
-  int inline child();
-  virtual void inline expand(std::string&) const;
-  void inline waitForStatus();
-  void inline waitExit() KTHROW(mkn::kul::proc::ExitException);
-  void inline tearDown();
-  void inline run() KTHROW(mkn::kul::proc::Exception);
-
-  virtual void finish() {}
-  virtual void preStart() {}
 };
 
 int Process::child() {
