@@ -50,6 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define MKN_KUL_PROC_DUP_RETRY 3
 #endif  // MKN_KUL_PROC_DUP_RETRY
 
+#include <cstring>
 #include <vector>
 #include <string>
 #include <sstream>
@@ -63,17 +64,6 @@ inline void kill(int32_t const& e) { ::kill(mkn::kul::this_proc::id(), e); }
 }  // namespace this_proc
 
 class Process : public mkn::kul::AProcess {
- private:
-  int inFd[2], outFd[2], errFd[2], popPip[3];
-  int cStat;  // child status
-
-  inline int recall(int const& _s) {
-    int ret;
-    while ((ret = (_s)) < 0x0 && (errno == EINTR)) {
-    }
-    return ret;
-  }
-
  public:
   Process(std::string const& cmd, bool const& _wfe = true) : mkn::kul::AProcess(cmd, _wfe) {}
   Process(std::string const& cmd, std::string const& path, bool const& _wfe = true)
@@ -99,6 +89,46 @@ class Process : public mkn::kul::AProcess {
 
   virtual void finish() {}
   virtual void preStart() {}
+
+ private:
+  // popPip aliases the parent's ends of the pipes below and is not closed itself
+  int inFd[2]{-1, -1}, outFd[2]{-1, -1}, errFd[2]{-1, -1}, popPip[3]{-1, -1, -1};
+  int cStat;  // child status
+
+  // close once - a repeated close() can hit an fd number another thread has since been given
+  static void closeFd(int& fd) {
+    if (fd < 0) return;
+    close(fd);
+    fd = -1;
+  }
+
+  // a forked child must never return or throw into the parent's code (e.g. a thread pool loop),
+  // nor run atexit handlers/static destructors it inherited
+  [[noreturn]] static void childFail(char const* msg) {
+    ssize_t const w = write(STDERR_FILENO, msg, strlen(msg));
+    (void)w;
+    _exit(127);
+  }
+
+  // close-on-exec so concurrent children don't inherit each other's pipes, the child's
+  // dup()'d stdin/out/err don't carry the flag and survive exec
+  static int pipeCloExec(int fds[2]) {
+#if defined(__APPLE__)
+    int const ret = pipe(fds);
+    if (ret == 0)
+      for (int i = 0; i < 2; ++i) fcntl(fds[i], F_SETFD, fcntl(fds[i], F_GETFD) | FD_CLOEXEC);
+    return ret;
+#else
+    return pipe2(fds, O_CLOEXEC);
+#endif
+  }
+
+  inline int recall(int const& _s) {
+    int ret;
+    while ((ret = (_s)) < 0x0 && (errno == EINTR)) {
+    }
+    return ret;
+  }
 };
 
 int Process::child() {
@@ -150,9 +180,9 @@ void Process::expand(std::string& _s) const {
 void Process::run() KTHROW(mkn::kul::proc::Exception) {
   {
     int32_t ret = 0;
-    if ((ret = pipe(inFd)) < 0) error(__LINE__, "Failed to pipe in");
-    if ((ret = pipe(outFd)) < 0) error(__LINE__, "Failed to pipe out");
-    if ((ret = pipe(errFd)) < 0) error(__LINE__, "Failed to pipe err");
+    if ((ret = pipeCloExec(inFd)) < 0) error(__LINE__, "Failed to pipe in");
+    if ((ret = pipeCloExec(outFd)) < 0) error(__LINE__, "Failed to pipe out");
+    if ((ret = pipeCloExec(errFd)) < 0) error(__LINE__, "Failed to pipe err");
   }
 
   this->preStart();
@@ -177,7 +207,8 @@ void Process::run() KTHROW(mkn::kul::proc::Exception) {
       FD_ZERO(&childOutFds);
       FD_SET(popPip[1], &childOutFds);
       FD_SET(popPip[2], &childOutFds);
-      close(inFd[1]);
+      closeFd(inFd[1]);
+      popPip[0] = -1;
       bool alive = true;
 
       char cOut[proc::BUFFER_SIZE] = {'\0'};
@@ -248,38 +279,35 @@ void Process::run() KTHROW(mkn::kul::proc::Exception) {
     close(0);
     for (uint16_t i = 0; i < retry; ++i)
       if ((ret = dup(inFd[0])) >= 0) break;
-    if (ret < 0) error(__LINE__, "dup in call failed");
+    if (ret < 0) childFail("dup in call failed");
 
     close(1);
     for (uint16_t i = 0; i < retry; ++i)
       if ((ret = dup(outFd[1])) >= 0) break;
-    if (ret < 0) error(__LINE__, "dup out call failed");
+    if (ret < 0) childFail("dup out call failed");
 
     close(2);
     for (uint16_t i = 0; i < retry; ++i)
       if ((ret = dup(errFd[1])) >= 0) break;
-    if (ret < 0) error(__LINE__, "dup err call failed");
+    if (ret < 0) childFail("dup err call failed");
 
     /* SETUP EnvVars */  // SET ENV, it's a forked process so it doesn't matter -
                          // it'll die soon, like you.
     for (auto const& ev : vars()) env::SET(ev.first.c_str(), ev.second.c_str());
 
-    if (!this->directory().empty()) mkn::kul::env::CWD(this->directory());
-    exit(this->child());
+    try {
+      if (!this->directory().empty()) mkn::kul::env::CWD(this->directory());
+      this->child();
+    } catch (...) {
+    }
+    childFail("exec failed");
   } else
     error(__LINE__, "Unhandled process id for child: " + std::to_string(pid()));
 }
 
 void Process::tearDown() {
-  recall(close(popPip[0]));
-  recall(close(popPip[1]));
-  recall(close(popPip[2]));
-  recall(close(errFd[1]));
-  recall(close(errFd[0]));
-  recall(close(outFd[1]));
-  recall(close(outFd[0]));
-  recall(close(inFd[1]));
-  recall(close(inFd[0]));
+  for (int* fd : {&errFd[1], &errFd[0], &outFd[1], &outFd[0], &inFd[1], &inFd[0]}) closeFd(*fd);
+  popPip[0] = popPip[1] = popPip[2] = -1;
 }
 
 void Process::waitExit() KTHROW(mkn::kul::proc::ExitException) {
