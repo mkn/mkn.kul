@@ -34,7 +34,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "mkn/kul/lang/cpp/gcc.hpp"
 
 #include "mkn/kul/cli.hpp"
+#include "mkn/kul/env.hpp"
 #include "mkn/kul/string.hpp"
+#include "mkn/kul/lang/cpp/msvc/def.hpp"
+
+#include <fstream>
 
 namespace mkn::kul::lang::cpp {
 
@@ -195,6 +199,10 @@ class WINCompiler : public CCompiler {
     if (mode == Mode::STAT) p.arg("-LTCG");
     p.arg("-OUT:\"" + out_file.escm() + "\"");
     if (mode == Mode::SHAR) {
+#if defined(_WIN32)
+      if (!dryRun && export_all_symbols())
+        p.arg("-DEF:\"" + write_export_def(objects, dirs, env.compilationInfo, imp_file) + "\"");
+#endif
       p.arg("-IMPLIB:\"" + imp_file.escm() + "\"").arg("-DLL");
       for (std::string const& path : libPaths) p.arg("-LIBPATH:\"" + path + "\"");
       for (std::string const& lib : libs) p.arg(staticLib(lib));
@@ -227,6 +235,45 @@ class WINCompiler : public CCompiler {
  protected:
   std::string ccBinary() const override { return CC("cl"); }
   std::string cxxBinary() const override { return CXX("cl"); }
+
+#if defined(_WIN32)
+ private:
+  // MKN_WINDOWS_EXPORT_ALL_SYMBOLS=1: DLLs export every external symbol of their objects via a
+  // generated .def file, no __declspec(dllexport) needed
+  static bool export_all_symbols() {
+    std::string const v = mkn::kul::env::GET("MKN_WINDOWS_EXPORT_ALL_SYMBOLS");
+    return !v.empty() && mkn::kul::String::BOOL(v);
+  }
+
+  // .def for the explicit objects and those linked via "<dir>/*.<obj_ext>", next to the import
+  // lib, returns its escaped path
+  static std::string write_export_def(std::vector<std::string> const& objects,
+                                      mkn::kul::hash::set::String const& dirs,
+                                      CompilationInfo const& info, mkn::kul::File const& imp) {
+    msvc::ExportDef exports;
+    auto const add = [&](std::string const& obj) {
+      auto const result = exports.add(obj);
+      if (result == msvc::ExportDef::Result::Failed)
+        KEXCEPT(mkn::kul::Exception, "MKN_WINDOWS_EXPORT_ALL_SYMBOLS: " + exports.error());
+      if (result == msvc::ExportDef::Result::LLVMBitcode)
+        KERR << "MKN_WINDOWS_EXPORT_ALL_SYMBOLS: skipping " << exports.error();
+    };
+    for (auto const& o : objects) add(mkn::kul::File(o).real());
+    std::string const ext = "." + info.obj_ext;
+    for (auto const& d : dirs)
+      for (auto const& f : mkn::kul::Dir(d).files())
+        if (f.name().size() > ext.size() && f.name().ends_with(ext)) add(f.real());
+
+    std::string const impName = imp.name();
+    mkn::kul::File const def{impName.substr(0, impName.rfind('.')) + ".def", imp.dir()};
+    std::ofstream out{def.full(), std::ios::binary | std::ios::trunc};
+    exports.write(out);
+    out.close();
+    if (!out)
+      KEXCEPT(mkn::kul::Exception, "MKN_WINDOWS_EXPORT_ALL_SYMBOLS: can't write " + def.full());
+    return def.escm();
+  }
+#endif
 };
 
 }  // namespace mkn::kul::lang::cpp
