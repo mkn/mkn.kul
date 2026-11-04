@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "mkn/kul/defs.hpp"
 
 #include "mkn/kul/os.hpp"
-#include "mkn/kul/os/mem.hpp"
+#include "mkn/kul/mem.hpp"
 #include "mkn/kul/log.hpp"
 #include "mkn/kul/string.hpp"
 #include "mkn/kul/threads/def.hpp"
@@ -55,8 +55,8 @@ namespace kul {
 
 namespace this_proc {
 // values in KiB
-inline uint64_t virtualMemory() { return mkn::kul::os::mem::virtual_bytes() / 1024; }
-inline uint64_t physicalMemory() { return mkn::kul::os::mem::rss_bytes() / 1024; }
+inline uint64_t virtualMemory() { return mkn::kul::mem::virtual_bytes() / 1024; }
+inline uint64_t physicalMemory() { return mkn::kul::mem::rss_bytes() / 1024; }
 inline uint64_t totalMemory() { return virtualMemory() + physicalMemory(); }
 
 inline uint16_t cpuLoad() { return 0; }
