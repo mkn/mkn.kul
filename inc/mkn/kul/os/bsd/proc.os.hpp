@@ -42,56 +42,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <unistd.h>
 #include <stdexcept>
 
-#if defined(__APPLE__)
-#include <mach/mach.h>
-#endif
+#include "mkn/kul/mem.hpp"
 
 namespace mkn {
 namespace kul {
 namespace this_proc {
-class MemGetter {
- private:
-#if defined(__APPLE__)
-  bool f = 0;
-  struct task_basic_info inf;
-  MemGetter() {
-    mach_msg_type_number_t inf_count = TASK_BASIC_INFO_COUNT;
-    f = KERN_SUCCESS != task_info(mach_task_self(), TASK_BASIC_INFO, (task_info_t)&inf, &inf_count);
-  }
-#endif
-  void virtula(uint64_t& v) {
-#if defined(__APPLE__)
-    if (!f) v += inf.virtual_size;
-#endif
-  }
-  void physical(uint64_t& v) {
-#if defined(__APPLE__)
-    if (!f) v += inf.resident_size;
-#endif
-  }
-
-  friend uint64_t virtualMemory();
-  friend uint64_t physicalMemory();
-  friend uint64_t totalMemory();
-};
-
-inline uint64_t virtualMemory() {
-  uint64_t v = 0;
-  MemGetter().virtula(v);
-  return v;
-}
-inline uint64_t physicalMemory() {
-  uint64_t v = 0;
-  MemGetter().physical(v);
-  return v;
-}
-inline uint64_t totalMemory() {
-  uint64_t v = 0;
-  MemGetter pg;
-  pg.virtula(v);
-  pg.physical(v);
-  return v;
-}
+// values in KiB
+inline uint64_t virtualMemory() { return mkn::kul::mem::virtual_bytes() / 1024; }
+inline uint64_t physicalMemory() { return mkn::kul::mem::rss_bytes() / 1024; }
+inline uint64_t totalMemory() { return virtualMemory() + physicalMemory(); }
 
 inline uint16_t cpuLoad() { return 0; }
 }  // namespace this_proc

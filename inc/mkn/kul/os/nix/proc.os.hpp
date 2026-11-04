@@ -41,67 +41,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <unistd.h>
 #include <sys/wait.h>
 
+#include "mkn/kul/mem.hpp"
+
 namespace mkn {
 namespace kul {
 namespace this_proc {
 
-class ProcParser {
- private:
-  static inline int PARSE_LINE(char* line);
-  static inline void VIRTUAL(uint64_t& mem);
-  static inline void PHYSICAL(uint64_t& mem);  // Note: this value is in KB!
-
-  friend uint64_t virtualMemory();
-  friend uint64_t physicalMemory();
-  friend uint64_t totalMemory();
-};
-
-int ProcParser::PARSE_LINE(char* line) {
-  int i = strlen(line);
-  while (*line < '0' || *line > '9') line++;
-  line[i - 3] = '\0';
-  i = atoi(line);
-  return i;
-}
-void ProcParser::VIRTUAL(uint64_t& mem) {
-  FILE* file = fopen("/proc/self/status", "r");
-  char line[128];
-  while (fgets(line, 128, file) != NULL) {
-    if (strncmp(line, "VmSize:", 7) == 0) {
-      mem += PARSE_LINE(line);
-      break;
-    }
-  }
-  fclose(file);
-}
-void ProcParser::PHYSICAL(uint64_t& mem) {
-  FILE* file = fopen("/proc/self/status", "r");
-  char line[128];
-  while (fgets(line, 128, file) != NULL) {
-    if (strncmp(line, "VmRSS:", 6) == 0) {
-      mem += PARSE_LINE(line);
-      break;
-    }
-  }
-  fclose(file);
-}
-
-inline uint64_t virtualMemory() {
-  uint64_t v = 0;
-  ProcParser::VIRTUAL(v);
-  return v;
-}
-inline uint64_t physicalMemory() {
-  uint64_t v = 0;
-  ProcParser::PHYSICAL(v);
-  return v;
-}
-inline uint64_t totalMemory() {
-  uint64_t v = 0;
-  ProcParser::VIRTUAL(v);
-  ProcParser::PHYSICAL(v);
-  return v;
-}
+// values in KiB
+inline uint64_t virtualMemory() { return mkn::kul::mem::virtual_bytes() / 1024; }
+inline uint64_t physicalMemory() { return mkn::kul::mem::rss_bytes() / 1024; }
+inline uint64_t totalMemory() { return virtualMemory() + physicalMemory(); }
 inline uint16_t cpuLoad() { return 0; }
 }  // namespace this_proc
 }  // namespace kul
