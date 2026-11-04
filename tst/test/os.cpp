@@ -4,10 +4,35 @@
 
 #include "mkn/kul/os.hpp"
 #include "mkn/kul/proc.hpp"
+#include "mkn/kul/os/mem.hpp"
+
+#include <vector>
 
 TEST(OperatingSystemTests, HasRAMUsageSupport) {
   ASSERT_TRUE(mkn::kul::this_proc::physicalMemory());
   ASSERT_TRUE(mkn::kul::this_proc::virtualMemory());
+}
+
+TEST(OperatingSystemTests, MemBytesSupport) {
+  namespace mem = mkn::kul::os::mem;
+  auto const rss = mem::rss_bytes();
+  ASSERT_GT(rss, 0u);
+  ASSERT_GT(mem::virtual_bytes(), 0u);
+  ASSERT_GE(mem::peak_rss_bytes(), rss);
+  auto const u = mem::usage();
+  ASSERT_GT(u.rss, 0u);
+  ASSERT_GE(u.peak, u.rss);
+}
+
+TEST(OperatingSystemTests, MemRSSGrowsWhenTouched) {
+  namespace mem = mkn::kul::os::mem;
+  std::size_t constexpr N = 64 * 1024 * 1024;
+  auto const before = mem::rss_bytes();
+  std::vector<char> v(N, 1);  // value-init touches every page
+  auto const after = mem::rss_bytes();
+  ASSERT_GE(after, before + N / 2);
+  ASSERT_GE(mem::peak_rss_bytes(), after);
+  ASSERT_EQ(v[N - 1], 1);
 }
 
 class TimeStampHandler {

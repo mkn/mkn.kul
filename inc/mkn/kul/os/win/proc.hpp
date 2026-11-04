@@ -42,6 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "mkn/kul/defs.hpp"
 
 #include "mkn/kul/os.hpp"
+#include "mkn/kul/os/mem.hpp"
 #include "mkn/kul/log.hpp"
 #include "mkn/kul/string.hpp"
 #include "mkn/kul/threads/def.hpp"
@@ -53,35 +54,10 @@ namespace mkn {
 namespace kul {
 
 namespace this_proc {
-class MemGetter {
- private:
-  PROCESS_MEMORY_COUNTERS_EX pmc;
-  MemGetter() {
-    GetProcessMemoryInfo(GetCurrentProcess(), (PROCESS_MEMORY_COUNTERS*)&pmc, sizeof(pmc));
-  }
-  void virtula(uint64_t& v) { v += pmc.PrivateUsage; }
-  void physical(uint64_t& v) { v += pmc.WorkingSetSize; }
-  friend uint64_t virtualMemory();
-  friend uint64_t physicalMemory();
-  friend uint64_t totalMemory();
-};
-inline uint64_t virtualMemory() {
-  uint64_t v = 0;
-  MemGetter().virtula(v);
-  return v / 1000;
-}
-inline uint64_t physicalMemory() {
-  uint64_t v = 0;
-  MemGetter().physical(v);
-  return v / 1000;
-}
-inline uint64_t totalMemory() {
-  uint64_t v = 0;
-  MemGetter pg;
-  pg.virtula(v);
-  pg.physical(v);
-  return v / 1000;
-}
+// values in KiB
+inline uint64_t virtualMemory() { return mkn::kul::os::mem::virtual_bytes() / 1024; }
+inline uint64_t physicalMemory() { return mkn::kul::os::mem::rss_bytes() / 1024; }
+inline uint64_t totalMemory() { return virtualMemory() + physicalMemory(); }
 
 inline uint16_t cpuLoad() { return 0; }
 
