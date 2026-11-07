@@ -34,17 +34,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef MKN_KUL_ALLOC_HUGE_HPP_
 #define MKN_KUL_ALLOC_HUGE_HPP_
 
-#if __has_include(<sys/mman.h>)
-
 #include "mkn/kul/alloc/base.hpp"
 
-#include <new>
-#include <cstddef>
+#include <cstddef>  // IWYU pragma: keep
 #include <cstdlib>
-#include <type_traits>
-
 #include <limits>
-#include <stdlib.h>    // posix_memalign
+#include <new>
+#include <type_traits>
+#include <utility>
+
+#if __has_include(<sys/mman.h>)
+
+// posix_memalign is POSIX, <cstdlib> need not declare it
+#include <stdlib.h>  // IWYU pragma: keep
 #include <sys/mman.h>  // madvise
 
 namespace mkn::kul {

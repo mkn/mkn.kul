@@ -31,13 +31,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef MKN_KUL_EXCEPT_HPP_
 #define MKN_KUL_EXCEPT_HPP_
 
-#include "mkn/kul/std/string.hpp"
-
 #include <cstdint>
 #include <memory>
 #include <sstream>
 #include <iostream>
 #include <stdexcept>
+#include <exception>
+#include <string>
+
+// KEXCEPT/KEXIT expand to to_str
+#include "mkn/kul/std/string.hpp"  // IWYU pragma: export
 
 namespace mkn::kul {
 

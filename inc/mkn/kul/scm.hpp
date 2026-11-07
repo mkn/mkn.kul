@@ -35,6 +35,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "mkn/kul/log.hpp"
 #include "mkn/kul/proc.hpp"
 #include "mkn/kul/string.hpp"
+#include "mkn/kul/env.hpp"
+#include "mkn/kul/except.hpp"
+
+#include <stdint.h>
+#include <ostream>
+#include <string>
+#include <typeinfo>
+#include <vector>
 
 namespace mkn {
 namespace kul {

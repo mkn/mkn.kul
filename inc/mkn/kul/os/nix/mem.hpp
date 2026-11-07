@@ -34,11 +34,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef MKN_KUL_OS_NIX_MEM_HPP_
 #define MKN_KUL_OS_NIX_MEM_HPP_
 
-#include <cstdint>
-
 #include <fcntl.h>
 #include <sys/resource.h>
 #include <unistd.h>
+#include <bits/types/struct_rusage.h>
+#include <cstdint>
 
 namespace mkn {
 namespace kul {

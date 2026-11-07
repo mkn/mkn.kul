@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define MKN_KUL_IO_HPP_
 
 #include <tuple>
+#include <cstddef>
+#include <utility>
 
 namespace mkn::kul {
 

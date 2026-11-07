@@ -31,7 +31,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef MKN_KUL_SYS_HPP_
 #define MKN_KUL_SYS_HPP_
 
-#include "mkn/kul/os.hpp"
+#include "mkn/kul/except.hpp"
+
+#include <stdint.h>
+#include <string>
 
 namespace mkn {
 namespace kul {

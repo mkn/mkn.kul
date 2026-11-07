@@ -34,15 +34,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef MKN_KUL_OS_NIX_PROC_OS_HPP_
 #define MKN_KUL_OS_NIX_PROC_OS_HPP_
 
-#include <cstdio>
-#include <cstdint>
-#include <fcntl.h>
-#include <cstring>
-#include <stdlib.h>
-#include <unistd.h>
-#include <sys/wait.h>
+#include "mkn/kul/os/nix/mem.hpp"
 
-#include "mkn/kul/mem.hpp"
+#include <cstdint>
 
 namespace mkn {
 namespace kul {

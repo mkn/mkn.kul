@@ -33,14 +33,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "mkn/kul/except.hpp"
 
-#include <cmath>
 #include <cctype>
 #include <cerrno>
 #include <string>
 #include <vector>
 #include <cstdint>
 #include <cstdlib>
-#include <cstring>
 #include <optional>
 #include <sstream>
 #include <utility>
@@ -64,7 +62,6 @@ class StringException : public mkn::kul::Exception {
       : mkn::kul::Exception(f, l, s) {}
 };
 
-class String;
 class StringOpHelper {
   friend class String;
 

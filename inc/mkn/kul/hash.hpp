@@ -35,8 +35,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * REQUIRES libcrypto
  */
 
-#include <iomanip>
 #include "openssl/sha.h"
+
+#include <stddef.h>
+#include <stdint.h>
+#include <iomanip>
+#include <sstream>
+#include <string>
 
 namespace mkn {
 namespace kul {

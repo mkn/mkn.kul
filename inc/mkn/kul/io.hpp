@@ -31,18 +31,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef MKN_KUL_IO_HPP_
 #define MKN_KUL_IO_HPP_
 
-#include <time.h>
+#include "mkn/kul/except.hpp"
+#include "mkn/kul/log.hpp"
+#include "mkn/kul/os.hpp"
+#include "mkn/kul/defs.hpp"
+
+#include <stdio.h>
 #include <cstdint>
 #include <cstring>
 #include <fstream>
 #include <limits>
-#include <memory>
-#include <stdexcept>
-
-#include "mkn/kul/except.hpp"
-#include "mkn/kul/log.hpp"
-#include "mkn/kul/os.hpp"
-#include "mkn/kul/string.hpp"
+#include <sstream>
+#include <string>
 
 namespace mkn {
 namespace kul {

@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define MKN_KUL_ASIO_LOG_HPP
 
 #include "mkn/kul/log.hpp"
+
 #include "mkn/kul/threads.hpp"
 
 namespace mkn {
@@ -46,7 +47,6 @@ class Exception : public mkn::kul::Exception {
 };
 }  // namespace log
 
-class LogMan;
 class Logger : public mkn::kul::Logger {
   friend class LogMan;
 

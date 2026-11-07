@@ -33,6 +33,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "mkn/kul/log.hpp"
 #include "mkn/kul/defs.hpp"
+#include "mkn/kul/time.hpp"
+
+#include <stdint.h>
+#include <string>
+#include <vector>
 
 namespace mkn {
 namespace kul {

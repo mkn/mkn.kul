@@ -34,23 +34,28 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef MKN_KUL_OS_NIXISH_SIGNAL_HPP_
 #define MKN_KUL_OS_NIXISH_SIGNAL_HPP_
 
-#include "mkn/kul/defs.hpp"
 #include "mkn/kul/log.hpp"
-#include "mkn/kul/proc.hpp"
+#include "mkn/kul/os.hpp"
+#include "mkn/kul/os/nixish/proc.hpp"
+#include "mkn/kul/os/nixish/threads/def.hpp"
 
 #include <signal.h>
-
-#include <execinfo.h>
-
-#include <cxxabi.h>
 #include <execinfo.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
+#include <unistd.h>
 
+// IWYU pragma: no_include <features.h>
+// glibc only, defines __USE_GNU, not on macOS/BSD
 #ifndef __USE_GNU
 #define __USE_GNU
 #endif /* __USE_GNU */
 #include <ucontext.h>
+#include <functional>
+#include <iostream>
+#include <string>
+#include <vector>
 
 #ifndef REG_EIP
 #ifdef __x86_64__
@@ -104,7 +109,6 @@ inline void print_stacktrace() {
 }
 }  // namespace this_thread
 
-class Signal;
 class SignalStatic {
  private:
   bool addr = 0, euaddr = 0, q = 0;

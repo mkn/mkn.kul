@@ -32,10 +32,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define MKN_KUL_BON_YAML_HPP_
 
 #include "mkn/kul/bon.hpp"
-
 #include "yaml-cpp/yaml.h"
 
 #include <string>
+#include <vector>
 
 namespace mkn::kul::bon {
 

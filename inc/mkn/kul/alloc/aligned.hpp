@@ -40,6 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <new>
 #include <cstdint>
 #include <cstdlib>
+#include <cstddef>
 
 namespace mkn::kul {
 

@@ -34,15 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef MKN_KUL_OS_NIX_CPU_HPP_
 #define MKN_KUL_OS_NIX_CPU_HPP_
 
-#include <dirent.h>
-#include <pwd.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/stat.h>
-#include <sys/types.h>
 #include <unistd.h>
-#include <algorithm>
-#include <fstream>
+#include <stdint.h>
 #include <thread>
 
 namespace mkn {

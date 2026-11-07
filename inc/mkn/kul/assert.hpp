@@ -31,9 +31,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef MKN_KUL_ASSERT_HPP_
 #define MKN_KUL_ASSERT_HPP_
 
-#include <cstdlib>
-
 #include "mkn/kul/signal.hpp"
+#include "mkn/kul/log.hpp"
+#include "mkn/kul/threads/def.hpp"
+
+#include <cstdlib>
+#include <string>
+#include <vector>
 
 namespace mkn {
 namespace kul {

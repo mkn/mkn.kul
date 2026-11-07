@@ -31,15 +31,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef MKN_KUL_FOR_HPP_
 #define MKN_KUL_FOR_HPP_
 
+#include "mkn/kul/except.hpp"
+
 #include <array>
 #include <tuple>
 #include <vector>
 #include <utility>
-#include <cassert>
 #include <algorithm>
 #include <type_traits>
-
-#include "mkn/kul/except.hpp"
+#include <cstddef>
+#include <initializer_list>
 
 namespace mkn::kul {
 

@@ -31,11 +31,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef MKN_KUL_SPAN_HPP_
 #define MKN_KUL_SPAN_HPP_
 
+#include "mkn/kul/decltype.hpp"
+
 #include <vector>
 #include <cstddef>
 #include <numeric>
 #include <utility>
-#include "mkn/kul/decltype.hpp"
+#include <type_traits>
 
 namespace mkn {
 namespace kul {

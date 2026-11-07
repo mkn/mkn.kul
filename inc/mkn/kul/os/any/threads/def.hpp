@@ -36,8 +36,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "mkn/kul/except.hpp"
 
+#include <stdint.h>
 #include <chrono>
 #include <thread>
+#include <string>
 
 namespace mkn::kul::this_thread {
 inline void sleep(unsigned long const& millis) {

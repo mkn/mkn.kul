@@ -34,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "mkn/kul/env.hpp"
 #include "mkn/kul/except.hpp"
 
+#include <stdint.h>
 #include <functional>
 #include <map>
 #include <optional>

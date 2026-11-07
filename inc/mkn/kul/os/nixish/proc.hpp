@@ -37,7 +37,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "mkn/kul/os.hpp"
 #include "mkn/kul/cli.hpp"
 #include "mkn/kul/os/any/proc/any_proc.hpp"  // IWYU pragma: export
-#include "mkn/kul/threads/def.hpp"
+#include "mkn/kul/defs.hpp"
+#include "mkn/kul/except.hpp"
+#include "mkn/kul/os/any/proc/def.hpp"
+#include "mkn/kul/os/nixish/env.hpp"
 
 #if MKN_KUL_IS_NIX
 #include "mkn/kul/os/nix/proc.os.hpp"  // IWYU pragma: export
@@ -51,10 +54,23 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define MKN_KUL_PROC_DUP_RETRY 3
 #endif  // MKN_KUL_PROC_DUP_RETRY
 
+#include <assert.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <signal.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <sys/select.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <unistd.h>
 #include <cstring>
 #include <vector>
 #include <string>
 #include <sstream>
+#include <initializer_list>
+#include <unordered_map>
+#include <utility>
 
 namespace mkn {
 namespace kul {

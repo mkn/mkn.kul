@@ -40,12 +40,14 @@ or via cli
 #ifndef MKN_KUL_YAML_HPP_
 #define MKN_KUL_YAML_HPP_
 
+#include "mkn/kul/except.hpp"
+#include "mkn/kul/os.hpp"
+
+#include <stddef.h>
+#include <exception>
 #if __has_include("yaml-cpp/yaml.h")
 
-#include "mkn/kul/io.hpp"
-#include "mkn/kul/dbg.hpp"
 #include "mkn/kul/map.hpp"
-
 #include "yaml-cpp/yaml.h"
 
 #include <string>
@@ -53,9 +55,6 @@ or via cli
 #include <cstdint>
 
 namespace mkn::kul::yaml {
-
-class Validator;
-class NodeValidator;
 
 class Exception : public mkn::kul::Exception {
  public:

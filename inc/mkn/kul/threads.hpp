@@ -31,8 +31,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef MKN_KUL_THREADS_HPP_
 #define MKN_KUL_THREADS_HPP_
 
-#include "mkn/kul/defs.hpp"
-#include "mkn/kul/threads/def.hpp"
+#include "mkn/kul/threads/def.hpp"  // IWYU pragma: export
+#include "mkn/kul/except.hpp"
 
 #include <condition_variable>
 #include <cstddef>

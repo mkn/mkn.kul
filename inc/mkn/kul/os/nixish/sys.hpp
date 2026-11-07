@@ -35,8 +35,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define MKN_KUL_OS_NIXISH_SYS_HPP_
 
 #include "mkn/kul/os.hpp"
+#include "mkn/kul/except.hpp"
 
 #include <dlfcn.h>
+#include <string>
 
 #ifndef MKN_KUL_SYS_DLOPEN
 #define MKN_KUL_SYS_DLOPEN RTLD_NOW | RTLD_GLOBAL
@@ -45,9 +47,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace mkn {
 namespace kul {
 namespace sys {
-
-template <class F>
-class SharedFunction;
 
 class SharedLibrary {
   template <class F>
