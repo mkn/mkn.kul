@@ -32,9 +32,23 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define MKN_KUL_LANG_CPP_MSVC_HPP
 
 #include "mkn/kul/lang/cpp/gcc.hpp"
-
 #include "mkn/kul/cli.hpp"
 #include "mkn/kul/string.hpp"
+#include "mkn/kul/except.hpp"
+#include "mkn/kul/lang/compiler.hpp"
+#include "mkn/kul/lang/def.hpp"
+#include "mkn/kul/log.hpp"
+#include "mkn/kul/map.hpp"
+#include "mkn/kul/os.hpp"
+#include "mkn/kul/proc.hpp"
+
+#include <stddef.h>
+#include <exception>
+#include <ostream>
+#include <string>
+#include <unordered_map>
+#include <utility>
+#include <vector>
 
 namespace mkn::kul::lang::cpp {
 

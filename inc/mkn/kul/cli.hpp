@@ -31,17 +31,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef MKN_KUL_CLI_HPP_
 #define MKN_KUL_CLI_HPP_
 
-#include <iostream>
-#include <string>
-#include <vector>
-#include <cstdint>
-
-#include "mkn/kul/env.hpp"
 #include "mkn/kul/map.hpp"
 #include "mkn/kul/except.hpp"
 #include "mkn/kul/os/cli.hpp"
 #include "mkn/kul/serial.hpp"  // IWYU pragma: export
-#include "mkn/kul/string.hpp"
+
+#include <iostream>
+#include <string>
+#include <vector>
+#include <cstdint>
+#include <cstring>
+#include <sstream>
 
 namespace mkn {
 namespace kul {

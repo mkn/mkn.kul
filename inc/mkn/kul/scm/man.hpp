@@ -32,6 +32,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define MKN_KUL_SCM_MAN_HPP_
 
 #include "mkn/kul/scm.hpp"
+#include "mkn/kul/except.hpp"
+#include "mkn/kul/map.hpp"
+
+#include <memory>
+#include <string>
+#include <unordered_map>
+#include <utility>
 
 namespace mkn {
 namespace kul {

@@ -41,9 +41,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "mkn/kul/map.hpp"
 #include "mkn/kul/except.hpp"
 #include "mkn/kul/os/any/proc/def.hpp"  // IWYU pragma: export
+#include "mkn/kul/defs.hpp"
 
+#include <stdint.h>
+#include <stdio.h>
 #include <string>
 #include <functional>
+#include <sstream>
+#include <unordered_map>
+#include <utility>
+#include <vector>
 
 namespace mkn::kul::proc {
 

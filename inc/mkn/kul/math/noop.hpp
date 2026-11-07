@@ -4,12 +4,13 @@
 
 // This macro ensures that the corresponding optimized blas function is used if
 // available
+#include "mkn/kul/std/ints.hpp"
+
 #include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <numeric>
-
-#include "mkn/kul/std/ints.hpp"
+#include <type_traits>
 
 #if !defined(NDEBUG) && defined(MKN_KUL_USE_CBLAS)
 // x and y are two pointers

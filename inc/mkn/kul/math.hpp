@@ -34,9 +34,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "mkn/kul/except.hpp"
 #include "mkn/kul/std/ints.hpp"
 #include "mkn/kul/std/floats.hpp"
+#include "mkn/kul/std/types.hpp"
 
-#include <math.h>
+#include <stdint.h>
 #include <numeric>
+#include <functional>
+#include <string>
 
 namespace mkn {
 namespace kul {

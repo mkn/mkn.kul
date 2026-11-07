@@ -34,8 +34,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef MKN_KUL_OS_CLI_HPP_
 #define MKN_KUL_OS_CLI_HPP_
 
-#include "mkn/kul/defs.hpp"
-
 #if defined(_WIN32)
 #include "mkn/kul/os/win/cli.os.hpp"  // IWYU pragma: export
 #else

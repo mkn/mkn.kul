@@ -40,6 +40,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "mkn/kul/defs.hpp"
 
+#include <cstdint>
+
 #if MKN_KUL_IS_NIX
 #include "mkn/kul/os/nix/mem.hpp"  // IWYU pragma: export
 #elif MKN_KUL_IS_BSD

@@ -36,7 +36,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <new>
 #include <cstddef>
-#include <cstdlib>
 #include <utility>
 #include <type_traits>
 

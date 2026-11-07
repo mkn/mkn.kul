@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "mkn/kul/defs.hpp"
 #include "mkn/kul/string.hpp"
+#include "mkn/kul/except.hpp"
 
 #include <string>
 #include <sstream>

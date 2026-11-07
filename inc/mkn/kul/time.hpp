@@ -31,11 +31,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef MKN_KUL_TIME_HPP_
 #define MKN_KUL_TIME_HPP_
 
+#include "mkn/kul/string.hpp"
+#include "mkn/kul/except.hpp"
+
+#include <stdint.h>
 #include <chrono>
 #include <ctime>
 #include <sstream>
-
-#include "mkn/kul/string.hpp"
+#include <string>
 
 namespace mkn {
 namespace kul {

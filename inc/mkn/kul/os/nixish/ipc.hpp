@@ -39,14 +39,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 #include "mkn/kul/log.hpp"
-#include "mkn/kul/proc.hpp"
+#include "mkn/kul/except.hpp"
+#include "mkn/kul/os.hpp"
+#include "mkn/kul/os/nixish/proc.hpp"
 
 #include <fcntl.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include <sys/stat.h>
-#include <sys/types.h>
 #include <unistd.h>
+#include <stdint.h>
+#include <string.h>
+#include <sstream>
+#include <string>
 
 #define BUFSIZE 512
 

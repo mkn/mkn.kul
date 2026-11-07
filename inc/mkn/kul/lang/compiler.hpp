@@ -31,9 +31,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef MKN_KUL_LANG_COMPILER_HPP
 #define MKN_KUL_LANG_COMPILER_HPP
 
-#include "mkn/kul/lang/def.hpp"
-
 #include "mkn/kul/except.hpp"
+#include "mkn/kul/lang/def.hpp"  // IWYU pragma: export
 #include "mkn/kul/os.hpp"
 #include "mkn/kul/proc.hpp"
 
@@ -41,6 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include <exception>
 
 namespace mkn::kul::lang {
 

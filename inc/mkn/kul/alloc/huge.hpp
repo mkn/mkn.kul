@@ -34,18 +34,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef MKN_KUL_ALLOC_HUGE_HPP_
 #define MKN_KUL_ALLOC_HUGE_HPP_
 
+#include <utility>
 #if __has_include(<sys/mman.h>)
 
 #include "mkn/kul/alloc/base.hpp"
 
+#include <sys/mman.h>  // madvise
 #include <new>
-#include <cstddef>
 #include <cstdlib>
 #include <type_traits>
-
 #include <limits>
-#include <stdlib.h>    // posix_memalign
-#include <sys/mman.h>  // madvise
 
 namespace mkn::kul {
 

@@ -31,8 +31,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef MKN_KUL_IPC_HPP_
 #define MKN_KUL_IPC_HPP_
 
-#include "mkn/kul/defs.hpp"
-
 #if defined(_WIN32)
 #include "mkn/kul/os/win/ipc.hpp"  // IWYU pragma: export
 #else

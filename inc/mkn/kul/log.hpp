@@ -32,16 +32,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define MKN_KUL_LOG_HPP
 
 #include "mkn/kul/defs.hpp"
-
 #include "mkn/kul/env.hpp"
 #include "mkn/kul/time.hpp"
 #include "mkn/kul/except.hpp"
 #include "mkn/kul/threads/def.hpp"
+#include "mkn/kul/string.hpp"
 
+#include <stdint.h>
 #include <memory>
 #include <string>
 #include <iostream>
 #include <functional>
+#include <sstream>
 
 #ifndef MKN_KUL_LOG_TIME_FRMT
 #define MKN_KUL_LOG_TIME_FRMT "%Y-%m-%d-%H:%M:%S:%i"
@@ -64,7 +66,6 @@ class Exception : public mkn::kul::Exception {
 };
 }  // namespace log
 
-class ALogMan;
 class Logger {
   friend class ALogMan;
 

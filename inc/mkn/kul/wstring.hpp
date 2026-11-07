@@ -31,9 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef MKN_KUL_WSTRING_HPP_
 #define MKN_KUL_WSTRING_HPP_
 
-#include <algorithm>
 #include <cstdint>
-#include <sstream>
 #include <string>
 #include <vector>
 

@@ -44,6 +44,7 @@ REQUIRES
 #define MKN_KUL_MAP_HPP_
 
 #include <string>
+#include <utility>
 
 #ifndef MKN_WITH_GOOGLE_SPARSEHASH
 
@@ -116,7 +117,6 @@ using String = Set<std::string>;
 
 #include "sparsehash/sparse_hash_map"
 #include "sparsehash/sparse_hash_set"
-
 #include "sparsehash/dense_hash_map"
 #include "sparsehash/dense_hash_set"
 

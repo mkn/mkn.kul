@@ -42,8 +42,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "mkn/kul/os/nixish/os.top.hpp"  // IWYU pragma: export
 #endif
 
+#include <stdint.h>
 #include <vector>
 #include <optional>
+#include <cstdio>
+#include <fstream>
+#include <iostream>
+#include <string>
 
 namespace mkn {
 namespace kul {
