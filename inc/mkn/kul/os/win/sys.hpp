@@ -31,7 +31,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef MKN_KUL_OS_WIN_SYS_HPP_
 #define MKN_KUL_OS_WIN_SYS_HPP_
 
+#include "mkn/kul/except.hpp"
 #include "mkn/kul/log.hpp"
+#include "mkn/kul/os.hpp"
 
 #include <windows.h>
 

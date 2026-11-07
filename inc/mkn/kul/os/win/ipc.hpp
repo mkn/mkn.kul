@@ -35,6 +35,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define MKN_KUL_IPC_UUID_PREFIX "\\\\.\\pipe\\"
 #endif
 
+#include "mkn/kul/except.hpp"
+#include "mkn/kul/log.hpp"
 #include "mkn/kul/proc.hpp"
 
 #include <conio.h>
