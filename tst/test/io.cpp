@@ -4,6 +4,10 @@
 
 #include "mkn/kul/io.hpp"
 
+#include <fstream>
+#include <iterator>
+#include <string>
+
 TEST(IO_Test, ReadFileLine) {
   mkn::kul::io::Reader r("LICENSE.md");
   char const* c = r.readLine();
@@ -33,7 +37,9 @@ TEST(IO_Test, ReadFileEnd) {
   std::string all;
   char c[64];
   for (std::size_t n; (n = r.read(c, sizeof(c)));) all.append(c, n);
-  EXPECT_EQ(all.size(), mkn::kul::File("LICENSE.md").size());
+  std::ifstream in("LICENSE.md");  // text mode like Reader, "\r\n" is "\n" on Windows
+  std::string const expected{std::istreambuf_iterator<char>{in}, std::istreambuf_iterator<char>{}};
+  EXPECT_EQ(all, expected);
   EXPECT_EQ(r.read(c, sizeof(c)), 0u);
 }
 
