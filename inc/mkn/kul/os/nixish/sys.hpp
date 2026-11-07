@@ -34,13 +34,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef MKN_KUL_OS_NIXISH_SYS_HPP_
 #define MKN_KUL_OS_NIXISH_SYS_HPP_
 
-#include "mkn/kul/log.hpp"
+#include "mkn/kul/os.hpp"
 
 #include <dlfcn.h>
 
 #ifndef MKN_KUL_SYS_DLOPEN
 #define MKN_KUL_SYS_DLOPEN RTLD_NOW | RTLD_GLOBAL
-#endif  //MKN_KUL_SYS_DLOPEN
+#endif  // MKN_KUL_SYS_DLOPEN
 
 namespace mkn {
 namespace kul {
