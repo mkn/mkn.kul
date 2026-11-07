@@ -37,10 +37,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define MKN_KUL_OS bsd
 #endif /*  MKN_KUL_OS */
 
-#ifndef MKN_KUL_THREAD_SPAWN_WAIT
-#define MKN_KUL_THREAD_SPAWN_WAIT 5000000
-#endif /*  MKN_KUL_THREAD_SPAWN_WAIT */
-
 #include <string>
 
 namespace mkn::kul::os {

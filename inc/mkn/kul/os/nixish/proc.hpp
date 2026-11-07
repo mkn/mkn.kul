@@ -214,15 +214,15 @@ void Process::run() KTHROW(mkn::kul::proc::Exception) {
       char cOut[proc::BUFFER_SIZE] = {'\0'};
       char cErr[proc::BUFFER_SIZE] = {'\0'};
       do {
-#if MKN_KUL_PROC_LOOP_NSLEEP_
-        mkn::kul::this_thread::nSleep(MKN_KUL_PROC_LOOP_NSLEEP_);
+#if MKN_KUL_PROC_LOOP_NSLEEP
+        mkn::kul::this_thread::nSleep(MKN_KUL_PROC_LOOP_NSLEEP);
 #endif
         alive = ::kill(pid(), 0) == 0;
         if (FD_ISSET(popPip[1], &childOutFds)) {
           bool b = 0;
           do {
-#if MKN_KUL_PROC_LOOP_NSLEEP_
-            mkn::kul::this_thread::nSleep(MKN_KUL_PROC_LOOP_NSLEEP_);
+#if MKN_KUL_PROC_LOOP_NSLEEP
+            mkn::kul::this_thread::nSleep(MKN_KUL_PROC_LOOP_NSLEEP);
 #endif
 
             memset(cOut, 0, sizeof(cOut));
@@ -243,8 +243,8 @@ void Process::run() KTHROW(mkn::kul::proc::Exception) {
         if (FD_ISSET(popPip[2], &childOutFds)) {
           bool b = 0;
           do {
-#if MKN_KUL_PROC_LOOP_NSLEEP_
-            mkn::kul::this_thread::nSleep(MKN_KUL_PROC_LOOP_NSLEEP_);
+#if MKN_KUL_PROC_LOOP_NSLEEP
+            mkn::kul::this_thread::nSleep(MKN_KUL_PROC_LOOP_NSLEEP);
 #endif
 
             memset(cErr, 0, sizeof(cErr));

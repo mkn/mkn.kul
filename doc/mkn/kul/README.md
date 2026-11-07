@@ -51,9 +51,6 @@ OS-specific implementations are selected at include time. The public API documen
 | Shared libraries | `dlopen` / `dlsym` | `LoadLibrary` / `GetProcAddress` |
 | CPU info | `/proc/cpuinfo` / sysctl | `GetSystemInfo` |
 
-## Key environment variables
+## Environment variables and compile switches
 
-| Variable | Effect |
-|----------|--------|
-| `KLOG` | Log verbosity: `0`=off `1`=INF `2`=ERR `3`=DBG `4`=OTH `5`=TRC |
-| `MKN_KUL_GIT_CO` | Extra args passed to `git clone` during dependency fetch |
+See [API.md](../../../API.md#environment-variables).
