@@ -1,4 +1,5 @@
 // IWYU pragma: private, include "mkn/kul/alloc.hpp"
+// IWYU pragma: friend ".*mkn/kul/alloc/.*"
 
 /**
 Copyright (c) 2026, Philip Deegan.

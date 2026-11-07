@@ -48,9 +48,9 @@ class Exception : public mkn::kul::Exception {
 }  // namespace mkn
 
 #if defined(_WIN32)
-#include "mkn/kul/os/win/sys.hpp"
+#include "mkn/kul/os/win/sys.hpp"  // IWYU pragma: export
 #else
-#include "mkn/kul/os/nixish/sys.hpp"
+#include "mkn/kul/os/nixish/sys.hpp"  // IWYU pragma: export
 #endif
 
 #endif /* MKN_KUL_SYS_HPP_ */

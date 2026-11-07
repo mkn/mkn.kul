@@ -34,9 +34,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "mkn/kul/defs.hpp"
 
 #if MKN_KUL_IS_WIN
-#include "mkn/kul/os/win/signal.hpp"
+#include "mkn/kul/os/win/signal.hpp"  // IWYU pragma: export
 #else
-#include "mkn/kul/os/nixish/signal.hpp"
+#include "mkn/kul/os/nixish/signal.hpp"  // IWYU pragma: export
 #endif
 
 #endif  // MKN_KUL_SIGNAL_HPP_

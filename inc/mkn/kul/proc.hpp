@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define MKN_KUL_PROC_LOOP_NSLEEP 1000000
 #endif /* MKN_KUL_PROC_LOOP_NSLEEP */
 
-#include "mkn/kul/os/any/proc/def.hpp"
+#include "mkn/kul/os/any/proc/def.hpp"  // IWYU pragma: export
 
 #include <cstdio>
 // #include <vector>
@@ -60,9 +60,9 @@ uint16_t cpuLoad();
 }  // namespace mkn
 
 #if defined(_WIN32)
-#include "mkn/kul/os/win/proc.hpp"
+#include "mkn/kul/os/win/proc.hpp"  // IWYU pragma: export
 #else
-#include "mkn/kul/os/nixish/proc.hpp"
+#include "mkn/kul/os/nixish/proc.hpp"  // IWYU pragma: export
 #endif
 
 #endif  // MKN_KUL_PROC_HPP_

@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "mkn/kul/map.hpp"
 #include "mkn/kul/except.hpp"
 #include "mkn/kul/os/cli.hpp"
-#include "mkn/kul/serial.hpp"
+#include "mkn/kul/serial.hpp"  // IWYU pragma: export
 #include "mkn/kul/string.hpp"
 
 namespace mkn {
@@ -239,7 +239,7 @@ class Args {
   std::string rest_ = "";  // populated with everything after " -- "
 
  public:
-#include "mkn/kul/serial/cli.arg.end.hpp"
+#include "mkn/kul/serial/cli.arg.end.hpp"  // IWYU pragma: export
 };
 
 namespace {
@@ -321,6 +321,6 @@ inline std::vector<std::string> asArgs(std::string const& cmd) {
 }  // namespace kul
 }  // namespace mkn
 
-#include "mkn/kul/serial/cli.bottom.hpp"
+#include "mkn/kul/serial/cli.bottom.hpp"  // IWYU pragma: export
 
 #endif /* MKN_KUL_CLI_HPP_ */

@@ -29,6 +29,7 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 // IWYU pragma: private, include "mkn/kul/env.hpp"
+// IWYU pragma: friend ".*mkn/kul/os/(nix|nixish|bsd)/.*"
 
 #ifndef MKN_KUL_OS_NIXISH_ENV_HPP_
 #define MKN_KUL_OS_NIXISH_ENV_HPP_
@@ -44,6 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fstream>
 #include <thread>
 #include <cassert>
+#include <cstring>
 
 #include <limits.h>
 

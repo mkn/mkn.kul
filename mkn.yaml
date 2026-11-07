@@ -40,6 +40,19 @@ profile:
   mod: |
     clang.format{init{style: file, types: hpp cpp ipp, paths: .}}
 
+# include-what-you-use report for inc/, needs iwyu on PATH, see res/iwyu.imp
+- name: iwyu
+  parent: usage
+  dep: parse.yaml[headers]
+  mod:
+  - name: cpp.iwyu
+    compile:
+      paths: inc
+      # os/win os/bsd: other platforms, the rest are fragments of a parent header
+      ignore: os/win os/bsd os.top os.bot cli.os math/blas math/noblas os/def.hpp
+      headers: -x c++-header
+      args: -Xiwyu --mapping_file=res/iwyu.imp
+
 - name: clang.tidy
   parent: _test
   src: tst
