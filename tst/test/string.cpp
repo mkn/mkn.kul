@@ -33,6 +33,28 @@ TEST(StringOperations, SplitByEscapedChar) {
   EXPECT_EQ(" dash", v[2]);
 }
 
+TEST(StringOperations, Trim) {
+  auto const trim = [](auto fn, std::string s) {
+    fn(s);
+    return s;
+  };
+  auto const left = [](std::string& s) { mkn::kul::String::TRIM_LEFT(s); };
+  auto const right = [](std::string& s) { mkn::kul::String::TRIM_RIGHT(s); };
+  auto const both = [](std::string& s) { mkn::kul::String::TRIM(s); };
+
+  EXPECT_EQ(trim(left, "  a b  "), "a b  ");
+  EXPECT_EQ(trim(right, "  a b  "), "  a b");
+  EXPECT_EQ(trim(both, " \t a b \t "), "a b");
+  for (auto const fn : {+left, +right, +both}) {  // all delimiters or empty
+    EXPECT_EQ(trim(fn, ""), "");
+    EXPECT_EQ(trim(fn, "   "), "");
+  }
+  std::string s = "xxaxx";
+  mkn::kul::String::TRIM_LEFT(s, 'x');
+  mkn::kul::String::TRIM_RIGHT(s, 'x');
+  EXPECT_EQ(s, "a");
+}
+
 TEST(StringOperations, String_2_UInt16_t_invalid_tooLarge) {
   tryCatch(
       {// toolarge
