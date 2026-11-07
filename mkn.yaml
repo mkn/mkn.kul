@@ -22,6 +22,11 @@ profile:
   src: tst/test
   mode: none
 
+- name: test_bon
+  parent: _test
+  main: tst/test_yaml/bon.cpp
+  dep: parse.yaml
+
 - name: bench
   parent: include
   main: tst/bench/bench.cpp
