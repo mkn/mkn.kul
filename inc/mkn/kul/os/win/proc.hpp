@@ -144,7 +144,7 @@ class Process : public mkn::kul::AProcess {
   }
 
   void run() KTHROW(mkn::kul::Exception) {
-#ifndef MKN_KUL_PROC_LOOP_NSLEEP_
+#ifndef MKN_KUL_PROC_LOOP_NSLEEP
 #error  // define as 0 to disable
 #endif
     SECURITY_ATTRIBUTES sa;
@@ -278,8 +278,8 @@ class Process : public mkn::kul::AProcess {
       bSuccess = FALSE;
       bool alive = true;
       do {
-#if MKN_KUL_PROC_LOOP_NSLEEP_
-        mkn::kul::this_thread::nSleep(MKN_KUL_PROC_LOOP_NSLEEP_);
+#if MKN_KUL_PROC_LOOP_NSLEEP
+        mkn::kul::this_thread::nSleep(MKN_KUL_PROC_LOOP_NSLEEP);
 #endif
         alive = WaitForSingleObject(piProcInfo.hProcess, 11) == WAIT_TIMEOUT;
         for (;;) {

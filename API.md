@@ -81,17 +81,17 @@ Platform detection and utility macros.
 |--------|---------|----|--------|
 | `MKN_KUL_LOG_FRMT` | `"[%M]: %T - %D : %F fn(%N)#%L - %S"` | all | Log line format: `%M` mode, `%T` thread id, `%D` date time, `%F` file, `%N` function, `%L` line, `%S` message, see [log](doc/mkn/kul/log.md) |
 | `MKN_KUL_LOG_TIME_FRMT` | `"%Y-%m-%d-%H:%M:%S:%i"` | all | `%D` format for [strftime](https://en.cppreference.com/w/cpp/chrono/c/strftime), `%i` is milliseconds |
-| `MKN_KUL_DISABLE_KLOG_DEF_` | undefined | all | Do not define the `KLOG*` / `KOUT*` / `KERR` macros |
+| `MKN_KUL_DISABLE_KLOG_DEF` | undefined | all | Do not define the `KLOG*` / `KOUT*` / `KERR` macros |
 | `KUL_FORCE_DBG_LOGS` | undefined | all | Keep `KLOG(DBG/OTH/TRC)` with `NDEBUG` |
 | `KUL_FORCE_DEBUG_DO` | undefined | all | Keep `MKN_KUL_DEBUG_DO` with `NDEBUG` |
 | `MKN_KUL_FORCE_TRACE` | undefined | all | Keep `MKN_KUL_LOG_SCOPE` / function tracing with `NDEBUG`, see [dbg](doc/mkn/kul/dbg.md) |
 | `KASSERT_REPLACE_ASSERT` | undefined | all | Replace `assert` with `KASSERT`, see [assert](doc/mkn/kul/assert.md) |
-| `MKN_KUL_MAX_PATH_` | `PATH_MAX` / `_MAX_PATH` | all | Max path length for filesystem calls |
+| `MKN_KUL_MAX_PATH` | `PATH_MAX` / `_MAX_PATH` | all | Max path length for filesystem calls |
 | `MKN_KUL_PROCESS_BUFFER` | `64000`, Windows `1024` | all | Process output read buffer size, see [proc](doc/mkn/kul/proc.md) |
-| `MKN_KUL_PROC_LOOP_NSLEEP_` | `1000000` | all | Nanoseconds slept between reads of a running process's output, `0` disables |
+| `MKN_KUL_PROC_LOOP_NSLEEP` | `1000000` | all | Nanoseconds slept between reads of a running process's output, `0` disables |
 | `MKN_KUL_PROC_BLOCK_ERR` | undefined | nix/bsd | Check errors of `fcntl(fd, F_SETFL, O_NONBLOCK)` when starting a process, can fail when starting many processes rapidly |
 | `MKN_KUL_PROC_DUP_RETRY` | `3` | nix/bsd | Retries for `dup` in the forked process |
-| `MKN_KUL_IPC_UUID_PREFIX_` | `"/tmp/pipe"` | nix/bsd | Directory for IPC pipes, see [ipc](doc/mkn/kul/ipc.md) |
+| `MKN_KUL_IPC_UUID_PREFIX` | `"/tmp/pipe"`, Windows `"\\\\.\\pipe\\"` | all | Prefix for IPC pipe paths, see [ipc](doc/mkn/kul/ipc.md) |
 | `MKN_KUL_SYS_DLOPEN` | `RTLD_NOW \| RTLD_GLOBAL` | nix/bsd | `dlopen` flags, see [sys](doc/mkn/kul/sys.md) |
 | `MKN_WITH_GOOGLE_SPARSEHASH` | undefined | all | Use google sparsehash for `hash::map` / `hash::set`, needs `dep: google.sparsehash`, see [map](doc/mkn/kul/map.md) |
 | `MKN_KUL_USE_MKL` / `MKN_KUL_USE_CBLAS` | undefined | all | BLAS backend for [math](doc/mkn/kul/math.md) |

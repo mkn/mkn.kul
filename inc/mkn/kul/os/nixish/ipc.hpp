@@ -33,8 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef MKN_KUL_OS_NIXISH_IPC_HPP_
 #define MKN_KUL_OS_NIXISH_IPC_HPP_
 
-#ifndef MKN_KUL_IPC_UUID_PREFIX_
-#define MKN_KUL_IPC_UUID_PREFIX_ "/tmp/pipe"
+#ifndef MKN_KUL_IPC_UUID_PREFIX
+#define MKN_KUL_IPC_UUID_PREFIX "/tmp/pipe"
 #endif
 
 #include "mkn/kul/log.hpp"
@@ -109,11 +109,11 @@ class Server : public IPCCall {
   Server(int16_t const& _lp = -1) KTHROW(Exception)
       : lp(_lp),
         uuid(std::to_string(mkn::kul::this_proc::id()),
-             Dir(MKN_KUL_IPC_UUID_PREFIX_ + std::string("/pid/"))) {
+             Dir(MKN_KUL_IPC_UUID_PREFIX + std::string("/pid/"))) {
     start();
   }
   Server(std::string const& ui, int16_t const& _lp = -1) KTHROW(Exception)
-      : lp(_lp), uuid(ui, Dir(MKN_KUL_IPC_UUID_PREFIX_)) {
+      : lp(_lp), uuid(ui, Dir(MKN_KUL_IPC_UUID_PREFIX)) {
     start();
   }
 };
@@ -130,11 +130,11 @@ class Client : public IPCCall {
 
  public:
   virtual ~Client() { stop(); }
-  Client(std::string const& ui) KTHROW(Exception) : uuid(ui, Dir(MKN_KUL_IPC_UUID_PREFIX_)) {
+  Client(std::string const& ui) KTHROW(Exception) : uuid(ui, Dir(MKN_KUL_IPC_UUID_PREFIX)) {
     start();
   }
   Client(int16_t const& pid) KTHROW(Exception)
-      : uuid(std::to_string(pid), Dir(MKN_KUL_IPC_UUID_PREFIX_ + std::string("/pid/"))) {
+      : uuid(std::to_string(pid), Dir(MKN_KUL_IPC_UUID_PREFIX + std::string("/pid/"))) {
     start();
   }
   virtual void send(std::string const& m) const KTHROW(Exception) {

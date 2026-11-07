@@ -48,13 +48,13 @@ namespace mkn {
 namespace kul {
 namespace env {
 
-#if defined(MKN_KUL_MAX_PATH_)
-constexpr size_t KUL_MAX_PATH = MKN_KUL_MAX_PATH_;
+#if defined(MKN_KUL_MAX_PATH)
+constexpr size_t KUL_MAX_PATH = MKN_KUL_MAX_PATH;
 #elif defined(_MAX_PATH)
 constexpr size_t KUL_MAX_PATH = _MAX_PATH;
 #else
 #error  // could not set KUL_MAX_PATH
-#endif  /*MKN_KUL_MAX_PATH_*/
+#endif  /*MKN_KUL_MAX_PATH*/
 
 inline std::string EOL() { return mkn::kul::os::EOL(); }
 
