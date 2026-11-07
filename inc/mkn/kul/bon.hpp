@@ -59,8 +59,9 @@ class Exception : public mkn::kul::Exception {
 };
 
 struct Node {
+  struct Entry;  // {key, node}, std::pair<std::string, Node> can't hold the incomplete Node
   using List = std::vector<Node>;
-  using Map = std::vector<std::pair<std::string, Node>>;  // in input order
+  using Map = std::vector<Entry>;  // in input order
 
   std::variant<Map, List, std::string> value;
 
@@ -72,23 +73,10 @@ struct Node {
   List const& list() const { return get<List>("list"); }
   std::string const& str() const { return get<std::string>("string"); }
 
-  // entries of a map or list, 1 for a string
-  std::size_t size() const {
-    if (is_string()) return 1;
-    return is_map() ? map().size() : list().size();
-  }
-
-  bool contains(std::string const& key) const { return is_map() && find(key); }
-
-  Node const& operator[](std::string const& key) const {
-    if (auto const* node = find(key)) return *node;
-    KEXCEPT(Exception, "bon: no key: ", key);
-  }
-
-  Node const& operator[](std::size_t const i) const {
-    if (i >= list().size()) KEXCEPT(Exception, "bon: index ", i, " out of range");
-    return list()[i];
-  }
+  std::size_t size() const;  // entries of a map or list, 1 for a string
+  bool contains(std::string const& key) const;
+  Node const& operator[](std::string const& key) const;
+  Node const& operator[](std::size_t const i) const;
 
  private:
   template <typename T>
@@ -97,12 +85,37 @@ struct Node {
     KEXCEPT(Exception, "bon: not a ", type);
   }
 
-  Node const* find(std::string const& key) const {
-    for (auto const& [k, node] : map())
-      if (k == key) return &node;
-    return nullptr;
-  }
+  Node const* find(std::string const& key) const;
 };
+
+struct Node::Entry {
+  std::string key;
+  Node node;
+};
+
+// defined after Entry is complete
+inline std::size_t Node::size() const {
+  if (is_string()) return 1;
+  return is_map() ? map().size() : list().size();
+}
+
+inline bool Node::contains(std::string const& key) const { return is_map() && find(key); }
+
+inline Node const& Node::operator[](std::string const& key) const {
+  if (auto const* node = find(key)) return *node;
+  KEXCEPT(Exception, "bon: no key: ", key);
+}
+
+inline Node const& Node::operator[](std::size_t const i) const {
+  if (i >= list().size()) KEXCEPT(Exception, "bon: index ", i, " out of range");
+  return list()[i];
+}
+
+inline Node const* Node::find(std::string const& key) const {
+  for (auto const& [k, node] : map())
+    if (k == key) return &node;
+  return nullptr;
+}
 
 namespace detail {
 
@@ -158,7 +171,7 @@ class Parser {
         n = std::move(node);
         return;
       }
-    map.emplace_back(key, std::move(node));
+    map.push_back(Node::Entry{key, std::move(node)});
   }
 
   Node object() {

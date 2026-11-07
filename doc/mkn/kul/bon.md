@@ -9,8 +9,9 @@ arguments on the command line, e.g. `-m 'cpp.iwyu{compile{fix: --nocomments, sys
 Node parse(std::string const& s);  // throws bon::Exception on malformed input
 
 struct Node {
+  struct Entry { std::string key; Node node; };
   using List = std::vector<Node>;
-  using Map  = std::vector<std::pair<std::string, Node>>;  // in input order
+  using Map  = std::vector<Entry>;  // in input order
   std::variant<Map, List, std::string> value;
 
   bool is_map() const;  bool is_list() const;  bool is_string() const;
