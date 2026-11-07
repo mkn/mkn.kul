@@ -32,7 +32,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define MKN_KUL_SPAN_HPP_
 
 #include <vector>
+#include <cstddef>
 #include <numeric>
+#include <utility>
 #include "mkn/kul/decltype.hpp"
 
 namespace mkn {
@@ -101,11 +103,14 @@ struct SpanSet {
 
   SpanSet(std::vector<SIZE>&& sizes_)
       : m_size{std::accumulate(sizes_.begin(), sizes_.end(), SIZE{0})},
-        m_sizes(sizes_),
-        m_displs(sizes_.size()),
+        m_sizes(std::move(sizes_)),
+        m_displs(m_sizes.size()),
         m_vec(m_size) {
-    for (SIZE off = 0, i = 0; i < static_cast<SIZE>(sizes_.size()); i++, off += sizes_[i])
+    SIZE off = 0;
+    for (std::size_t i = 0; i < m_sizes.size(); ++i) {
       m_displs[i] = off;
+      off += m_sizes[i];
+    }
   }
 
   SpanSet(SpanSet_&& from)
@@ -123,24 +128,30 @@ struct SpanSet {
   Span<T, SIZE> raw() { return {m_vec.data(), m_size}; }
   Span<T, SIZE> raw() const { return {m_vec.data(), m_size}; }
 
-  struct iterator {
-    iterator(SpanSet_* _sv) : sv(_sv) {}
-    iterator operator++() {
-      curr_pos += sv->m_sizes[curr_ptr++];
+  template <typename SV, typename V>
+  struct Iterator {
+    Iterator& operator++() {
+      ++idx;
       return *this;
     }
-    bool operator!=(iterator const& /*other*/) const { return curr_ptr != sv->m_sizes.size(); }
-    Span<T, SIZE> operator*() const { return {sv->m_vec.data() + curr_pos, sv->m_sizes[curr_ptr]}; }
+    bool operator==(Iterator const& that) const { return idx == that.idx; }
+    bool operator!=(Iterator const& that) const { return idx != that.idx; }
+    Span<V, SIZE> operator*() const {
+      return {sv->m_vec.data() + sv->m_displs[idx], sv->m_sizes[idx]};
+    }
 
-    SpanSet_* sv = nullptr;
-    SIZE curr_pos = 0, curr_ptr = 0;
+    SV* sv = nullptr;
+    std::size_t idx = 0;
   };
+  using iterator = Iterator<SpanSet_, T>;
+  using const_iterator = Iterator<SpanSet_ const, T const>;
 
-  auto begin() { return iterator(this); }
-  auto cbegin() const { return iterator(this); }
-
-  auto end() { return iterator(this); }
-  auto cend() const { return iterator(this); }
+  iterator begin() { return {this, 0}; }
+  iterator end() { return {this, m_sizes.size()}; }
+  const_iterator begin() const { return {this, 0}; }
+  const_iterator end() const { return {this, m_sizes.size()}; }
+  const_iterator cbegin() const { return begin(); }
+  const_iterator cend() const { return end(); }
 
   SIZE const& size() const { return m_size; }
   std::vector<SIZE> const& sizes() const { return m_sizes; }
