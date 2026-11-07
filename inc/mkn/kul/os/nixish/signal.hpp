@@ -43,10 +43,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <execinfo.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <features.h>
 #include <stdint.h>
 #include <unistd.h>
 
+// IWYU pragma: no_include <features.h>
+// glibc only, defines __USE_GNU, not on macOS/BSD
 #ifndef __USE_GNU
 #define __USE_GNU
 #endif /* __USE_GNU */
