@@ -99,10 +99,10 @@ class String {
     }
   }
   static void TRIM_LEFT(std::string& s, char const& delim = ' ') {
-    while (s.find(delim) == 0) s.erase(0, 1);
+    s.erase(0, s.find_first_not_of(delim));
   }
   static void TRIM_RIGHT(std::string& s, char const& delim = ' ') {
-    while (s.rfind(delim) == s.size() - 1) s.pop_back();
+    while (!s.empty() && s.back() == delim) s.pop_back();
   }
   static void TRIM(std::string& s) {
     while (s.find(' ') == 0 || s.find('\t') == 0) s.erase(0, 1);
