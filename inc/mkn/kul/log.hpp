@@ -252,7 +252,7 @@ class DBoMessage : public Message {
 }  // namespace kul
 }  // namespace mkn
 
-#if !defined(MKN_KUL_DISABLE_KLOG_DEF_) || MKN_KUL_DISABLE_KLOG_DEF_ == 1
+#if !defined(MKN_KUL_DISABLE_KLOG_DEF_)
 
 #define KLOG_NON mkn::kul::LogMessage(__FILE__, __func__, __LINE__, mkn::kul::log::mode::NON)
 #define KLOG_INF mkn::kul::LogMessage(__FILE__, __func__, __LINE__, mkn::kul::log::mode::INF)

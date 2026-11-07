@@ -91,8 +91,6 @@ Platform detection and utility macros.
 | `MKN_KUL_PROC_LOOP_NSLEEP_` | `1000000` | all | Nanoseconds slept between reads of a running process's output, `0` disables |
 | `MKN_KUL_PROC_BLOCK_ERR` | undefined | nix/bsd | Check errors of `fcntl(fd, F_SETFL, O_NONBLOCK)` when starting a process, can fail when starting many processes rapidly |
 | `MKN_KUL_PROC_DUP_RETRY` | `3` | nix/bsd | Retries for `dup` in the forked process |
-| `MKN_KUL_ENV_BUFFER` | `1024` | win | Environment variable read buffer size, see [env](doc/mkn/kul/env.md) |
-| `MKN_KUL_PROCESS_ENV_BUFFER` | `8192` | win | Process environment block buffer size |
 | `MKN_KUL_IPC_UUID_PREFIX_` | `"/tmp/pipe"` | nix/bsd | Directory for IPC pipes, see [ipc](doc/mkn/kul/ipc.md) |
 | `MKN_KUL_SYS_DLOPEN` | `RTLD_NOW \| RTLD_GLOBAL` | nix/bsd | `dlopen` flags, see [sys](doc/mkn/kul/sys.md) |
 | `MKN_WITH_GOOGLE_SPARSEHASH` | undefined | all | Use google sparsehash for `hash::map` / `hash::set`, needs `dep: google.sparsehash`, see [map](doc/mkn/kul/map.md) |

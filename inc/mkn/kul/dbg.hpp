@@ -58,14 +58,6 @@ class StackTrace {
 
 #define MKN_KUL_TRACE 1
 
-#ifndef MKN_KUL_TRACE_OR_VOID
-#define MKN_KUL_TRACE_OR_VOID mkn::kul::dbg::StackTrace
-#endif  // MKN_KUL_TRACE_OR_VOID
-
-#ifndef MKN_KUL_STACK_TRACE
-#define MKN_KUL_STACK_TRACE return mkn::kul::dbg::StackTrace(__PRETTY_FUNCTION__)
-#endif  // MKN_KUL_STACK_TRACE
-
 #ifndef MKN_KUL_LOG_SCOPE
 #define MKN_KUL_LOG_SCOPE(s)                                              \
   mkn::kul::dbg::FunctionScope MKN_KUL_STR_CAT(_mkn_dbg_scope, __LINE__)( \
@@ -81,8 +73,6 @@ class StackTrace {
 #else  //
 
 #define MKN_KUL_TRACE 0
-#define MKN_KUL_TRACE_OR_VOID void
-#define MKN_KUL_STACK_TRACE
 #define MKN_KUL_DBG_FUNC_ENTER
 #define MKN_KUL_LOG_SCOPE(...)
 
