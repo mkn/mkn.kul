@@ -74,6 +74,7 @@ class AReader {
   }
   virtual ~AReader() {}
   virtual char const* readLine() = 0;
+  // reads up to l bytes into c, not null terminated, returns the number read
   virtual size_t read(char* c, size_t const& l) = 0;
   virtual void seek(size_t const& l) = 0;
   static void seek(std::ifstream& _f, size_t const& _l) { _f.seekg(checkedStreamOff(_l)); }
@@ -104,18 +105,11 @@ class AReader {
     }
     return 0;
   }
+  // reads up to l bytes into c, not null terminated, returns the number read
   size_t read(char* c, std::ifstream& _f, size_t const& l) {
-    s1.clear();
-    if (_f.good()) {
-      std::vector<char> v;
-      v.resize(l);
-      _f.read(&v[0], checkedStreamSize(l));
-      v.resize((size_t)_f.gcount());
-      s1 = std::string(v.begin(), v.end());
-      std::strcpy(c, s1.c_str());
-      return s1.size();
-    }
-    return 0;
+    if (!_f.good()) return 0;
+    _f.read(c, checkedStreamSize(l));
+    return static_cast<size_t>(_f.gcount());
   }
   std::ifstream f;
 

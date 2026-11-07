@@ -4,6 +4,10 @@
 
 #include "mkn/kul/io.hpp"
 
+#include <fstream>
+#include <iterator>
+#include <string>
+
 TEST(IO_Test, ReadFileLine) {
   mkn::kul::io::Reader r("LICENSE.md");
   char const* c = r.readLine();
@@ -13,20 +17,30 @@ TEST(IO_Test, ReadFileLine) {
   EXPECT_EQ("OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.", s2);
 }
 TEST(IO_Test, ReadFile) {
-  char c[20] = {0};
-  bzero(c);
+  char c[21];
+  c[20] = 'X';  // read must not write past the 20 bytes asked for
   mkn::kul::File file("LICENSE.md");
   if (!file) KEXCEPT(mkn::kul::Exception, "ReadFile: FileNotFound: ", file.full());
   mkn::kul::io::Reader r("LICENSE.md");
-  r.read(c, 20);
-  std::string s1 = c;
-  std::stringstream ss;
-  while ((r.read(c, 20))) {
-    ss << c;
-    break;
-  }
-  EXPECT_EQ("Copyright (c) 2026, ", s1);
-  EXPECT_EQ("Philip Deegan.\nAll r", ss.str());
+  auto n = r.read(c, 20);
+  ASSERT_EQ(n, 20u);
+  EXPECT_EQ("Copyright (c) 2026, ", std::string(c, n));
+  EXPECT_EQ(c[20], 'X');
+  n = r.read(c, 20);
+  ASSERT_EQ(n, 20u);
+  EXPECT_EQ("Philip Deegan.\nAll r", std::string(c, n));
+  EXPECT_EQ(c[20], 'X');
+}
+
+TEST(IO_Test, ReadFileEnd) {
+  mkn::kul::io::Reader r("LICENSE.md");
+  std::string all;
+  char c[64];
+  for (std::size_t n; (n = r.read(c, sizeof(c)));) all.append(c, n);
+  std::ifstream in("LICENSE.md");  // text mode like Reader, "\r\n" is "\n" on Windows
+  std::string const expected{std::istreambuf_iterator<char>{in}, std::istreambuf_iterator<char>{}};
+  EXPECT_EQ(all, expected);
+  EXPECT_EQ(r.read(c, sizeof(c)), 0u);
 }
 
 // Travis has a tough time with this one
@@ -40,19 +54,11 @@ TEST(IO_Test, ReadBinaryFileLine) {
   EXPECT_EQ("OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.", s2);
 }
 TEST(IO_Test, ReadBinaryFile) {
-  char c[20] = {0};
-  bzero(c);
+  char c[20];
   mkn::kul::io::BinaryReader r("LICENSE.md");
-  r.read(c, 20);
-  std::string s1 = c;
-  KLOG(INF) << s1.size();
-  KLOG(INF) << strlen(c);
-  std::stringstream ss;
-  while ((r.read(c, 20))) {
-    ss << c;
-    break;
-  }
-  EXPECT_EQ("Copyright (c) 2026, ", s1);
-  EXPECT_EQ("Philip Deegan.\nAll r", ss.str());
+  auto n = r.read(c, 20);
+  EXPECT_EQ("Copyright (c) 2026, ", std::string(c, n));
+  n = r.read(c, 20);
+  EXPECT_EQ("Philip Deegan.\nAll r", std::string(c, n));
 }
 #endif
