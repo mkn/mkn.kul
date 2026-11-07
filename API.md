@@ -67,10 +67,36 @@ Platform detection and utility macros.
 
 ## Environment Variables
 
-| Variable | Effect |
-|----------|--------|
-| `KLOG` | Log verbosity: `0`=off, `1`=INF, `2`=ERR, `3`=DBG, `4`=OTH, `5`=TRC |
-| `MKN_KUL_GIT_CO` | Extra args passed to `git clone` during dependency fetch |
+| Variable | Default | Effect |
+|----------|---------|--------|
+| `KLOG` | `0` | Log level, number or name: `-1`/`OFF`, `0`/`NON`, `1`/`INF`, `2`/`ERR`, `3`/`DBG`, `4`/`OTH`, `5`/`TRC`. Levels `3`+ are compiled out with `NDEBUG`, see [log](doc/mkn/kul/log.md) |
+| `MKN_KUL_GIT_CO` | `--depth 10 --recursive --shallow-submodules` | Extra args to `git clone`, see [scm](doc/mkn/kul/scm.md) |
+| `MKN_KUL_SVN_CO` | empty | Extra args to `svn checkout`, see [scm](doc/mkn/kul/scm.md) |
+
+---
+
+## Compile Switches
+
+| Define | Default | OS | Effect |
+|--------|---------|----|--------|
+| `MKN_KUL_LOG_FRMT` | `"[%M]: %T - %D : %F fn(%N)#%L - %S"` | all | Log line format: `%M` mode, `%T` thread id, `%D` date time, `%F` file, `%N` function, `%L` line, `%S` message, see [log](doc/mkn/kul/log.md) |
+| `MKN_KUL_LOG_TIME_FRMT` | `"%Y-%m-%d-%H:%M:%S:%i"` | all | `%D` format for [strftime](https://en.cppreference.com/w/cpp/chrono/c/strftime), `%i` is milliseconds |
+| `MKN_KUL_DISABLE_KLOG_DEF` | undefined | all | Do not define the `KLOG*` / `KOUT*` / `KERR` macros |
+| `KUL_FORCE_DBG_LOGS` | undefined | all | Keep `KLOG(DBG/OTH/TRC)` with `NDEBUG` |
+| `KUL_FORCE_DEBUG_DO` | undefined | all | Keep `MKN_KUL_DEBUG_DO` with `NDEBUG` |
+| `MKN_KUL_FORCE_TRACE` | undefined | all | Keep `MKN_KUL_LOG_SCOPE` / function tracing with `NDEBUG`, see [dbg](doc/mkn/kul/dbg.md) |
+| `KASSERT_REPLACE_ASSERT` | undefined | all | Replace `assert` with `KASSERT`, see [assert](doc/mkn/kul/assert.md) |
+| `MKN_KUL_MAX_PATH` | `PATH_MAX` / `_MAX_PATH` | all | Max path length for filesystem calls |
+| `MKN_KUL_PROCESS_BUFFER` | `64000`, Windows `1024` | all | Process output read buffer size, see [proc](doc/mkn/kul/proc.md) |
+| `MKN_KUL_PROC_LOOP_NSLEEP` | `1000000` | all | Nanoseconds slept between reads of a running process's output, `0` disables |
+| `MKN_KUL_PROC_BLOCK_ERR` | undefined | nix/bsd | Check errors of `fcntl(fd, F_SETFL, O_NONBLOCK)` when starting a process, can fail when starting many processes rapidly |
+| `MKN_KUL_PROC_DUP_RETRY` | `3` | nix/bsd | Retries for `dup` in the forked process |
+| `MKN_KUL_IPC_UUID_PREFIX` | `"/tmp/pipe"`, Windows `"\\\\.\\pipe\\"` | all | Prefix for IPC pipe paths, see [ipc](doc/mkn/kul/ipc.md) |
+| `MKN_KUL_SYS_DLOPEN` | `RTLD_NOW \| RTLD_GLOBAL` | nix/bsd | `dlopen` flags, see [sys](doc/mkn/kul/sys.md) |
+| `MKN_WITH_GOOGLE_SPARSEHASH` | undefined | all | Use google sparsehash for `hash::map` / `hash::set`, needs `dep: google.sparsehash`, see [map](doc/mkn/kul/map.md) |
+| `MKN_KUL_USE_MKL` / `MKN_KUL_USE_CBLAS` | undefined | all | BLAS backend for [math](doc/mkn/kul/math.md) |
+
+OSX is BSD for the OS column.
 
 ---
 

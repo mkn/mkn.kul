@@ -39,7 +39,5 @@ public:
 | Macro | Description |
 |-------|-------------|
 | `MKN_KUL_TRACE` | `1` if tracing is active, `0` otherwise |
-| `MKN_KUL_TRACE_OR_VOID` | `mkn::kul::dbg::StackTrace` when tracing, `void` otherwise |
-| `MKN_KUL_STACK_TRACE` | `return mkn::kul::dbg::StackTrace(__PRETTY_FUNCTION__)` |
 | `MKN_KUL_LOG_SCOPE(s)` | Log entry/exit of the current scope with label `s` |
 | `MKN_KUL_DBG_FUNC_ENTER` | Log function entry (file, function, line) |

@@ -66,7 +66,7 @@ public:
   std::string str(char const* f, char const* fn, uint16_t const& l,
                   log::mode const& m,
                   std::string const& s   = "",
-                  std::string const  fmt = /* __MKN_KUL_LOG_FRMT__ */);
+                  std::string const  fmt = /* MKN_KUL_LOG_FRMT */);
 
   void setOut(std::function<void(std::string const&)> o);
   void setErr(std::function<void(std::string const&)> e);
@@ -109,7 +109,7 @@ KERR << "message";
 
 ## Log format placeholders
 
-Configurable via `__MKN_KUL_LOG_FRMT__`:
+Configurable via `MKN_KUL_LOG_FRMT`:
 
 | Placeholder | Value |
 |-------------|-------|

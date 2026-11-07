@@ -53,13 +53,13 @@ namespace env {
 
 inline std::string EOL() { return "\r\n"; }
 
-#if defined(MKN_KUL_MAX_PATH_)
-constexpr size_t KUL_MAX_PATH = MKN_KUL_MAX_PATH_;
+#if defined(MKN_KUL_MAX_PATH)
+constexpr size_t KUL_MAX_PATH = MKN_KUL_MAX_PATH;
 #elif defined(PATH_MAX)
 constexpr size_t KUL_MAX_PATH = PATH_MAX;
 #else
 #error  // could not set KUL_MAX_PATH
-#endif  /*MKN_KUL_MAX_PATH_*/
+#endif  /*MKN_KUL_MAX_PATH*/
 
 inline bool EXISTS(char const* c) { return getenv(c); }
 inline std::string GET(char const* c, std::string default_ = "") {

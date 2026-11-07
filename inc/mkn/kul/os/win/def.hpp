@@ -37,18 +37,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define MKN_KUL_OS win
 #endif /*  MKN_KUL_OS */
 
-#ifndef MKN_KUL_THREAD_SPAWN_WAIT
-#define MKN_KUL_THREAD_SPAWN_WAIT 0
-#endif /*  MKN_KUL_THREAD_SPAWN_WAIT */
-
-#ifndef MKN_KUL_ENV_BUFFER
-#define MKN_KUL_ENV_BUFFER 1024
-#endif /*  MKN_KUL_ENV_BUFFER */
-
-#ifndef MKN_KUL_PROCESS_ENV_BUFFER
-#define MKN_KUL_PROCESS_ENV_BUFFER 4096 * 2
-#endif /*  MKN_KUL_PROCESS_ENV_BUFFER */
-
 #pragma warning(disable : 4005)
 #pragma warning(disable : 4101)
 #pragma warning(disable : 4290)
