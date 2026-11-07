@@ -7,7 +7,7 @@ Header-only, all symbols are under `mkn::kul`.
 ## Documentation
 
 - [API.md](API.md): API reference, one page per header under [doc/mkn/kul](doc/mkn/kul/README.md)
-- [README.noformat](README.noformat): environment variables and compile switches
+- [Environment variables and compile switches](API.md#environment-variables)
 - [tst/usage.cpp](tst/usage.cpp): usage of most headers in one file
 
 ## Example
