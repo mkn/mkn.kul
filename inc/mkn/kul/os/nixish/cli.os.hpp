@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <termios.h>
 #include <unistd.h>
+#include <iostream>
 #include <string>
 
 namespace mkn {

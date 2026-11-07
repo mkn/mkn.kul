@@ -29,6 +29,7 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 // IWYU pragma: private, include "mkn/kul/proc.hpp"
+// IWYU pragma: friend ".*mkn/kul/os/.*"
 
 #ifndef MKN_KUL_OS_ANY_PROC_ANY_PROC_HPP_
 #define MKN_KUL_OS_ANY_PROC_ANY_PROC_HPP_
@@ -39,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "mkn/kul/log.hpp"
 #include "mkn/kul/map.hpp"
 #include "mkn/kul/except.hpp"
-#include "mkn/kul/os/any/proc/def.hpp"
+#include "mkn/kul/os/any/proc/def.hpp"  // IWYU pragma: export
 
 #include <string>
 #include <functional>

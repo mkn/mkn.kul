@@ -29,19 +29,20 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 // IWYU pragma: private, include "mkn/kul/proc.hpp"
+// IWYU pragma: friend ".*mkn/kul/os/(nix|nixish|bsd)/.*"
 
 #ifndef MKN_KUL_OS_NIXISH_PROC_HPP_
 #define MKN_KUL_OS_NIXISH_PROC_HPP_
 
 #include "mkn/kul/os.hpp"
 #include "mkn/kul/cli.hpp"
-#include "mkn/kul/os/any/proc/any_proc.hpp"
+#include "mkn/kul/os/any/proc/any_proc.hpp"  // IWYU pragma: export
 #include "mkn/kul/threads/def.hpp"
 
 #if MKN_KUL_IS_NIX
-#include "mkn/kul/os/nix/proc.os.hpp"
+#include "mkn/kul/os/nix/proc.os.hpp"  // IWYU pragma: export
 #elif MKN_KUL_IS_BSD
-#include "mkn/kul/os/bsd/proc.os.hpp"
+#include "mkn/kul/os/bsd/proc.os.hpp"  // IWYU pragma: export
 #else
 #error unresolved
 #endif

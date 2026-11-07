@@ -1,0 +1,8 @@
+# iwyu mappings for mkn.kul, used by the iwyu profile in mkn.yaml
+[
+  # libstdc++ 14 <format> forward declares std::vector, iwyu credits it when only a declaration is needed
+  { symbol: ["std::vector", "private", "<vector>", "public"] },
+
+  # yaml-cpp: only yaml-cpp/yaml.h is meant to be included
+  { include: ["@\"yaml-cpp/node/.*\"", "private", "\"yaml-cpp/yaml.h\"", "public"] },
+]

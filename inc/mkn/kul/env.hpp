@@ -40,9 +40,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vector>
 
 #if MKN_KUL_IS_WIN
-#include "mkn/kul/os/win/env.hpp"
+#include "mkn/kul/os/win/env.hpp"  // IWYU pragma: export
 #else
-#include "mkn/kul/os/nixish/env.hpp"
+#include "mkn/kul/os/nixish/env.hpp"  // IWYU pragma: export
 #endif /*MKN_KUL_IS_WIN*/
 
 namespace mkn {

@@ -29,16 +29,18 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 // IWYU pragma: private, include "mkn/kul/threads.hpp"
+// IWYU pragma: friend ".*mkn/kul/os/.*"
+// IWYU pragma: friend ".*mkn/kul/log\.hpp"
 
 #ifndef MKN_KUL_THREADS_DEF_HPP_
 #define MKN_KUL_THREADS_DEF_HPP_
 
-#include "mkn/kul/os/any/threads/def.hpp"
+#include "mkn/kul/os/any/threads/def.hpp"  // IWYU pragma: export
 
 #if defined(_WIN32)
-#include "mkn/kul/os/win/threads/def.hpp"
+#include "mkn/kul/os/win/threads/def.hpp"  // IWYU pragma: export
 #else
-#include "mkn/kul/os/nixish/threads/def.hpp"
+#include "mkn/kul/os/nixish/threads/def.hpp"  // IWYU pragma: export
 #endif
 
 #endif /* MKN_KUL_THREADS_DEF_HPP_ */

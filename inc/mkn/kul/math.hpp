@@ -82,7 +82,7 @@ Return sum(Container const& container, Return r = 0) {
 }  // namespace kul
 }  // namespace mkn
 
-#include "mkn/kul/math/noop.hpp"
+#include "mkn/kul/math/noop.hpp"  // IWYU pragma: export
 
 #if defined(MKN_KUL_USE_MKL)
 #include "mkl.h"
@@ -96,8 +96,8 @@ extern "C" {
 #endif  // defined(__APPLE__)
 #endif
 #if defined(MKN_KUL_USE_MKL) || defined(MKN_KUL_USE_CBLAS)
-#include "mkn/kul/math/blas.hpp"
+#include "mkn/kul/math/blas.hpp"  // IWYU pragma: export
 #else
-#include "mkn/kul/math/noblas.hpp"
+#include "mkn/kul/math/noblas.hpp"  // IWYU pragma: export
 #endif
 #endif  // MKN_KUL_MATH_HPP_

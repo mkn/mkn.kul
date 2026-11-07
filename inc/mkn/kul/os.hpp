@@ -37,9 +37,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "mkn/kul/string.hpp"
 
 #if MKN_KUL_IS_WIN
-#include "mkn/kul/os/win/os.top.hpp"
+#include "mkn/kul/os/win/os.top.hpp"  // IWYU pragma: export
 #else
-#include "mkn/kul/os/nixish/os.top.hpp"
+#include "mkn/kul/os/nixish/os.top.hpp"  // IWYU pragma: export
 #endif
 
 #include <vector>
@@ -331,9 +331,9 @@ inline bool WHICH(std::string const& s) { return WHERE(s.c_str()).size(); }
 }  // namespace mkn
 
 #if MKN_KUL_IS_WIN
-#include "mkn/kul/os/win/os.bot.hpp"
+#include "mkn/kul/os/win/os.bot.hpp"  // IWYU pragma: export
 #else
-#include "mkn/kul/os/nixish/os.bot.hpp"
+#include "mkn/kul/os/nixish/os.bot.hpp"  // IWYU pragma: export
 #endif
 
 #endif /* MKN_KUL_OS_HPP_ */

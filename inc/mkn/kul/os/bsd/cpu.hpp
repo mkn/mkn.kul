@@ -29,6 +29,7 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 // IWYU pragma: private, include "mkn/kul/cpu.hpp"
+// IWYU pragma: friend ".*mkn/kul/os/(nix|nixish|bsd)/.*"
 
 #ifndef MKN_KUL_OS_BSD_CPU_HPP_
 #define MKN_KUL_OS_BSD_CPU_HPP_

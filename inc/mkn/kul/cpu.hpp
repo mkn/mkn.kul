@@ -34,11 +34,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "mkn/kul/defs.hpp"
 
 #if MKN_KUL_IS_NIX
-#include "mkn/kul/os/nix/cpu.hpp"
+#include "mkn/kul/os/nix/cpu.hpp"  // IWYU pragma: export
 #elif MKN_KUL_IS_BSD
-#include "mkn/kul/os/bsd/cpu.hpp"
+#include "mkn/kul/os/bsd/cpu.hpp"  // IWYU pragma: export
 #elif MKN_KUL_IS_WIN
-#include "mkn/kul/os/win/cpu.hpp"
+#include "mkn/kul/os/win/cpu.hpp"  // IWYU pragma: export
 #else
 #error unresolved
 #endif

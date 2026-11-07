@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "mkn/kul/log.hpp"
 #include "mkn/kul/string.hpp"
 #include "mkn/kul/threads/def.hpp"
-#include "mkn/kul/os/any/proc/any_proc.hpp"
+#include "mkn/kul/os/any/proc/any_proc.hpp"  // IWYU pragma: export
 
 // extern char **environ;
 
