@@ -33,19 +33,21 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "mkn/kul/except.hpp"
 
-#include "yaml-cpp/yaml.h"
-
 #include <cstddef>
 #include <string>
 #include <string_view>
+#include <utility>
+#include <variant>
+#include <vector>
 
 // Better Object Notation: json without quotes
 //
 //   {a: b, c: {d: e}}    map, only the first ':' separates key and value: {url: http://x}
 //   {c{d: e}}            key directly followed by an object
-//   {x, y, z}            bare entries are a list, a single one is a scalar: {a: {b}} is a: b
+//   {x, y, z}            bare entries are a list, a single one is a string: {a: {b}} is a: b
 //   \, \: \{ \} \\       escapes, surrounding unescaped whitespace is trimmed
 //
+// parse() returns a bon::Node, see mkn/kul/bon/yaml.hpp for YAML::Node
 // Malformed input throws mkn::kul::bon::Exception
 
 namespace mkn::kul::bon {
@@ -56,13 +58,59 @@ class Exception : public mkn::kul::Exception {
       : mkn::kul::Exception(f, l, s) {}
 };
 
+struct Node {
+  using List = std::vector<Node>;
+  using Map = std::vector<std::pair<std::string, Node>>;  // in input order
+
+  std::variant<Map, List, std::string> value;
+
+  bool is_map() const { return std::holds_alternative<Map>(value); }
+  bool is_list() const { return std::holds_alternative<List>(value); }
+  bool is_string() const { return std::holds_alternative<std::string>(value); }
+
+  Map const& map() const { return get<Map>("map"); }
+  List const& list() const { return get<List>("list"); }
+  std::string const& str() const { return get<std::string>("string"); }
+
+  // entries of a map or list, 1 for a string
+  std::size_t size() const {
+    if (is_string()) return 1;
+    return is_map() ? map().size() : list().size();
+  }
+
+  bool contains(std::string const& key) const { return is_map() && find(key); }
+
+  Node const& operator[](std::string const& key) const {
+    if (auto const* node = find(key)) return *node;
+    KEXCEPT(Exception, "bon: no key: ", key);
+  }
+
+  Node const& operator[](std::size_t const i) const {
+    if (i >= list().size()) KEXCEPT(Exception, "bon: index ", i, " out of range");
+    return list()[i];
+  }
+
+ private:
+  template <typename T>
+  T const& get(char const* const type) const {
+    if (auto const* v = std::get_if<T>(&value)) return *v;
+    KEXCEPT(Exception, "bon: not a ", type);
+  }
+
+  Node const* find(std::string const& key) const {
+    for (auto const& [k, node] : map())
+      if (k == key) return &node;
+    return nullptr;
+  }
+};
+
 namespace detail {
 
 class Parser {
  public:
   explicit Parser(std::string const& s) : s{s} {}
 
-  YAML::Node parse() {
+  Node parse() {
     skip_ws();
     if (!at('{')) fail("expected '{'");
     auto node = object();
@@ -103,18 +151,29 @@ class Parser {
     return t;
   }
 
-  YAML::Node object() {
+  // last wins for duplicate keys
+  static void set(Node::Map& map, std::string const& key, Node&& node) {
+    for (auto& [k, n] : map)
+      if (k == key) {
+        n = std::move(node);
+        return;
+      }
+    map.emplace_back(key, std::move(node));
+  }
+
+  Node object() {
     ++i;  // '{'
-    YAML::Node map{YAML::NodeType::Map}, list{YAML::NodeType::Sequence};
+    Node::Map map;
+    Node::List list;
     skip_ws();
     if (at('}')) {
       ++i;
-      return map;
+      return {std::move(map)};
     }
     while (true) {
       skip_ws();
       if (at('{')) fail("object without key");
-      auto const key = text(":{,}");
+      auto key = text(":{,}");
       if (i == s.size()) fail("missing '}'");
 
       if (at(':') || at('{')) {
@@ -123,15 +182,15 @@ class Parser {
         if (at(':')) ++i;
         skip_ws();
         if (at('{'))
-          map[key] = object();
+          set(map, key, object());
         else {
-          map[key] = text("{,}");
+          set(map, key, Node{text("{,}")});
           if (at('{')) fail("unexpected '{' in value");
         }
       } else {
         if (key.empty()) fail("empty entry");
         if (map.size()) fail("list entry in a map");
-        list.push_back(key);
+        list.push_back(Node{std::move(key)});
       }
 
       skip_ws();
@@ -143,8 +202,9 @@ class Parser {
       if (at('}')) break;  // trailing comma
     }
     ++i;  // '}'
-    if (list.size()) return list.size() == 1 ? list[0] : list;
-    return map;
+    if (list.size() == 1) return std::move(list[0]);
+    if (list.size()) return {std::move(list)};
+    return {std::move(map)};
   }
 
   std::string const& s;
@@ -153,7 +213,7 @@ class Parser {
 
 }  // namespace detail
 
-inline YAML::Node from(std::string const& s) { return detail::Parser{s}.parse(); }
+inline Node parse(std::string const& s) { return detail::Parser{s}.parse(); }
 
 }  // namespace mkn::kul::bon
 
