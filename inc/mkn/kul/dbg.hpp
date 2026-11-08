@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "mkn/kul/defs.hpp"
 #include "mkn/kul/time.hpp"
 
-#include <stdint.h>
+#include <cstdint>
 #include <string>
 #include <vector>
 

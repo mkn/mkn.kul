@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "mkn/kul/os/nixish/os.top.hpp"  // IWYU pragma: export
 #endif
 
-#include <stdint.h>
+#include <cstdint>
 #include <vector>
 #include <optional>
 #include <cstdio>

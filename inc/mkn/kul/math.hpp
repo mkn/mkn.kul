@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "mkn/kul/std/floats.hpp"
 #include "mkn/kul/std/types.hpp"
 
-#include <stdint.h>
+#include <cstdint>
 #include <numeric>
 #include <functional>
 #include <string>

@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "mkn/kul/for.hpp"
 
-#include <stddef.h>
+#include <cstddef>
 #include <tuple>
 #include <type_traits>
 #include <utility>
