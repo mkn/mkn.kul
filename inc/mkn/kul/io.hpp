@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "mkn/kul/os.hpp"
 #include "mkn/kul/defs.hpp"
 
-#include <stdio.h>
+#include <cstdio>
 #include <cstdint>
 #include <cstring>
 #include <fstream>

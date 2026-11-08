@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "mkn/kul/os.hpp"
 #include "mkn/kul/proc.hpp"
 
-#include <stdint.h>
+#include <cstdint>
 #include <unordered_set>
 #include <initializer_list>
 #include <sstream>

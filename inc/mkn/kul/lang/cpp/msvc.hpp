@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "mkn/kul/os.hpp"
 #include "mkn/kul/proc.hpp"
 
-#include <stddef.h>
+#include <cstddef>
 #include <exception>
 #include <ostream>
 #include <string>

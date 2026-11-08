@@ -43,7 +43,7 @@ or via cli
 #include "mkn/kul/except.hpp"
 #include "mkn/kul/os.hpp"
 
-#include <stddef.h>
+#include <cstddef>
 #include <exception>
 #if __has_include("yaml-cpp/yaml.h")
 

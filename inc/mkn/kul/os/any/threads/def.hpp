@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "mkn/kul/except.hpp"
 
-#include <stdint.h>
+#include <cstdint>
 #include <chrono>
 #include <thread>
 #include <string>

@@ -43,8 +43,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "mkn/kul/os/any/proc/def.hpp"  // IWYU pragma: export
 #include "mkn/kul/defs.hpp"
 
-#include <stdint.h>
-#include <stdio.h>
+#include <cstdint>
+#include <cstdio>
 #include <string>
 #include <functional>
 #include <sstream>
