@@ -159,16 +159,23 @@ class GccCompiler : public CCompiler {
 
   // -l<name> only finds lib<name>.so/.dylib, a shared lib named otherwise (e.g. a
   // python extension module) is linked by path, and so needs a soname on ELF.
+  // On Windows -l<name> links the import lib <name>.lib, whatever the dll is named.
   static constexpr std::array<char const*, 2> BY_NAME_EXTS{".so", ".dylib"};
-  static bool linkableByName(CompilationInfo const& info) {
+  static bool linkableByName([[maybe_unused]] CompilationInfo const& info) {
+#if defined(_WIN32)
+    return true;
+#else
     return info.lib_prefix == "lib" &&
            std::find(BY_NAME_EXTS.begin(), BY_NAME_EXTS.end(), info.lib_ext) != BY_NAME_EXTS.end();
+#endif
   }
   static bool isLibPath(std::string const& lib) {
     return lib.find_first_of("/\\") != std::string::npos;
   }
   static std::string linkArg(std::string const& lib) {
-    return isLibPath(lib) ? mkn::kul::File(lib).escm() : "-l" + lib;
+    if (!isLibPath(lib)) return "-l" + lib;
+    mkn::kul::File const file(lib);
+    return file.dir() ? file.escm() : file.esc();  // not built yet on dry runs
   }
 
   ProcessCapture compileSource(CompileDAO& dao) const KTHROW(mkn::kul::Exception) override;
