@@ -178,7 +178,7 @@ classDiagram
 |---|---|
 | `CCompiler_Type` | `NON`, `GCC`, `CLANG`, `ICC`, `HCC`, `WIN` |
 | `CCompiler` | adds `executableFor`, `staticLib`, `libName`, `oType`/`oStar`, `type()`, static `CC`/`CXX`/`LD` env-override helpers |
-| `GccCompiler` | `gcc`/`g++`; also base for `ClangCompiler`, `HccCompiler`, `IntelCompiler` (only override `ccBinary`/`cxxBinary`/`type`) |
+| `GccCompiler` | `gcc`/`g++`; also base for `ClangCompiler`, `HccCompiler`, `IntelCompiler` (only override `ccBinary`/`cxxBinary`/`type`). A `libs` entry containing a path separator is linked by path, otherwise as `-l<name>`; `linkableByName(info)` is whether `-l` can find a lib named by `info`, and a shared lib that it can't is given an `-soname` (not on macOS, which uses `-install_name @rpath/...`) |
 | `WINCompiler` | MSVC (`cl`); `compileSource`/`buildExecutable`/`buildLibrary` fully self-contained (no `Compilers::INSTANCE()` lookup) |
 | `Compilers` | singleton registry: family name/alias → `Compiler*`; `identify()`/`split()`/`key()`/`matchesFamily()` resolve a raw compiler string to a family |
 | `CompilerIdentityDAO` | `{prefix, binary, trailing, family}` — result of `Compilers::identify()` |
