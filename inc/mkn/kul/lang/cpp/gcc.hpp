@@ -155,6 +155,18 @@ class GccCompiler : public CCompiler {
 
   std::string staticLib(std::string const& lib) const override { return "lib" + lib + ".a"; }
 
+  // -l<name> only finds lib<name>.so/.dylib, a shared lib named otherwise (e.g. a
+  // python extension module) is linked by path, and so needs a soname on ELF.
+  static bool linkableByName(CompilationInfo const& info) {
+    return info.lib_prefix == "lib" && (info.lib_ext == ".so" || info.lib_ext == ".dylib");
+  }
+  static bool isLibPath(std::string const& lib) {
+    return lib.find_first_of("/\\") != std::string::npos;
+  }
+  static std::string linkArg(std::string const& lib) {
+    return isLibPath(lib) ? mkn::kul::File(lib).escm() : "-l" + lib;
+  }
+
   ProcessCapture compileSource(CompileDAO& dao) const KTHROW(mkn::kul::Exception) override;
 
   ProcessCapture buildExecutable(LinkDAO& dao) const KTHROW(mkn::kul::Exception) override;
@@ -187,11 +199,14 @@ class GccCompiler : public CCompiler {
                 [[maybe_unused]] mkn::kul::File const& out, std::vector<std::string> const& libs,
                 std::vector<std::string> const& libPaths) const {
     std::unordered_set<std::string> rpaths;
-    for (std::string const& path : libPaths) {
-      for (std::string const& lib : libs) {
-        mkn::kul::File lib_file(libName(info, lib), path);
-        if (lib_file) rpaths.emplace(lib_file.dir().real());
+    for (std::string const& lib : libs) {
+      if (isLibPath(lib)) {
+        if (mkn::kul::File const lib_file(lib); lib_file) rpaths.emplace(lib_file.dir().real());
+        continue;
       }
+      for (std::string const& path : libPaths)
+        if (mkn::kul::File const lib_file(libName(info, lib), path); lib_file)
+          rpaths.emplace(lib_file.dir().real());
     }
     for (auto const& rpath : rpaths) {
       mkn::kul::Dir path(rpath);

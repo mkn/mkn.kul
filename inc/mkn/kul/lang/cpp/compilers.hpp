@@ -272,7 +272,7 @@ inline ProcessCapture GccCompiler::buildExecutable(LinkDAO& dao) const KTHROW(mk
     p.arg("-o").arg(exe);
     for (std::string const& d : dirs) p << mkn::kul::File(oStar(env.compilationInfo), d).escm();
     for (std::string const& o : objects) p << mkn::kul::File(o).escm();
-    for (std::string const& lib : libs) p.arg("-l" + lib);
+    for (std::string const& lib : libs) p.arg(linkArg(lib));
     for (std::string const& s : mkn::kul::cli::asArgs(linkerEnd)) p << s;
 
     if (!dryRun) p.set(env.envVars).start();
@@ -313,12 +313,16 @@ inline ProcessCapture GccCompiler::buildLibrary(LinkDAO& dao) const KTHROW(mkn::
     for (std::string const& t : id.trailing) p.arg(t);
     if (mode == Mode::SHAR) p.arg("-shared").arg("-o");
     p.arg(lib);
+#if !defined(__APPLE__)
+    if (mode == Mode::SHAR && !linkableByName(env.compilationInfo))
+      p.arg("-Wl,-soname," + out_file.name());
+#endif
     for (std::string const& d : dirs) p.arg(mkn::kul::File(oStar(env.compilationInfo), d).escm());
     for (std::string const& o : objects) p << mkn::kul::File(o).escm();
 
     if (mode == Mode::SHAR) {
       for (std::string const& path : libPaths) p.arg("-L" + path);
-      for (std::string const& lib : libs) p.arg("-l" + lib);
+      for (std::string const& lib : libs) p.arg(linkArg(lib));
       if (env.compilationInfo.rpathing) rpathing(env.compilationInfo, p, out, libs, libPaths);
 #if defined(__APPLE__)
       std::stringstream loader;
