@@ -142,6 +142,11 @@ struct LibInput : AbstractCompilerInput {
   LibInput(std::string name) : name(std::move(name)) {}
   std::string name;
 };
+// Compile argument applied to every source file, e.g. "-DNAME=VALUE".
+struct CompileArgInput : AbstractCompilerInput {
+  CompileArgInput(std::string value) : value(std::move(value)) {}
+  std::string value;
+};
 struct LinkPrefixInput : AbstractCompilerInput {
   LinkPrefixInput(std::string value) : value(std::move(value)) {}
   std::string value;

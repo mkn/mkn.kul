@@ -47,6 +47,7 @@ classDiagram
   }
   class LibPathInput { +path string }
   class LibInput { +name string }
+  class CompileArgInput { +value string }
   class LinkPrefixInput { +value string }
   class BuildModeInput { +mode Mode }
   class CompilationInfoInput { +info CompilationInfo }
@@ -54,6 +55,7 @@ classDiagram
   AbstractCompilerInput <|-- IncludeInput
   AbstractCompilerInput <|-- LibPathInput
   AbstractCompilerInput <|-- LibInput
+  AbstractCompilerInput <|-- CompileArgInput
   AbstractCompilerInput <|-- LinkPrefixInput
   AbstractCompilerInput <|-- BuildModeInput
   AbstractCompilerInput <|-- CompilationInfoInput
@@ -163,7 +165,7 @@ classDiagram
 | `CompileEnv` | struct | `envVars`, `compilationInfo` |
 | `ContextState` | struct | full read-only snapshot returned by `Context::state()` |
 | `AbstractCompilerInput` | abstract struct | tag base for `CompilerState::add()`; polymorphic (has a vtable) so `dynamic_cast` can dispatch on it |
-| `IncludeInput`, `LibPathInput`, `LibInput`, `LinkPrefixInput`, `BuildModeInput`, `CompilationInfoInput` | structs | concrete `AbstractCompilerInput`s |
+| `IncludeInput`, `LibPathInput`, `LibInput`, `CompileArgInput`, `LinkPrefixInput`, `BuildModeInput`, `CompilationInfoInput` | structs | concrete `AbstractCompilerInput`s |
 | `Context` | abstract class | `state()`, `compilerState()`, `per_compiler_command(hook)`, `compileCommandFor(in)` |
 | `CompilerState` | abstract class | `add(AbstractCompilerInput const&)` |
 | `ProcessCapture` | class | `mkn::kul::ProcessCapture` + `exception()`/`cmd()`/`file()` |
