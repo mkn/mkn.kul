@@ -40,6 +40,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "mkn/kul/os.hpp"
 #include "mkn/kul/proc.hpp"
 
+#include <algorithm>
+#include <array>
 #include <cstdint>
 #include <unordered_set>
 #include <initializer_list>
@@ -157,8 +159,10 @@ class GccCompiler : public CCompiler {
 
   // -l<name> only finds lib<name>.so/.dylib, a shared lib named otherwise (e.g. a
   // python extension module) is linked by path, and so needs a soname on ELF.
+  static constexpr std::array<char const*, 2> BY_NAME_EXTS{".so", ".dylib"};
   static bool linkableByName(CompilationInfo const& info) {
-    return info.lib_prefix == "lib" && (info.lib_ext == ".so" || info.lib_ext == ".dylib");
+    return info.lib_prefix == "lib" &&
+           std::find(BY_NAME_EXTS.begin(), BY_NAME_EXTS.end(), info.lib_ext) != BY_NAME_EXTS.end();
   }
   static bool isLibPath(std::string const& lib) {
     return lib.find_first_of("/\\") != std::string::npos;
@@ -195,8 +199,9 @@ class GccCompiler : public CCompiler {
 
   CCompiler_Type type() const override { return CCompiler_Type::GCC; }
 
-  void rpathing(CompilationInfo const& info, mkn::kul::Process& p,
-                [[maybe_unused]] mkn::kul::File const& out, std::vector<std::string> const& libs,
+  // Path entries add their directory, names the directories -l<name> would find them in.
+  void rpathing(mkn::kul::Process& p, [[maybe_unused]] mkn::kul::File const& out,
+                std::vector<std::string> const& libs,
                 std::vector<std::string> const& libPaths) const {
     std::unordered_set<std::string> rpaths;
     for (std::string const& lib : libs) {
@@ -205,8 +210,9 @@ class GccCompiler : public CCompiler {
         continue;
       }
       for (std::string const& path : libPaths)
-        if (mkn::kul::File const lib_file(libName(info, lib), path); lib_file)
-          rpaths.emplace(lib_file.dir().real());
+        for (auto const* ext : BY_NAME_EXTS)
+          if (mkn::kul::File const lib_file("lib" + lib + ext, path); lib_file)
+            rpaths.emplace(lib_file.dir().real());
     }
     for (auto const& rpath : rpaths) {
       mkn::kul::Dir path(rpath);

@@ -267,7 +267,7 @@ inline ProcessCapture GccCompiler::buildExecutable(LinkDAO& dao) const KTHROW(mk
     if (mode == Mode::STAT) p.arg("-static");
     if (env.compilationInfo.rpathing && (mode == Mode::SHAR || mode == Mode::NONE)) {
       mkn::kul::File file(exe);
-      rpathing(env.compilationInfo, p, file, libs, libPaths);
+      rpathing(p, file, libs, libPaths);
     }
     p.arg("-o").arg(exe);
     for (std::string const& d : dirs) p << mkn::kul::File(oStar(env.compilationInfo), d).escm();
@@ -323,7 +323,7 @@ inline ProcessCapture GccCompiler::buildLibrary(LinkDAO& dao) const KTHROW(mkn::
     if (mode == Mode::SHAR) {
       for (std::string const& path : libPaths) p.arg("-L" + path);
       for (std::string const& lib : libs) p.arg(linkArg(lib));
-      if (env.compilationInfo.rpathing) rpathing(env.compilationInfo, p, out, libs, libPaths);
+      if (env.compilationInfo.rpathing) rpathing(p, out, libs, libPaths);
 #if defined(__APPLE__)
       std::stringstream loader;
       loader << "-Wl,-install_name,@rpath/" << mkn::kul::File(lib).name();
