@@ -1,4 +1,4 @@
-#! clean build -dtKOp test run -p test,usage -W 9
+#! clean build run -dtKOp test,usage -W 9
 
 name: mkn.kul
 

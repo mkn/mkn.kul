@@ -82,7 +82,11 @@ class Arg : public Cmd {
 
  public:
   Arg(char const _d, char const* dd, ArgType _t, bool m = false) : Cmd(dd), man(m), d(_d), t(_t) {}
+  // lim: how often it may be given, e.g. 2 for -vv, 0 for no limit, default once
+  Arg(char const _d, char const* dd, ArgType _t, int const lim)
+      : Cmd(dd), man(false), d(_d), t(_t), mx(lim) {}
   Arg(char const _d, char const* dd, bool m = false) : Cmd(dd), man(m), d(_d) {}
+  Arg(char const _d, char const* dd, int const lim) : Cmd(dd), man(false), d(_d), mx(lim) {}
 
   Arg(char const* dd, ArgType _t, bool m = false) : Cmd(dd), man(m), t(_t) {}
   Arg(char const* dd, bool m = false) : Cmd(dd), man(m) {}
@@ -91,11 +95,13 @@ class Arg : public Cmd {
   char dash() const { return d; }
   char const* dashdash() const { return command(); }
   ArgType const& type() const { return t; }
+  int limit() const { return mx; }
 
  private:
   bool man;
   char const d = ' ';
   ArgType t = ArgType::FLAG;
+  int mx = 1;
 };
 
 class Args {
@@ -238,8 +244,13 @@ class Args {
     }
     if (valExpected == 1)
       KEXCEPT(Exception, "Value expected for argument: \"" + valExpectedFor + "\"");
-    for (Arg const& a : args)
+    for (Arg const& a : args) {
       if (a.mandatory()) get(a.dashdash());
+      if (auto const n = count(a.dashdash());
+          a.limit() > 0 && n > static_cast<std::size_t>(a.limit()))
+        KEXCEPT(Exception, "Argument --", a.dashdash(), " given ", n, " times, at most ",
+                a.limit());
+    }
   }
 #if defined(MKN_WITH_IO_CEREAL)
   friend class cereal::access;

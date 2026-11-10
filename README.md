@@ -38,7 +38,7 @@ dep: mkn.kul
 Build and run the tests and the usage example:
 
 ```bash
-mkn clean build -dtKOp test run -p test,usage -W 9
+mkn clean build run -dtKOp test,usage -W 9
 ```
 
 ## Platforms

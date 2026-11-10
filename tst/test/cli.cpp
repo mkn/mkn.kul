@@ -32,12 +32,11 @@ TEST(CLI_Test, ParseWeirdPythonExample) {
 }
 
 namespace {
-mkn::kul::cli::Args count_args() {
+mkn::kul::cli::Args count_args() {  // no limits, the counts tests repeat on purpose
   using namespace mkn::kul::cli;
-  return Args({Cmd("build")}, {Arg('v', "verbose", ArgType::FLAG),       //
-                               Arg('d', "dependencies", ArgType::FLAG),  //
-                               Arg('a', "args", ArgType::STRING),        //
-                               Arg('O', "optimise", ArgType::MAYBE)});
+  return Args({Cmd("build")},
+              {Arg('v', "verbose", 0), Arg('d', "dependencies", 0),
+               Arg('a', "args", ArgType::STRING, 0), Arg('O', "optimise", ArgType::MAYBE, 0)});
 }
 
 mkn::kul::cli::Args process(std::vector<std::string> in) {
@@ -104,4 +103,47 @@ TEST(CLI_Test, ArgCountErase) {
   EXPECT_TRUE(args.erase("verbose"));
   EXPECT_FALSE(args.has("verbose"));
   EXPECT_EQ(0ull, args.count("verbose"));
+}
+
+namespace {
+mkn::kul::cli::Args limited(std::vector<std::string> in) {
+  using namespace mkn::kul::cli;
+  in.insert(in.begin(), "mkn");
+  std::vector<char*> argv;
+  for (auto& s : in) argv.push_back(s.data());
+  Args args({}, {Arg('v', "version", 2), Arg('d', "dependencies", true)});
+  args.process(argv.size(), argv.data());
+  return args;
+}
+}  // namespace
+
+TEST(CLI_Test, ArgLimitAllowsUpToLimit) {
+  EXPECT_EQ(1ull, limited({"-d", "-v"}).count("version"));
+  EXPECT_EQ(2ull, limited({"-d", "-vv"}).count("version"));
+  EXPECT_EQ(2ull, limited({"-dv", "--version"}).count("version"));
+}
+
+TEST(CLI_Test, ArgLimitThrowsAboveLimit) {
+  EXPECT_THROW(limited({"-d", "-vvv"}), mkn::kul::cli::Exception);
+  EXPECT_THROW(limited({"-d", "-v", "-v", "--version"}), mkn::kul::cli::Exception);
+  EXPECT_THROW(limited({"-dvvvvvvvvvvv"}), mkn::kul::cli::Exception);
+}
+
+TEST(CLI_Test, ArgBoolStillMandatory) {  // Arg(char, char const*, true) is not a limit of 1
+  EXPECT_THROW(limited({"-v"}), mkn::kul::cli::ArgNotFoundException);
+}
+
+TEST(CLI_Test, ArgDefaultLimitIsOnce) {
+  using namespace mkn::kul::cli;
+  auto const process_default = [](std::vector<std::string> in) {
+    in.insert(in.begin(), "mkn");
+    std::vector<char*> argv;
+    for (auto& s : in) argv.push_back(s.data());
+    Args args({}, {Arg('d', "dependencies"), Arg('a', "args", ArgType::STRING)});
+    args.process(argv.size(), argv.data());
+    return args;
+  };
+  EXPECT_EQ("x", process_default({"-d", "-a", "x"}).get("args"));
+  EXPECT_THROW(process_default({"-a", "x", "-a", "y"}), Exception);  // would drop x
+  EXPECT_THROW(process_default({"-dd"}), Exception);
 }
