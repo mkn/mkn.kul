@@ -97,6 +97,7 @@ std::vector<mkn::kul::Dir> mkn::kul::Dir::dirs(bool incHidden) const KTHROW(fs::
   std::vector<Dir> dirs;
 
   DIR* dir = opendir(real().c_str());
+  if (!dir) KEXCEPT(fs::Exception, "Directory : \"" + path() + "\" could not be opened");
   struct dirent* entry = readdir(dir);
   while (entry != NULL) {
     std::string d(entry->d_name);
@@ -116,6 +117,7 @@ std::vector<mkn::kul::File> mkn::kul::Dir::files(bool recursive) const KTHROW(fs
 
   std::vector<File> fs;
   DIR* dir = opendir(path().c_str());
+  if (!dir) KEXCEPT(fs::Exception, "Directory : \"" + path() + "\" could not be opened");
   struct dirent* entry = readdir(dir);
   while (entry != NULL) {
     if (!mkn::kul::Dir(JOIN(real(), entry->d_name)).is()) fs.push_back(File(entry->d_name, *this));
