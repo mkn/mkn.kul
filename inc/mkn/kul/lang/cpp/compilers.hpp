@@ -34,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "mkn/kul/lang/cs/msvc.hpp"
 #include "mkn/kul/lang/cpp/gcc.hpp"
 #include "mkn/kul/lang/cpp/msvc.hpp"
+#include "mkn/kul/lang/cpp/nvcc.hpp"
 #include "mkn/kul/cli.hpp"
 #include "mkn/kul/defs.hpp"
 #include "mkn/kul/except.hpp"
@@ -125,8 +126,8 @@ class Compilers {
   Compilers() {
     clang = std::make_unique<ClangCompiler>();
     gcc = std::make_unique<GccCompiler>();
-    hcc = std::make_unique<HccCompiler>();
     intel = std::make_unique<IntelCompiler>();
+    nvcc = std::make_unique<NvccCompiler>();
     winc = std::make_unique<WINCompiler>();
     wincs = std::make_unique<cs::WINCompiler>();
 
@@ -139,12 +140,10 @@ class Compilers {
     cs_.insert(std::pair<std::string, Compiler*>("gcc", gcc.get()));
     cs_.insert(std::pair<std::string, Compiler*>("g++", gcc.get()));
 
-    cs_.insert(std::pair<std::string, Compiler*>("hcc", hcc.get()));
-
     cs_.insert(std::pair<std::string, Compiler*>("icc", intel.get()));
     cs_.insert(std::pair<std::string, Compiler*>("icpc", intel.get()));
 
-    cs_.insert(std::pair<std::string, Compiler*>("nvcc", gcc.get()));
+    cs_.insert(std::pair<std::string, Compiler*>("nvcc", nvcc.get()));
   }
 
   static CompilerIdentityDAO split(std::string const& raw) {
@@ -202,7 +201,7 @@ class Compilers {
     return comp;
   }
 
-  std::unique_ptr<Compiler> hcc, gcc, clang, intel, winc, wincs;
+  std::unique_ptr<Compiler> gcc, clang, intel, nvcc, winc, wincs;
   mkn::kul::hash::map::S2T<Compiler*> cs_, masks;
   mkn::kul::hash::map::S2S maskFamily;
 };
@@ -315,7 +314,7 @@ inline ProcessCapture GccCompiler::buildLibrary(LinkDAO& dao) const KTHROW(mkn::
     p.arg(lib);
 #if !defined(__APPLE__)
     if (mode == Mode::SHAR && !linkableByName(env.compilationInfo))
-      p.arg("-Wl,-soname," + out_file.name());
+      p.arg(linkerOption("-soname," + out_file.name()));
 #endif
     for (std::string const& d : dirs) p.arg(mkn::kul::File(oStar(env.compilationInfo), d).escm());
     for (std::string const& o : objects) p << mkn::kul::File(o).escm();
@@ -325,9 +324,7 @@ inline ProcessCapture GccCompiler::buildLibrary(LinkDAO& dao) const KTHROW(mkn::
       for (std::string const& lib : libs) p.arg(linkArg(lib));
       if (env.compilationInfo.rpathing) rpathing(p, out, libs, libPaths);
 #if defined(__APPLE__)
-      std::stringstream loader;
-      loader << "-Wl,-install_name,@rpath/" << mkn::kul::File(lib).name();
-      p << loader.str();
+      p << linkerOption("-install_name,@rpath/" + mkn::kul::File(lib).name());
 #endif
     }
     for (std::string const& s : mkn::kul::cli::asArgs(linkerEnd)) p.arg(s);

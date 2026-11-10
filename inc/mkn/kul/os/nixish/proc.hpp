@@ -195,12 +195,9 @@ void Process::expand(std::string& _s) const {
 }
 
 void Process::run() KTHROW(mkn::kul::proc::Exception) {
-  {
-    int32_t ret = 0;
-    if ((ret = pipeCloExec(inFd)) < 0) error(__LINE__, "Failed to pipe in");
-    if ((ret = pipeCloExec(outFd)) < 0) error(__LINE__, "Failed to pipe out");
-    if ((ret = pipeCloExec(errFd)) < 0) error(__LINE__, "Failed to pipe err");
-  }
+  if (pipeCloExec(inFd) < 0) error(__LINE__, "Failed to pipe in");
+  if (pipeCloExec(outFd) < 0) error(__LINE__, "Failed to pipe out");
+  if (pipeCloExec(errFd) < 0) error(__LINE__, "Failed to pipe err");
 
   this->preStart();
   pid(fork());

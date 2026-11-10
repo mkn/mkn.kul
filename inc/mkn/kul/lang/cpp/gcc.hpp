@@ -45,7 +45,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cstdint>
 #include <unordered_set>
 #include <initializer_list>
-#include <sstream>
 #include <string>
 #include <unordered_map>
 #include <utility>
@@ -58,7 +57,7 @@ class Exception : public mkn::kul::Exception {
   Exception(char const* f, int const l, std::string s) : mkn::kul::Exception(f, l, s) {}
 };
 
-enum class CCompiler_Type : uint16_t { NON = 0, GCC = 1, CLANG = 2, ICC = 3, HCC = 4, WIN = 5 };
+enum class CCompiler_Type : uint16_t { NON = 0, GCC = 1, CLANG = 2, ICC = 3, WIN = 5, NVCC = 6 };
 
 class CCompiler : public Compiler {
  public:
@@ -99,7 +98,8 @@ class CCompiler : public Compiler {
   virtual std::string cxxBinary() const = 0;
 
   static bool isCSource(std::string const& fileType) {
-    return mkn::kul::String::NO_CASE_CMP(fileType, "c") || mkn::kul::String::NO_CASE_CMP(fileType, "h");
+    return mkn::kul::String::NO_CASE_CMP(fileType, "c") ||
+           mkn::kul::String::NO_CASE_CMP(fileType, "h");
   }
   static bool isCxxSource(std::string const& fileType) {
     for (auto const& ext : {"cpp", "cc", "cxx", "hpp", "hh", "hxx"})
@@ -206,6 +206,9 @@ class GccCompiler : public CCompiler {
 
   CCompiler_Type type() const override { return CCompiler_Type::GCC; }
 
+  // an option for the linker, comma separated as -Wl, takes them
+  virtual std::string linkerOption(std::string const& option) const { return "-Wl," + option; }
+
   // Path entries add their directory, names the directories -l<name> would find them in.
   void rpathing(mkn::kul::Process& p, [[maybe_unused]] mkn::kul::File const& out,
                 std::vector<std::string> const& libs,
@@ -223,17 +226,15 @@ class GccCompiler : public CCompiler {
     }
     for (auto const& rpath : rpaths) {
       mkn::kul::Dir path(rpath);
-      std::stringstream loader;
 #if defined(__APPLE__)
-      loader << "-Wl,-rpath," << path.esc();
       mkn::kul::File tmp_out(out);
       tmp_out.mk();
-      loader << " -Wl,-rpath,@loader_path/" << tmp_out.relative(path);
+      p << linkerOption("-rpath," + path.esc())
+        << linkerOption("-rpath,@loader_path/" + tmp_out.relative(path));
       tmp_out.rm();
 #else
-      loader << "-Wl,-rpath=" << path.esc();
+      p << linkerOption("-rpath=" + path.esc());
 #endif
-      p << loader.str();
     }
   }
 
@@ -258,16 +259,6 @@ class ClangCompiler : public GccCompiler {
  protected:
   std::string ccBinary() const override { return CC("clang"); }
   std::string cxxBinary() const override { return CXX("clang++"); }
-};
-
-class HccCompiler : public GccCompiler {
- public:
-  HccCompiler(int const& v = 0) : GccCompiler(v) {}
-  CCompiler_Type type() const override { return CCompiler_Type::HCC; }
-
- protected:
-  std::string ccBinary() const override { return CC("hcc"); }
-  std::string cxxBinary() const override { return CXX("h++"); }
 };
 
 class IntelCompiler : public GccCompiler {
