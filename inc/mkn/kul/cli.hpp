@@ -128,8 +128,16 @@ class Args {
   }
   bool empty() const { return vals.size() == 0; }
   bool has(std::string const& s) const { return vals.count(s); }
+  // number of times the argument was given, e.g. 3 for "-vvv" or "-v -v --verbose"
+  std::size_t count(std::string const& s) const {
+    auto const it = counts.find(s);
+    return it == counts.end() ? 0 : it->second;
+  }
   size_t size() const { return vals.size(); }
-  bool erase(std::string const& key) { return vals.erase(key); }
+  bool erase(std::string const& key) {
+    counts.erase(key);
+    return vals.erase(key);
+  }
   auto& rest() const { return rest_; }
   void process(uint16_t const& argc, char* argv[], uint16_t first = 1)
       KTHROW(ArgNotFoundException) {
@@ -179,6 +187,7 @@ class Args {
         if (c.find("=") == std::string::npos) {
           arg = const_cast<Arg*>(&doubleDashes(c.c_str()));
           valExpected = arg->type();
+          ++counts[arg->dashdash()];
           if (!valExpected) vals[arg->dashdash()] = "";
           continue;
         }
@@ -188,6 +197,7 @@ class Args {
         if (valExpected == 0)
           KEXCEPT(Exception, "Found = when no value is expected for arg " + valExpectedFor);
         c = c.substr(c.find("=") + 1);
+        ++counts[arg->dashdash()];
         vals[arg->dashdash()] = c;
       } else if (c.find("-") == 0) {
         valExpectedFor = c;
@@ -196,6 +206,7 @@ class Args {
           if (c.substr(0, c.find("=")).size() > 1)
             KEXCEPT(Exception, "Cannot mix flag and non-flag arguments");
           arg = const_cast<Arg*>(&dashes(c.at(0)));
+          ++counts[arg->dashdash()];
           vals[arg->dashdash()] = c.substr(c.find("=") + 1);
           valExpected = 0;
         } else if (c.length() > 1) {
@@ -206,12 +217,14 @@ class Args {
               valExpected = arg->type();
             else if (arg->type() == ArgType::STRING)
               KEXCEPT(Exception, "Cannot mix flag and non-flag arguments");
+            ++counts[arg->dashdash()];
             vals[arg->dashdash()] = "";
             if (a.length() > 1) a = a.substr(1);
           }
         } else {
           arg = const_cast<Arg*>(&dashes(c.at(0)));
           valExpected = arg->type();
+          ++counts[arg->dashdash()];
           vals[arg->dashdash()] = "";
         }
         continue;
@@ -235,6 +248,7 @@ class Args {
   std::vector<Cmd> cmds;
   std::vector<Arg> args;
   hash::map::S2S vals;
+  hash::map::S2T<std::size_t> counts;
 
   std::string rest_ = "";  // populated with everything after " -- "
 
