@@ -183,10 +183,10 @@ class Dir : public fs::Item {
     if (l_p.path() != r_p.path()) return right;
     l_p = l;
     r_p = r;
-    size_t upsies = 0, pos = 0;
+    size_t upsies = 0;
     while (true) {
       left = l_p.real();
-      if ((pos = right.find(left)) != std::string::npos) break;
+      if (right.find(left) != std::string::npos) break;
       l_p = mkn::kul::Dir(l_p.real()).parent();
       upsies++;
     }
