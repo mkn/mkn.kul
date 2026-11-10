@@ -8,6 +8,7 @@
 #include "mkn/kul/lang/cpp/nvcc.hpp"
 #include "mkn/kul/lang/compiler.hpp"
 #include "mkn/kul/lang/def.hpp"
+#include "mkn/kul/os.hpp"
 
 #include <cstddef>
 #include <cstdint>
@@ -126,7 +127,14 @@ TEST(CompilerTests, LinkLibsByPathOrName) {
 }
 
 TEST(CompilerTests, NvccIsItsOwnCompiler) {
-  for (auto const* const comp : {"nvcc", "/usr/local/cuda/bin/nvcc"}) {
+  auto const sep = mkn::kul::Dir::SEP();
+  std::string const path = "cuda" + sep + "bin" + sep + "nvcc";
+#ifdef _WIN32
+  std::vector<std::string> const comps{"nvcc", path + ".exe"};
+#else
+  std::vector<std::string> const comps{"nvcc", path};
+#endif
+  for (auto const& comp : comps) {
     auto const* cc = dynamic_cast<NvccCompiler const*>(Compilers::INSTANCE().get(comp));
     ASSERT_TRUE(cc) << comp;
     EXPECT_EQ(CCompiler_Type::NVCC, cc->type());
