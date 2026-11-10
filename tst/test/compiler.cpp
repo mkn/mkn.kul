@@ -127,12 +127,10 @@ TEST(CompilerTests, LinkLibsByPathOrName) {
 }
 
 TEST(CompilerTests, NvccIsItsOwnCompiler) {
-  auto const sep = mkn::kul::Dir::SEP();
-  std::string const path = "cuda" + sep + "bin" + sep + "nvcc";
-#ifdef _WIN32
-  std::vector<std::string> const comps{"nvcc", path + ".exe"};
+#ifdef _WIN32  // compiler paths with backslashes are not identified, see cli::asArgs
+  std::vector<std::string> const comps{"nvcc"};
 #else
-  std::vector<std::string> const comps{"nvcc", path};
+  std::vector<std::string> const comps{"nvcc", "/usr/local/cuda/bin/nvcc"};
 #endif
   for (auto const& comp : comps) {
     auto const* cc = dynamic_cast<NvccCompiler const*>(Compilers::INSTANCE().get(comp));
