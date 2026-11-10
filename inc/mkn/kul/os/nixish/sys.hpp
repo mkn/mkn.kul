@@ -59,12 +59,9 @@ class SharedLibrary {
 
  public:
   SharedLibrary(mkn::kul::File const& f) KTHROW(Exception) : _f(f) {
-    if (!_f)
-      KEXCEPT(mkn::kul::sys::Exception,
-              "Library attempted to be loaded does not exist: ", _f.full());
+    if (!_f) KEXCEPT(Exception, "Library attempted to be loaded does not exist: ", _f.full());
     _handle = dlopen(_f.real().c_str(), MKN_KUL_SYS_DLOPEN);
-    if (!_handle)
-      KEXCEPT(mkn::kul::sys::Exception, "Cannot load library: ", f, " - Error: ", dlerror());
+    if (!_handle) KEXCEPT(Exception, "Cannot load library: ", f, " - Error: ", dlerror());
     _loaded = 1;
   }
   ~SharedLibrary() {
@@ -84,7 +81,7 @@ class SharedFunction {
   SharedFunction(SharedLibrary& lib, std::string const& f) KTHROW(Exception) : _lib(lib) {
     _funcP = (F*)dlsym(_lib._handle, f.c_str());
     char const* dlsym_error = dlerror();
-    if (dlsym_error) KEXCEPT(mkn::kul::sys::Exception, "Cannot load symbol create ", dlsym_error);
+    if (dlsym_error) KEXCEPT(Exception, "Cannot load symbol create ", dlsym_error);
   }
   ~SharedFunction() { dlerror(); }
   F* pointer() { return _funcP; }
@@ -108,12 +105,12 @@ class SharedClass {
  protected:
   void construct(T*& t) KTHROW(Exception) {
     t = _c.pointer()();
-    if (!t) KEXCEPT(mkn::kul::sys::Exception, "Dynamically loaded class was not created");
+    if (!t) KEXCEPT(Exception, "Dynamically loaded class was not created");
   }
   void destruct(T*& t) {
     _d.pointer()(t);
     t = nullptr;
-    if (t) KEXCEPT(mkn::kul::sys::Exception, "Dynamically loaded class was not destroyed");
+    if (t) KEXCEPT(Exception, "Dynamically loaded class was not destroyed");
   }
 };
 
