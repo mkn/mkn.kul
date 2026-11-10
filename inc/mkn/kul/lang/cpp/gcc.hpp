@@ -57,15 +57,7 @@ class Exception : public mkn::kul::Exception {
   Exception(char const* f, int const l, std::string s) : mkn::kul::Exception(f, l, s) {}
 };
 
-enum class CCompiler_Type : uint16_t {
-  NON = 0,
-  GCC = 1,
-  CLANG = 2,
-  ICC = 3,
-  HCC = 4,
-  WIN = 5,
-  NVCC = 6
-};
+enum class CCompiler_Type : uint16_t { NON = 0, GCC = 1, CLANG = 2, ICC = 3, WIN = 5, NVCC = 6 };
 
 class CCompiler : public Compiler {
  public:
@@ -267,16 +259,6 @@ class ClangCompiler : public GccCompiler {
  protected:
   std::string ccBinary() const override { return CC("clang"); }
   std::string cxxBinary() const override { return CXX("clang++"); }
-};
-
-class HccCompiler : public GccCompiler {
- public:
-  HccCompiler(int const& v = 0) : GccCompiler(v) {}
-  CCompiler_Type type() const override { return CCompiler_Type::HCC; }
-
- protected:
-  std::string ccBinary() const override { return CC("hcc"); }
-  std::string cxxBinary() const override { return CXX("h++"); }
 };
 
 class IntelCompiler : public GccCompiler {

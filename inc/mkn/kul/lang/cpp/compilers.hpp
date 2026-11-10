@@ -126,7 +126,6 @@ class Compilers {
   Compilers() {
     clang = std::make_unique<ClangCompiler>();
     gcc = std::make_unique<GccCompiler>();
-    hcc = std::make_unique<HccCompiler>();
     intel = std::make_unique<IntelCompiler>();
     nvcc = std::make_unique<NvccCompiler>();
     winc = std::make_unique<WINCompiler>();
@@ -140,8 +139,6 @@ class Compilers {
 
     cs_.insert(std::pair<std::string, Compiler*>("gcc", gcc.get()));
     cs_.insert(std::pair<std::string, Compiler*>("g++", gcc.get()));
-
-    cs_.insert(std::pair<std::string, Compiler*>("hcc", hcc.get()));
 
     cs_.insert(std::pair<std::string, Compiler*>("icc", intel.get()));
     cs_.insert(std::pair<std::string, Compiler*>("icpc", intel.get()));
@@ -204,7 +201,7 @@ class Compilers {
     return comp;
   }
 
-  std::unique_ptr<Compiler> hcc, gcc, clang, intel, nvcc, winc, wincs;
+  std::unique_ptr<Compiler> gcc, clang, intel, nvcc, winc, wincs;
   mkn::kul::hash::map::S2T<Compiler*> cs_, masks;
   mkn::kul::hash::map::S2S maskFamily;
 };
