@@ -185,6 +185,7 @@ TEST(CompilerTests, LinkOutputIsCaptured) {
   auto const pc = cc->buildExecutable(dao);
   EXPECT_TRUE(pc.exception());
   EXPECT_NE(std::string::npos, pc.errs().find("mkn-kul-unknown-option")) << pc.errs();
+  EXPECT_NE(std::string::npos, pc.cmd().find("mkn-kul-unknown-option")) << pc.cmd();
 #endif
 }
 

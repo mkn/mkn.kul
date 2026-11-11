@@ -230,8 +230,8 @@ inline ProcessCapture GccCompiler::compileSource(CompileDAO& dao) const
     for (std::string const& s : args) p.arg(s);
     p.arg("-o").arg(out).arg("-c").arg(in);
     pc.setProcess(p);
+    pc.cmd(p.toString());  // before start, which throws when it fails
     if (!dryRun) p.set(env.envVars).start();
-    pc.cmd(p.toString());
   } catch (std::exception const& e) {
     pc.exception(std::current_exception());
   }
@@ -275,8 +275,8 @@ inline ProcessCapture GccCompiler::buildExecutable(LinkDAO& dao) const KTHROW(mk
     for (std::string const& s : mkn::kul::cli::asArgs(linkerEnd)) p << s;
 
     pc.setProcess(p);
+    pc.cmd(p.toString());  // before start, which throws when it fails
     if (!dryRun) p.set(env.envVars).start();
-    pc.cmd(p.toString());
   } catch (std::exception const& e) {
     pc.exception(std::current_exception());
   }
@@ -332,8 +332,8 @@ inline ProcessCapture GccCompiler::buildLibrary(LinkDAO& dao) const KTHROW(mkn::
     for (std::string const& s : mkn::kul::cli::asArgs(linkerEnd)) p.arg(s);
 
     pc.setProcess(p);
+    pc.cmd(p.toString());  // before start, which throws when it fails
     if (!dryRun) p.set(env.envVars).start();
-    pc.cmd(p.toString());
   } catch (std::exception const& e) {
     pc.exception(std::current_exception());
   }
