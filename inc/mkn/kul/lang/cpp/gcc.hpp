@@ -77,7 +77,18 @@ class CCompiler : public Compiler {
     return info.lib_prefix + lib + info.lib_ext;
   }
   static std::string oType(CompilationInfo const& info) { return info.obj_ext; }
-  static std::string oStar(CompilationInfo const& info) { return "*." + info.obj_ext; }
+  // the object files in dir, sorted: processes start without a shell, so a "*.o" would not be
+  //  expanded
+  static std::vector<std::string> objectFiles(CompilationInfo const& info, std::string const& dir) {
+    std::vector<std::string> objs;
+    mkn::kul::Dir const d(dir);
+    if (!d) return objs;
+    std::string const ext = "." + info.obj_ext;
+    for (auto const& f : d.files())
+      if (f.name().size() > ext.size() && f.name().ends_with(ext)) objs.emplace_back(f.escm());
+    std::sort(objs.begin(), objs.end());
+    return objs;
+  }
 
   virtual CCompiler_Type type() const = 0;
 

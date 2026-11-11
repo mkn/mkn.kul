@@ -8,7 +8,9 @@
 #include "mkn/kul/lang/cpp/nvcc.hpp"
 #include "mkn/kul/lang/compiler.hpp"
 #include "mkn/kul/lang/def.hpp"
+#include "mkn/kul/io.hpp"
 #include "mkn/kul/os.hpp"
+#include "mkn/kul/proc.hpp"
 
 #include <cstddef>
 #include <cstdint>
@@ -183,5 +185,44 @@ TEST(CompilerTests, LinkOutputIsCaptured) {
   auto const pc = cc->buildExecutable(dao);
   EXPECT_TRUE(pc.exception());
   EXPECT_NE(std::string::npos, pc.errs().find("mkn-kul-unknown-option")) << pc.errs();
+#endif
+}
+
+// the object files of a directory, not a "*.o" only a shell would expand
+TEST(CompilerTests, ObjectFilesOfDir) {
+  mkn::kul::Dir const d("bin/test_link/objs");
+  d.mk();
+  for (auto const* const n : {"b.o", "a.o", "c.txt"})
+    mkn::kul::io::Writer(mkn::kul::File(n, d)) << "";
+  auto const objs = CCompiler::objectFiles(info("lib", ".so"), d.real());
+  ASSERT_EQ(2u, objs.size());
+  EXPECT_NE(std::string::npos, objs[0].find("a.o")) << objs[0];
+  EXPECT_NE(std::string::npos, objs[1].find("b.o")) << objs[1];
+  EXPECT_TRUE(CCompiler::objectFiles(info("lib", ".so"), "bin/test_link/none").empty());
+}
+
+// a link of a directory's objects, started without a shell
+TEST(CompilerTests, LinkObjectsOfDir) {
+#if !defined(_WIN32)
+  mkn::kul::Dir const d("bin/test_link/main_objs");
+  d.mk();
+  mkn::kul::File const src("main.cpp", d);
+  mkn::kul::io::Writer(src) << "int main() { return 0; }\n";
+  mkn::kul::Process c("g++");
+  c << "-c" << src.escm() << "-o" << mkn::kul::File("main.o", d).escm();
+  c.start();
+
+  StubContext ctx;
+  ctx.s.compileEnv.compilationInfo = info("lib", ".so");
+  std::string const linkerEnd, out = "bin/test_link/main_objs_exe";
+  std::vector<mkn::kul::Dir> stars{d};
+  std::vector<std::string> objects, libs, libPaths;
+  mkn::kul::lang::LinkDAO dao{ctx,     "g++", linkerEnd, out,        stars,
+                              objects, libs,  libPaths,  Mode::NONE, false};
+  auto const* cc = gcc_like("g++");
+  ASSERT_TRUE(cc);
+  auto const pc = cc->buildExecutable(dao);
+  EXPECT_FALSE(pc.exception()) << pc.errs();
+  EXPECT_TRUE(mkn::kul::File(out));
 #endif
 }
