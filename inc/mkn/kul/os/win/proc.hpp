@@ -39,6 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdio.h>
 #include <strsafe.h>
 #include <tchar.h>
+#include <algorithm>
 #include <sstream>
 #include <string>
 
@@ -278,38 +279,34 @@ class Process : public mkn::kul::AProcess {
       memset(&el, 0, sizeof(el));
       el.hEvent = revent;
 
-      DWORD dwRead;
-      CHAR chBuf[proc::BUFFER_SIZE + 1];
-      bSuccess = FALSE;
+      CHAR chBuf[proc::BUFFER_SIZE];
+      // reads what is waiting in a pipe, without waiting for more: a read left pending on one pipe
+      //  while the child fills the other deadlocks
+      auto const drain = [&](HANDLE const h, OVERLAPPED& o, auto const& emit) {
+        DWORD avail = 0;
+        while (::PeekNamedPipe(h, NULL, 0, NULL, &avail, NULL) && avail > 0) {
+          DWORD dwRead = 0;
+          DWORD const want = (std::min)(avail, static_cast<DWORD>(proc::BUFFER_SIZE));
+          if (!::ReadFile(h, chBuf, want, &dwRead, &o)) {
+            auto const e = GetLastError();
+            if (e == ERROR_IO_PENDING) {
+              if (!GetOverlappedResult(h, &o, &dwRead, TRUE) && GetLastError() != ERROR_MORE_DATA)
+                break;
+            } else if (e != ERROR_MORE_DATA)
+              break;
+          }
+          if (dwRead == 0) break;
+          emit(std::string(chBuf, dwRead));
+        }
+      };
       bool alive = true;
       do {
 #if MKN_KUL_PROC_LOOP_NSLEEP
         mkn::kul::this_thread::nSleep(MKN_KUL_PROC_LOOP_NSLEEP);
 #endif
         alive = WaitForSingleObject(piProcInfo.hProcess, 11) == WAIT_TIMEOUT;
-        for (;;) {
-          dwRead = 0;
-          bSuccess = ::ReadFile(g_hChildStd_OUT_Rd, chBuf, proc::BUFFER_SIZE, &dwRead, &ol);
-          while (!bSuccess &&
-                 (GetLastError() == ERROR_IO_PENDING || GetLastError() == ERROR_IO_INCOMPLETE)) {
-            WaitForSingleObject(ol.hEvent, 11);
-            bSuccess = GetOverlappedResult(g_hChildStd_OUT_Rd, &ol, &dwRead, 0);
-          }
-          if (!bSuccess || dwRead == 0) break;
-          chBuf[dwRead] = '\0';
-          out(std::string(chBuf, dwRead));
-        }
-        for (;;) {
-          dwRead = 0;
-          bSuccess = ::ReadFile(g_hChildStd_ERR_Rd, chBuf, proc::BUFFER_SIZE, &dwRead, &el);
-          if (GetLastError() == ERROR_IO_PENDING) {
-            WaitForSingleObject(el.hEvent, 11);
-            bSuccess = GetOverlappedResult(g_hChildStd_OUT_Rd, &el, &dwRead, 0);
-          }
-          if (!bSuccess || dwRead == 0) break;
-          chBuf[dwRead] = '\0';
-          err(std::string(chBuf, dwRead));
-        }
+        drain(g_hChildStd_OUT_Rd, ol, [&](std::string const& _s) { out(_s); });
+        drain(g_hChildStd_ERR_Rd, el, [&](std::string const& _s) { err(_s); });
       } while (alive);
     }
     tearDown();
