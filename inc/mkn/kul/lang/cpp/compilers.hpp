@@ -229,8 +229,7 @@ inline ProcessCapture GccCompiler::compileSource(CompileDAO& dao) const
     for (std::string const& t : id.trailing) p.arg(t);
     for (std::string const& s : args) p.arg(s);
     p.arg("-o").arg(out).arg("-c").arg(in);
-    if (!mkn::kul::LogMan::INSTANCE().inf()) pc.setProcess(p);
-
+    pc.setProcess(p);
     if (!dryRun) p.set(env.envVars).start();
     pc.cmd(p.toString());
   } catch (std::exception const& e) {
@@ -274,6 +273,7 @@ inline ProcessCapture GccCompiler::buildExecutable(LinkDAO& dao) const KTHROW(mk
     for (std::string const& lib : libs) p.arg(linkArg(lib));
     for (std::string const& s : mkn::kul::cli::asArgs(linkerEnd)) p << s;
 
+    pc.setProcess(p);
     if (!dryRun) p.set(env.envVars).start();
     pc.cmd(p.toString());
   } catch (std::exception const& e) {
@@ -329,6 +329,7 @@ inline ProcessCapture GccCompiler::buildLibrary(LinkDAO& dao) const KTHROW(mkn::
     }
     for (std::string const& s : mkn::kul::cli::asArgs(linkerEnd)) p.arg(s);
 
+    pc.setProcess(p);
     if (!dryRun) p.set(env.envVars).start();
     pc.cmd(p.toString());
   } catch (std::exception const& e) {

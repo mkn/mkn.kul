@@ -140,9 +140,11 @@ class Process : public mkn::kul::AProcess {
 #endif
   }
 
-  inline int recall(int const& _s) {
-    int ret;
-    while ((ret = (_s)) < 0x0 && (errno == EINTR)) {
+  // calls f again while it fails with EINTR
+  template <typename F>
+  static auto recall(F&& f) {
+    decltype(f()) ret;
+    while ((ret = f()) < 0 && errno == EINTR) {
     }
     return ret;
   }
@@ -202,16 +204,15 @@ void Process::run() KTHROW(mkn::kul::proc::Exception) {
   this->preStart();
   pid(fork());
   if (pid() > 0) {
-    int32_t ret = 0;
     if (this->waitForExit()) {  // parent
       popPip[0] = inFd[1];
       popPip[1] = outFd[0];
       popPip[2] = errFd[0];
 
 #ifdef MKN_KUL_PROC_BLOCK_ERR
-      if ((ret = fcntl(popPip[1], F_SETFL, O_NONBLOCK)) < 0)
+      if (fcntl(popPip[1], F_SETFL, O_NONBLOCK) < 0)
         error(__LINE__, "Failed nonblocking for popPip[1]");
-      if ((ret = fcntl(popPip[2], F_SETFL, O_NONBLOCK)) < 0)
+      if (fcntl(popPip[2], F_SETFL, O_NONBLOCK) < 0)
         error(__LINE__, "Failed nonblocking for popPip[2]");
 #else
       fcntl(popPip[1], F_SETFL, O_NONBLOCK);
@@ -227,56 +228,34 @@ void Process::run() KTHROW(mkn::kul::proc::Exception) {
 
       char cOut[proc::BUFFER_SIZE] = {'\0'};
       char cErr[proc::BUFFER_SIZE] = {'\0'};
+      // reads fd until it is empty, every chunk with its length, a NUL byte does not end it
+      auto const drain = [&](int const fd, char* const buf, auto const& emit) {
+        ssize_t ret = 0;
+        do {
+#if MKN_KUL_PROC_LOOP_NSLEEP
+          mkn::kul::this_thread::nSleep(MKN_KUL_PROC_LOOP_NSLEEP);
+#endif
+          ret = recall([&] { return read(fd, buf, proc::BUFFER_SIZE); });
+          if (ret > 0)
+            emit(std::string(buf, static_cast<std::size_t>(ret)));
+          else if (ret == 0)
+            waitForStatus();
+          else if (errno != EAGAIN && errno != EWOULDBLOCK)
+            error(__LINE__, "read on child pipe failed: " + std::to_string(errno));
+        } while (ret > 0);
+      };
       do {
 #if MKN_KUL_PROC_LOOP_NSLEEP
         mkn::kul::this_thread::nSleep(MKN_KUL_PROC_LOOP_NSLEEP);
 #endif
         alive = ::kill(pid(), 0) == 0;
         if (FD_ISSET(popPip[1], &childOutFds)) {
-          bool b = 0;
-          do {
-#if MKN_KUL_PROC_LOOP_NSLEEP
-            mkn::kul::this_thread::nSleep(MKN_KUL_PROC_LOOP_NSLEEP);
-#endif
-
-            memset(cOut, 0, sizeof(cOut));
-            ret = recall(read(popPip[1], cOut, sizeof(cOut) - 1));
-            if (ret >= proc::BUFFER_SIZE)
-              error(__LINE__, "ret >= proc::BUFFER_SIZE: " + std::to_string(ret));
-            cOut[ret > 0 ? ret : 0] = 0;
-            if (ret < 0) {
-              if (b && ((errno != EAGAIN) || (errno != EWOULDBLOCK)))
-                error(__LINE__, "read on childout failed");
-              if (((errno != EAGAIN) || (errno != EWOULDBLOCK))) b = 1;
-            } else if (ret)
-              out(cOut);
-            else
-              waitForStatus();
-          } while (ret > 0);
+          drain(popPip[1], cOut, [&](std::string const& _s) { out(_s); });
         }
         if (FD_ISSET(popPip[2], &childOutFds)) {
-          bool b = 0;
-          do {
-#if MKN_KUL_PROC_LOOP_NSLEEP
-            mkn::kul::this_thread::nSleep(MKN_KUL_PROC_LOOP_NSLEEP);
-#endif
-
-            memset(cErr, 0, sizeof(cErr));
-            ret = recall(read(popPip[2], cErr, sizeof(cErr) - 1));
-            if (ret >= proc::BUFFER_SIZE)
-              error(__LINE__, "ret >= proc::BUFFER_SIZE: " + std::to_string(ret));
-            cErr[ret > 0 ? ret : 0] = 0;
-            if (ret < 0) {
-              if (b && ((errno != EAGAIN) || (errno != EWOULDBLOCK)))
-                error(__LINE__, "read on childout failed");
-              if (((errno != EAGAIN) || (errno != EWOULDBLOCK))) b = 1;
-            } else if (ret)
-              err(cErr);
-            else
-              waitForStatus();
-          } while (ret > 0);
+          drain(popPip[2], cErr, [&](std::string const& _s) { err(_s); });
         }
-        recall(waitpid(pid(), &cStat, WNOHANG));
+        recall([&] { return waitpid(pid(), &cStat, WNOHANG); });
       } while (alive);
 
       waitExit();
@@ -333,7 +312,7 @@ void Process::waitExit() KTHROW(mkn::kul::proc::ExitException) {
 
 void Process::waitForStatus() {
   int32_t ret = 0;
-  ret = recall(waitpid(pid(), &cStat, 0));
+  ret = recall([&] { return waitpid(pid(), &cStat, 0); });
   (void)ret;
   assert(ret);
 }
