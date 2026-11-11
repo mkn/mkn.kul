@@ -37,3 +37,33 @@ TEST(Process_Test, CaptureProcess) {
     }
   });
 }
+
+#if !defined(_WIN32)
+// output is passed on with the length read, a NUL byte does not end it
+TEST(Process_Test, CaptureKeepsNulBytes) {
+  mkn::kul::Process p("head");
+  mkn::kul::ProcessCapture pc(p);
+  p << "-c" << "3" << "/dev/zero";
+  mkn::kul::tst::run_main([&] {
+    p.start();
+    EXPECT_EQ(std::string(3, '\0'), pc.outs());
+  });
+}
+
+// stdout and stderr each keep their order, in their own capture
+TEST(Process_Test, CaptureKeepsStreamOrder) {
+  mkn::kul::Process p("bash");
+  mkn::kul::ProcessCapture pc(p);
+  p << "-c" << "'for i in $(seq 1 2000); do echo $i; echo e$i >&2; done'";
+  mkn::kul::tst::run_main([&] {
+    p.start();
+    std::uint16_t i = 0;
+    for (auto const& s : mkn::kul::String::LINES(pc.outs())) EXPECT_EQ(s, std::to_string(++i));
+    EXPECT_EQ(i, 2000);
+    i = 0;
+    for (auto const& s : mkn::kul::String::LINES(pc.errs()))
+      EXPECT_EQ(s, "e" + std::to_string(++i));
+    EXPECT_EQ(i, 2000);
+  });
+}
+#endif

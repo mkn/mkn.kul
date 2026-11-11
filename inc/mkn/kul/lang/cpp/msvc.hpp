@@ -123,8 +123,7 @@ class WINCompiler : public CCompiler {
     p.arg("-nologo");
     for (std::string const& s : args) p.arg(s);
     p.arg("-c").arg("-Fo\"" + out + "\"").arg("\"" + in + "\"");
-    ProcessCapture pc;
-    if (!mkn::kul::LogMan::INSTANCE().inf()) pc.setProcess(p);
+    ProcessCapture pc(p);
 
     try {
       if (!dryRun) p.set(env.envVars).start();
@@ -164,7 +163,7 @@ class WINCompiler : public CCompiler {
     for (std::string const& lib : libs) p.arg(staticLib(lib));
     for (std::string const& s : mkn::kul::cli::asArgs(linkerEnd)) p.arg(s);
 
-    ProcessCapture pc;
+    ProcessCapture pc(p);
     try {
       if (!dryRun) p.set(env.envVars).start();
     } catch (mkn::kul::proc::Exception const& e) {
@@ -217,7 +216,7 @@ class WINCompiler : public CCompiler {
     for (std::string const& o : objects) p << mkn::kul::File(o).escm();
     for (std::string const& s : mkn::kul::cli::asArgs(linkerEnd)) p.arg(s);
 
-    ProcessCapture pc;
+    ProcessCapture pc(p);
     try {
       if (!dryRun) p.set(env.envVars).start();
     } catch (mkn::kul::proc::Exception const& e) {

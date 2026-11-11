@@ -167,3 +167,21 @@ TEST(CompilerTests, NvccLinkerOptions) {
   EXPECT_EQ(std::string::npos, cmd.find("-Wl,")) << cmd;
 #endif
 }
+
+// a linker's output is captured, not written to the terminal: parallel links print it whole
+TEST(CompilerTests, LinkOutputIsCaptured) {
+#if !defined(_WIN32)
+  StubContext ctx;
+  ctx.s.compileEnv.compilationInfo = info("lib", ".so");
+  std::string const linkerEnd = "--mkn-kul-unknown-option", out = "bin/test_link/captured";
+  std::vector<mkn::kul::Dir> stars;
+  std::vector<std::string> objects, libs, libPaths;
+  mkn::kul::lang::LinkDAO dao{ctx,     "g++", linkerEnd, out,        stars,
+                              objects, libs,  libPaths,  Mode::NONE, false};
+  auto const* cc = gcc_like("g++");
+  ASSERT_TRUE(cc);
+  auto const pc = cc->buildExecutable(dao);
+  EXPECT_TRUE(pc.exception());
+  EXPECT_NE(std::string::npos, pc.errs().find("mkn-kul-unknown-option")) << pc.errs();
+#endif
+}
