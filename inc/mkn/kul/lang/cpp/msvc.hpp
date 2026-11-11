@@ -158,7 +158,8 @@ class WINCompiler : public CCompiler {
     for (unsigned int i = 1; i < bits.size(); i++) p.arg(bits[i]);
     p.arg("-OUT:\"" + out_file.escm() + "\"").arg("-nologo");
     for (std::string const& path : libPaths) p.arg("-LIBPATH:\"" + path + "\"");
-    for (std::string const& d : dirs) p.arg(mkn::kul::File(oStar(env.compilationInfo), d).escm());
+    for (std::string const& d : dirs)
+      for (auto const& o : objectFiles(env.compilationInfo, d)) p.arg(o);
     for (std::string const& o : objects) p << mkn::kul::File(o).escm();
     for (std::string const& lib : libs) p.arg(staticLib(lib));
     for (std::string const& s : mkn::kul::cli::asArgs(linkerEnd)) p.arg(s);
@@ -212,7 +213,8 @@ class WINCompiler : public CCompiler {
       for (std::string const& path : libPaths) p.arg("-LIBPATH:\"" + path + "\"");
       for (std::string const& lib : libs) p.arg(staticLib(lib));
     }
-    for (std::string const& d : dirs) p.arg(mkn::kul::File(oStar(env.compilationInfo), d).escm());
+    for (std::string const& d : dirs)
+      for (auto const& o : objectFiles(env.compilationInfo, d)) p.arg(o);
     for (std::string const& o : objects) p << mkn::kul::File(o).escm();
     for (std::string const& s : mkn::kul::cli::asArgs(linkerEnd)) p.arg(s);
 

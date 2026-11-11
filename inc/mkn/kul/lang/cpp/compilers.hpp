@@ -268,7 +268,8 @@ inline ProcessCapture GccCompiler::buildExecutable(LinkDAO& dao) const KTHROW(mk
       rpathing(p, file, libs, libPaths);
     }
     p.arg("-o").arg(exe);
-    for (std::string const& d : dirs) p << mkn::kul::File(oStar(env.compilationInfo), d).escm();
+    for (std::string const& d : dirs)
+      for (auto const& o : objectFiles(env.compilationInfo, d)) p.arg(o);
     for (std::string const& o : objects) p << mkn::kul::File(o).escm();
     for (std::string const& lib : libs) p.arg(linkArg(lib));
     for (std::string const& s : mkn::kul::cli::asArgs(linkerEnd)) p << s;
@@ -316,7 +317,8 @@ inline ProcessCapture GccCompiler::buildLibrary(LinkDAO& dao) const KTHROW(mkn::
     if (mode == Mode::SHAR && !linkableByName(env.compilationInfo))
       p.arg(linkerOption("-soname," + out_file.name()));
 #endif
-    for (std::string const& d : dirs) p.arg(mkn::kul::File(oStar(env.compilationInfo), d).escm());
+    for (std::string const& d : dirs)
+      for (auto const& o : objectFiles(env.compilationInfo, d)) p.arg(o);
     for (std::string const& o : objects) p << mkn::kul::File(o).escm();
 
     if (mode == Mode::SHAR) {
