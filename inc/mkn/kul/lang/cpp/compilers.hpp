@@ -227,6 +227,7 @@ inline ProcessCapture GccCompiler::compileSource(CompileDAO& dao) const
     for (size_t i = 1; i < id.prefix.size(); i++) p.arg(id.prefix[i]);
     if (!id.prefix.empty()) p.arg(bin);
     for (std::string const& t : id.trailing) p.arg(t);
+    if (env.compilationInfo.visibility_hidden) p.arg(hiddenVisibility());  // args may override
     for (std::string const& s : args) p.arg(s);
     p.arg("-o").arg(out).arg("-c").arg(in);
     pc.setProcess(p);

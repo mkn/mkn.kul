@@ -122,6 +122,20 @@ class CCompiler : public Compiler {
 // compileSource/buildExecutable/buildLibrary are declared only - defined out
 // of line in lang/cpp/compilers.hpp, since they resolve the linker/compiler
 // binary via Compilers::INSTANCE(), which needs this class complete first.
+// link time optimisation at the highest optimisation level (-O 9), compile and link: inlining
+//  across translation units, as optimised python modules get from pybind11 / nanobind builds.
+//  Linux only: Apple's and Windows' toolchains differ.
+#if defined(__linux__)
+inline constexpr char const* GCC_LTO = "-flto=auto";
+inline constexpr char const* CLANG_LTO = "-flto=thin";
+#else
+inline constexpr char const* GCC_LTO = "";
+inline constexpr char const* CLANG_LTO = "";
+#endif
+inline std::string with_lto(std::string const& flags, char const* lto) {
+  return *lto ? flags + " " + lto : flags;
+}
+
 class GccCompiler : public CCompiler {
  public:
   GccCompiler(int const& v = 0) : CCompiler(v) {
@@ -134,7 +148,7 @@ class GccCompiler : public CCompiler {
                          {6, "-O3 -funroll-loops"},
                          {7, "-O3 -funroll-loops"},
                          {8, "-O3 -funroll-loops"},
-                         {9, "-O3 -funroll-loops -march=native -mtune=native"}});
+                         {9, with_lto("-O3 -funroll-loops -march=native -mtune=native", GCC_LTO)}});
     m_debug_c.insert({{0, "-DNDEBUG"},
                       {1, "-g1"},
                       {2, "-g2"},
@@ -145,10 +159,26 @@ class GccCompiler : public CCompiler {
                       {7, "-g3"},
                       {8, "-g3"},
                       {9, "-g3 -pg -fno-omit-frame-pointer"}});
-    m_optimise_l_bin.insert(
-        {{0, ""}, {1, ""}, {2, ""}, {3, ""}, {4, ""}, {5, ""}, {6, ""}, {7, ""}, {8, ""}, {9, ""}});
-    m_optimise_l_lib.insert(
-        {{0, ""}, {1, ""}, {2, ""}, {3, ""}, {4, ""}, {5, ""}, {6, ""}, {7, ""}, {8, ""}, {9, ""}});
+    m_optimise_l_bin.insert({{0, ""},
+                             {1, ""},
+                             {2, ""},
+                             {3, ""},
+                             {4, ""},
+                             {5, ""},
+                             {6, ""},
+                             {7, ""},
+                             {8, ""},
+                             {9, GCC_LTO}});
+    m_optimise_l_lib.insert({{0, ""},
+                             {1, ""},
+                             {2, ""},
+                             {3, ""},
+                             {4, ""},
+                             {5, ""},
+                             {6, ""},
+                             {7, ""},
+                             {8, ""},
+                             {9, GCC_LTO}});
     m_debug_l_bin.insert(
         {{0, ""}, {1, ""}, {2, ""}, {3, ""}, {4, ""}, {5, ""}, {6, ""}, {7, ""}, {8, ""}, {9, ""}});
     m_debug_l_lib.insert(
@@ -220,6 +250,9 @@ class GccCompiler : public CCompiler {
   // an option for the linker, comma separated as -Wl, takes them
   virtual std::string linkerOption(std::string const& option) const { return "-Wl," + option; }
 
+  // the compile option for CompilationInfo::visibility_hidden
+  virtual std::string hiddenVisibility() const { return "-fvisibility=hidden"; }
+
   // Path entries add their directory, names the directories -l<name> would find them in.
   void rpathing(mkn::kul::Process& p, [[maybe_unused]] mkn::kul::File const& out,
                 std::vector<std::string> const& libs,
@@ -256,7 +289,10 @@ class GccCompiler : public CCompiler {
 
 class ClangCompiler : public GccCompiler {
  public:
-  ClangCompiler(int const& v = 0) : GccCompiler(v) {}
+  ClangCompiler(int const& v = 0) : GccCompiler(v) {
+    m_optimise_c[9] = with_lto("-O3 -funroll-loops -march=native -mtune=native", CLANG_LTO);
+    m_optimise_l_bin[9] = m_optimise_l_lib[9] = CLANG_LTO;
+  }
   CCompiler_Type type() const override { return CCompiler_Type::CLANG; }
 
   // On Windows, clang targets the MSVC ABI: its driver resolves "-lfoo" by
@@ -274,7 +310,10 @@ class ClangCompiler : public GccCompiler {
 
 class IntelCompiler : public GccCompiler {
  public:
-  IntelCompiler(int const& v = 0) : GccCompiler(v) {}
+  IntelCompiler(int const& v = 0) : GccCompiler(v) {  // no link time optimisation
+    m_optimise_c[9] = "-O3 -funroll-loops -march=native -mtune=native";
+    m_optimise_l_bin[9] = m_optimise_l_lib[9] = "";
+  }
   CCompiler_Type type() const override { return CCompiler_Type::ICC; }
 
  protected:
