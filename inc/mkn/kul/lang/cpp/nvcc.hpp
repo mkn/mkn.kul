@@ -52,6 +52,7 @@ class NvccCompiler : public GccCompiler {
                     {7, "-O3 -Xcompiler -funroll-loops"},
                     {8, "-O3 -Xcompiler -funroll-loops"},
                     {9, "-O3 -Xcompiler -funroll-loops,-march=native,-mtune=native"}};
+    m_optimise_l_bin[9] = m_optimise_l_lib[9] = "";  // gcc's link time optimisation is not nvcc's
     m_debug_c = {
         {0, "-DNDEBUG"},     {1, "-g -lineinfo"}, {2, "-g -lineinfo"}, {3, "-g -lineinfo"},
         {4, "-g -lineinfo"}, {5, "-g -lineinfo"}, {6, "-g -lineinfo"}, {7, "-g -lineinfo"},
@@ -72,6 +73,7 @@ class NvccCompiler : public GccCompiler {
   std::string linkerOption(std::string const& option) const override {
     return "-Xlinker=" + option;
   }
+  std::string hiddenVisibility() const override { return "-Xcompiler=-fvisibility=hidden"; }
 
  protected:
   std::string ccBinary() const override { return CC("nvcc"); }

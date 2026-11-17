@@ -56,6 +56,7 @@ inline Mode mode_from(std::string const& mode, std::string const& shared_str = "
 struct CompilationInfo {
   std::string lib_prefix, lib_postfix, lib_ext, obj_ext;
   bool rpathing = true;
+  bool visibility_hidden = false;  // compile with hidden symbol visibility by default
 };
 
 struct CompileCommand {
