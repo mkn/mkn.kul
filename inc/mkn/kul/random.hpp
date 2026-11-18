@@ -96,11 +96,11 @@ class SplitMix64 {
 
   MKN_KUL_FN_SIG constexpr explicit SplitMix64(std::uint64_t const seed) : state_{seed} {}
 
-  MKN_KUL_FN_SIG_RET static constexpr result_type min() {
-    return std::numeric_limits<result_type>::min();
+  MKN_KUL_FN_SIG_RET static constexpr result_type(min)() {
+    return (std::numeric_limits<result_type>::min)();
   }
-  MKN_KUL_FN_SIG_RET static constexpr result_type max() {
-    return std::numeric_limits<result_type>::max();
+  MKN_KUL_FN_SIG_RET static constexpr result_type(max)() {
+    return (std::numeric_limits<result_type>::max)();
   }
 
   MKN_KUL_FN_SIG constexpr result_type operator()() {

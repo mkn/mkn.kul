@@ -101,15 +101,16 @@ MKN_KUL_FN_SIG_RET constexpr auto range(std::type_identity_t<T> const start,
   return Range<T>{start, stop};
 }
 
-// Each element of a container with its index, for range-based for loops
-//   for (auto&& [i, o] : mkn::kul::enumerate(objects)) // i: std::size_t, o: objects[i]
+// Each element of a container, read only, with its index, for range-based for loops
+//   for (auto&& [i, o] : mkn::kul::enumerate(objects)) // i: std::size_t, o: objects[i] const&
 //   for (auto&& [i, o] : mkn::kul::enumerate<int>(objects)) // i: int
-// o refers to the element, so it can be assigned through. A temporary container is moved into
-//  the view and lives for the loop.
+// to change elements: for (auto& o : objects), or with the index too
+//  for (auto const i : mkn::kul::range(objects.size())) objects[i] = ...
+// A temporary container is moved into the view and lives for the loop.
 template <typename Container, std::integral Index = std::size_t>
 class Enumerate {
-  using base_iterator = decltype(std::begin(std::declval<Container&>()));
-  using base_sentinel = decltype(std::end(std::declval<Container&>()));
+  using base_iterator = decltype(std::cbegin(std::declval<Container&>()));
+  using base_sentinel = decltype(std::cend(std::declval<Container&>()));
 
  public:
   class sentinel {
@@ -150,8 +151,8 @@ class Enumerate {
   MKN_KUL_FN_SIG constexpr explicit Enumerate(Container&& c)
       : container_{std::forward<Container>(c)} {}
 
-  MKN_KUL_FN_SIG constexpr iterator begin() { return iterator{Index{0}, std::begin(container_)}; }
-  MKN_KUL_FN_SIG constexpr sentinel end() { return sentinel{std::end(container_)}; }
+  MKN_KUL_FN_SIG constexpr iterator begin() { return iterator{Index{0}, std::cbegin(container_)}; }
+  MKN_KUL_FN_SIG constexpr sentinel end() { return sentinel{std::cend(container_)}; }
 
  private:
   Container container_;  // a reference for an lvalue, the moved container for a temporary

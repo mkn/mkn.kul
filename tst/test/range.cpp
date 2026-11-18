@@ -38,13 +38,15 @@ TEST(Range, empty) {
 
 TEST(Enumerate, lvalue) {
   std::vector<std::string> v{"a", "b", "c"};
+  std::string joined;
   std::size_t n = 0;
   for (auto&& [i, o] : mkn::kul::enumerate(v)) {
     static_assert(std::is_same_v<decltype(i), std::size_t>);
+    static_assert(std::is_same_v<decltype(o), std::string const&>);  // read only
     EXPECT_EQ(i, n++);
-    o += std::to_string(i);
+    joined += o + std::to_string(i);
   }
-  EXPECT_EQ(v, (std::vector<std::string>{"a0", "b1", "c2"}));
+  EXPECT_EQ(joined, "a0b1c2");
 }
 
 TEST(Enumerate, constAndIndexType) {
@@ -70,7 +72,8 @@ TEST(Enumerate, temporary) {
 }
 
 static_assert([] {
-  std::array<int, 3> a{1, 2, 3};
-  for (auto&& [i, o] : mkn::kul::enumerate(a)) o *= static_cast<int>(i);
-  return a[2] == 6 && a[0] == 0;
+  std::array<int, 3> const a{1, 2, 3};
+  int sum = 0;
+  for (auto&& [i, o] : mkn::kul::enumerate(a)) sum += o * static_cast<int>(i);
+  return sum == 0 * 1 + 1 * 2 + 2 * 3;
 }());
