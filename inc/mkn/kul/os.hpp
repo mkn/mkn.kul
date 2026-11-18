@@ -46,9 +46,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vector>
 #include <optional>
 #include <cstdio>
+#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <string>
+#include <system_error>
 
 namespace mkn {
 namespace kul {
@@ -126,7 +128,7 @@ class Dir : public fs::Item {
   Dir(std::string const& s, Dir const& d) : _p(d.join(s)) {}
 
   bool cp(Dir const& d) const;
-  bool mv(Dir const& d) const { return std::rename(this->path().c_str(), d.path().c_str()); }
+  inline bool mv(Dir const& d) const;
 
   inline void rm() const;
   inline bool is() const;
@@ -238,20 +240,14 @@ class File : public fs::Item {
     if (!d.is() && !d.mk()) KEXCEPT(fs::Exception, "Directory: \"" + _d.path() + "\" is not valid");
     return cp(mkn::kul::File(name(), d._p));
   }
-  bool cp(File const& f) const {
-    std::ifstream src(_d.join(_n), std::ios::binary);
-    std::ofstream dst(f.dir().join(f.name()), std::ios::binary);
-    return (bool)(dst << src.rdbuf());
-  }
+  inline bool cp(File const& f) const;
 
   inline bool is() const;
   inline bool mk() const;
   inline bool rm() const;
 
-  bool mv(File const& f) const { return std::rename(this->full().c_str(), f.full().c_str()); }
-  bool mv(Dir const& d) const {
-    return std::rename(this->full().c_str(), d.join(this->name()).c_str());
-  }
+  inline bool mv(File const& f) const;
+  bool mv(Dir const& d) const { return mv(File(name(), d)); }
 
   std::string const& name() const { return _n; }
 
@@ -282,6 +278,126 @@ class File : public fs::Item {
     return rel;
   }
 };
+
+inline bool mkn::kul::Dir::mv(Dir const& d) const {
+  std::error_code ec;
+  std::filesystem::rename(path(), d.path(), ec);
+  return !ec;
+}
+
+inline void mkn::kul::Dir::rm() const {
+  std::error_code ec;
+  if (is()) std::filesystem::remove_all(path(), ec);
+}
+
+inline bool mkn::kul::Dir::is() const {
+  std::error_code ec;
+  return !path().empty() && std::filesystem::is_directory(path(), ec);
+}
+
+inline bool mkn::kul::Dir::mk() const {
+  std::error_code ec;
+  return !path().empty() && std::filesystem::create_directories(locl(), ec);
+}
+
+inline bool mkn::kul::Dir::root() const {
+  if (!is()) return false;
+  std::filesystem::path const p(real());
+  return p == p.root_path();
+}
+
+inline std::vector<mkn::kul::Dir> mkn::kul::Dir::dirs(bool incHidden) const KTHROW(fs::Exception) {
+  if (!is()) KEXCEPT(fs::Exception, "Directory : \"" + path() + "\" does not exist");
+#if MKN_KUL_IS_WIN
+  auto const& base = path();
+#else
+  auto const base = real();
+#endif
+  std::vector<Dir> dirs;
+  std::error_code ec;
+  std::filesystem::directory_iterator it(path(), ec), end;
+  for (; !ec && it != end; it.increment(ec)) {
+    auto const name = it->path().filename().string();
+    std::error_code type_ec;
+    if ((incHidden || name[0] != '.') && it->is_directory(type_ec))
+      dirs.emplace_back(JOIN(base, name));
+  }
+  if (ec) KEXCEPT(fs::Exception, "Directory : \"" + path() + "\" could not be read");
+  return dirs;
+}
+
+inline std::vector<mkn::kul::File> mkn::kul::Dir::files(bool recursive) const
+    KTHROW(fs::Exception) {
+  if (!is()) KEXCEPT(fs::Exception, "Directory : \"" + path() + "\" does not exist");
+  std::vector<File> fs;
+  std::error_code ec;
+  std::filesystem::directory_iterator it(path(), ec), end;
+  for (; !ec && it != end; it.increment(ec)) {
+    std::error_code type_ec;
+    if (!it->is_directory(type_ec)) fs.emplace_back(it->path().filename().string(), *this);
+  }
+  if (ec) KEXCEPT(fs::Exception, "Directory : \"" + path() + "\" could not be read");
+  if (recursive)
+    for (auto const& d : dirs()) {
+      auto const sub = d.files(true);
+      fs.insert(fs.end(), sub.begin(), sub.end());
+    }
+  return fs;
+}
+
+inline std::optional<std::string> mkn::kul::Dir::REAL_OR_NULL(std::string const& s)
+    KTHROW(fs::Exception) {
+  std::error_code ec;
+#if MKN_KUL_IS_WIN  // like _fullpath, the path need not exist
+  auto const p = std::filesystem::absolute(s, ec).lexically_normal();
+#else
+  auto const p = std::filesystem::canonical(s, ec);
+#endif
+  if (ec) return std::nullopt;
+  auto r = p.string();
+#if MKN_KUL_IS_WIN
+  if (r.size() && r.back() == '\\') r.pop_back();
+#endif
+  return r;
+}
+
+inline std::string mkn::kul::Dir::REAL(std::string const& s) KTHROW(fs::Exception) {
+  if (auto r = REAL_OR_NULL(s)) return *r;
+  KEXCEPT(fs::Exception, "Item: \"" + s + "\" does not exist");
+}
+
+inline bool mkn::kul::File::is() const {
+  std::error_code ec;
+  return !name().empty() && std::filesystem::is_regular_file(_d.join(_n), ec);
+}
+
+inline bool mkn::kul::File::rm() const {
+  if (!is()) return false;
+  std::error_code ec;
+  std::filesystem::remove(_d.join(_n), ec);
+  return true;
+}
+
+inline bool mkn::kul::File::mk() const { return static_cast<bool>(std::ofstream(full())); }
+
+inline uint64_t mkn::kul::File::size() const {
+  std::error_code ec;
+  auto const s = std::filesystem::file_size(full(), ec);
+  return ec ? 0 : s;
+}
+
+inline bool mkn::kul::File::cp(File const& f) const {
+  std::error_code ec;
+  std::filesystem::copy_file(_d.join(_n), f.dir().join(f.name()),
+                             std::filesystem::copy_options::overwrite_existing, ec);
+  return !ec;
+}
+
+inline bool mkn::kul::File::mv(File const& f) const {
+  std::error_code ec;
+  std::filesystem::rename(full(), f.full(), ec);
+  return !ec;
+}
 
 inline bool mkn::kul::Dir::cp(Dir const& d) const {
   if (!d.is() && !d.mk()) KEXCEPT(fs::Exception, "Directory: \"" + d.path() + "\" is not valid");

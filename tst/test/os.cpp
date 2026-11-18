@@ -6,6 +6,7 @@
 #include "mkn/kul/proc.hpp"
 #include "mkn/kul/mem.hpp"
 
+#include <fstream>
 #include <vector>
 
 TEST(OperatingSystemTests, HasRAMUsageSupport) {
@@ -120,4 +121,62 @@ TEST(OperatingSystemTests, FileBareNonExistentNameDefaultsToCWD) {
   mkn::kul::File const f("does_not_exist_kul_os_test.txt");
   EXPECT_FALSE(f.is());
   EXPECT_EQ(mkn::kul::Dir(mkn::kul::env::CWD()).real(), f.dir().real());
+}
+
+TEST(OperatingSystemTests, DirMkFilesDirsCpMvRm) {
+  using mkn::kul::Dir, mkn::kul::File;
+  Dir const tmp("bin/test/kul_os_fs_test");
+  tmp.rm();
+  ASSERT_FALSE(tmp.is());
+
+  Dir const sub(tmp.join("a/b"));
+  ASSERT_TRUE(sub.mk());   // creates parents
+  EXPECT_FALSE(sub.mk());  // already exists
+  ASSERT_TRUE(tmp.is());
+  Dir const hidden(tmp.join(".hidden"));
+  ASSERT_TRUE(hidden.mk());
+
+  File const f("f.txt", tmp);
+  ASSERT_TRUE(f.mk());
+  ASSERT_TRUE(f.is());
+  EXPECT_EQ(f.size(), 0u);
+  {
+    std::ofstream(f.full()) << "12345";
+  }
+  EXPECT_EQ(f.size(), 5u);
+  EXPECT_FALSE(Dir(f.full()).is());
+  EXPECT_FALSE(File("a", tmp).is());
+
+  EXPECT_EQ(tmp.files().size(), 1u);
+  EXPECT_EQ(tmp.dirs().size(), 1u);
+  EXPECT_EQ(tmp.dirs(true).size(), 2u);
+
+  ASSERT_TRUE(f.cp(sub));
+  File const copied("f.txt", sub);
+  ASSERT_TRUE(copied.is());
+  EXPECT_EQ(copied.size(), 5u);
+  EXPECT_EQ(tmp.files(true).size(), 2u);
+
+  File const moved("g.txt", tmp);
+  ASSERT_TRUE(f.mv(moved));
+  EXPECT_FALSE(f.is());
+  EXPECT_TRUE(moved.is());
+
+  EXPECT_TRUE(moved.rm());
+  EXPECT_FALSE(moved.rm());
+
+  tmp.rm();  // removes hidden directories too
+  EXPECT_FALSE(tmp.is());
+}
+
+TEST(OperatingSystemTests, DirRealAndRoot) {
+  using mkn::kul::Dir;
+  EXPECT_FALSE(Dir("inc").root());
+  EXPECT_EQ(Dir("inc/mkn/..").real(), Dir("inc").real());
+  EXPECT_EQ(Dir("inc").real(), Dir::JOIN(Dir(mkn::kul::env::CWD()).real(), "inc"));
+#ifndef _WIN32
+  EXPECT_TRUE(Dir("/").root());
+  EXPECT_FALSE(Dir::REAL_OR_NULL("does_not_exist_kul_os_test"));
+  EXPECT_THROW(Dir::REAL("does_not_exist_kul_os_test"), mkn::kul::fs::Exception);
+#endif
 }
