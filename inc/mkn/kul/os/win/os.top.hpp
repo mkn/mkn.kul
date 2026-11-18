@@ -66,7 +66,7 @@ class KulTimeStampsResolver {
   static void GET(char const* const p, uint64_t& a, uint64_t& c, uint64_t& m) {
     WIN32_FIND_DATA ffd;
     HANDLE h = FindFirstFile(TEXT(p), &ffd);
-    if (h) {
+    if (h != INVALID_HANDLE_VALUE) {
       a = FileTimeToPOSIX(ffd.ftLastAccessTime);
       c = FileTimeToPOSIX(ffd.ftCreationTime);
       m = FileTimeToPOSIX(ffd.ftLastWriteTime);
