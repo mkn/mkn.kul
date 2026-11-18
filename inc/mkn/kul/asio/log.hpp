@@ -81,7 +81,7 @@ class LogMan : public mkn::kul::ALogMan {
   static LogMan& INSTANCE() {
     static LogMan instance;
     return instance;
-  };
+  }
 };
 
 class Message {

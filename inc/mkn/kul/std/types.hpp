@@ -32,7 +32,7 @@ struct StrongType {
   StrongType& operator=(U const& u) {
     _t = static_cast<T>(u);
     return *this;
-  };
+  }
 
   T _t;
 };

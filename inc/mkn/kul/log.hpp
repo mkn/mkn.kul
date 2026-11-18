@@ -181,7 +181,7 @@ class LogMan : public ALogMan {
   static LogMan& INSTANCE() {
     static LogMan instance;
     return instance;
-  };
+  }
 };
 
 class Message {
