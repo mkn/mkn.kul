@@ -41,9 +41,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <tchar.h>
 #include <algorithm>
 #include <concepts>
+#include <cstddef>
+#include <cwchar>
 #include <filesystem>
 #include <sstream>
 #include <string>
+#include <utility>
+#include <vector>
 
 #include "mkn/kul/defs.hpp"
 
@@ -228,42 +232,59 @@ class Process : public mkn::kul::AProcess {
 
     preStart();
 
-    LPTSTR lpszVariable;
-    LPCH lpvEnv = GetEnvironmentStrings();
-    if (lpvEnv == NULL) error(__LINE__, "GetEnvironmentStrings() failed.");
-    kul::hash::map::S2S env;
-    for (lpszVariable = (LPTSTR)lpvEnv; *lpszVariable; lpszVariable++) {
-      std::stringstream ss;
-      while (*lpszVariable) ss << *lpszVariable++;
-      std::string var = ss.str();
-      if (var.find("=") != std::string::npos)
-        env.insert(var.substr(0, var.find("=")), var.substr(var.find("=") + 1));
-    }
-    if (FreeEnvironmentStrings(lpvEnv) == 0) error(__LINE__, "FreeEnvironmentStrings() failed");
-
     char const* dir = directory().empty() ? 0 : directory().c_str();
     std::string cmd(toString());
 
     expand(cmd);
     LPSTR szCmdline = _strdup(cmd.c_str());
 
+    // the child's own environment block when vars() are set, this process's is not changed
+    std::wstring block;
     if (vars().size()) {
-      std::wstring newEnv;
+      auto const widen = [](std::string const& s) {
+        auto const n = MultiByteToWideChar(CP_ACP, 0, s.data(), static_cast<int>(s.size()), 0, 0);
+        std::wstring w(static_cast<std::size_t>(n), L'\0');
+        MultiByteToWideChar(CP_ACP, 0, s.data(), static_cast<int>(s.size()), w.data(), n);
+        return w;
+      };
+      // names are case insensitive, e.g. "PATH" replaces "Path"
+      auto const compare = [](std::wstring const& a, std::wstring const& b) {
+        return CompareStringOrdinal(a.data(), static_cast<int>(a.size()), b.data(),
+                                    static_cast<int>(b.size()), TRUE);
+      };
 
-      for (auto& evs : vars()) env[evs.first] = evs.second;
-
-      for (auto& evs : env) {
-        std::string name = evs.first;
-        std::string var(name + "=" + evs.second);
-        newEnv += std::wstring(var.begin(), var.end());
-        newEnv.push_back('\0');
+      std::vector<std::pair<std::wstring, std::wstring>> env;
+      LPWCH const strings = GetEnvironmentStringsW();
+      if (!strings) error(__LINE__, "GetEnvironmentStringsW() failed");
+      for (LPWCH var = strings; *var; var += std::wcslen(var) + 1) {
+        std::wstring const entry(var);
+        // from 1: the per drive working directories are named like "=C:"
+        if (auto const eq = entry.find(L'=', 1); eq != std::wstring::npos)
+          env.emplace_back(entry.substr(0, eq), entry.substr(eq + 1));
       }
-      // may not work
-      bSuccess = CreateProcess(NULL, szCmdline, NULL, NULL, TRUE, flags, (LPVOID)newEnv.c_str(),
-                               dir, &siStartInfo, &piProcInfo);
-    } else
-      bSuccess = CreateProcess(NULL, szCmdline, NULL, NULL, TRUE, flags, NULL, dir, &siStartInfo,
-                               &piProcInfo);
+      FreeEnvironmentStringsW(strings);
+
+      for (auto const& ev : vars()) {
+        auto const name = widen(ev.first);
+        std::erase_if(env, [&](auto const& e) { return compare(e.first, name) == CSTR_EQUAL; });
+        env.emplace_back(name, widen(ev.second));
+      }
+      // CreateProcess expects the block sorted by name, case insensitively
+      std::ranges::stable_sort(env, [&](auto const& a, auto const& b) {
+        return compare(a.first, b.first) == CSTR_LESS_THAN;
+      });
+
+      for (auto const& [name, value] : env) {
+        block += name;
+        block += L'=';
+        block += value;
+        block.push_back(L'\0');
+      }
+      block.push_back(L'\0');  // the block ends with an empty entry
+    }
+    bSuccess = CreateProcess(NULL, szCmdline, NULL, NULL, TRUE, flags,
+                             block.empty() ? NULL : static_cast<LPVOID>(block.data()), dir,
+                             &siStartInfo, &piProcInfo);
 
     if (!bSuccess)
       error(__LINE__, "CreateProcess failed with last error: " + std::to_string(GetLastError()));
