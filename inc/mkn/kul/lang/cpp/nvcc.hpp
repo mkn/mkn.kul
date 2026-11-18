@@ -34,6 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "mkn/kul/lang/cpp/gcc.hpp"
 
 #include <string>
+#include <unordered_map>
+#include <utility>
 
 namespace mkn::kul::lang::cpp {
 

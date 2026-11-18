@@ -39,7 +39,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "mkn/kul/except.hpp"
 
 #include <cstdint>
-#include <ostream>
 #include <string>
 #include <typeinfo>
 #include <vector>

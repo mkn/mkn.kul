@@ -34,8 +34,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "mkn/kul/defs.hpp"
 #include "mkn/kul/string.hpp"
 #include "mkn/kul/except.hpp"
+#include "mkn/kul/lang/cpp/compiler/def.hpp"
 
 #include <string>
+#include <optional>
 #include <sstream>
 #include <utility>
 #include <vector>
@@ -59,6 +61,25 @@ auto GET_AS(std::string const& s, T const& def) {
     ss >> t;
     return t;
   }
+  return def;
+}
+
+// the value of key, if set
+MKN_KUL_FN_SIG_RET inline std::optional<std::string> get(std::string const& key) {
+  if (EXISTS(key.c_str())) return GET(key.c_str());
+  return std::nullopt;
+}
+
+// the value of key, or def if not set
+MKN_KUL_FN_SIG_RET inline std::string get(std::string const& key, std::string const& def) {
+  if (auto e = get(key)) return *e;
+  return def;
+}
+
+// the value of key parsed as T (mkn::kul::from_string), or def if not set
+template <typename T>
+MKN_KUL_FN_SIG_RET T get_as(std::string const& key, T const& def) {
+  if (auto e = get(key)) return from_string<T>(*e);
   return def;
 }
 

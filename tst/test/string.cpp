@@ -236,3 +236,27 @@ TEST(StringOperations, String_2_Int64_t_valid) {
        []() { mkn::kul::String::INT64(std::to_string((std::numeric_limits<int64_t>::max)())); }},
       false);
 }
+
+#include <string_view>
+
+namespace {
+constexpr std::string_view sv_a = "ab", sv_b = "cd";
+}
+
+TEST(StringConvert, to_from) {
+  EXPECT_EQ(mkn::kul::to_string(1.5), "1.5");
+  EXPECT_EQ(mkn::kul::to_string_with_precision(1.25, 3), "1.250");
+  EXPECT_EQ(mkn::kul::to_string_fixed_width(1.5, 2, 7), "0001.50");
+  EXPECT_EQ(mkn::kul::from_string<int>("42"), 42);
+  EXPECT_THROW((void)mkn::kul::from_string<int>("x"), std::runtime_error);
+}
+
+TEST(StringConvert, compile_time) {
+  static_assert(mkn::kul::join_string_views_v<sv_a, sv_b> == "abcd");
+  static_assert(mkn::kul::to_string_view_v<int, 0> == "0");
+  static_assert(mkn::kul::to_string_view_v<int, 7> == "7");
+  static_assert(mkn::kul::to_string_view_v<int, 10> == "10");
+  static_assert(mkn::kul::to_string_view_v<int, -305> == "-305");
+  static_assert(mkn::kul::to_string_view_v<unsigned, 1234u> == "1234");
+  static_assert(mkn::kul::to_string_view_v<long, -9> == "-9");
+}

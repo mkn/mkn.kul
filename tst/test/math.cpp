@@ -34,3 +34,15 @@ TEST(Math, more) {
   do_math<uint32_t>();
   do_math<int32_t>();
 }
+
+#include <array>
+#include <vector>
+
+TEST(Math, from) {
+  std::vector<int> const v{3, -1, 7, 2};
+  EXPECT_EQ(mkn::kul::math::product(std::array{2, 3, 4}), 24);
+  EXPECT_EQ(mkn::kul::math::max_from(v), 7);
+  EXPECT_EQ(mkn::kul::math::min_from(v), -1);
+  EXPECT_EQ(mkn::kul::math::sum_from(v, [](auto e) { return e * 2; }), 22);
+  EXPECT_DOUBLE_EQ(mkn::kul::math::norm(std::array{3., 4., 0.}), 5.);
+}

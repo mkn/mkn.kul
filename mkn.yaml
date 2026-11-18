@@ -53,6 +53,23 @@ profile:
       headers: -x c++-header
       args: -Xiwyu --mapping_file=res/iwyu.imp
 
+# iwyu's suggestions applied (fix_include): CI builds this and fails on any resulting diff
+- name: iwyu_fix
+  parent: usage
+  dep: parse.yaml[headers]
+  mod:
+  - name: cpp.iwyu
+    compile:
+      paths: inc
+      # os/win os/bsd: other platforms, the rest are fragments of a parent header
+      ignore: os/win os/bsd os.top os.bot cli.os math/blas math/noblas os/def.hpp
+      headers: -x c++-header
+      args: -Xiwyu --mapping_file=res/iwyu.imp
+      # --noreorder keeps the include order (kul, other, system), --nosafe_headers lets it
+      # remove unused includes from headers too
+      fix: --nocomments --noreorder --nosafe_headers
+      system_last: true
+
 - name: clang.tidy
   parent: _test
   src: tst

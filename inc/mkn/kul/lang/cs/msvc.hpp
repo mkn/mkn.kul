@@ -34,7 +34,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "mkn/kul/lang/compiler.hpp"
 #include "mkn/kul/string.hpp"
 #include "mkn/kul/except.hpp"
-#include "mkn/kul/lang/def.hpp"
 #include "mkn/kul/os.hpp"
 #include "mkn/kul/proc.hpp"
 

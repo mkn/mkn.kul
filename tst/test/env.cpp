@@ -99,3 +99,13 @@ TEST(PushEnvOperations, MoveTransfersRestoreResponsibility) {
   EXPECT_EQ("orig", mkn::kul::env::GET("MKN_KUL_TEST_ENV_J"));
   mkn::kul::env::SET("MKN_KUL_TEST_ENV_J", nullptr);
 }
+
+TEST(Env, get_optional) {
+  mkn::kul::env::PushEnv const push{"MKN_KUL_TEST_GET_AS", "12"};
+  EXPECT_EQ(mkn::kul::env::get("MKN_KUL_TEST_GET_AS"), std::optional<std::string>{"12"});
+  EXPECT_EQ(mkn::kul::env::get_as<int>("MKN_KUL_TEST_GET_AS", 3), 12);
+  mkn::kul::env::PushEnv const unset{std::string{"MKN_KUL_TEST_UNSET"}};
+  EXPECT_FALSE(mkn::kul::env::get("MKN_KUL_TEST_UNSET"));
+  EXPECT_EQ(mkn::kul::env::get("MKN_KUL_TEST_UNSET", "def"), "def");
+  EXPECT_EQ(mkn::kul::env::get_as<int>("MKN_KUL_TEST_UNSET", 3), 3);
+}

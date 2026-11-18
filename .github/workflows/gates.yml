@@ -1,0 +1,108 @@
+name: gates
+
+# pull request gates, as damn's: changed C++ lines follow .clang-format, applying iwyu's
+#  suggestions changes nothing, .clang-tidy's checks on changed lines (warning only)
+
+on:
+  pull_request: # not drafts (each job's if): a draft's pushes cost no Actions minutes, being
+    #  marked ready for review runs everything once; test locally meanwhile
+    types: [opened, synchronize, reopened, ready_for_review]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  CURL_GET: curl -fL --retry 3 --retry-delay 2
+  PATH_GET: https://github.com/mkn/mkn/releases/download/latest
+
+jobs:
+  clang-format:
+    if: ${{ !github.event.pull_request.draft }}
+    # one clang-format version for everyone: results differ between versions
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+    - uses: actions/checkout@v6
+      with:
+        fetch-depth: 0
+
+    - uses: actions/setup-python@v5
+      with:
+        python-version: "3.13"
+
+    - run: python -m pip install clang-format==22.1.8
+
+    # exit 0: nothing to change, 1: a diff, other: an error
+    - run: |
+        mb=$(git merge-base "origin/${{ github.base_ref }}" HEAD)
+        rc=0
+        git clang-format --diff --extensions c,cc,cpp,h,hpp,ipp "$mb" -- inc tst \
+          > format.diff || rc=$?
+        [ "$rc" -le 1 ] || { cat format.diff; exit "$rc"; }
+        if grep -q '^diff --git' format.diff; then
+          cat format.diff
+          echo "run: git clang-format $mb -- inc tst"
+          exit 1
+        fi
+
+  iwyu:
+    if: ${{ !github.event.pull_request.draft }}
+    # include what you use: applying iwyu's suggestions changes nothing
+    # Debian 13: the same iwyu (0.23) and libstdc++ as development machines, results differ
+    # between versions
+    runs-on: ubuntu-24.04
+    container: debian:trixie
+    timeout-minutes: 30
+    steps:
+    - run: |  # git before checkout, so the checkout is a repository
+        apt-get update
+        apt-get install -y --no-install-recommends ca-certificates curl git g++ iwyu
+
+    - uses: actions/checkout@v6
+
+    - run: |
+        $CURL_GET -o mkn ${PATH_GET}/mkn_nix
+        chmod +x mkn
+        KLOG=3 ./mkn build -dtKOqp iwyu_fix -a "-std=c++20 -fPIC" # build: the module must link
+        git config --global --add safe.directory "$PWD"
+        if ! git diff --exit-code -- inc tst; then
+          echo "run: mkn build -p iwyu_fix, and commit the result"
+          exit 1
+        fi
+
+  clang-tidy:
+    if: ${{ !github.event.pull_request.draft }}
+    # .clang-tidy's checks on the changed C++ lines: clang-tidy reads the real compile commands,
+    #  from an mkn dry run (res/ci/compile_db.py: no build). Findings show inline on the PR
+    #  (annotations). Warning only for now.
+    runs-on: ubuntu-24.04
+    container: debian:trixie
+    timeout-minutes: 20
+    steps:
+    # Debian 13's clang-tidy 22, the same as development machines (results differ between versions)
+    - run: |  # git before checkout, so the checkout is a repository
+        apt-get update
+        apt-get install -y --no-install-recommends ca-certificates curl git g++ python3 \
+          clang-tidy-22
+        clang-tidy-22 --version
+
+    - uses: actions/checkout@v6
+      with:
+        fetch-depth: 0
+
+    - name: compile commands
+      run: |
+        git config --global --add safe.directory "$PWD"
+        $CURL_GET -o mkn ${PATH_GET}/mkn_nix
+        chmod +x mkn && mv mkn /usr/local/bin/mkn
+        python3 res/ci/compile_db.py test,usage -dKO -a "-std=c++20 -fPIC"
+
+    - continue-on-error: true # warning only (step level: the job stays green)
+      run: |
+        mb=$(git merge-base "origin/${{ github.base_ref }}" HEAD)
+        git diff -U0 "$mb" HEAD -- inc tst \
+          | clang-tidy-diff-22.py -clang-tidy-binary clang-tidy-22 -p1 -path . -j "$(nproc)" \
+                                  -quiet -iregex '.*\.(c|cc|cpp|h|hpp|ipp)' > tidy.log 2>&1 || true
+        python3 res/ci/tidy_annotations.py tidy.log "$PWD"
+        ! grep -qE ": (warning|error): .*\[" tidy.log # the step fails (yellow) on findings

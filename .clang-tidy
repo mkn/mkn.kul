@@ -1,5 +1,22 @@
----
-Checks: '-*,bugprone-*,cert-*,portability-*,-bugprone-throwing-static-initialization,-cert-err58-cpp'#
-HeaderFilterRegex: 'inc/mkn/kul/|tst/'
-...
-
+# clang-tidy for mkn.kul, run on the changed lines of a PR (clang-tidy-diff, gates.yml): checks
+#  that find bugs or performance problems, not style, portability (kul is cross-platform), and
+#  unused parameters / variables
+Checks: >
+  -*,
+  bugprone-*,
+  -bugprone-easily-swappable-parameters,
+  -bugprone-narrowing-conversions,
+  -bugprone-implicit-widening-of-multiplication-result,
+  -bugprone-throwing-static-initialization,
+  performance-*,
+  -performance-avoid-endl,
+  portability-*,
+  misc-unused-parameters,
+  clang-diagnostic-unused-parameter,
+  clang-diagnostic-unused-variable,
+  modernize-use-nodiscard
+HeaderFilterRegex: '.*/(inc/mkn/kul|tst)/.*'
+# the compiler's unused warnings (misc-unused-parameters does not look into templates); before
+#  the command: a header's command is inferred from a source's, where after it they read as files
+ExtraArgsBefore: [-Wunused-parameter, -Wunused-variable]
+WarningsAsErrors: ''

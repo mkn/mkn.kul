@@ -36,15 +36,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "mkn/kul/string.hpp"
 #include "mkn/kul/except.hpp"
 #include "mkn/kul/lang/compiler.hpp"
-#include "mkn/kul/lang/def.hpp"
-#include "mkn/kul/log.hpp"
 #include "mkn/kul/map.hpp"
 #include "mkn/kul/os.hpp"
 #include "mkn/kul/proc.hpp"
 
 #include <cstddef>
 #include <exception>
-#include <ostream>
 #include <string>
 #include <unordered_map>
 #include <utility>

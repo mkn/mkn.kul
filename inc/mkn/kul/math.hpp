@@ -32,14 +32,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define MKN_KUL_MATH_HPP_
 
 #include "mkn/kul/except.hpp"
+#include "mkn/kul/lang/cpp/compiler/def.hpp"
 #include "mkn/kul/std/ints.hpp"
 #include "mkn/kul/std/floats.hpp"
 #include "mkn/kul/std/types.hpp"
 
+#include <array>
+#include <cmath>
+#include <cassert>
+#include <cstddef>
 #include <cstdint>
+#include <type_traits>
 #include <numeric>
-#include <functional>
 #include <string>
+#include <initializer_list>
 
 namespace mkn {
 namespace kul {
@@ -72,13 +78,51 @@ T root(Float_t const& f, Int16_t const& r = 2, Int16_t const& it = 6, T g = 0) {
 }
 
 template <typename Container, typename Multiplies = typename Container::value_type>
-Multiplies product(Container const& container, Multiplies mul = 1) {
-  return std::accumulate(container.begin(), container.end(), mul, std::multiplies<Multiplies>());
+MKN_KUL_FN_SIG_ALL_RET Multiplies product(Container const& container, Multiplies mul = 1) {
+  for (auto const& v : container) mul *= v;  // no std::accumulate in device code
+  return mul;
 }
 
 template <typename Container, typename Return = typename Container::value_type>
 Return sum(Container const& container, Return r = 0) {
   return std::accumulate(container.begin(), container.end(), r);
+}
+
+template <typename T>
+MKN_KUL_FN_SIG_RET T norm(std::array<T, 3> const& vec) {
+  return std::sqrt(std::inner_product(std::begin(vec), std::end(vec), std::begin(vec), T{0}));
+}
+
+// sum of fn(element)
+template <typename Container, typename F>
+MKN_KUL_FN_SIG_RET auto sum_from(Container&& container, F fn) {
+  using value_type = typename std::decay_t<Container>::value_type;
+  using return_type = std::decay_t<std::invoke_result_t<F const&, value_type const&>>;
+  return_type sum = 0;
+  for (auto const& el : container) sum += fn(el);
+  return sum;
+}
+
+auto constexpr static accessor = [](auto const& v, auto const& i) -> auto& { return v[i]; };
+
+// largest fn(container, i), container[i] by default
+template <typename Container, typename Fn = decltype(accessor)>
+MKN_KUL_FN_SIG_RET auto constexpr max_from(Container const& container, Fn fn = accessor) {
+  assert(container.size());
+  auto t = fn(container, 0);
+  for (std::size_t i = 1; i < container.size(); ++i)
+    if (auto const& e = fn(container, i); e > t) t = e;
+  return t;
+}
+
+// smallest fn(container, i), container[i] by default
+template <typename Container, typename Fn = decltype(accessor)>
+MKN_KUL_FN_SIG_RET auto constexpr min_from(Container const& container, Fn fn = accessor) {
+  assert(container.size());
+  auto t = fn(container, 0);
+  for (std::size_t i = 1; i < container.size(); ++i)
+    if (auto const& e = fn(container, i); e < t) t = e;
+  return t;
 }
 
 }  // namespace math
