@@ -227,3 +227,34 @@ TEST(CompilerTests, LinkObjectsOfDir) {
   EXPECT_TRUE(mkn::kul::File(out));
 #endif
 }
+
+// a level's flags as named parts, joined into the same string as before
+TEST(CompilerTests, FlagParts) {
+  using mkn::kul::lang::Flags;
+  auto const names = [](Flags const& f) {
+    std::string s;
+    for (auto const& p : f.parts()) s += p.name + ";";
+    return s;
+  };
+
+  auto const* gcc = gcc_like("g++");
+  ASSERT_TRUE(gcc);
+  auto const o9 = gcc->compilerOptimizationFlags(9);
+  EXPECT_EQ(o9.str(), gcc->compilerOptimization(9));
+#if defined(__linux__)
+  EXPECT_EQ("optimise;arch;lto;", names(o9));
+  EXPECT_EQ("-O3 -funroll-loops -march=native -mtune=native -flto=auto", o9.str());
+  EXPECT_EQ("-flto=auto", gcc->linkerOptimizationBin(9));
+  EXPECT_EQ("lto;", names(gcc->linkerOptimizationLibFlags(9)));
+#endif
+  EXPECT_EQ("-O3 -funroll-loops -march=native -mtune=native", o9.without("lto").str());
+  // a plain string level is one part, named after its kind
+  EXPECT_EQ("optimise;", names(gcc->compilerOptimizationFlags(2)));
+  EXPECT_EQ("warn;", names(gcc->compilerWarningFlags(9)));
+  EXPECT_EQ("", names(gcc->compilerOptimizationFlags(0)));  // "", no parts
+
+  Flags f = o9;
+  f.set("optimise", "-O2").set("lto", "").set("extra", "-fno-strict-aliasing");
+  EXPECT_EQ("-O2 -march=native -mtune=native -fno-strict-aliasing", f.str());
+  EXPECT_EQ("optimise;arch;extra;", names(f));
+}

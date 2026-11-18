@@ -33,14 +33,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "mkn/kul/except.hpp"
 #include "mkn/kul/lang/def.hpp"  // IWYU pragma: export
+#include "mkn/kul/lang/cpp/compiler/def.hpp"
 #include "mkn/kul/os.hpp"
 #include "mkn/kul/proc.hpp"
 
+#include <algorithm>
 #include <cstdint>
+#include <initializer_list>
 #include <string>
 #include <unordered_map>
 #include <vector>
 #include <exception>
+#include <utility>
 
 namespace mkn::kul::lang {
 
@@ -86,6 +90,64 @@ struct LinkDAO {
   bool dryRun = false;
 };
 
+// A named part of a level's flags, e.g. {"lto", "-flto=auto"}, so a build can replace or drop it
+//  by name, or a module leave it out of its own command
+struct FlagPart {
+  std::string name, flags;
+};
+
+// A level's flags as named parts, in the order they're joined into a command. A plain string is
+//  one unnamed part, named after its kind (optimise / debug / warn) when read from a Compiler.
+class Flags {
+ public:
+  Flags() = default;
+  Flags(char const* const flags) : Flags(std::string(flags)) {}
+  Flags(std::string flags) {
+    if (!flags.empty()) _parts.push_back({"", std::move(flags)});
+  }
+  Flags(std::initializer_list<FlagPart> parts) : _parts(parts) {}
+
+  std::vector<FlagPart> const& parts() const { return _parts; }
+
+  // replaces the flags of the part called name, appended if there's none, empty flags drop it
+  Flags& set(std::string const& name, std::string flags) {
+    auto const it =
+        std::find_if(_parts.begin(), _parts.end(), [&](auto const& p) { return p.name == name; });
+    if (flags.empty()) {
+      if (it != _parts.end()) _parts.erase(it);
+    } else if (it != _parts.end()) {
+      it->flags = std::move(flags);
+    } else {
+      _parts.push_back({name, std::move(flags)});
+    }
+    return *this;
+  }
+  // these flags less the part called name
+  MKN_KUL_FN_SIG_RET Flags without(std::string const& name) const {
+    return Flags(*this).set(name, "");
+  }
+  // unnamed parts named name
+  MKN_KUL_FN_SIG_RET Flags named(std::string const& name) const {
+    Flags f(*this);
+    for (auto& p : f._parts)
+      if (p.name.empty()) p.name = name;
+    return f;
+  }
+  // the parts' flags, space separated, empty ones skipped
+  MKN_KUL_FN_SIG_RET std::string str() const {
+    std::string s;
+    for (auto const& p : _parts) {
+      if (p.flags.empty()) continue;
+      if (!s.empty()) s += " ";
+      s += p.flags;
+    }
+    return s;
+  }
+
+ private:
+  std::vector<FlagPart> _parts;
+};
+
 class Compiler {
  public:
   virtual ~Compiler() {}
@@ -104,33 +166,48 @@ class Compiler {
                                 std::string const& out, bool dryRun = false) const
       KTHROW(mkn::kul::Exception) = 0;
 
-  std::string compilerDebug(uint8_t const& key) const {
-    return m_debug_c.count(key) ? m_debug_c.at(key) : "";
+  // a level's flags in parts, unnamed parts named after their kind
+  Flags compilerDebugFlags(uint8_t const& key) const { return at(m_debug_c, key, "debug"); }
+  Flags compilerOptimizationFlags(uint8_t const& key) const {
+    return at(m_optimise_c, key, "optimise");
   }
+  Flags compilerWarningFlags(uint8_t const& key) const { return at(m_warn_c, key, "warn"); }
+  Flags linkerDebugBinFlags(uint8_t const& key) const { return at(m_debug_l_bin, key, "debug"); }
+  Flags linkerDebugLibFlags(uint8_t const& key) const { return at(m_debug_l_lib, key, "debug"); }
+  Flags linkerOptimizationBinFlags(uint8_t const& key) const {
+    return at(m_optimise_l_bin, key, "optimise");
+  }
+  Flags linkerOptimizationLibFlags(uint8_t const& key) const {
+    return at(m_optimise_l_lib, key, "optimise");
+  }
+
+  // the same, joined
+  std::string compilerDebug(uint8_t const& key) const { return compilerDebugFlags(key).str(); }
   std::string compilerOptimization(uint8_t const& key) const {
-    return m_optimise_c.count(key) ? m_optimise_c.at(key) : "";
+    return compilerOptimizationFlags(key).str();
   }
-  std::string compilerWarning(uint8_t const& key) const {
-    return m_warn_c.count(key) ? m_warn_c.at(key) : "";
-  }
-  std::string linkerDebugBin(uint8_t const& key) const {
-    return m_debug_l_bin.count(key) ? m_debug_l_bin.at(key) : "";
-  }
-  std::string linkerDebugLib(uint8_t const& key) const {
-    return m_debug_l_lib.count(key) ? m_debug_l_lib.at(key) : "";
-  }
+  std::string compilerWarning(uint8_t const& key) const { return compilerWarningFlags(key).str(); }
+  std::string linkerDebugBin(uint8_t const& key) const { return linkerDebugBinFlags(key).str(); }
+  std::string linkerDebugLib(uint8_t const& key) const { return linkerDebugLibFlags(key).str(); }
   std::string linkerOptimizationBin(uint8_t const& key) const {
-    return m_optimise_l_bin.count(key) ? m_optimise_l_bin.at(key) : "";
+    return linkerOptimizationBinFlags(key).str();
   }
   std::string linkerOptimizationLib(uint8_t const& key) const {
-    return m_optimise_l_lib.count(key) ? m_optimise_l_lib.at(key) : "";
+    return linkerOptimizationLibFlags(key).str();
   }
 
  protected:
   Compiler(int const& v) : version(v) {}
   int const version;
-  std::unordered_map<uint8_t, std::string> m_optimise_c, m_optimise_l_bin, m_optimise_l_lib,
-      m_debug_c, m_debug_l_bin, m_debug_l_lib, m_warn_c;
+  std::unordered_map<uint8_t, Flags> m_optimise_c, m_optimise_l_bin, m_optimise_l_lib, m_debug_c,
+      m_debug_l_bin, m_debug_l_lib, m_warn_c;
+
+ private:
+  static Flags at(std::unordered_map<uint8_t, Flags> const& map, uint8_t const key,
+                  std::string const& kind) {
+    auto const it = map.find(key);
+    return it == map.end() ? Flags{} : it->second.named(kind);
+  }
 };
 
 }  // namespace mkn::kul::lang

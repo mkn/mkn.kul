@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define MKN_KUL_LANG_CPP_NVCC_HPP
 
 #include "mkn/kul/lang/cpp/gcc.hpp"
+#include "mkn/kul/lang/compiler.hpp"
 
 #include <string>
 #include <unordered_map>
