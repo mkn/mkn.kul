@@ -42,6 +42,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cstdint>
 #include <cstring>
 #include <sstream>
+#include <unordered_map>
+#include <utility>
 
 namespace mkn {
 namespace kul {

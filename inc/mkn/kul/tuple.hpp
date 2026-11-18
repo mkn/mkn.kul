@@ -32,11 +32,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define MKN_KUL_TUPLE_HPP_
 
 #include "mkn/kul/for.hpp"
+#include "mkn/kul/lang/cpp/compiler/def.hpp"
 
+#include <array>
+#include <string>
 #include <cstddef>
 #include <tuple>
 #include <type_traits>
 #include <utility>
+#include <iterator>
 
 namespace mkn {
 namespace kul {
@@ -94,6 +98,37 @@ struct ApplySingleTupleValue {
 template <typename T, size_t Size>
 constexpr auto tuple_from(T t) {
   return apply_N<Size>(ApplySingleTupleValue{t});
+}
+
+// func(element) for each element of tuple
+template <typename Tuple, typename Func>
+MKN_KUL_FN_SIG void apply(Tuple tuple, Func func) {
+  std::apply([&](auto&... args) { (func(args), ...); }, tuple);
+}
+
+// a tuple of references to the elements of arr
+template <typename T, std::size_t S>
+auto constexpr as_tuple(std::array<T, S> const& arr) {
+  return for_N<S, for_N_R_mode::forward_tuple>([&](auto i) -> auto& { return arr[i]; });
+}
+
+template <typename Tuple, std::size_t... Is>
+constexpr auto named_pair_seq_(Tuple, std::index_sequence<Is...> const&&)
+    -> decltype(std::make_tuple(
+        (Is, std::declval<std::pair<std::string, std::tuple_element_t<Is, Tuple>>>())...));
+
+template <typename... Args>
+auto constexpr named_pair_seq()
+    -> decltype(named_pair_seq_(std::tuple<Args...>{},
+                                std::make_index_sequence<sizeof...(Args)>{}));
+
+// std::tuple<std::pair<std::string, Args>...>
+template <typename... Args>
+using NamedTuple = decltype(named_pair_seq<Args...>());
+
+template <typename... Pairs>
+auto make_named_tuple(Pairs&&... pairs) {
+  return std::make_tuple(pairs...);
 }
 
 }  // namespace kul

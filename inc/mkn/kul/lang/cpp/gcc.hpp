@@ -36,7 +36,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "mkn/kul/defs.hpp"
 #include "mkn/kul/env.hpp"
 #include "mkn/kul/except.hpp"
-#include "mkn/kul/lang/def.hpp"
 #include "mkn/kul/os.hpp"
 #include "mkn/kul/proc.hpp"
 

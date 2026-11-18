@@ -36,6 +36,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cctype>
 #include <cerrno>
 #include <string>
+#include <type_traits>
+#include <string_view>
+#include <stdexcept>
+#include <cstddef>
+#include <iomanip>
+#include <array>
 #include <vector>
 #include <cstdint>
 #include <cstdlib>
@@ -333,6 +339,97 @@ class String {
     return result;
   }
 };
+// v as operator<< writes it
+inline auto to_string(auto const& v) {
+  std::stringstream ss;
+  ss << v;
+  return ss.str();
+}
+
+// value in fixed notation with len decimals
+template <typename T>
+[[nodiscard]] std::string to_string_with_precision(T const& value, std::size_t const len) {
+  std::ostringstream out;
+  out.precision(len);
+  out << std::fixed << value;
+  return out.str();
+}
+
+// value in fixed notation with precision decimals, padded on the left with fill to width
+template <typename T>
+[[nodiscard]] auto to_string_fixed_width(T const& value, std::size_t const& precision,
+                                         std::size_t const& width, char const& fill = '0') {
+  std::ostringstream out;
+  out.width(width);
+  out.precision(precision);
+  out << std::setfill(fill) << std::fixed << value;
+  return out.str();
+}
+
+// T as operator>> reads it from s, throws if it can't
+template <typename T>
+[[nodiscard]] T from_string(std::string const& s) {
+  T t;
+  std::stringstream ss(s);
+  ss >> t;
+  if (ss.fail()) throw std::runtime_error("mkn::kul::from_string: cannot parse T from: " + s);
+  return t;
+}
+
+// compile-time concatenation of string_views with static storage
+template <std::string_view const&... Strs>
+struct join_string_views {
+  static constexpr auto impl() noexcept {
+    constexpr std::size_t len = (Strs.size() + ... + 0);
+    std::array<char, len + 1> arr{};
+    auto append = [i = 0, &arr](auto const& s) mutable {
+      for (auto c : s) arr[i++] = c;
+    };
+    (append(Strs), ...);
+    arr[len] = 0;
+    return arr;
+  }
+  static constexpr auto arr = impl();
+  static constexpr std::string_view value{arr.data(), arr.size() - 1};
+};
+
+template <std::string_view const&... Strs>
+static constexpr auto join_string_views_v = join_string_views<Strs...>::value;
+
+// compile-time decimal string of the integer t
+template <typename T, T t>
+struct to_string_view {
+  static constexpr std::size_t size() {
+    std::size_t len = 1;
+    if constexpr (std::is_signed_v<T>)
+      if (t < 0) ++len;
+    for (auto n = t / 10; n != 0; n /= 10) ++len;
+    return len;
+  }
+
+  static constexpr auto impl() noexcept {
+    std::array<char, size() + 1> arr{};
+    auto i = size();
+    auto n = t;
+    do {
+      auto d = n % 10;
+      if constexpr (std::is_signed_v<T>)
+        if (d < 0) d = -d;
+      arr[--i] = "0123456789"[d];
+      n /= 10;
+    } while (n != 0);
+    if constexpr (std::is_signed_v<T>)
+      if (t < 0) arr[--i] = '-';
+    return arr;
+  }
+
+  static constexpr auto arr = impl();
+  static constexpr std::string_view value{arr.data(), arr.size() - 1};
+};
+
+template <typename T, T t>
+static constexpr auto to_string_view_v = to_string_view<T, t>::value;
+
 }  // namespace kul
 }  // namespace mkn
 #endif /* MKN_KUL_STRING_HPP_ */

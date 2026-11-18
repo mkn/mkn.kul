@@ -1,3 +1,4 @@
 bin
 .mkn
 .clangd
+compile_commands.json

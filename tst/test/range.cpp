@@ -31,3 +31,46 @@ TEST(Range, empty) {
   for ([[maybe_unused]] auto const i : mkn::kul::range<int>(3, -3)) ++n;
   EXPECT_EQ(n, 0u);
 }
+
+#include <array>
+#include <string>
+#include <utility>
+
+TEST(Enumerate, lvalue) {
+  std::vector<std::string> v{"a", "b", "c"};
+  std::size_t n = 0;
+  for (auto&& [i, o] : mkn::kul::enumerate(v)) {
+    static_assert(std::is_same_v<decltype(i), std::size_t>);
+    EXPECT_EQ(i, n++);
+    o += std::to_string(i);
+  }
+  EXPECT_EQ(v, (std::vector<std::string>{"a0", "b1", "c2"}));
+}
+
+TEST(Enumerate, constAndIndexType) {
+  std::array<int, 3> const a{4, 5, 6};
+  int sum = 0;
+  for (auto const& [i, o] : mkn::kul::enumerate<int>(a)) {
+    static_assert(std::is_same_v<std::remove_cvref_t<decltype(i)>, int>);
+    static_assert(std::is_same_v<decltype(o), int const&>);
+    sum += i * o;
+  }
+  EXPECT_EQ(sum, 0 * 4 + 1 * 5 + 2 * 6);
+}
+
+TEST(Enumerate, temporary) {
+  std::size_t n = 0;
+  for (auto&& [i, o] : mkn::kul::enumerate(std::vector<int>{7, 8})) {
+    EXPECT_EQ(o, int(7 + i));
+    ++n;
+  }
+  EXPECT_EQ(n, 2u);
+  for ([[maybe_unused]] auto&& [i, o] : mkn::kul::enumerate(std::vector<int>{})) ++n;
+  EXPECT_EQ(n, 2u);
+}
+
+static_assert([] {
+  std::array<int, 3> a{1, 2, 3};
+  for (auto&& [i, o] : mkn::kul::enumerate(a)) o *= static_cast<int>(i);
+  return a[2] == 6 && a[0] == 0;
+}());

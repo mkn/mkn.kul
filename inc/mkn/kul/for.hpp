@@ -31,6 +31,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef MKN_KUL_FOR_HPP_
 #define MKN_KUL_FOR_HPP_
 
+#include "mkn/kul/lang/cpp/compiler/def.hpp"
+#include "mkn/kul/meta.hpp"
 #include "mkn/kul/except.hpp"
 
 #include <array>
@@ -45,11 +47,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace mkn::kul {
 
-template <typename T, typename... Ts>
-auto constexpr all_are(Ts&&... ts) {
-  return ((std::is_same_v<T, std::decay_t<decltype(ts)>>) && ...);
-}
-
 auto constexpr any(auto... bools)
   requires(all_are<bool>(bools...))
 {
@@ -60,6 +57,13 @@ auto constexpr all(auto... bools)
   requires(all_are<bool>(bools...))
 {
   return (bools && ...);
+}
+
+// a equals every / any of ts
+MKN_KUL_FN_SIG_RET auto constexpr all_in(auto const a, auto&&... ts) { return ((a == ts) && ...); }
+
+MKN_KUL_FN_SIG_RET auto constexpr any_in([[maybe_unused]] auto const a, auto&&... ts) {
+  return ((a == ts) || ...);
 }
 
 // calls operator bool() or copies bool
@@ -100,7 +104,7 @@ constexpr auto apply_N(Apply&& f) {
 }
 
 template <std::uint16_t N, typename Fn>
-constexpr decltype(auto) for_N_fold(Fn&& fn) {
+MKN_KUL_FN_SIG constexpr decltype(auto) for_N_fold(Fn&& fn) {
   /*  // how to use: fn gets every index at once, as a pack
       for_N_fold<3>([&](auto... ics) { return array(idx[ics]...); });
   */
@@ -117,7 +121,7 @@ enum class for_N_R_mode {
 };
 
 template <std::uint16_t N, auto M = for_N_R_mode::make_tuple, typename Fn>
-constexpr auto for_N(Fn&& fn) {
+MKN_KUL_FN_SIG constexpr auto for_N(Fn&& fn) {
   /*  // how to use
       for_N<2>([](auto ic) {
           constexpr auto i = ic();
@@ -145,17 +149,17 @@ constexpr auto for_N(Fn&& fn) {
 }
 
 template <std::uint16_t N, typename Fn>
-constexpr auto for_N_make_array(Fn&& fn) {
+MKN_KUL_FN_SIG_RET constexpr auto for_N_make_array(Fn&& fn) {
   return for_N<N, for_N_R_mode::make_array>(fn);
 }
 
 template <std::uint16_t N, typename Fn>
-[[nodiscard]] constexpr auto for_N_all(Fn&& fn) {
+MKN_KUL_FN_SIG_RET constexpr auto for_N_all(Fn&& fn) {
   return all(for_N<N, for_N_R_mode::make_array>(fn));
 }
 
 template <std::uint16_t N, typename Fn>
-[[nodiscard]] constexpr auto for_N_any(Fn&& fn) {
+MKN_KUL_FN_SIG_RET constexpr auto for_N_any(Fn&& fn) {
   return any(for_N<N, for_N_R_mode::make_array>(fn));
 }
 
@@ -203,19 +207,23 @@ auto generate_from(F&& f, std::vector<T>&& v) {
   return generate_from(std::forward<F>(f), v);
 }
 
-template <std::size_t Idx, typename F, typename Type, std::size_t Size>
-auto constexpr generate_array_at_(F& f, std::array<Type, Size> const& arr) {
+template <std::size_t Idx, typename F>
+auto constexpr generate_array_at_(F& f, auto&& arr) {
   return f(arr[Idx]);
 }
 
-template <typename Type, std::size_t Size, typename F, std::size_t... Is>
-auto constexpr generate_array_(F& f, std::array<Type, Size> const& arr,
-                               std::integer_sequence<std::size_t, Is...>) {
+template <typename F, std::size_t... Is>
+auto constexpr generate_array_(F& f, auto&& arr, std::integer_sequence<std::size_t, Is...>) {
   return std::array{generate_array_at_<Is>(f, arr)...};
 }
 
 template <typename F, typename Type, std::size_t Size>
 auto constexpr generate_from(F&& f, std::array<Type, Size> const& arr) {
+  return generate_array_(f, arr, std::make_integer_sequence<std::size_t, Size>{});
+}
+
+template <typename F, typename Type, std::size_t Size>
+auto constexpr generate_from(F&& f, std::array<Type, Size>& arr) {
   return generate_array_(f, arr, std::make_integer_sequence<std::size_t, Size>{});
 }
 
