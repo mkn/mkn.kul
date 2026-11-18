@@ -34,12 +34,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef MKN_KUL_OS_WIN_OS_BOT_HPP_
 #define MKN_KUL_OS_WIN_OS_BOT_HPP_
 
-std::string mkn::kul::Dir::ESC(std::string s) {
-  ESC_REPLACE(s, "\\", "\\\\");
+std::string mkn::kul::fsys::detail::esc(std::string s) {
+  mkn::kul::String::REPLACE_ALL(s, "\\", "\\\\");
   return s;
 }
 
-std::string mkn::kul::Dir::LOCL(std::string s) {
+std::string mkn::kul::fsys::locl(std::string s) {
   mkn::kul::String::REPLACE_ALL(s, "/", "\\");
   return s;
 }

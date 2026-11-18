@@ -54,7 +54,7 @@ class Dir;
 namespace fsys {
 
 class KulTimeStampsResolver {
- private:
+ public:
   static uint64_t FileTimeToPOSIX(FILETIME& ft) {
     LARGE_INTEGER date, adjust;
     date.HighPart = ft.dwHighDateTime;

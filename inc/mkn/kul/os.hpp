@@ -44,6 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 #include <algorithm>
+#include <concepts>
 #include <cstdint>
 #include <vector>
 #include <optional>
@@ -53,6 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 #include <string>
 #include <system_error>
+#include <utility>
 
 namespace mkn {
 namespace kul {
@@ -153,6 +155,57 @@ MKN_KUL_FN_SIG_RET inline std::vector<std::filesystem::path> files(std::filesyst
   return out;
 }
 
+// the platform's separators, "\\" to "/" on nix and "/" to "\\" on Windows
+MKN_KUL_FN_SIG_RET inline std::string locl(std::string s);
+
+namespace detail {
+// for a shell, spaces escaped on nix and backslashes doubled on Windows
+inline std::string esc(std::string s);
+
+// the part of real after the working directory, or real if it's not under it
+inline std::string trim_cwd(std::string const& real) {
+  std::string const cwd = env::CWD();
+  if (real.find(cwd) == std::string::npos) return real;
+  return real == cwd ? real.substr(cwd.size()) : real.substr(cwd.size() + 1);
+}
+}  // namespace detail
+
+// p absolute with "." / ".." resolved, p need not exist. Symlinks are resolved on nix (as
+//  realpath), not on Windows (as _fullpath)
+MKN_KUL_FN_SIG_RET inline std::string real(std::filesystem::path const& p) KTHROW(Exception) {
+  std::error_code ec;
+#if MKN_KUL_IS_WIN
+  auto r = std::filesystem::absolute(p, ec).lexically_normal().string();
+  if (r.size() && r.back() == '\\') r.pop_back();
+#else
+  auto r = std::filesystem::weakly_canonical(p, ec).string();
+#endif
+  if (ec) KEXCEPT(Exception, "Path \"" + p.string() + "\" could not be resolved");
+  return r;
+}
+
+// p relative to the working directory when under it, as File / Dir::mini()
+MKN_KUL_FN_SIG_RET inline std::string mini(std::filesystem::path const& p) KTHROW(Exception) {
+  return detail::trim_cwd(real(p));
+}
+
+// p as given, for a shell, as File / Dir::esc()
+MKN_KUL_FN_SIG_RET inline std::string esc(std::filesystem::path const& p) {
+  return detail::esc(locl(p.string()));
+}
+
+// mini(p) for a shell, as File / Dir::escm()
+MKN_KUL_FN_SIG_RET inline std::string escm(std::filesystem::path const& p) KTHROW(Exception) {
+  return detail::esc(mini(p));
+}
+
+// last modification, seconds since the epoch, 0 if p can't be read
+MKN_KUL_FN_SIG_RET inline std::uint64_t modified(std::filesystem::path const& p) {
+  std::uint64_t a = 0, c = 0, m = 0;
+  KulTimeStampsResolver::GET(p.string().c_str(), a, c, m);
+  return m;
+}
+
 }  // namespace fsys
 
 class Dir : public fsys::Item {
@@ -163,24 +216,13 @@ class Dir : public fsys::Item {
     fsys::KulTimeStampsResolver::GET(s.c_str(), a, c, m);
     return fsys::TimeStamps(a, c, m);
   }
-  static inline std::string LOCL(std::string s);
-  static void ESC_REPLACE(std::string& s, std::string const& f, std::string const& r) {
-    size_t p = s.find(f);
-    while (p != std::string::npos) {
-      s.replace(s.find(f, p), f.size(), r);
-      p = s.find(f, p + r.size());
-    }
-  }
-  static inline std::string ESC(std::string s);
+  static std::string LOCL(std::string s) { return fsys::locl(std::move(s)); }
+  static std::string ESC(std::string s) { return fsys::detail::esc(std::move(s)); }
   static std::string PRNT(std::string const& s) {  // parent
     std::string const& p = s.substr(0, s.rfind(SEP()) + 1);
     return mkn::kul::Dir(p).root() ? p : s.substr(0, s.rfind(SEP()));
   }
-  static std::string MINI(std::string const& a) {
-    return a.find(env::CWD()) == std::string::npos ? a
-           : a.compare(env::CWD()) == 0            ? a.substr(std::string(env::CWD()).size())
-                                                   : a.substr(std::string(env::CWD()).size() + 1);
-  }
+  static std::string MINI(std::string const& a) { return fsys::detail::trim_cwd(a); }
 
  public:
   Dir() : _p() {}
@@ -476,12 +518,15 @@ namespace os {
 
 class PushDir {
  public:
-  PushDir(mkn::kul::Dir const& d) {
-    if (!d) KEXCEPTION("PushDir directory does not exist: ", d);
+  PushDir(std::filesystem::path const& d) {
+    std::error_code ec;
+    if (!std::filesystem::is_directory(d, ec))
+      KEXCEPTION("PushDir directory does not exist: ", d.string());
     cwd = mkn::kul::env::CWD();
-    mkn::kul::env::CWD(d.real());
+    mkn::kul::env::CWD(fsys::real(d));
   }
-  PushDir(std::string const& d) : PushDir(mkn::kul::Dir(d)) {}
+  template <std::same_as<mkn::kul::Dir> D>
+  PushDir(D const& d) : PushDir(std::filesystem::path(d.path())) {}
   ~PushDir() { mkn::kul::env::CWD(cwd); }
 
  private:

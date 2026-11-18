@@ -52,7 +52,7 @@ class Dir;
 namespace fsys {
 
 class KulTimeStampsResolver {
- private:
+ public:
   static void GET(char const* const p, uint64_t& a, uint64_t& c, uint64_t& m) {
     struct stat att;
     if (stat(p, &att) != -1) {
