@@ -146,9 +146,6 @@ inline constexpr char const* CLANG_LTO = "-flto=thin";
 inline constexpr char const* GCC_LTO = "";
 inline constexpr char const* CLANG_LTO = "";
 #endif
-inline std::string with_lto(std::string const& flags, char const* lto) {
-  return *lto ? flags + " " + lto : flags;
-}
 
 class GccCompiler : public CCompiler {
  public:
@@ -162,7 +159,10 @@ class GccCompiler : public CCompiler {
                          {6, "-O3 -funroll-loops"},
                          {7, "-O3 -funroll-loops"},
                          {8, "-O3 -funroll-loops"},
-                         {9, with_lto("-O3 -funroll-loops -march=native -mtune=native", GCC_LTO)}});
+                         {9,
+                          {{"optimise", "-O3 -funroll-loops"},
+                           {"arch", "-march=native -mtune=native"},
+                           {"lto", GCC_LTO}}}});
     m_debug_c.insert({{0, "-DNDEBUG"},
                       {1, "-g1"},
                       {2, "-g2"},
@@ -182,7 +182,7 @@ class GccCompiler : public CCompiler {
                              {6, ""},
                              {7, ""},
                              {8, ""},
-                             {9, GCC_LTO}});
+                             {9, {{"lto", GCC_LTO}}}});
     m_optimise_l_lib.insert({{0, ""},
                              {1, ""},
                              {2, ""},
@@ -192,7 +192,7 @@ class GccCompiler : public CCompiler {
                              {6, ""},
                              {7, ""},
                              {8, ""},
-                             {9, GCC_LTO}});
+                             {9, {{"lto", GCC_LTO}}}});
     m_debug_l_bin.insert(
         {{0, ""}, {1, ""}, {2, ""}, {3, ""}, {4, ""}, {5, ""}, {6, ""}, {7, ""}, {8, ""}, {9, ""}});
     m_debug_l_lib.insert(
@@ -308,8 +308,10 @@ class GccCompiler : public CCompiler {
 class ClangCompiler : public GccCompiler {
  public:
   ClangCompiler(int const& v = 0) : GccCompiler(v) {
-    m_optimise_c[9] = with_lto("-O3 -funroll-loops -march=native -mtune=native", CLANG_LTO);
-    m_optimise_l_bin[9] = m_optimise_l_lib[9] = CLANG_LTO;
+    m_optimise_c[9] = {{"optimise", "-O3 -funroll-loops"},
+                       {"arch", "-march=native -mtune=native"},
+                       {"lto", CLANG_LTO}};
+    m_optimise_l_bin[9] = m_optimise_l_lib[9] = {{"lto", CLANG_LTO}};
   }
   CCompiler_Type type() const override { return CCompiler_Type::CLANG; }
 
@@ -329,7 +331,7 @@ class ClangCompiler : public GccCompiler {
 class IntelCompiler : public GccCompiler {
  public:
   IntelCompiler(int const& v = 0) : GccCompiler(v) {  // no link time optimisation
-    m_optimise_c[9] = "-O3 -funroll-loops -march=native -mtune=native";
+    m_optimise_c[9] = {{"optimise", "-O3 -funroll-loops"}, {"arch", "-march=native -mtune=native"}};
     m_optimise_l_bin[9] = m_optimise_l_lib[9] = "";
   }
   CCompiler_Type type() const override { return CCompiler_Type::ICC; }
