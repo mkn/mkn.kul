@@ -40,6 +40,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <strsafe.h>
 #include <tchar.h>
 #include <algorithm>
+#include <concepts>
+#include <filesystem>
 #include <sstream>
 #include <string>
 
@@ -47,6 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "mkn/kul/env.hpp"
 #include "mkn/kul/except.hpp"
+#include "mkn/kul/lang/cpp/compiler/def.hpp"
 #include "mkn/kul/os.hpp"
 #include "mkn/kul/mem.hpp"
 #include "mkn/kul/log.hpp"
@@ -89,9 +92,11 @@ class Process : public mkn::kul::AProcess {
 
  public:
   Process(std::string const& cmd, bool const& wfe = true) : mkn::kul::AProcess(cmd, wfe) {}
-  Process(std::string const& cmd, std::string const& path, bool const& wfe = true)
-      : mkn::kul::AProcess(cmd, path, wfe) {}
-  Process(std::string const& cmd, mkn::kul::Dir const& d, bool const& wfe = true)
+  Process(std::string const& cmd, std::filesystem::path const& path, bool const& wfe = true)
+      : mkn::kul::AProcess(cmd, path.string(), wfe) {}
+  template <std::same_as<mkn::kul::Dir> D>
+  MKN_KUL_DEPRECATED("use std::filesystem::path")
+  Process(std::string const& cmd, D const& d, bool const& wfe = true)
       : mkn::kul::AProcess(cmd, d ? d.real() : d.path(), wfe) {}
   ~Process() { tearDown(); }
   bool kill(int16_t k = 6) {

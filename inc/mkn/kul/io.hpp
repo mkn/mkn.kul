@@ -35,9 +35,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "mkn/kul/log.hpp"
 #include "mkn/kul/os.hpp"
 #include "mkn/kul/defs.hpp"
+#include "mkn/kul/lang/cpp/compiler/def.hpp"
 
 #include <cstdio>
+#include <concepts>
 #include <cstdint>
+#include <filesystem>
 #include <fstream>
 #include <limits>
 #include <sstream>
@@ -68,8 +71,8 @@ class AReader {
   std::ifstream const& buffer() const { return f; }
   std::ifstream& buffer() { return f; }
 
-  AReader(char const* const path, std::ios_base::openmode const flags) : f(path, flags) {
-    if (!f) KEXCEPT(Exception, "FileException : file \"" + std::string(path) + "\" not found");
+  AReader(std::filesystem::path const& path, std::ios_base::openmode const flags) : f(path, flags) {
+    if (!f) KEXCEPT(Exception, "FileException : file \"" + path.string() + "\" not found");
   }
   virtual ~AReader() {}
   virtual char const* readLine() = 0;
@@ -117,8 +120,10 @@ class AReader {
 };
 class Reader : public AReader {
  public:
-  Reader(char const* c) : AReader(c, std::ios::in) {}
-  Reader(File const& c) : Reader(c.full().c_str()) {}
+  Reader(std::filesystem::path const& p) : AReader(p, std::ios::in) {}
+  template <std::same_as<File> F>
+  MKN_KUL_DEPRECATED("use std::filesystem::path")
+  Reader(F const& c) : Reader(c.full()) {}
   ~Reader() { f.close(); }
   char const* readLine() { return AReader::readLine(f); }
   size_t read(char* c, size_t const& s) { return AReader::read(c, f, s); }
@@ -127,10 +132,12 @@ class Reader : public AReader {
 class BinaryReader : public AReader {
  private:
  public:
-  BinaryReader(char const* c) : AReader(c, std::ios::in | std::ios::binary) {
+  BinaryReader(std::filesystem::path const& p) : AReader(p, std::ios::in | std::ios::binary) {
     f.exceptions(std::ifstream::badbit | std::ifstream::failbit);
   }
-  BinaryReader(File const& c) : BinaryReader(c.full().c_str()) {}
+  template <std::same_as<File> F>
+  MKN_KUL_DEPRECATED("use std::filesystem::path")
+  BinaryReader(F const& c) : BinaryReader(c.full()) {}
   ~BinaryReader() { f.close(); }
   char const* readLine() { return AReader::readLine(f); }
 #ifdef _WIN32
@@ -201,24 +208,25 @@ class AWriter {
 };
 class Writer : public AWriter {
  public:
-  Writer(char const* c, bool a = 0) {
-    if (a)
-      f.open(c, std::ios::out | std::ios::app);
-    else
-      f.open(c, std::ios::out);
-    if (!f) KEXCEPT(Exception, "FileException : file \"" + std::string(c) + "\" not found");
+  Writer(std::filesystem::path const& p, bool a = 0) {
+    f.open(p, a ? std::ios::out | std::ios::app : std::ios::out);
+    if (!f) KEXCEPT(Exception, "FileException : file \"" + p.string() + "\" not found");
   }
-  Writer(File const& c, bool a = 0) : Writer(c.full().c_str(), a) {}
+  template <std::same_as<File> F>
+  MKN_KUL_DEPRECATED("use std::filesystem::path")
+  Writer(F const& c, bool a = 0) : Writer(c.full(), a) {}
   ~Writer() {}
 };
 class BinaryWriter : public AWriter {
  public:
-  BinaryWriter(char const* c) {
-    f.open(c, std::ios::out | std::ios::binary);
-    if (!f) KEXCEPT(Exception, "FileException : file \"" + std::string(c) + "\" not found");
+  BinaryWriter(std::filesystem::path const& p) {
+    f.open(p, std::ios::out | std::ios::binary);
+    if (!f) KEXCEPT(Exception, "FileException : file \"" + p.string() + "\" not found");
     f.unsetf(std::ios_base::skipws);
   }
-  BinaryWriter(File const& c) : BinaryWriter(c.full().c_str()) {}
+  template <std::same_as<File> F>
+  MKN_KUL_DEPRECATED("use std::filesystem::path")
+  BinaryWriter(F const& c) : BinaryWriter(c.full()) {}
   ~BinaryWriter() {
     f << std::flush;
     f.close();

@@ -39,6 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "mkn/kul/os/any/proc/any_proc.hpp"  // IWYU pragma: export
 #include "mkn/kul/defs.hpp"
 #include "mkn/kul/except.hpp"
+#include "mkn/kul/lang/cpp/compiler/def.hpp"
 #include "mkn/kul/os/any/proc/def.hpp"
 #include "mkn/kul/os/nixish/env.hpp"
 
@@ -64,7 +65,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
+#include <concepts>
 #include <cstring>
+#include <filesystem>
 #include <vector>
 #include <string>
 #include <sstream>
@@ -83,10 +86,12 @@ inline void kill(int32_t const& e) { ::kill(mkn::kul::this_proc::id(), e); }
 class Process : public mkn::kul::AProcess {
  public:
   Process(std::string const& cmd, bool const& _wfe = true) : mkn::kul::AProcess(cmd, _wfe) {}
-  Process(std::string const& cmd, std::string const& path, bool const& _wfe = true)
-      : mkn::kul::AProcess(cmd, path, _wfe) {}
-  Process(std::string const& cmd, mkn::kul::Dir const& _d, bool const& _wfe = true)
-      : mkn::kul::AProcess(cmd, (_d ? _d.real() : _d.path()), _wfe) {}
+  Process(std::string const& cmd, std::filesystem::path const& path, bool const& _wfe = true)
+      : mkn::kul::AProcess(cmd, path.string(), _wfe) {}
+  template <std::same_as<mkn::kul::Dir> D>
+  MKN_KUL_DEPRECATED("use std::filesystem::path")
+  Process(std::string const& cmd, D const& d, bool const& _wfe = true)
+      : mkn::kul::AProcess(cmd, d ? d.real() : d.path(), _wfe) {}
   bool kill(int16_t k = 6) {
     if (started()) {
       bool b = ::kill(pid(), k) == 0;
