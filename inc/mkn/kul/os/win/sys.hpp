@@ -35,10 +35,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define MKN_KUL_OS_WIN_SYS_HPP_
 
 #include "mkn/kul/except.hpp"
+#include "mkn/kul/lang/cpp/compiler/def.hpp"
 #include "mkn/kul/log.hpp"
 #include "mkn/kul/os.hpp"
 
 #include <windows.h>
+
+#include <concepts>
+#include <filesystem>
+#include <string>
+#include <system_error>
 
 namespace mkn {
 namespace kul {
@@ -54,20 +60,28 @@ class SharedLibrary {
  private:
   bool _loaded = 0;
   HINSTANCE _handle;
-  mkn::kul::File const _f;
+  std::filesystem::path const _p;
 
  public:
-  SharedLibrary(mkn::kul::File const& f) KTHROW(Exception) : _f(f) {
-    if (!_f) KEXCEPT(Exception, "Library attempted to be loaded does not exist: ", _f.full());
-    LPSTR lib = _strdup(_f.real().c_str());
-    _handle = LoadLibrary(lib);
-    if (!_handle) KEXCEPT(Exception, "Cannot load library: ", f, " - Error: ", GetLastError());
+  SharedLibrary(std::filesystem::path const& p) KTHROW(Exception) : _p(p) {
+    std::error_code ec;
+    if (!std::filesystem::is_regular_file(_p, ec))
+      KEXCEPT(Exception, "Library attempted to be loaded does not exist: ", _p.string());
+    _handle = LoadLibraryA(std::filesystem::absolute(_p, ec).string().c_str());
+    if (!_handle)
+      KEXCEPT(Exception, "Cannot load library: ", _p.string(), " - Error: ", GetLastError());
     _loaded = 1;
   }
+  template <std::same_as<mkn::kul::File> F>
+  MKN_KUL_DEPRECATED("use std::filesystem::path")
+  SharedLibrary(F const& f) KTHROW(Exception) : SharedLibrary(f.full()) {}
   ~SharedLibrary() {
     if (_loaded) FreeLibrary(_handle);
   }
-  mkn::kul::File const file() const { return _f; }
+  std::filesystem::path const& path() const { return _p; }
+  MKN_KUL_DEPRECATED("use std::filesystem::path") mkn::kul::File file() const {
+    return mkn::kul::File(_p.string());
+  }
 };
 
 template <class F>
@@ -97,8 +111,13 @@ class SharedClass {
   SharedFunction<destruct_t> _d;
 
  public:
-  SharedClass(mkn::kul::File const& f, std::string const& c, std::string const& d) KTHROW(Exception)
-      : _lib(f), _c(_lib, c), _d(_lib, d) {}
+  SharedClass(std::filesystem::path const& p, std::string const& c, std::string const& d)
+      KTHROW(Exception)
+      : _lib(p), _c(_lib, c), _d(_lib, d) {}
+  template <std::same_as<mkn::kul::File> F>
+  MKN_KUL_DEPRECATED("use std::filesystem::path")
+  SharedClass(F const& f, std::string const& c, std::string const& d) KTHROW(Exception)
+      : SharedClass(f.full(), c, d) {}
   virtual ~SharedClass() {}
 
  protected:

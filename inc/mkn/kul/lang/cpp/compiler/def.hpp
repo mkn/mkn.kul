@@ -60,4 +60,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define MKN_KUL_FN_SIG_ALL_RET [[nodiscard]] MKN_KUL_FN_SIG_ALL
 #endif
 
+// MKN_KUL_DEPRECATED(msg): marks functions to be removed, define it before including mkn.kul to
+//  override
+#if !defined(MKN_KUL_DEPRECATED)
+#define MKN_KUL_DEPRECATED(msg) [[deprecated(msg)]]
+#endif
+
 #endif /* MKN_KUL_LANG_CPP_COMPILER_DEF_HPP_ */

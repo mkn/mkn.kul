@@ -42,8 +42,11 @@ or via cli
 
 #include "mkn/kul/except.hpp"
 #include "mkn/kul/os.hpp"
+#include "mkn/kul/lang/cpp/compiler/def.hpp"
 
+#include <concepts>
 #include <cstddef>
+#include <filesystem>
 #include <exception>
 #if __has_include("yaml-cpp/yaml.h")
 
@@ -177,8 +180,10 @@ class File : public Item {
     }
   }
   File(File const& f) : Item(f.r), f(f.f) {}
-  File(mkn::kul::File const& f) KTHROW(Exception) : f(f.real()) { reload(); }
-  File(std::string const& f) KTHROW(Exception) : f(f) { reload(); }
+  File(std::filesystem::path const& p) KTHROW(Exception) : f(p.string()) { reload(); }
+  template <std::same_as<mkn::kul::File> F>
+  MKN_KUL_DEPRECATED("use std::filesystem::path")
+  File(F const& file) KTHROW(Exception) : File(file.real()) {}
 
  private:
   std::string const f;  // file

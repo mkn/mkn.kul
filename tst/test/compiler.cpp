@@ -194,7 +194,7 @@ TEST(CompilerTests, ObjectFilesOfDir) {
   mkn::kul::Dir const d("bin/test_link/objs");
   d.mk();
   for (auto const* const n : {"b.o", "a.o", "c.txt"})
-    mkn::kul::io::Writer(mkn::kul::File(n, d)) << "";
+    mkn::kul::io::Writer(mkn::kul::File(n, d).full()) << "";
   auto const objs = CCompiler::objectFiles(info("lib", ".so"), d.real());
   ASSERT_EQ(2u, objs.size());
   EXPECT_NE(std::string::npos, objs[0].find("a.o")) << objs[0];
@@ -208,7 +208,7 @@ TEST(CompilerTests, LinkObjectsOfDir) {
   mkn::kul::Dir const d("bin/test_link/main_objs");
   d.mk();
   mkn::kul::File const src("main.cpp", d);
-  mkn::kul::io::Writer(src) << "int main() { return 0; }\n";
+  mkn::kul::io::Writer(src.full()) << "int main() { return 0; }\n";
   mkn::kul::Process c("g++");
   c << "-c" << src.escm() << "-o" << mkn::kul::File("main.o", d).escm();
   c.start();

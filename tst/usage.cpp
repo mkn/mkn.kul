@@ -110,8 +110,8 @@ class Test {
     mkn::kul::File fo("TEST_WRITE_OUT");
     mkn::kul::File fe("TEST_WRITE_ERR");
     {
-      mkn::kul::io::Writer wo(fo);
-      mkn::kul::io::Writer we(fe);
+      mkn::kul::io::Writer wo(fo.full());
+      mkn::kul::io::Writer we(fe.full());
       auto lo = [&](std::string const& _s) { wo << _s; };
       auto le = [&](std::string const& _s) { we << _s; };
       mkn::kul::LogMan::INSTANCE().setOut(lo);

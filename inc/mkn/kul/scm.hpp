@@ -37,8 +37,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "mkn/kul/string.hpp"
 #include "mkn/kul/env.hpp"
 #include "mkn/kul/except.hpp"
+#include "mkn/kul/lang/cpp/compiler/def.hpp"
 
+#include <concepts>
 #include <cstdint>
+#include <filesystem>
 #include <string>
 #include <typeinfo>
 #include <vector>
@@ -106,8 +109,8 @@ class Git : public SCM {
     // e.g. git ls-remote --symref git@github.com:user/repo HEAD
   }
 
-  std::string branch(mkn::kul::Dir const& dr) const {
-    mkn::kul::os::PushDir pushd(dr);
+  std::string branch(std::filesystem::path const& d) const {
+    mkn::kul::os::PushDir pushd(d.string());
     mkn::kul::Process p("git");
     mkn::kul::ProcessCapture pc(p);
     p << "branch"
@@ -120,7 +123,11 @@ class Git : public SCM {
     return mkn::kul::String::LINES(pc.outs())[0];
   }
 
-  std::string branch(std::string const& d) const { return branch(mkn::kul::Dir(d)); }
+  template <std::same_as<mkn::kul::Dir> D>
+  MKN_KUL_DEPRECATED("use std::filesystem::path")
+  std::string branch(D const& d) const {
+    return branch(std::filesystem::path(d.path()));
+  }
 
   std::string co(std::string const& d, std::string const& r, std::string const& v) const
       KTHROW(Exception) override {
