@@ -50,31 +50,30 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace mkn {
 namespace kul {
 
-class Dir;
 namespace fsys {
 
-class KulTimeStampsResolver {
- private:
-  static uint64_t FileTimeToPOSIX(FILETIME& ft) {
-    LARGE_INTEGER date, adjust;
-    date.HighPart = ft.dwHighDateTime;
-    date.LowPart = ft.dwLowDateTime;
-    adjust.QuadPart = 11644473600000 * 10000;
-    date.QuadPart -= adjust.QuadPart;
-    return (uint64_t)date.QuadPart / 10000000;
+namespace detail {
+inline uint64_t file_time_to_posix(FILETIME const& ft) {
+  LARGE_INTEGER date, adjust;
+  date.HighPart = ft.dwHighDateTime;
+  date.LowPart = ft.dwLowDateTime;
+  adjust.QuadPart = 11644473600000 * 10000;
+  date.QuadPart -= adjust.QuadPart;
+  return (uint64_t)date.QuadPart / 10000000;
+}
+
+// accessed / created / modified, seconds since the epoch, unchanged if p can't be read
+inline void timestamps(char const* const p, uint64_t& a, uint64_t& c, uint64_t& m) {
+  WIN32_FIND_DATA ffd;
+  HANDLE h = FindFirstFile(TEXT(p), &ffd);
+  if (h != INVALID_HANDLE_VALUE) {
+    a = file_time_to_posix(ffd.ftLastAccessTime);
+    c = file_time_to_posix(ffd.ftCreationTime);
+    m = file_time_to_posix(ffd.ftLastWriteTime);
+    FindClose(h);
   }
-  static void GET(char const* const p, uint64_t& a, uint64_t& c, uint64_t& m) {
-    WIN32_FIND_DATA ffd;
-    HANDLE h = FindFirstFile(TEXT(p), &ffd);
-    if (h) {
-      a = FileTimeToPOSIX(ffd.ftLastAccessTime);
-      c = FileTimeToPOSIX(ffd.ftCreationTime);
-      m = FileTimeToPOSIX(ffd.ftLastWriteTime);
-      FindClose(h);
-    }
-  }
-  friend class mkn::kul::Dir;
-};
+}
+}  // namespace detail
 }  // namespace fsys
 
 }  // namespace kul

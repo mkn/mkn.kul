@@ -208,3 +208,42 @@ TEST(OperatingSystemTests, FsysFilesDirs) {
 
   std::filesystem::remove_all(tmp);
 }
+
+// the fsys free functions give the same strings as the File / Dir members they replace
+TEST(OperatingSystemTests, FsysMatchesFileDir) {
+  namespace fsys = mkn::kul::fsys;
+  using mkn::kul::Dir, mkn::kul::File;
+  Dir const tmp("bin/test/kul fsys mini");  // a space, for esc
+  tmp.rm();
+  ASSERT_TRUE(tmp.mk());
+  File const f("a file.txt", tmp);
+  ASSERT_TRUE(f.mk());
+
+  for (auto const& p : {std::string{"mkn.yaml"}, std::string{"inc/../mkn.yaml"}, f.full(),
+                        File("missing.txt", tmp).full()}) {
+    File const file(p);
+    EXPECT_EQ(fsys::real(p), file.real()) << p;
+    EXPECT_EQ(fsys::mini(p), file.mini()) << p;
+    EXPECT_EQ(fsys::esc(file.full()), file.esc()) << p;
+    EXPECT_EQ(fsys::escm(p), file.escm()) << p;
+  }
+  for (auto const& p :
+       {std::string{"inc"}, std::string{"inc/mkn/.."}, tmp.path(), mkn::kul::env::CWD()}) {
+    Dir const dir(p);
+    EXPECT_EQ(fsys::real(p), dir.real()) << p;
+    EXPECT_EQ(fsys::mini(p), dir.mini()) << p;
+    EXPECT_EQ(fsys::esc(p), dir.esc()) << p;
+    EXPECT_EQ(fsys::escm(p), dir.escm()) << p;
+  }
+  EXPECT_EQ(fsys::modified("mkn.yaml"), File("mkn.yaml").timeStamps().modified());
+  EXPECT_GT(fsys::modified("mkn.yaml"), 0u);
+  EXPECT_EQ(fsys::modified("does_not_exist_kul_os_test"), 0u);
+
+  {
+    auto const inc = Dir("inc").real();
+    mkn::kul::os::PushDir const pd(std::filesystem::path{"inc"});
+    EXPECT_EQ(std::string{mkn::kul::env::CWD()}, inc);
+  }
+  EXPECT_THROW(mkn::kul::os::PushDir{"does_not_exist_kul_os_test"}, mkn::kul::Exception);
+  tmp.rm();
+}
