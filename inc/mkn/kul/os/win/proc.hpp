@@ -41,8 +41,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <tchar.h>
 #include <algorithm>
 #include <concepts>
+#include <cstddef>
+#include <cwchar>
 #include <filesystem>
-#include <mutex>
 #include <sstream>
 #include <string>
 #include <utility>
@@ -220,7 +221,7 @@ class Process : public mkn::kul::AProcess {
     siStartInfo.cbReserved2 = 0;
     siStartInfo.lpReserved2 = NULL;
 
-    unsigned flags = 0;
+    unsigned flags = CREATE_UNICODE_ENVIRONMENT;
     HANDLE cons = CreateFile("CONOUT$", GENERIC_WRITE, FILE_SHARE_WRITE, NULL, OPEN_EXISTING,
                              FILE_ATTRIBUTE_NORMAL, NULL);
     if (cons == INVALID_HANDLE_VALUE) {
@@ -237,17 +238,53 @@ class Process : public mkn::kul::AProcess {
     expand(cmd);
     LPSTR szCmdline = _strdup(cmd.c_str());
 
-    {
-      // the child inherits this process's environment, set vars() in it for the duration of
-      //  CreateProcess: Windows then handles case insensitive names ("PATH" over "Path") and the
-      //  block's order. One lock for every start, so no other child sees vars meant for this one
-      static std::mutex mutex;
-      std::lock_guard<std::mutex> lock(mutex);
-      std::vector<std::pair<std::string, std::string>> const evs(vars().begin(), vars().end());
-      mkn::kul::env::PushEnv const pushed(evs);
-      bSuccess = CreateProcess(NULL, szCmdline, NULL, NULL, TRUE, flags, NULL, dir, &siStartInfo,
-                               &piProcInfo);
+    // the child's own environment block when vars() are set, this process's is not changed
+    std::wstring block;
+    if (vars().size()) {
+      auto const widen = [](std::string const& s) {
+        auto const n = MultiByteToWideChar(CP_ACP, 0, s.data(), static_cast<int>(s.size()), 0, 0);
+        std::wstring w(static_cast<std::size_t>(n), L'\0');
+        MultiByteToWideChar(CP_ACP, 0, s.data(), static_cast<int>(s.size()), w.data(), n);
+        return w;
+      };
+      // names are case insensitive, e.g. "PATH" replaces "Path"
+      auto const compare = [](std::wstring const& a, std::wstring const& b) {
+        return CompareStringOrdinal(a.data(), static_cast<int>(a.size()), b.data(),
+                                    static_cast<int>(b.size()), TRUE);
+      };
+
+      std::vector<std::pair<std::wstring, std::wstring>> env;
+      LPWCH const strings = GetEnvironmentStringsW();
+      if (!strings) error(__LINE__, "GetEnvironmentStringsW() failed");
+      for (LPWCH var = strings; *var; var += std::wcslen(var) + 1) {
+        std::wstring const entry(var);
+        // from 1: the per drive working directories are named like "=C:"
+        if (auto const eq = entry.find(L'=', 1); eq != std::wstring::npos)
+          env.emplace_back(entry.substr(0, eq), entry.substr(eq + 1));
+      }
+      FreeEnvironmentStringsW(strings);
+
+      for (auto const& ev : vars()) {
+        auto const name = widen(ev.first);
+        std::erase_if(env, [&](auto const& e) { return compare(e.first, name) == CSTR_EQUAL; });
+        env.emplace_back(name, widen(ev.second));
+      }
+      // CreateProcess expects the block sorted by name, case insensitively
+      std::ranges::stable_sort(env, [&](auto const& a, auto const& b) {
+        return compare(a.first, b.first) == CSTR_LESS_THAN;
+      });
+
+      for (auto const& [name, value] : env) {
+        block += name;
+        block += L'=';
+        block += value;
+        block.push_back(L'\0');
+      }
+      block.push_back(L'\0');  // the block ends with an empty entry
     }
+    bSuccess = CreateProcess(NULL, szCmdline, NULL, NULL, TRUE, flags,
+                             block.empty() ? NULL : static_cast<LPVOID>(block.data()), dir,
+                             &siStartInfo, &piProcInfo);
 
     if (!bSuccess)
       error(__LINE__, "CreateProcess failed with last error: " + std::to_string(GetLastError()));
