@@ -38,15 +38,26 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define MKN_KUL_PRAGMA(x) _Pragma(#x)
 #endif
 
-// MKN_KUL_FN_SIG: leads the signature of mkn.kul functions that can run on a device, empty unless
-//  defined before including mkn.kul, e.g. "__host__ __device__" from mkn.gpu
+// Leading the signatures of mkn.kul functions, each empty or [[nodiscard]] unless defined before
+//  including mkn.kul:
+//   MKN_KUL_FN_SIG / MKN_KUL_FN_SIG_RET: host functions, _RET for those whose return value is the
+//    point of calling them
+//   MKN_KUL_FN_SIG_ALL / MKN_KUL_FN_SIG_ALL_RET: functions that can also run on a device, mkn.gpu
+//    defines MKN_KUL_FN_SIG_ALL as "__host__ __device__"
 #if !defined(MKN_KUL_FN_SIG)
 #define MKN_KUL_FN_SIG
 #endif
 
-// MKN_KUL_FN_SIG_RET: MKN_KUL_FN_SIG for functions whose return value is the point of calling them
 #if !defined(MKN_KUL_FN_SIG_RET)
 #define MKN_KUL_FN_SIG_RET [[nodiscard]] MKN_KUL_FN_SIG
+#endif
+
+#if !defined(MKN_KUL_FN_SIG_ALL)
+#define MKN_KUL_FN_SIG_ALL MKN_KUL_FN_SIG
+#endif
+
+#if !defined(MKN_KUL_FN_SIG_ALL_RET)
+#define MKN_KUL_FN_SIG_ALL_RET [[nodiscard]] MKN_KUL_FN_SIG_ALL
 #endif
 
 #endif /* MKN_KUL_LANG_CPP_COMPILER_DEF_HPP_ */

@@ -49,22 +49,22 @@ template <typename T>
 inline constexpr bool dependent_false_v = false;
 
 template <typename T, typename... Ts>
-MKN_KUL_FN_SIG_RET auto constexpr all_are(Ts&&...) {
+MKN_KUL_FN_SIG_ALL_RET auto constexpr all_are(Ts&&...) {
   return ((std::is_same_v<T, std::decay_t<Ts>>) && ...);
 }
 
 template <typename T, typename... Ts>
-MKN_KUL_FN_SIG_RET auto constexpr any_are(Ts&&...) {
+MKN_KUL_FN_SIG_ALL_RET auto constexpr any_are(Ts&&...) {
   return ((std::is_same_v<T, std::decay_t<Ts>>) || ...);
 }
 
 template <typename... Ts>
-MKN_KUL_FN_SIG_RET auto constexpr is_any_of(auto const& t) {
+MKN_KUL_FN_SIG_ALL_RET auto constexpr is_any_of(auto const& t) {
   return ((std::is_same_v<Ts, std::decay_t<decltype(t)>>) || ...);
 }
 
 template <typename T, typename... Ts>
-MKN_KUL_FN_SIG_RET auto constexpr is_any_of() {
+MKN_KUL_FN_SIG_ALL_RET auto constexpr is_any_of() {
   return ((std::is_same_v<Ts, T>) || ...);
 }
 
@@ -99,7 +99,7 @@ struct aggregate_adapter : public T {
 
 // the object, whether given a pointer to it or the object
 template <typename Type>
-MKN_KUL_FN_SIG_RET auto& deref(Type&& type) {
+MKN_KUL_FN_SIG_ALL_RET auto& deref(Type&& type) {
   if constexpr (std::is_pointer_v<std::decay_t<Type>>)
     return *type;
   else

@@ -41,7 +41,7 @@ namespace mkn::kul {
 
 // throws Exception{args...}, in device code, which can't throw, it asserts instead
 template <typename Exception, typename... Args>
-MKN_KUL_FN_SIG inline void throw_exception([[maybe_unused]] Args&&... args) {
+MKN_KUL_FN_SIG_ALL inline void throw_exception([[maybe_unused]] Args&&... args) {
 #if defined(__CUDA_ARCH__) || defined(__HIP_DEVICE_COMPILE__)
   assert(false);
 #else
@@ -50,7 +50,7 @@ MKN_KUL_FN_SIG inline void throw_exception([[maybe_unused]] Args&&... args) {
 }
 
 template <typename T>
-MKN_KUL_FN_SIG inline void throw_runtime_error(T const& err) {
+MKN_KUL_FN_SIG_ALL inline void throw_runtime_error(T const& err) {
   throw_exception<std::runtime_error>(err);
 }
 

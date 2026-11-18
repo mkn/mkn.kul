@@ -39,7 +39,8 @@ namespace mkn::kul {
 
 // equality of a signed and an unsigned int without the conversion, a negative is never equal
 template <typename SignedInt, typename UnsignedInt>
-MKN_KUL_FN_SIG_RET constexpr bool diff_sign_int_equals(SignedInt const& i0, UnsignedInt const& i1) {
+MKN_KUL_FN_SIG_ALL_RET constexpr bool diff_sign_int_equals(SignedInt const& i0,
+                                                           UnsignedInt const& i1) {
   static_assert(std::is_unsigned_v<UnsignedInt>);
   static_assert(std::is_signed_v<SignedInt>);
   static_assert(sizeof(UnsignedInt) >= sizeof(SignedInt), "Bad int comparison!");
@@ -49,7 +50,7 @@ MKN_KUL_FN_SIG_RET constexpr bool diff_sign_int_equals(SignedInt const& i0, Unsi
 
 // equality of ints of any signedness, see diff_sign_int_equals
 template <typename Int0, typename Int1>
-MKN_KUL_FN_SIG_RET constexpr bool int_equals(Int0 const& i0, Int1 const& i1) {
+MKN_KUL_FN_SIG_ALL_RET constexpr bool int_equals(Int0 const& i0, Int1 const& i1) {
   if constexpr (std::is_unsigned_v<Int0> == std::is_unsigned_v<Int1>)
     return i0 == i1;
   else if constexpr (std::is_unsigned_v<Int0>)

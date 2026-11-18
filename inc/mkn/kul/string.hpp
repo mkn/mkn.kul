@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define MKN_KUL_STRING_HPP_
 
 #include "mkn/kul/except.hpp"
+#include "mkn/kul/lang/cpp/compiler/def.hpp"
 
 #include <cctype>
 #include <cerrno>
@@ -348,7 +349,7 @@ inline auto to_string(auto const& v) {
 
 // value in fixed notation with len decimals
 template <typename T>
-[[nodiscard]] std::string to_string_with_precision(T const& value, std::size_t const len) {
+MKN_KUL_FN_SIG_RET std::string to_string_with_precision(T const& value, std::size_t const len) {
   std::ostringstream out;
   out.precision(len);
   out << std::fixed << value;
@@ -357,8 +358,8 @@ template <typename T>
 
 // value in fixed notation with precision decimals, padded on the left with fill to width
 template <typename T>
-[[nodiscard]] auto to_string_fixed_width(T const& value, std::size_t const& precision,
-                                         std::size_t const& width, char const& fill = '0') {
+MKN_KUL_FN_SIG_RET auto to_string_fixed_width(T const& value, std::size_t const& precision,
+                                              std::size_t const& width, char const& fill = '0') {
   std::ostringstream out;
   out.width(width);
   out.precision(precision);
@@ -368,7 +369,7 @@ template <typename T>
 
 // T as operator>> reads it from s, throws if it can't
 template <typename T>
-[[nodiscard]] T from_string(std::string const& s) {
+MKN_KUL_FN_SIG_RET T from_string(std::string const& s) {
   T t;
   std::stringstream ss(s);
   ss >> t;

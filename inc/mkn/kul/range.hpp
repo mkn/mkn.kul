@@ -55,34 +55,34 @@ class Range {
     using difference_type = std::ptrdiff_t;
     using iterator_category = std::forward_iterator_tag;
 
-    MKN_KUL_FN_SIG constexpr iterator() = default;
-    MKN_KUL_FN_SIG constexpr explicit iterator(T const v) : v_{v} {}
+    constexpr iterator() = default;
+    MKN_KUL_FN_SIG_ALL constexpr explicit iterator(T const v) : v_{v} {}
 
-    MKN_KUL_FN_SIG constexpr T operator*() const { return v_; }
-    MKN_KUL_FN_SIG constexpr iterator& operator++() {
+    MKN_KUL_FN_SIG_ALL constexpr T operator*() const { return v_; }
+    MKN_KUL_FN_SIG_ALL constexpr iterator& operator++() {
       ++v_;
       return *this;
     }
-    MKN_KUL_FN_SIG constexpr iterator operator++(int) {
+    MKN_KUL_FN_SIG_ALL constexpr iterator operator++(int) {
       auto const copy = *this;
       ++v_;
       return copy;
     }
-    MKN_KUL_FN_SIG constexpr bool operator==(iterator const&) const = default;
+    constexpr bool operator==(iterator const&) const = default;
 
    private:
     T v_{};
   };
 
-  MKN_KUL_FN_SIG constexpr Range(T const start, T const stop)
+  MKN_KUL_FN_SIG_ALL constexpr Range(T const start, T const stop)
       : start_{start}, stop_{stop < start ? start : stop} {}
 
-  MKN_KUL_FN_SIG constexpr iterator begin() const { return iterator{start_}; }
-  MKN_KUL_FN_SIG constexpr iterator end() const { return iterator{stop_}; }
-  MKN_KUL_FN_SIG constexpr std::size_t size() const {
+  MKN_KUL_FN_SIG_ALL constexpr iterator begin() const { return iterator{start_}; }
+  MKN_KUL_FN_SIG_ALL constexpr iterator end() const { return iterator{stop_}; }
+  MKN_KUL_FN_SIG_ALL constexpr std::size_t size() const {
     return static_cast<std::size_t>(stop_ - start_);
   }
-  MKN_KUL_FN_SIG constexpr bool empty() const { return start_ == stop_; }
+  MKN_KUL_FN_SIG_ALL constexpr bool empty() const { return start_ == stop_; }
 
  private:
   T start_, stop_;
@@ -91,13 +91,13 @@ class Range {
 // T is not deduced from the arguments, so range(10) is std::size_t, range<int>(10) is int.
 //  std::size_t by default: 32-bit indices can stop loops autovectorizing
 template <std::integral T = std::size_t>
-MKN_KUL_FN_SIG_RET constexpr auto range(std::type_identity_t<T> const stop) {
+MKN_KUL_FN_SIG_ALL_RET constexpr auto range(std::type_identity_t<T> const stop) {
   return Range<T>{T{0}, stop};
 }
 
 template <std::integral T = std::size_t>
-MKN_KUL_FN_SIG_RET constexpr auto range(std::type_identity_t<T> const start,
-                                        std::type_identity_t<T> const stop) {
+MKN_KUL_FN_SIG_ALL_RET constexpr auto range(std::type_identity_t<T> const start,
+                                            std::type_identity_t<T> const stop) {
   return Range<T>{start, stop};
 }
 
@@ -115,7 +115,7 @@ class Enumerate {
  public:
   class sentinel {
    public:
-    MKN_KUL_FN_SIG constexpr explicit sentinel(base_sentinel e) : end_{e} {}
+    MKN_KUL_FN_SIG_ALL constexpr explicit sentinel(base_sentinel e) : end_{e} {}
 
    private:
     friend class Enumerate;
@@ -128,31 +128,33 @@ class Enumerate {
     using value_type = std::tuple<Index, reference>;
     using difference_type = std::ptrdiff_t;
 
-    MKN_KUL_FN_SIG constexpr iterator(Index const i, base_iterator it) : i_{i}, it_{it} {}
+    MKN_KUL_FN_SIG_ALL constexpr iterator(Index const i, base_iterator it) : i_{i}, it_{it} {}
 
-    MKN_KUL_FN_SIG constexpr value_type operator*() const { return value_type{i_, *it_}; }
-    MKN_KUL_FN_SIG constexpr iterator& operator++() {
+    MKN_KUL_FN_SIG_ALL constexpr value_type operator*() const { return value_type{i_, *it_}; }
+    MKN_KUL_FN_SIG_ALL constexpr iterator& operator++() {
       ++i_;
       ++it_;
       return *this;
     }
-    MKN_KUL_FN_SIG constexpr iterator operator++(int) {
+    MKN_KUL_FN_SIG_ALL constexpr iterator operator++(int) {
       auto const copy = *this;
       ++*this;
       return copy;
     }
-    MKN_KUL_FN_SIG constexpr bool operator==(sentinel const& s) const { return it_ == s.end_; }
+    MKN_KUL_FN_SIG_ALL constexpr bool operator==(sentinel const& s) const { return it_ == s.end_; }
 
    private:
     Index i_;
     base_iterator it_;
   };
 
-  MKN_KUL_FN_SIG constexpr explicit Enumerate(Container&& c)
+  MKN_KUL_FN_SIG_ALL constexpr explicit Enumerate(Container&& c)
       : container_{std::forward<Container>(c)} {}
 
-  MKN_KUL_FN_SIG constexpr iterator begin() { return iterator{Index{0}, std::cbegin(container_)}; }
-  MKN_KUL_FN_SIG constexpr sentinel end() { return sentinel{std::cend(container_)}; }
+  MKN_KUL_FN_SIG_ALL constexpr iterator begin() {
+    return iterator{Index{0}, std::cbegin(container_)};
+  }
+  MKN_KUL_FN_SIG_ALL constexpr sentinel end() { return sentinel{std::cend(container_)}; }
 
  private:
   Container container_;  // a reference for an lvalue, the moved container for a temporary
@@ -160,7 +162,7 @@ class Enumerate {
 
 // Index is not deduced from the container, enumerate(v) counts in std::size_t, as range
 template <std::integral Index = std::size_t, typename Container>
-MKN_KUL_FN_SIG_RET constexpr auto enumerate(Container&& container) {
+MKN_KUL_FN_SIG_ALL_RET constexpr auto enumerate(Container&& container) {
   return Enumerate<Container, Index>{std::forward<Container>(container)};
 }
 

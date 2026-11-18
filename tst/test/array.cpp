@@ -1,6 +1,7 @@
 #include "test_common.hpp"
 
-#include "mkn/kul/array.hpp"
+#include "mkn/kul/std/array.hpp"
+#include "mkn/kul/std/vector.hpp"
 #include "mkn/kul/random.hpp"
 #include "mkn/kul/throw.hpp"
 

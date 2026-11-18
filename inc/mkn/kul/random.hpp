@@ -54,7 +54,7 @@ inline constexpr std::uint64_t golden_gamma = 0x9e3779b97f4a7c15ULL;
 //  different inputs never collide. mix(0) == 0, which is why callers add golden_gamma first.
 //  D. Stafford's "Mix13" variant of the MurmurHash3 64-bit finalizer, as in Java's
 //  SplittableRandom and S. Vigna's splitmix64.c
-MKN_KUL_FN_SIG_RET constexpr std::uint64_t splitmix64_mix(std::uint64_t z) {
+MKN_KUL_FN_SIG_ALL_RET constexpr std::uint64_t splitmix64_mix(std::uint64_t z) {
   z = (z ^ (z >> 30)) * 0xbf58476d1ce4e5b9ULL;
   z = (z ^ (z >> 27)) * 0x94d049bb133111ebULL;
   return z ^ (z >> 31);
@@ -65,14 +65,14 @@ MKN_KUL_FN_SIG_RET constexpr std::uint64_t splitmix64_mix(std::uint64_t z) {
 //  order matters, (3, 7) and (7, 3) give different keys. For a fixed key two different values
 //  never give the same result (each step is bijective), any other coincidence is about 2^-64.
 //  value is mixed before the xor so small values don't only flip a few low bits of the key
-MKN_KUL_FN_SIG_RET constexpr std::uint64_t hash_combine(std::uint64_t const key,
-                                                        std::uint64_t const value) {
+MKN_KUL_FN_SIG_ALL_RET constexpr std::uint64_t hash_combine(std::uint64_t const key,
+                                                            std::uint64_t const value) {
   return splitmix64_mix(key ^ splitmix64_mix(value + golden_gamma));
 }
 
 // FNV-1a 64-bit hash of a string. Unlike std::hash it's fixed by its definition, the same in
 //  every execution and standard library. Not a strong hash: feed it through hash_combine
-MKN_KUL_FN_SIG_RET constexpr std::uint64_t fnv1a64(std::string_view const str) {
+MKN_KUL_FN_SIG_ALL_RET constexpr std::uint64_t fnv1a64(std::string_view const str) {
   std::uint64_t hash = 0xcbf29ce484222325ULL;  // FNV-1a 64-bit offset basis
   for (char const c : str) {
     hash ^= static_cast<std::uint8_t>(c);
@@ -94,16 +94,16 @@ class SplitMix64 {
  public:
   using result_type = std::uint64_t;
 
-  MKN_KUL_FN_SIG constexpr explicit SplitMix64(std::uint64_t const seed) : state_{seed} {}
+  MKN_KUL_FN_SIG_ALL constexpr explicit SplitMix64(std::uint64_t const seed) : state_{seed} {}
 
-  MKN_KUL_FN_SIG_RET static constexpr result_type(min)() {
+  MKN_KUL_FN_SIG_ALL_RET static constexpr result_type(min)() {
     return (std::numeric_limits<result_type>::min)();
   }
-  MKN_KUL_FN_SIG_RET static constexpr result_type(max)() {
+  MKN_KUL_FN_SIG_ALL_RET static constexpr result_type(max)() {
     return (std::numeric_limits<result_type>::max)();
   }
 
-  MKN_KUL_FN_SIG constexpr result_type operator()() {
+  MKN_KUL_FN_SIG_ALL constexpr result_type operator()() {
     state_ += golden_gamma;
     return splitmix64_mix(state_);
   }

@@ -60,9 +60,11 @@ auto constexpr all(auto... bools)
 }
 
 // a equals every / any of ts
-MKN_KUL_FN_SIG_RET auto constexpr all_in(auto const a, auto&&... ts) { return ((a == ts) && ...); }
+MKN_KUL_FN_SIG_ALL_RET auto constexpr all_in(auto const a, auto&&... ts) {
+  return ((a == ts) && ...);
+}
 
-MKN_KUL_FN_SIG_RET auto constexpr any_in([[maybe_unused]] auto const a, auto&&... ts) {
+MKN_KUL_FN_SIG_ALL_RET auto constexpr any_in([[maybe_unused]] auto const a, auto&&... ts) {
   return ((a == ts) || ...);
 }
 
@@ -104,7 +106,7 @@ constexpr auto apply_N(Apply&& f) {
 }
 
 template <std::uint16_t N, typename Fn>
-MKN_KUL_FN_SIG constexpr decltype(auto) for_N_fold(Fn&& fn) {
+MKN_KUL_FN_SIG_ALL constexpr decltype(auto) for_N_fold(Fn&& fn) {
   /*  // how to use: fn gets every index at once, as a pack
       for_N_fold<3>([&](auto... ics) { return array(idx[ics]...); });
   */
@@ -121,7 +123,7 @@ enum class for_N_R_mode {
 };
 
 template <std::uint16_t N, auto M = for_N_R_mode::make_tuple, typename Fn>
-MKN_KUL_FN_SIG constexpr auto for_N(Fn&& fn) {
+MKN_KUL_FN_SIG_ALL constexpr auto for_N(Fn&& fn) {
   /*  // how to use
       for_N<2>([](auto ic) {
           constexpr auto i = ic();
@@ -149,17 +151,17 @@ MKN_KUL_FN_SIG constexpr auto for_N(Fn&& fn) {
 }
 
 template <std::uint16_t N, typename Fn>
-MKN_KUL_FN_SIG_RET constexpr auto for_N_make_array(Fn&& fn) {
+MKN_KUL_FN_SIG_ALL_RET constexpr auto for_N_make_array(Fn&& fn) {
   return for_N<N, for_N_R_mode::make_array>(fn);
 }
 
 template <std::uint16_t N, typename Fn>
-MKN_KUL_FN_SIG_RET constexpr auto for_N_all(Fn&& fn) {
+MKN_KUL_FN_SIG_ALL_RET constexpr auto for_N_all(Fn&& fn) {
   return all(for_N<N, for_N_R_mode::make_array>(fn));
 }
 
 template <std::uint16_t N, typename Fn>
-MKN_KUL_FN_SIG_RET constexpr auto for_N_any(Fn&& fn) {
+MKN_KUL_FN_SIG_ALL_RET constexpr auto for_N_any(Fn&& fn) {
   return any(for_N<N, for_N_R_mode::make_array>(fn));
 }
 

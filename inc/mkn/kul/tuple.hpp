@@ -102,7 +102,7 @@ constexpr auto tuple_from(T t) {
 
 // func(element) for each element of tuple
 template <typename Tuple, typename Func>
-MKN_KUL_FN_SIG void apply(Tuple tuple, Func func) {
+MKN_KUL_FN_SIG_ALL void apply(Tuple tuple, Func func) {
   std::apply([&](auto&... args) { (func(args), ...); }, tuple);
 }
 

@@ -58,27 +58,27 @@ struct StridedSpan {
   std::size_t n = 0;
   std::size_t stride = sizeof(T);  // bytes
 
-  MKN_KUL_FN_SIG_RET std::size_t size() const { return n; }
-  MKN_KUL_FN_SIG_RET T* data() const { return ptr; }
-  MKN_KUL_FN_SIG_RET bool contiguous() const { return stride == sizeof(T); }
-  MKN_KUL_FN_SIG_RET std::size_t stride_values() const { return stride / sizeof(T); }
+  MKN_KUL_FN_SIG_ALL_RET std::size_t size() const { return n; }
+  MKN_KUL_FN_SIG_ALL_RET T* data() const { return ptr; }
+  MKN_KUL_FN_SIG_ALL_RET bool contiguous() const { return stride == sizeof(T); }
+  MKN_KUL_FN_SIG_ALL_RET std::size_t stride_values() const { return stride / sizeof(T); }
 
   // the same values, read only (as std::span<T> to std::span<T const>)
-  MKN_KUL_FN_SIG operator StridedSpan<T const>() const
+  MKN_KUL_FN_SIG_ALL operator StridedSpan<T const>() const
     requires(!std::is_const_v<T>)
   {
     return {ptr, n, stride};
   }
 
-  MKN_KUL_FN_SIG_RET T& operator[](std::size_t const i) const {
+  MKN_KUL_FN_SIG_ALL_RET T& operator[](std::size_t const i) const {
     return *reinterpret_cast<T*>(reinterpret_cast<byte_type*>(ptr) + i * stride);
   }
 };
 
 // n values from first, stride bytes apart: a whole number of T
 template <typename T>
-[[nodiscard]] StridedSpan<T> strided_span(T* const first, std::size_t const n,
-                                          std::size_t const stride) {
+MKN_KUL_FN_SIG_RET StridedSpan<T> strided_span(T* const first, std::size_t const n,
+                                               std::size_t const stride) {
   if (stride < sizeof(T) or stride % sizeof(T) != 0)
     throw std::runtime_error("mkn::kul::strided_span: stride not a whole number of values");
   return {first, n, stride};

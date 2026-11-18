@@ -78,7 +78,7 @@ T root(Float_t const& f, Int16_t const& r = 2, Int16_t const& it = 6, T g = 0) {
 }
 
 template <typename Container, typename Multiplies = typename Container::value_type>
-MKN_KUL_FN_SIG_RET Multiplies product(Container const& container, Multiplies mul = 1) {
+MKN_KUL_FN_SIG_ALL_RET Multiplies product(Container const& container, Multiplies mul = 1) {
   for (auto const& v : container) mul *= v;  // no std::accumulate in device code
   return mul;
 }
@@ -89,13 +89,13 @@ Return sum(Container const& container, Return r = 0) {
 }
 
 template <typename T>
-[[nodiscard]] T norm(std::array<T, 3> const& vec) {
+MKN_KUL_FN_SIG_RET T norm(std::array<T, 3> const& vec) {
   return std::sqrt(std::inner_product(std::begin(vec), std::end(vec), std::begin(vec), T{0}));
 }
 
 // sum of fn(element)
 template <typename Container, typename F>
-[[nodiscard]] auto sum_from(Container&& container, F fn) {
+MKN_KUL_FN_SIG_RET auto sum_from(Container&& container, F fn) {
   using value_type = typename std::decay_t<Container>::value_type;
   using return_type = std::decay_t<std::invoke_result_t<F const&, value_type const&>>;
   return_type sum = 0;
@@ -107,7 +107,7 @@ auto constexpr static accessor = [](auto const& v, auto const& i) -> auto& { ret
 
 // largest fn(container, i), container[i] by default
 template <typename Container, typename Fn = decltype(accessor)>
-[[nodiscard]] auto constexpr max_from(Container const& container, Fn fn = accessor) {
+MKN_KUL_FN_SIG_RET auto constexpr max_from(Container const& container, Fn fn = accessor) {
   assert(container.size());
   auto t = fn(container, 0);
   for (std::size_t i = 1; i < container.size(); ++i)
@@ -117,7 +117,7 @@ template <typename Container, typename Fn = decltype(accessor)>
 
 // smallest fn(container, i), container[i] by default
 template <typename Container, typename Fn = decltype(accessor)>
-[[nodiscard]] auto constexpr min_from(Container const& container, Fn fn = accessor) {
+MKN_KUL_FN_SIG_RET auto constexpr min_from(Container const& container, Fn fn = accessor) {
   assert(container.size());
   auto t = fn(container, 0);
   for (std::size_t i = 1; i < container.size(); ++i)

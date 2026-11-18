@@ -1,4 +1,4 @@
-name: format
+name: gates
 
 # pull request gates, as damn's: changed C++ lines follow .clang-format, applying iwyu's
 #  suggestions changes nothing, .clang-tidy's checks on changed lines (warning only)
