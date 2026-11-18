@@ -40,7 +40,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "mkn/kul/log.hpp"
 #include "mkn/kul/except.hpp"
-#include "mkn/kul/os.hpp"
 #include "mkn/kul/os/nixish/proc.hpp"
 
 #include <fcntl.h>
@@ -48,8 +47,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <unistd.h>
 #include <stdint.h>
 #include <string.h>
+#include <filesystem>
 #include <sstream>
 #include <string>
+#include <system_error>
 
 #define BUFSIZE 512
 
@@ -80,11 +81,12 @@ class IPCCall {
 class Server : public IPCCall {
  private:
   int16_t lp;
-  mkn::kul::File const uuid;
+  std::filesystem::path const uuid;
 
   void start() KTHROW(Exception) {
-    uuid.dir().mk();
-    mkfifo(uuid.full().c_str(), 0666);
+    std::error_code ec;
+    std::filesystem::create_directories(uuid.parent_path(), ec);
+    mkfifo(uuid.c_str(), 0666);
   }
 
  protected:
@@ -97,7 +99,7 @@ class Server : public IPCCall {
     char buff[BUFSIZE];
     while (lp) {
       memset(buff, 0, BUFSIZE);
-      fd = open(uuid.full().c_str(), O_RDONLY);
+      fd = open(uuid.c_str(), O_RDONLY);
       if (fd == -1) KEXCEPT(mkn::kul::ipc::Exception, "Cannot open FIFO for read");
       int16_t l;
       read(fd, buff, 3);
@@ -112,33 +114,34 @@ class Server : public IPCCall {
   }
   Server(int16_t const& _lp = -1) KTHROW(Exception)
       : lp(_lp),
-        uuid(std::to_string(mkn::kul::this_proc::id()),
-             Dir(MKN_KUL_IPC_UUID_PREFIX + std::string("/pid/"))) {
+        uuid(std::filesystem::path(MKN_KUL_IPC_UUID_PREFIX) / "pid" /
+             std::to_string(mkn::kul::this_proc::id())) {
     start();
   }
   Server(std::string const& ui, int16_t const& _lp = -1) KTHROW(Exception)
-      : lp(_lp), uuid(ui, Dir(MKN_KUL_IPC_UUID_PREFIX)) {
+      : lp(_lp), uuid(std::filesystem::path(MKN_KUL_IPC_UUID_PREFIX) / ui) {
     start();
   }
 };
 
 class Client : public IPCCall {
  private:
-  mkn::kul::File const uuid;
+  std::filesystem::path const uuid;
 
   void start() KTHROW(Exception) {
-    fd = open(uuid.full().c_str(), O_WRONLY);
+    fd = open(uuid.c_str(), O_WRONLY);
     if (fd == -1) KEXCEPT(mkn::kul::ipc::Exception, "Cannot contact server");
   }
   void stop() const KTHROW(Exception) { close(fd); }
 
  public:
   virtual ~Client() { stop(); }
-  Client(std::string const& ui) KTHROW(Exception) : uuid(ui, Dir(MKN_KUL_IPC_UUID_PREFIX)) {
+  Client(std::string const& ui) KTHROW(Exception)
+      : uuid(std::filesystem::path(MKN_KUL_IPC_UUID_PREFIX) / ui) {
     start();
   }
   Client(int16_t const& pid) KTHROW(Exception)
-      : uuid(std::to_string(pid), Dir(MKN_KUL_IPC_UUID_PREFIX + std::string("/pid/"))) {
+      : uuid(std::filesystem::path(MKN_KUL_IPC_UUID_PREFIX) / "pid" / std::to_string(pid)) {
     start();
   }
   virtual void send(std::string const& m) const KTHROW(Exception) {

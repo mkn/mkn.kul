@@ -42,6 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cstddef>
 #include <exception>
+#include <filesystem>
 #include <string>
 #include <unordered_map>
 #include <utility>
@@ -142,8 +143,7 @@ class WINCompiler : public CCompiler {
     for (auto const& d : dao.stars) dirs.insert(d.real());
 
     std::string exe = out + ".exe";
-    mkn::kul::File out_file(exe);
-    out_file.dir().mk();
+    mkOutDir(exe);
 
     std::string cmd = LD(linker);
     std::vector<std::string> bits;
@@ -153,11 +153,11 @@ class WINCompiler : public CCompiler {
     }
     mkn::kul::Process p(cmd);
     for (unsigned int i = 1; i < bits.size(); i++) p.arg(bits[i]);
-    p.arg("-OUT:\"" + out_file.escm() + "\"").arg("-nologo");
+    p.arg("-OUT:\"" + mkn::kul::fsys::escm(exe) + "\"").arg("-nologo");
     for (std::string const& path : libPaths) p.arg("-LIBPATH:\"" + path + "\"");
     for (std::string const& d : dirs)
       for (auto const& o : objectFiles(env.compilationInfo, d)) p.arg(o);
-    for (std::string const& o : objects) p << mkn::kul::File(o).escm();
+    for (std::string const& o : objects) p << mkn::kul::fsys::escm(o);
     for (std::string const& lib : libs) p.arg(staticLib(lib));
     for (std::string const& s : mkn::kul::cli::asArgs(linkerEnd)) p.arg(s);
 
@@ -179,13 +179,14 @@ class WINCompiler : public CCompiler {
     auto &linker = dao.linker, &linkerEnd = dao.linkerEnd;
     auto& mode = dao.mode;
 
-    mkn::kul::File out(dao.out);
+    auto const out_dir = outDir(dao.out);
+    auto const out_name = std::filesystem::path(dao.out).filename().string();
     mkn::kul::hash::set::String dirs;
     for (auto const& d : dao.stars) dirs.insert(d.real());
 
-    std::string lib = out.dir().join(staticLib(out.name()));
-    if (mode == Mode::SHAR) lib = out.dir().join(libName(env.compilationInfo, out.name()));
-    std::string imp = out.dir().join(staticLib(out.name()));
+    std::string lib = (out_dir / staticLib(out_name)).string();
+    if (mode == Mode::SHAR) lib = (out_dir / libName(env.compilationInfo, out_name)).string();
+    std::string const imp = (out_dir / staticLib(out_name)).string();
 
     std::string cmd = linker;
     if (mode == Mode::SHAR) cmd = LD(linker);
@@ -196,23 +197,21 @@ class WINCompiler : public CCompiler {
     }
     mkn::kul::Process p(cmd);
 
-    auto out_file = mkn::kul::File{lib};
-    out_file.dir().mk();
-    auto imp_file = mkn::kul::File{imp};
-    imp_file.dir().mk();
+    mkOutDir(lib);
+    mkOutDir(imp);
 
     for (unsigned int i = 1; i < bits.size(); i++) p.arg(bits[i]);
     p.arg("-nologo");
     if (mode == Mode::STAT) p.arg("-LTCG");
-    p.arg("-OUT:\"" + out_file.escm() + "\"");
+    p.arg("-OUT:\"" + mkn::kul::fsys::escm(lib) + "\"");
     if (mode == Mode::SHAR) {
-      p.arg("-IMPLIB:\"" + imp_file.escm() + "\"").arg("-DLL");
+      p.arg("-IMPLIB:\"" + mkn::kul::fsys::escm(imp) + "\"").arg("-DLL");
       for (std::string const& path : libPaths) p.arg("-LIBPATH:\"" + path + "\"");
       for (std::string const& lib : libs) p.arg(staticLib(lib));
     }
     for (std::string const& d : dirs)
       for (auto const& o : objectFiles(env.compilationInfo, d)) p.arg(o);
-    for (std::string const& o : objects) p << mkn::kul::File(o).escm();
+    for (std::string const& o : objects) p << mkn::kul::fsys::escm(o);
     for (std::string const& s : mkn::kul::cli::asArgs(linkerEnd)) p.arg(s);
 
     ProcessCapture pc(p);

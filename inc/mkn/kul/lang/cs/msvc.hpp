@@ -36,8 +36,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "mkn/kul/except.hpp"
 #include "mkn/kul/os.hpp"
 #include "mkn/kul/proc.hpp"
+#include "mkn/kul/env.hpp"
 
 #include <exception>
+#include <filesystem>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -116,8 +118,10 @@ class WINCompiler : public Compiler {
     auto& dryRun = dao.dryRun;
     auto &linker = dao.linker, &linkerEnd = dao.linkerEnd;
 
-    mkn::kul::File out(dao.out);
-    std::string dll = out.full() + ".dll";
+    auto dir = std::filesystem::path(dao.out).parent_path();  // the working directory if none
+    if (dir.empty()) dir = mkn::kul::env::CWD();
+    std::string dll =
+        mkn::kul::fsys::locl((dir / std::filesystem::path(dao.out).filename()).string()) + ".dll";
     std::string cmd = linker;
     std::vector<std::string> bits;
     if (linker.find(" ") != std::string::npos) {
