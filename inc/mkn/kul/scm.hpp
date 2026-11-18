@@ -43,6 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cstdint>
 #include <filesystem>
 #include <string>
+#include <system_error>
 #include <typeinfo>
 #include <vector>
 
@@ -131,7 +132,10 @@ class Git : public SCM {
 
   std::string co(std::string const& d, std::string const& r, std::string const& v) const
       KTHROW(Exception) override {
-    Dir dr(d, true);
+    std::error_code ec;
+    std::filesystem::create_directories(d, ec);
+    if (!std::filesystem::is_directory(d, ec))
+      KEXCEPT(Exception, "SCM ERROR - could not create directory: " + d);
     mkn::kul::Process p("git");
     std::string const defaults = "--depth 10 --recursive --shallow-submodules";
     p << "clone" << mkn::kul::env::GET("MKN_KUL_GIT_CO", defaults) << r;
@@ -139,14 +143,14 @@ class Git : public SCM {
     try {
       p.arg(d).start();
     } catch (mkn::kul::proc::ExitException const& e) {
-      dr.rm();
+      std::filesystem::remove_all(d, ec);
       KEXCEPT(Exception, "SCM ERROR - Check remote dependency location / version");
     }
     return p.toString();
   }
   void up(std::string const& d, std::string const& r, std::string const& v) const
       KTHROW(Exception) override {
-    if (!Dir(d).is())
+    if (std::error_code ec; !std::filesystem::is_directory(d, ec))
       co(d, r, v);
     else {
       mkn::kul::Process p("git", d);

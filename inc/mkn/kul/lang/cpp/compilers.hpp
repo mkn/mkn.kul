@@ -46,6 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cstddef>
 #include <cctype>
+#include <filesystem>
 #include <memory>
 #include <exception>
 #include <string>
@@ -186,8 +187,9 @@ class Compilers {
     mkn::kul::String::REPLACE_ALL(token, ".exe", "");
     if (map.count(token) > 0) return token;
 
-    if (std::string(mkn::kul::Dir(token).locl()).find(mkn::kul::Dir::SEP()) != std::string::npos) {
-      std::string const base = token.substr(token.rfind(mkn::kul::Dir::SEP()) + 1);
+    auto constexpr sep = static_cast<char>(std::filesystem::path::preferred_separator);
+    if (mkn::kul::fsys::locl(token).find(sep) != std::string::npos) {
+      std::string const base = token.substr(token.rfind(sep) + 1);
       if (map.count(base) > 0) return base;
       token = base;
     }
@@ -249,7 +251,7 @@ inline ProcessCapture GccCompiler::buildExecutable(LinkDAO& dao) const KTHROW(mk
 
   std::string exe = out;
   if (MKN_KUL_STR(MKN_KUL_OS) == std::string("win")) exe += ".exe";
-  mkn::kul::File(exe).dir().mk();
+  mkOutDir(exe);
 
   ProcessCapture pc;
   try {
@@ -262,13 +264,12 @@ inline ProcessCapture GccCompiler::buildExecutable(LinkDAO& dao) const KTHROW(mk
     for (std::string const& path : libPaths) p.arg("-L" + path);
     if (mode == Mode::STAT) p.arg("-static");
     if (env.compilationInfo.rpathing && (mode == Mode::SHAR || mode == Mode::NONE)) {
-      mkn::kul::File file(exe);
-      rpathing(p, file, libs, libPaths);
+      rpathing(p, exe, libs, libPaths);
     }
     p.arg("-o").arg(exe);
     for (std::string const& d : dirs)
       for (auto const& o : objectFiles(env.compilationInfo, d)) p.arg(o);
-    for (std::string const& o : objects) p << mkn::kul::File(o).escm();
+    for (std::string const& o : objects) p << mkn::kul::fsys::escm(o);
     for (std::string const& lib : libs) p.arg(linkArg(lib));
     for (std::string const& s : mkn::kul::cli::asArgs(linkerEnd)) p << s;
 
@@ -289,17 +290,18 @@ inline ProcessCapture GccCompiler::buildLibrary(LinkDAO& dao) const KTHROW(mkn::
   auto &linker = dao.linker, &linkerEnd = dao.linkerEnd;
   auto& mode = dao.mode;
 
-  mkn::kul::File out(dao.out);
+  auto const& out = dao.out;
+  auto const out_dir = outDir(out);
+  auto const out_name = std::filesystem::path(out).filename().string();
 
   mkn::kul::hash::set::String dirs;
   for (auto const& d : dao.stars) dirs.insert(d.real());
 
-  std::string lib = out.dir().join(libName(env.compilationInfo, out.name()));
-  if (mode == Mode::STAT) lib = out.dir().join(staticLib(out.name()));
-
-  mkn::kul::File out_file(lib);
-  out_file.dir().mk();
-  lib = out_file.esc();
+  auto const lib_file = (out_dir / (mode == Mode::STAT ? staticLib(out_name)
+                                                       : libName(env.compilationInfo, out_name)))
+                            .string();
+  mkOutDir(lib_file);
+  std::string const lib = mkn::kul::fsys::esc(lib_file);
 
   ProcessCapture pc;
   try {
@@ -313,18 +315,19 @@ inline ProcessCapture GccCompiler::buildLibrary(LinkDAO& dao) const KTHROW(mkn::
     p.arg(lib);
 #if !defined(__APPLE__)
     if (mode == Mode::SHAR && !linkableByName(env.compilationInfo))
-      p.arg(linkerOption("-soname," + out_file.name()));
+      p.arg(linkerOption("-soname," + std::filesystem::path(lib_file).filename().string()));
 #endif
     for (std::string const& d : dirs)
       for (auto const& o : objectFiles(env.compilationInfo, d)) p.arg(o);
-    for (std::string const& o : objects) p << mkn::kul::File(o).escm();
+    for (std::string const& o : objects) p << mkn::kul::fsys::escm(o);
 
     if (mode == Mode::SHAR) {
       for (std::string const& path : libPaths) p.arg("-L" + path);
       for (std::string const& lib : libs) p.arg(linkArg(lib));
       if (env.compilationInfo.rpathing) rpathing(p, out, libs, libPaths);
 #if defined(__APPLE__)
-      p << linkerOption("-install_name,@rpath/" + mkn::kul::File(lib).name());
+      p << linkerOption("-install_name,@rpath/" +
+                        std::filesystem::path(lib_file).filename().string());
 #endif
     }
     for (std::string const& s : mkn::kul::cli::asArgs(linkerEnd)) p.arg(s);

@@ -42,6 +42,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <algorithm>
 #include <array>
 #include <cstdint>
+#include <filesystem>
+#include <system_error>
 #include <unordered_set>
 #include <initializer_list>
 #include <string>
@@ -76,15 +78,28 @@ class CCompiler : public Compiler {
     return info.lib_prefix + lib + info.lib_ext;
   }
   static std::string oType(CompilationInfo const& info) { return info.obj_ext; }
+  // the directory of a link output, the working directory if out names none
+  static std::filesystem::path outDir(std::string const& out) {
+    auto const dir = std::filesystem::path(out).parent_path();
+    return dir.empty() ? std::filesystem::path(mkn::kul::env::CWD()) : dir;
+  }
+  // creates the directory of a link output
+  static void mkOutDir(std::string const& out) {
+    std::error_code ec;
+    std::filesystem::create_directories(outDir(out), ec);
+  }
   // the object files in dir, sorted: processes start without a shell, so a "*.o" would not be
   //  expanded
   static std::vector<std::string> objectFiles(CompilationInfo const& info, std::string const& dir) {
     std::vector<std::string> objs;
-    mkn::kul::Dir const d(dir);
-    if (!d) return objs;
+    std::error_code ec;
+    if (!std::filesystem::is_directory(dir, ec)) return objs;
     std::string const ext = "." + info.obj_ext;
-    for (auto const& f : d.files())
-      if (f.name().size() > ext.size() && f.name().ends_with(ext)) objs.emplace_back(f.escm());
+    for (auto const& f : mkn::kul::fsys::files(dir)) {
+      auto const name = f.filename().string();
+      if (name.size() > ext.size() && name.ends_with(ext))
+        objs.emplace_back(mkn::kul::fsys::escm(f));
+    }
     std::sort(objs.begin(), objs.end());
     return objs;
   }
@@ -214,8 +229,9 @@ class GccCompiler : public CCompiler {
   }
   static std::string linkArg(std::string const& lib) {
     if (!isLibPath(lib)) return "-l" + lib;
-    mkn::kul::File const file(lib);
-    return file.dir() ? file.escm() : file.esc();  // not built yet on dry runs
+    std::error_code ec;  // its directory is not made yet on dry runs
+    return std::filesystem::is_directory(outDir(lib), ec) ? mkn::kul::fsys::escm(lib)
+                                                          : mkn::kul::fsys::esc(lib);
   }
 
   ProcessCapture compileSource(CompileDAO& dao) const KTHROW(mkn::kul::Exception) override;
@@ -240,8 +256,8 @@ class GccCompiler : public CCompiler {
   }
 
   std::string includeArg(std::string const& inc) const override {
-    mkn::kul::Dir const d(inc);
-    return d ? ("-I" + inc) : ("-include " + inc);
+    std::error_code ec;
+    return std::filesystem::is_directory(inc, ec) ? ("-I" + inc) : ("-include " + inc);
   }
 
   CCompiler_Type type() const override { return CCompiler_Type::GCC; }
@@ -253,30 +269,33 @@ class GccCompiler : public CCompiler {
   virtual std::string hiddenVisibility() const { return "-fvisibility=hidden"; }
 
   // Path entries add their directory, names the directories -l<name> would find them in.
-  void rpathing(mkn::kul::Process& p, [[maybe_unused]] mkn::kul::File const& out,
+  void rpathing(mkn::kul::Process& p, [[maybe_unused]] std::string const& out,
                 std::vector<std::string> const& libs,
                 std::vector<std::string> const& libPaths) const {
+    namespace fs = std::filesystem;
+    std::error_code ec;
     std::unordered_set<std::string> rpaths;
     for (std::string const& lib : libs) {
       if (isLibPath(lib)) {
-        if (mkn::kul::File const lib_file(lib); lib_file) rpaths.emplace(lib_file.dir().real());
+        if (fs::is_regular_file(lib, ec))
+          rpaths.emplace(fs::path(mkn::kul::fsys::real(lib)).parent_path().string());
         continue;
       }
       for (std::string const& path : libPaths)
         for (auto const* ext : BY_NAME_EXTS)
-          if (mkn::kul::File const lib_file("lib" + lib + ext, path); lib_file)
-            rpaths.emplace(lib_file.dir().real());
+          if (fs::is_regular_file(fs::path(path) / ("lib" + lib + ext), ec))
+            rpaths.emplace(mkn::kul::fsys::real(path));
     }
     for (auto const& rpath : rpaths) {
-      mkn::kul::Dir path(rpath);
 #if defined(__APPLE__)
-      mkn::kul::File tmp_out(out);
-      tmp_out.mk();
-      p << linkerOption("-rpath," + path.esc())
-        << linkerOption("-rpath,@loader_path/" + tmp_out.relative(path));
-      tmp_out.rm();
+      // relative to where out goes, real paths both sides
+      auto rel =
+          fs::path(rpath).lexically_relative(fs::path(mkn::kul::fsys::real(outDir(out)))).string();
+      if (rel == ".") rel.clear();
+      p << linkerOption("-rpath," + mkn::kul::fsys::esc(rpath))
+        << linkerOption("-rpath,@loader_path/" + rel);
 #else
-      p << linkerOption("-rpath=" + path.esc());
+      p << linkerOption("-rpath=" + mkn::kul::fsys::esc(rpath));
 #endif
     }
   }

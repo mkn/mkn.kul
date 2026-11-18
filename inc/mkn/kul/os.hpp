@@ -539,10 +539,9 @@ namespace env {
 
 inline std::string WHERE(char const* c) {
   for (auto const& s : mkn::kul::String::SPLIT(env::GET("PATH"), mkn::kul::env::SEP())) {
-    mkn::kul::Dir const d(s);
-    if (d)
-      for (auto const& f : d.files())
-        if (f.name().compare(c) == 0) return f.real();
+    if (std::error_code ec; !std::filesystem::is_directory(s, ec)) continue;
+    for (auto const& f : fsys::files(s))
+      if (f.filename() == c) return fsys::real(f);
   }
   return "";
 }
