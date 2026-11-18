@@ -258,3 +258,19 @@ TEST(CompilerTests, FlagParts) {
   EXPECT_EQ("-O2 -march=native -mtune=native -fno-strict-aliasing", f.str());
   EXPECT_EQ("optimise;arch;extra;", names(f));
 }
+
+// a Context that can't leave flag parts out gives the full command
+TEST(CompilerTests, ContextCompileCommandWithoutDefaultsToFull) {
+  struct NoParts : mkn::kul::lang::CompilerState {
+    void add(mkn::kul::lang::AbstractCompilerInput const&) override {}
+  };
+  struct Ctx : mkn::kul::lang::Context {
+    NoParts cs;
+    mkn::kul::lang::ContextState state() const override { return {}; }
+    mkn::kul::lang::CompilerState& compilerState() override { return cs; }
+    void per_compiler_command(CompileHook) override {}
+    std::string compileCommandFor(std::string const& in) const override { return "cc -flto " + in; }
+  } ctx;
+  mkn::kul::lang::Context const& c = ctx;
+  EXPECT_EQ("cc -flto a.cpp", c.compileCommandFor("a.cpp", {"lto"}));
+}

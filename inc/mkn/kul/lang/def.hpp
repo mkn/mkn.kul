@@ -188,6 +188,14 @@ class Context {
   // project-registered) source file - e.g. a module running a third-party
   // tool (iwyu) against the same flags real compilation would use.
   virtual std::string compileCommandFor(std::string const& in) const = 0;
+
+  // As compileCommandFor(in), less the compiler flag parts named in without, e.g. "lto" for a
+  //  tool compiling with -S, see Flags. A context that can't leave parts out gives the full
+  //  command.
+  virtual std::string compileCommandFor(std::string const& in,
+                                        std::vector<std::string> const& /*without*/) const {
+    return compileCommandFor(in);
+  }
 };
 
 }  // namespace mkn::kul::lang
