@@ -35,6 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "mkn/kul/env.hpp"
 #include "mkn/kul/except.hpp"
 #include "mkn/kul/string.hpp"
+#include "mkn/kul/lang/cpp/compiler/def.hpp"
 
 #if MKN_KUL_IS_WIN
 #include "mkn/kul/os/win/os.top.hpp"  // IWYU pragma: export
@@ -42,6 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "mkn/kul/os/nixish/os.top.hpp"  // IWYU pragma: export
 #endif
 
+#include <algorithm>
 #include <cstdint>
 #include <vector>
 #include <optional>
@@ -58,7 +60,7 @@ namespace kul {
 class Dir;
 class File;
 
-namespace fs {
+namespace fsys {
 class Exception : public mkn::kul::Exception {
  public:
   Exception(char const* f, uint16_t const& l, std::string const& s)
@@ -81,20 +83,85 @@ class TimeStamps {
 class Item {
  public:
   virtual ~Item() {}
-  virtual fs::TimeStamps timeStamps() const = 0;
+  virtual fsys::TimeStamps timeStamps() const = 0;
   virtual std::string esc() const = 0;
   virtual std::string real() const = 0;
   virtual std::string mini() const = 0;
 };
-}  // namespace fs
 
-class Dir : public fs::Item {
+struct ListOpts {
+  bool recursive = false;  // also list the contents of subdirectories
+  bool hidden = false;     // include ".name" directories, and with recursive descend into them
+};
+
+namespace detail {
+inline bool is_hidden(std::filesystem::path const& p) {
+  auto const name = p.filename().string();
+  return !name.empty() && name[0] == '.';
+}
+
+template <typename Fn>
+void each_entry(std::filesystem::path const& dir, Fn&& fn) KTHROW(Exception) {
+  std::error_code ec;
+  if (!std::filesystem::is_directory(dir, ec))
+    KEXCEPT(Exception, "Directory : \"" + dir.string() + "\" does not exist");
+  std::filesystem::directory_iterator it(dir, ec), end;
+  for (; !ec && it != end; it.increment(ec)) fn(*it);
+  if (ec) KEXCEPT(Exception, "Directory : \"" + dir.string() + "\" could not be read");
+}
+
+inline void dirs(std::filesystem::path const& dir, ListOpts const& opts,
+                 std::vector<std::filesystem::path>& out) KTHROW(Exception) {
+  each_entry(dir, [&](auto const& entry) {
+    std::error_code ec;
+    if ((opts.hidden || !is_hidden(entry.path())) && entry.is_directory(ec)) {
+      out.emplace_back(entry.path());
+      if (opts.recursive) dirs(entry.path(), opts, out);
+    }
+  });
+}
+
+inline void files(std::filesystem::path const& dir, ListOpts const& opts,
+                  std::vector<std::filesystem::path>& out) KTHROW(Exception) {
+  each_entry(dir, [&](auto const& entry) {
+    std::error_code ec;
+    if (!entry.is_directory(ec))
+      out.emplace_back(entry.path());
+    else if (opts.recursive && (opts.hidden || !is_hidden(entry.path())))
+      files(entry.path(), opts, out);
+  });
+}
+}  // namespace detail
+
+// the directories in dir, as dir / name, sorted
+MKN_KUL_FN_SIG_RET inline std::vector<std::filesystem::path> dirs(std::filesystem::path const& dir,
+                                                                  ListOpts const& opts = {})
+    KTHROW(Exception) {
+  std::vector<std::filesystem::path> out;
+  detail::dirs(dir, opts, out);
+  std::ranges::sort(out);
+  return out;
+}
+
+// everything in dir that is not a directory (hidden files included), as dir / name, sorted
+MKN_KUL_FN_SIG_RET inline std::vector<std::filesystem::path> files(std::filesystem::path const& dir,
+                                                                   ListOpts const& opts = {})
+    KTHROW(Exception) {
+  std::vector<std::filesystem::path> out;
+  detail::files(dir, opts, out);
+  std::ranges::sort(out);
+  return out;
+}
+
+}  // namespace fsys
+
+class Dir : public fsys::Item {
  private:
   std::string _p;
-  static fs::TimeStamps TIMESTAMPS(std::string const& s) {
+  static fsys::TimeStamps TIMESTAMPS(std::string const& s) {
     uint64_t a = 0, c = 0, m = 0;
-    fs::KulTimeStampsResolver::GET(s.c_str(), a, c, m);
-    return fs::TimeStamps(a, c, m);
+    fsys::KulTimeStampsResolver::GET(s.c_str(), a, c, m);
+    return fsys::TimeStamps(a, c, m);
   }
   static inline std::string LOCL(std::string s);
   static void ESC_REPLACE(std::string& s, std::string const& f, std::string const& r) {
@@ -117,12 +184,12 @@ class Dir : public fs::Item {
 
  public:
   Dir() : _p() {}
-  Dir(char const* p, bool m = false) KTHROW(fs::Exception) : Dir(std::string(p), m) {}
-  Dir(std::string const& p, bool m = false) KTHROW(fs::Exception) : _p(Dir::LOCL(p)) {
+  Dir(char const* p, bool m = false) KTHROW(fsys::Exception) : Dir(std::string(p), m) {}
+  Dir(std::string const& p, bool m = false) KTHROW(fsys::Exception) : _p(Dir::LOCL(p)) {
 #ifndef _WIN32
     if (p.size() && p[0] == '~') this->_p = (env::GET("HOME") + p.substr(1));
 #endif
-    if (m && !is() && !mk()) KEXCEPT(fs::Exception, "Invalid directory path provided");
+    if (m && !is() && !mk()) KEXCEPT(fsys::Exception, "Invalid directory path provided");
   }
   Dir(Dir const& d) : _p(d._p) {}
   Dir(std::string const& s, Dir const& d) : _p(d.join(s)) {}
@@ -150,17 +217,18 @@ class Dir : public fs::Item {
   std::string real() const { return REAL(path()); }
   std::string mini() const { return MINI(real()); }
 
-  fs::TimeStamps timeStamps() const { return TIMESTAMPS(_p); }
+  fsys::TimeStamps timeStamps() const { return TIMESTAMPS(_p); }
 
   Dir parent() const { return Dir(PRNT(path())); }
 
-  inline std::vector<Dir> dirs(bool incHidden = false) const KTHROW(fs::Exception);
-  inline std::vector<File> files(bool recursive = false) const KTHROW(fs::Exception);
+  inline std::vector<Dir> dirs(bool incHidden = false) const KTHROW(fsys::Exception);
+  inline std::vector<File> files(bool recursive = false) const KTHROW(fsys::Exception);
 
   static std::string JOIN(std::string const& a, std::string const& b) { return a + SEP() + b; }
 
-  static inline std::string REAL(std::string const& s) KTHROW(fs::Exception);
-  static inline std::optional<std::string> REAL_OR_NULL(std::string const& s) KTHROW(fs::Exception);
+  static inline std::string REAL(std::string const& s) KTHROW(fsys::Exception);
+  static inline std::optional<std::string> REAL_OR_NULL(std::string const& s)
+      KTHROW(fsys::Exception);
 
 #ifdef _WIN32
   static std::string SEP() { return std::string("\\"); }
@@ -203,7 +271,7 @@ class Dir : public fs::Item {
 
 inline std::ostream& operator<<(std::ostream& s, Dir const& d) { return s << d.path(); }
 
-class File : public fs::Item {
+class File : public fsys::Item {
  private:
   std::string _n;
   Dir _d;
@@ -218,7 +286,7 @@ class File : public fs::Item {
         this->_n = Dir::REAL(this->_n);
         this->_d = Dir(Dir::PRNT(this->_n), m);
         this->_n = this->_n.substr(_d.path().size() + 1);
-      } catch (mkn::kul::fs::Exception const& e) {
+      } catch (mkn::kul::fsys::Exception const& e) {
         std::cerr << e.debug() << std::endl;
       }
     } else if (n.find(Dir::SEP()) != std::string::npos) {
@@ -237,7 +305,8 @@ class File : public fs::Item {
   File(File const& f) : _n(f._n), _d(f._d) {}
 
   bool cp(Dir const& d) const {
-    if (!d.is() && !d.mk()) KEXCEPT(fs::Exception, "Directory: \"" + _d.path() + "\" is not valid");
+    if (!d.is() && !d.mk())
+      KEXCEPT(fsys::Exception, "Directory: \"" + _d.path() + "\" is not valid");
     return cp(mkn::kul::File(name(), d._p));
   }
   inline bool cp(File const& f) const;
@@ -261,7 +330,7 @@ class File : public fs::Item {
   inline uint64_t size() const;
 
   Dir const& dir() const { return _d; }
-  fs::TimeStamps timeStamps() const { return Dir::TIMESTAMPS(mini()); }
+  fsys::TimeStamps timeStamps() const { return Dir::TIMESTAMPS(mini()); }
 
   File& operator=(File const& f) = default;
   bool operator==(File const& f) const {
@@ -306,47 +375,35 @@ inline bool mkn::kul::Dir::root() const {
   return p == p.root_path();
 }
 
-inline std::vector<mkn::kul::Dir> mkn::kul::Dir::dirs(bool incHidden) const KTHROW(fs::Exception) {
-  if (!is()) KEXCEPT(fs::Exception, "Directory : \"" + path() + "\" does not exist");
+inline std::vector<mkn::kul::Dir> mkn::kul::Dir::dirs(bool incHidden) const
+    KTHROW(fsys::Exception) {
+  if (!is()) KEXCEPT(fsys::Exception, "Directory : \"" + path() + "\" does not exist");
 #if MKN_KUL_IS_WIN
   auto const& base = path();
 #else
   auto const base = real();
 #endif
   std::vector<Dir> dirs;
-  std::error_code ec;
-  std::filesystem::directory_iterator it(path(), ec), end;
-  for (; !ec && it != end; it.increment(ec)) {
-    auto const name = it->path().filename().string();
-    std::error_code type_ec;
-    if ((incHidden || name[0] != '.') && it->is_directory(type_ec))
-      dirs.emplace_back(JOIN(base, name));
-  }
-  if (ec) KEXCEPT(fs::Exception, "Directory : \"" + path() + "\" could not be read");
+  for (auto const& p : fsys::dirs(path(), {.hidden = incHidden}))
+    dirs.emplace_back(JOIN(base, p.filename().string()));
   return dirs;
 }
 
 inline std::vector<mkn::kul::File> mkn::kul::Dir::files(bool recursive) const
-    KTHROW(fs::Exception) {
-  if (!is()) KEXCEPT(fs::Exception, "Directory : \"" + path() + "\" does not exist");
-  std::vector<File> fs;
-  std::error_code ec;
-  std::filesystem::directory_iterator it(path(), ec), end;
-  for (; !ec && it != end; it.increment(ec)) {
-    std::error_code type_ec;
-    if (!it->is_directory(type_ec)) fs.emplace_back(it->path().filename().string(), *this);
-  }
-  if (ec) KEXCEPT(fs::Exception, "Directory : \"" + path() + "\" could not be read");
+    KTHROW(fsys::Exception) {
+  if (!is()) KEXCEPT(fsys::Exception, "Directory : \"" + path() + "\" does not exist");
+  std::vector<File> files;
+  for (auto const& p : fsys::files(path())) files.emplace_back(p.filename().string(), *this);
   if (recursive)
     for (auto const& d : dirs()) {
       auto const sub = d.files(true);
-      fs.insert(fs.end(), sub.begin(), sub.end());
+      files.insert(files.end(), sub.begin(), sub.end());
     }
-  return fs;
+  return files;
 }
 
 inline std::optional<std::string> mkn::kul::Dir::REAL_OR_NULL(std::string const& s)
-    KTHROW(fs::Exception) {
+    KTHROW(fsys::Exception) {
   std::error_code ec;
 #if MKN_KUL_IS_WIN  // like _fullpath, the path need not exist
   auto const p = std::filesystem::absolute(s, ec).lexically_normal();
@@ -361,9 +418,9 @@ inline std::optional<std::string> mkn::kul::Dir::REAL_OR_NULL(std::string const&
   return r;
 }
 
-inline std::string mkn::kul::Dir::REAL(std::string const& s) KTHROW(fs::Exception) {
+inline std::string mkn::kul::Dir::REAL(std::string const& s) KTHROW(fsys::Exception) {
   if (auto r = REAL_OR_NULL(s)) return *r;
-  KEXCEPT(fs::Exception, "Item: \"" + s + "\" does not exist");
+  KEXCEPT(fsys::Exception, "Item: \"" + s + "\" does not exist");
 }
 
 inline bool mkn::kul::File::is() const {
@@ -400,7 +457,7 @@ inline bool mkn::kul::File::mv(File const& f) const {
 }
 
 inline bool mkn::kul::Dir::cp(Dir const& d) const {
-  if (!d.is() && !d.mk()) KEXCEPT(fs::Exception, "Directory: \"" + d.path() + "\" is not valid");
+  if (!d.is() && !d.mk()) KEXCEPT(fsys::Exception, "Directory: \"" + d.path() + "\" is not valid");
   Dir c(d.join(name()));
   c.mk();
   for (auto const& f : files()) f.cp(c);
