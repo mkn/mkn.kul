@@ -48,21 +48,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace mkn {
 namespace kul {
 
-class Dir;
 namespace fsys {
 
-class KulTimeStampsResolver {
- public:
-  static void GET(char const* const p, uint64_t& a, uint64_t& c, uint64_t& m) {
-    struct stat att;
-    if (stat(p, &att) != -1) {
-      a = att.st_atime;
-      m = att.st_mtime;
-      c = 0;  // doesn't exist on this platform
-    }
+namespace detail {
+// accessed / created / modified, seconds since the epoch, unchanged if p can't be read
+inline void timestamps(char const* const p, uint64_t& a, uint64_t& c, uint64_t& m) {
+  struct stat att;
+  if (stat(p, &att) != -1) {
+    a = att.st_atime;
+    m = att.st_mtime;
+    c = 0;  // doesn't exist on this platform
   }
-  friend class mkn::kul::Dir;
-};
+}
+}  // namespace detail
 
 }  // namespace fsys
 }  // namespace kul

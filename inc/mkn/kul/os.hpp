@@ -202,7 +202,7 @@ MKN_KUL_FN_SIG_RET inline std::string escm(std::filesystem::path const& p) KTHRO
 // last modification, seconds since the epoch, 0 if p can't be read
 MKN_KUL_FN_SIG_RET inline std::uint64_t modified(std::filesystem::path const& p) {
   std::uint64_t a = 0, c = 0, m = 0;
-  KulTimeStampsResolver::GET(p.string().c_str(), a, c, m);
+  detail::timestamps(p.string().c_str(), a, c, m);
   return m;
 }
 
@@ -213,7 +213,7 @@ class Dir : public fsys::Item {
   std::string _p;
   static fsys::TimeStamps TIMESTAMPS(std::string const& s) {
     uint64_t a = 0, c = 0, m = 0;
-    fsys::KulTimeStampsResolver::GET(s.c_str(), a, c, m);
+    fsys::detail::timestamps(s.c_str(), a, c, m);
     return fsys::TimeStamps(a, c, m);
   }
   static std::string LOCL(std::string s) { return fsys::locl(std::move(s)); }
