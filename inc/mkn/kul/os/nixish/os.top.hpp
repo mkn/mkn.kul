@@ -49,7 +49,7 @@ namespace mkn {
 namespace kul {
 
 class Dir;
-namespace fs {
+namespace fsys {
 
 class KulTimeStampsResolver {
  private:
@@ -64,7 +64,7 @@ class KulTimeStampsResolver {
   friend class mkn::kul::Dir;
 };
 
-}  // namespace fs
+}  // namespace fsys
 }  // namespace kul
 }  // namespace mkn
 

@@ -6,6 +6,7 @@
 #include "mkn/kul/proc.hpp"
 #include "mkn/kul/mem.hpp"
 
+#include <filesystem>
 #include <fstream>
 #include <vector>
 
@@ -39,7 +40,7 @@ TEST(OperatingSystemTests, MemRSSGrowsWhenTouched) {
 class TimeStampHandler {
  private:
   mkn::kul::File f;
-  mkn::kul::fs::TimeStamps fts;
+  mkn::kul::fsys::TimeStamps fts;
   TimeStampHandler() : f("mkn.yaml"), fts(f.timeStamps()) {}
 
  public:
@@ -48,7 +49,7 @@ class TimeStampHandler {
     return i;
   }
   bool is() { return f.is(); }
-  mkn::kul::fs::TimeStamps const& timeStamps() { return fts; }
+  mkn::kul::fsys::TimeStamps const& timeStamps() { return fts; }
 };
 
 TEST(OperatingSystemTests, HasFileAccessedTimeStampSupport) {
@@ -177,6 +178,33 @@ TEST(OperatingSystemTests, DirRealAndRoot) {
 #ifndef _WIN32
   EXPECT_TRUE(Dir("/").root());
   EXPECT_FALSE(Dir::REAL_OR_NULL("does_not_exist_kul_os_test"));
-  EXPECT_THROW(Dir::REAL("does_not_exist_kul_os_test"), mkn::kul::fs::Exception);
+  EXPECT_THROW(Dir::REAL("does_not_exist_kul_os_test"), mkn::kul::fsys::Exception);
 #endif
+}
+
+TEST(OperatingSystemTests, FsysFilesDirs) {
+  namespace fsys = mkn::kul::fsys;
+  using path = std::filesystem::path;
+  path const tmp("bin/test/kul_fsys_test");
+  std::filesystem::remove_all(tmp);
+  for (auto const* d : {"b/c", "a", ".hidden"}) std::filesystem::create_directories(tmp / d);
+  for (auto const* f : {"z.txt", ".dotfile", "b/y.txt", "b/c/x.txt", ".hidden/w.txt"})
+    std::ofstream(tmp / f) << "";
+
+  EXPECT_EQ(fsys::dirs(tmp), (std::vector<path>{tmp / "a", tmp / "b"}));
+  EXPECT_EQ(fsys::dirs(tmp, {.hidden = true}),
+            (std::vector<path>{tmp / ".hidden", tmp / "a", tmp / "b"}));
+  EXPECT_EQ(fsys::dirs(tmp, {.recursive = true}),
+            (std::vector<path>{tmp / "a", tmp / "b", tmp / "b/c"}));
+
+  EXPECT_EQ(fsys::files(tmp), (std::vector<path>{tmp / ".dotfile", tmp / "z.txt"}));
+  EXPECT_EQ(
+      fsys::files(tmp, {.recursive = true}),
+      (std::vector<path>{tmp / ".dotfile", tmp / "b/c/x.txt", tmp / "b/y.txt", tmp / "z.txt"}));
+  EXPECT_EQ(fsys::files(tmp, {.recursive = true, .hidden = true}).size(), 5u);
+
+  EXPECT_THROW((void)fsys::files(tmp / "nope"), fsys::Exception);
+  EXPECT_THROW((void)fsys::dirs(tmp / "z.txt"), fsys::Exception);
+
+  std::filesystem::remove_all(tmp);
 }
