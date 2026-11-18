@@ -155,14 +155,16 @@ MKN_KUL_FN_SIG_ALL_RET constexpr auto for_N_make_array(Fn&& fn) {
   return for_N<N, for_N_R_mode::make_array>(fn);
 }
 
+// fn(ic) for every / any index, stopping at the first false / true: a fold over the indices, not
+//  all / any over an array, nvcc 12 errors on all / any's constrained overload
 template <std::uint16_t N, typename Fn>
 MKN_KUL_FN_SIG_ALL_RET constexpr auto for_N_all(Fn&& fn) {
-  return all(for_N<N, for_N_R_mode::make_array>(fn));
+  return for_N_fold<N>([&](auto... ics) { return (static_cast<bool>(fn(ics)) && ...); });
 }
 
 template <std::uint16_t N, typename Fn>
 MKN_KUL_FN_SIG_ALL_RET constexpr auto for_N_any(Fn&& fn) {
-  return any(for_N<N, for_N_R_mode::make_array>(fn));
+  return for_N_fold<N>([&](auto... ics) { return (static_cast<bool>(fn(ics)) || ...); });
 }
 
 template <typename F>
