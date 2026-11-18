@@ -22,6 +22,6 @@ void inline tryCatch(std::vector<std::function<void()>> funcs, bool katch) {
       if (!katch) KOUT(NON) << e.debug();
       ASSERT_TRUE(katch);
     }
-};
+}
 
 #endif /*MKN_KUL_TESTS_CMN_HPP_*/

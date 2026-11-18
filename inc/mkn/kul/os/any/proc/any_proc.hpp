@@ -117,7 +117,7 @@ class AProcess {
   bool waitForExit() const { return wfe; }
   void pid(int32_t const& _pi) { this->pi = _pi; }
 
-  std::vector<std::string> const& args() const { return argv; };
+  std::vector<std::string> const& args() const { return argv; }
   mkn::kul::hash::map::S2S const& vars() const { return evs; }
   virtual void out(std::string const& _s) {
     if (this->o)

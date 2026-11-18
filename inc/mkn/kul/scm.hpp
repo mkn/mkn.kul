@@ -104,7 +104,7 @@ class Git : public SCM {
     auto const tab = ret.find('\t');
     return tab != std::string::npos ? ret.substr(0, tab) : ret;
     // e.g. git ls-remote --symref git@github.com:user/repo HEAD
-  };
+  }
 
   std::string branch(mkn::kul::Dir const& dr) const {
     mkn::kul::os::PushDir pushd(dr);
