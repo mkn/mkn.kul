@@ -39,11 +39,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <tuple>
 #include <vector>
 #include <utility>
-#include <algorithm>
 #include <type_traits>
 #include <cstddef>
 #include <cstdint>
-#include <initializer_list>
 
 namespace mkn::kul {
 
@@ -71,19 +69,25 @@ MKN_KUL_FN_SIG_ALL_RET auto constexpr any_in([[maybe_unused]] auto const a, auto
 // calls operator bool() or copies bool
 auto constexpr static to_bool = [](auto const& v) { return bool{v}; };
 
+// fn(element) for every / any / no element, stopping at the first that decides it: loops, not
+//  std::all_of ..., so device code can use them
 template <typename Container, typename Fn = decltype(to_bool)>
-auto constexpr all(Container const& container, Fn fn = to_bool) {
-  return std::all_of(std::begin(container), std::end(container), fn);
+MKN_KUL_FN_SIG_ALL_RET constexpr bool all(Container const& container, Fn fn = to_bool) {
+  for (auto const& e : container)
+    if (!fn(e)) return false;
+  return true;
 }
 
 template <typename Container, typename Fn = decltype(to_bool)>
-auto constexpr any(Container const& container, Fn fn = to_bool) {
-  return std::any_of(std::begin(container), std::end(container), fn);
+MKN_KUL_FN_SIG_ALL_RET constexpr bool any(Container const& container, Fn fn = to_bool) {
+  for (auto const& e : container)
+    if (fn(e)) return true;
+  return false;
 }
 
 template <typename Container, typename Fn = decltype(to_bool)>
-auto constexpr none(Container const& container, Fn fn = to_bool) {
-  return std::none_of(std::begin(container), std::end(container), fn);
+MKN_KUL_FN_SIG_ALL_RET constexpr bool none(Container const& container, Fn fn = to_bool) {
+  return !any(container, fn);
 }
 
 template <typename T = std::size_t>

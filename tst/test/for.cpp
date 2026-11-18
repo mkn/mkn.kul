@@ -81,3 +81,21 @@ TEST(For_Test, unroll_loop) {
   for (int i = 0; i < 8; ++i) sum += i;
   EXPECT_EQ(sum, 28);
 }
+
+TEST(For_Test, all_any_none) {
+  std::array<int, 3> const a{1, 2, 3};
+  static_assert(mkn::kul::all(std::array{true, true}) && !mkn::kul::all(std::array{true, false}));
+  static_assert(mkn::kul::any(std::array{false, true}) && !mkn::kul::any(std::array{false, false}));
+  static_assert(mkn::kul::none(std::array{false, false}) && !mkn::kul::none(std::array{true}));
+  EXPECT_TRUE(mkn::kul::all(a, [](auto e) { return e > 0; }));
+  EXPECT_FALSE(mkn::kul::any(a, [](auto e) { return e > 3; }));
+
+  int calls = 0;  // stops at the first element that decides it
+  EXPECT_FALSE(mkn::kul::all(a, [&](auto e) { return ++calls, e > 1; }));
+  EXPECT_EQ(calls, 1);
+  calls = 0;
+  EXPECT_TRUE(mkn::kul::any(a, [&](auto e) { return ++calls, e == 2; }));
+  EXPECT_EQ(calls, 2);
+  EXPECT_TRUE(mkn::kul::all(std::array<bool, 0>{}));
+  EXPECT_FALSE(mkn::kul::any(std::array<bool, 0>{}));
+}
