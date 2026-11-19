@@ -156,7 +156,9 @@ MKN_KUL_FN_SIG_RET inline std::vector<std::filesystem::path> files(std::filesyst
 }
 
 // the platform's separators, "\\" to "/" on nix and "/" to "\\" on Windows
-MKN_KUL_FN_SIG_RET inline std::string locl(std::string s);
+MKN_KUL_FN_SIG_RET inline std::string local_separators(std::string s);
+// local_separators
+MKN_KUL_FN_SIG_RET inline std::string locl(std::string s) { return local_separators(std::move(s)); }
 
 namespace detail {
 // for a shell, spaces escaped on nix and backslashes doubled on Windows
@@ -184,19 +186,41 @@ MKN_KUL_FN_SIG_RET inline std::string real(std::filesystem::path const& p) KTHRO
   return r;
 }
 
-// p relative to the working directory when under it, as File / Dir::mini()
-MKN_KUL_FN_SIG_RET inline std::string mini(std::filesystem::path const& p) KTHROW(Exception) {
+// real(p) relative to the working directory when under it, as File / Dir::mini()
+MKN_KUL_FN_SIG_RET inline std::string cwd_relative(std::filesystem::path const& p)
+    KTHROW(Exception) {
   return detail::trim_cwd(real(p));
+}
+// cwd_relative
+MKN_KUL_FN_SIG_RET inline std::string mini(std::filesystem::path const& p) KTHROW(Exception) {
+  return cwd_relative(p);
 }
 
 // p as given, for a shell, as File / Dir::esc()
-MKN_KUL_FN_SIG_RET inline std::string esc(std::filesystem::path const& p) {
-  return detail::esc(locl(p.string()));
+MKN_KUL_FN_SIG_RET inline std::string escaped(std::filesystem::path const& p) {
+  return detail::esc(local_separators(p.string()));
+}
+// escaped
+MKN_KUL_FN_SIG_RET inline std::string esc(std::filesystem::path const& p) { return escaped(p); }
+
+// real(p) for a shell, as File / Dir::escr() of an existing path
+MKN_KUL_FN_SIG_RET inline std::string escaped_real(std::filesystem::path const& p)
+    KTHROW(Exception) {
+  return detail::esc(real(p));
+}
+// escaped_real
+MKN_KUL_FN_SIG_RET inline std::string escr(std::filesystem::path const& p) KTHROW(Exception) {
+  return escaped_real(p);
 }
 
-// mini(p) for a shell, as File / Dir::escm()
+// cwd_relative(p) for a shell, as File / Dir::escm()
+MKN_KUL_FN_SIG_RET inline std::string escaped_mini(std::filesystem::path const& p)
+    KTHROW(Exception) {
+  return detail::esc(cwd_relative(p));
+}
+// escaped_mini
 MKN_KUL_FN_SIG_RET inline std::string escm(std::filesystem::path const& p) KTHROW(Exception) {
-  return detail::esc(mini(p));
+  return escaped_mini(p);
 }
 
 // last modification, seconds since the epoch, 0 if p can't be read

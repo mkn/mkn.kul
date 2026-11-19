@@ -140,7 +140,7 @@ class WINCompiler : public CCompiler {
     auto &linker = dao.linker, &linkerEnd = dao.linkerEnd, &out = dao.out;
 
     mkn::kul::hash::set::String dirs;
-    for (auto const& d : dao.stars) dirs.insert(d.real());
+    for (auto const& d : dao.stars) dirs.insert(mkn::kul::fsys::real(d));
 
     std::string exe = out + ".exe";
     mkOutDir(exe);
@@ -182,7 +182,7 @@ class WINCompiler : public CCompiler {
     auto const out_dir = outDir(dao.out);
     auto const out_name = std::filesystem::path(dao.out).filename().string();
     mkn::kul::hash::set::String dirs;
-    for (auto const& d : dao.stars) dirs.insert(d.real());
+    for (auto const& d : dao.stars) dirs.insert(mkn::kul::fsys::real(d));
 
     std::string lib = (out_dir / staticLib(out_name)).string();
     if (mode == Mode::SHAR) lib = (out_dir / libName(env.compilationInfo, out_name)).string();

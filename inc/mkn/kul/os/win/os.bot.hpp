@@ -39,7 +39,7 @@ std::string mkn::kul::fsys::detail::esc(std::string s) {
   return s;
 }
 
-std::string mkn::kul::fsys::locl(std::string s) {
+std::string mkn::kul::fsys::local_separators(std::string s) {
   mkn::kul::String::REPLACE_ALL(s, "/", "\\");
   return s;
 }
@@ -58,12 +58,14 @@ inline uint16_t exec(std::string const& cmd, bool q = false) {
 
 namespace user {
 
-inline mkn::kul::Dir home() {
+// %HOME%, or %HOMEDRIVE%%HOMEPATH% without it
+inline std::filesystem::path home() {
   std::string const h(env::GET("HOME"));
-  if (h.size()) return mkn::kul::Dir(h);
-  return mkn::kul::Dir(std::string(env::GET("HOMEDRIVE")) + std::string(env::GET("HOMEPATH")));
+  if (h.size()) return h;
+  return std::string(env::GET("HOMEDRIVE")) + std::string(env::GET("HOMEPATH"));
 }
-inline mkn::kul::Dir home(std::string const& app) { return mkn::kul::Dir(home().join(app)); }
+// an application's directory in home(), as "app"
+inline std::filesystem::path home(std::string const& app) { return home() / app; }
 
 }  // namespace user
 
