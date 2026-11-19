@@ -71,6 +71,18 @@ std::string link(CompilationInfo const& ci, Mode const mode, std::vector<std::st
 }
 }  // namespace
 
+TEST(CompilerTests, ModeToStringIsModeFromsInverse) {
+  using mkn::kul::lang::Mode;
+  for (auto const mode : {Mode::NONE, Mode::STAT, Mode::SHAR})
+    EXPECT_EQ(mkn::kul::lang::mode_from(to_string(mode)), mode);
+  EXPECT_EQ(to_string(Mode::STAT), "static");
+  EXPECT_EQ(to_string(Mode::SHAR), "shared");
+  EXPECT_EQ(to_string(Mode::NONE), "none");
+  EXPECT_EQ(to_string(Mode::SHAR, "dll", "lib"), "dll");
+  EXPECT_EQ(mkn::kul::lang::mode_from(to_string(Mode::STAT, "dll", "lib"), "dll", "lib"),
+            Mode::STAT);
+}
+
 TEST(CompilerTests, ClangResolvesToClangFamily) {
   EXPECT_EQ("clang", Compilers::INSTANCE().base("clang"));
   EXPECT_EQ("clang++", Compilers::INSTANCE().base("clang++"));

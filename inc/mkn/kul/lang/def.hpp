@@ -53,6 +53,14 @@ inline Mode mode_from(std::string const& mode, std::string const& shared_str = "
   return Mode::NONE;
 }
 
+// mode_from's inverse, NONE as "none"
+inline std::string to_string(Mode const mode, std::string const& shared_str = "shared",
+                             std::string const& static_str = "static") {
+  if (mode == Mode::SHAR) return shared_str;
+  if (mode == Mode::STAT) return static_str;
+  return "none";
+}
+
 struct CompilationInfo {
   std::string lib_prefix, lib_postfix, lib_ext, obj_ext;
   bool rpathing = true;
