@@ -2,7 +2,10 @@
 #include "gtest/gtest.h"
 
 #include "mkn/kul/bon/yaml.hpp"
+#include "mkn/kul/yaml.hpp"
 
+#include <filesystem>
+#include <fstream>
 #include <string>
 
 // bon::from: bon to YAML::Node, the parser itself is tested in tst/test/bon.cpp
@@ -43,4 +46,27 @@ TEST(BonYaml, malformed) { EXPECT_THROW(mkn::kul::bon::from("{a: b"), mkn::kul::
 int main(int argc, char* argv[]) {
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
+}
+
+namespace {
+class NamedYaml : public mkn::kul::yaml::File {
+ public:
+  NamedYaml(std::filesystem::path const& p) : mkn::kul::yaml::File(p) {}
+  mkn::kul::yaml::Validator validator() const override {
+    return mkn::kul::yaml::Validator({mkn::kul::yaml::NodeValidator("name", 1)});
+  }
+};
+}  // namespace
+
+TEST(Yaml, createFromPath) {
+  std::filesystem::path const dir{"bin/test/kul yaml"};  // a space
+  std::filesystem::create_directories(dir);
+  std::ofstream(dir / "ok.yaml") << "name: x\n";
+  std::ofstream(dir / "bad.yaml") << "nom: x\n";
+
+  auto const ok = mkn::kul::yaml::File::CREATE<NamedYaml>(dir / "ok.yaml");
+  EXPECT_EQ(ok.root()["name"].as<std::string>(), "x");
+  EXPECT_EQ(ok.file(), (dir / "ok.yaml").string());
+  EXPECT_ANY_THROW(mkn::kul::yaml::File::CREATE<NamedYaml>(dir / "bad.yaml"));
+  std::filesystem::remove_all(dir);
 }
