@@ -34,11 +34,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "mkn/kul/except.hpp"
 #include "mkn/kul/lang/def.hpp"  // IWYU pragma: export
 #include "mkn/kul/lang/cpp/compiler/def.hpp"
-#include "mkn/kul/os.hpp"
 #include "mkn/kul/proc.hpp"
 
 #include <algorithm>
 #include <cstdint>
+#include <filesystem>
 #include <initializer_list>
 #include <string>
 #include <unordered_map>
@@ -82,7 +82,7 @@ struct LinkDAO {
   std::string const& linker;
   std::string const& linkerEnd;
   std::string const& out;
-  std::vector<mkn::kul::Dir> stars;
+  std::vector<std::filesystem::path> stars;
   std::vector<std::string> const& objects;
   std::vector<std::string> const& libs;
   std::vector<std::string> const& libPaths;

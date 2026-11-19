@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef MKN_KUL_OS_NIXISH_OS_BOT_HPP_
 #define MKN_KUL_OS_NIXISH_OS_BOT_HPP_
 
-std::string mkn::kul::fsys::locl(std::string s) {
+std::string mkn::kul::fsys::local_separators(std::string s) {
   mkn::kul::String::REPLACE_ALL(s, "\\", "/");
   return s;
 }
@@ -61,10 +61,10 @@ inline int exec(std::string const& cmd, bool q = false) {
 
 namespace user {
 
-inline mkn::kul::Dir home() { return Dir(env::GET("HOME")); }
-inline mkn::kul::Dir home(std::string const& app) {
-  return Dir(Dir::JOIN(env::GET("HOME"), "." + app));
-}
+// $HOME
+inline std::filesystem::path home() { return env::GET("HOME"); }
+// an application's directory in home(), as ".app"
+inline std::filesystem::path home(std::string const& app) { return home() / ("." + app); }
 
 }  // namespace user
 

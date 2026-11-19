@@ -15,6 +15,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <exception>
+#include <filesystem>
 #include <string>
 #include <vector>
 
@@ -58,7 +59,7 @@ std::string link(CompilationInfo const& ci, Mode const mode, std::vector<std::st
   StubContext ctx;
   ctx.s.compileEnv.compilationInfo = ci;
   std::string const linkerEnd, out = "bin/test_link/out";
-  std::vector<mkn::kul::Dir> stars;
+  std::vector<std::filesystem::path> stars;
   std::vector<std::string> objects, libPaths;
   mkn::kul::lang::LinkDAO dao{ctx,     linker, linkerEnd, out,  stars,
                               objects, libs,   libPaths,  mode, true};
@@ -176,7 +177,7 @@ TEST(CompilerTests, LinkOutputIsCaptured) {
   StubContext ctx;
   ctx.s.compileEnv.compilationInfo = info("lib", ".so");
   std::string const linkerEnd = "--mkn-kul-unknown-option", out = "bin/test_link/captured";
-  std::vector<mkn::kul::Dir> stars;
+  std::vector<std::filesystem::path> stars;
   std::vector<std::string> objects, libs, libPaths;
   mkn::kul::lang::LinkDAO dao{ctx,     "g++", linkerEnd, out,        stars,
                               objects, libs,  libPaths,  Mode::NONE, false};
@@ -216,7 +217,7 @@ TEST(CompilerTests, LinkObjectsOfDir) {
   StubContext ctx;
   ctx.s.compileEnv.compilationInfo = info("lib", ".so");
   std::string const linkerEnd, out = "bin/test_link/main_objs_exe";
-  std::vector<mkn::kul::Dir> stars{d};
+  std::vector<std::filesystem::path> stars{d.path()};
   std::vector<std::string> objects, libs, libPaths;
   mkn::kul::lang::LinkDAO dao{ctx,     "g++", linkerEnd, out,        stars,
                               objects, libs,  libPaths,  Mode::NONE, false};

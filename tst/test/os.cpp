@@ -226,6 +226,8 @@ TEST(OperatingSystemTests, FsysMatchesFileDir) {
     EXPECT_EQ(fsys::mini(p), file.mini()) << p;
     EXPECT_EQ(fsys::esc(file.full()), file.esc()) << p;
     EXPECT_EQ(fsys::escm(p), file.escm()) << p;
+    // escr is escaped real for a missing path too, File::escr() gives the path as given
+    EXPECT_EQ(fsys::escr(p), file.is() ? file.escr() : fsys::esc(fsys::real(p))) << p;
   }
   for (auto const& p :
        {std::string{"inc"}, std::string{"inc/mkn/.."}, tmp.path(), mkn::kul::env::CWD()}) {
@@ -234,6 +236,7 @@ TEST(OperatingSystemTests, FsysMatchesFileDir) {
     EXPECT_EQ(fsys::mini(p), dir.mini()) << p;
     EXPECT_EQ(fsys::esc(p), dir.esc()) << p;
     EXPECT_EQ(fsys::escm(p), dir.escm()) << p;
+    EXPECT_EQ(fsys::escr(p), dir.escr()) << p;
   }
   EXPECT_EQ(fsys::modified("mkn.yaml"), File("mkn.yaml").timeStamps().modified());
   EXPECT_GT(fsys::modified("mkn.yaml"), 0u);
@@ -246,4 +249,29 @@ TEST(OperatingSystemTests, FsysMatchesFileDir) {
   }
   EXPECT_THROW(mkn::kul::os::PushDir{"does_not_exist_kul_os_test"}, mkn::kul::Exception);
   tmp.rm();
+}
+
+// the short fsys names are the full ones
+TEST(OperatingSystemTests, FsysShortNames) {
+  namespace fsys = mkn::kul::fsys;
+  for (auto const* p : {"mkn.yaml", "inc/../inc", "missing dir/x.txt", "a\\b/c"}) {
+    EXPECT_EQ(fsys::mini(p), fsys::cwd_relative(p)) << p;
+    EXPECT_EQ(fsys::esc(p), fsys::escaped(p)) << p;
+    EXPECT_EQ(fsys::escr(p), fsys::escaped_real(p)) << p;
+    EXPECT_EQ(fsys::escm(p), fsys::escaped_mini(p)) << p;
+    EXPECT_EQ(fsys::locl(p), fsys::local_separators(p)) << p;
+  }
+  EXPECT_EQ(fsys::escaped_real("missing dir/x.txt"),
+            fsys::escaped(fsys::real("missing dir/x.txt")));
+}
+
+TEST(OperatingSystemTests, UserHome) {
+  auto const home = mkn::kul::user::home();
+  EXPECT_FALSE(home.empty());
+#if MKN_KUL_IS_WIN
+  EXPECT_EQ(mkn::kul::user::home("app"), home / "app");
+#else
+  EXPECT_EQ(home, std::filesystem::path{mkn::kul::env::GET("HOME")});
+  EXPECT_EQ(mkn::kul::user::home("app"), home / ".app");
+#endif
 }

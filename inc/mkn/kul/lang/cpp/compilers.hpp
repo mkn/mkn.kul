@@ -247,7 +247,7 @@ inline ProcessCapture GccCompiler::buildExecutable(LinkDAO& dao) const KTHROW(mk
   auto& mode = dao.mode;
 
   mkn::kul::hash::set::String dirs;
-  for (auto const& d : dao.stars) dirs.insert(d.real());
+  for (auto const& d : dao.stars) dirs.insert(mkn::kul::fsys::real(d));
 
   std::string exe = out;
   if (MKN_KUL_STR(MKN_KUL_OS) == std::string("win")) exe += ".exe";
@@ -295,7 +295,7 @@ inline ProcessCapture GccCompiler::buildLibrary(LinkDAO& dao) const KTHROW(mkn::
   auto const out_name = std::filesystem::path(out).filename().string();
 
   mkn::kul::hash::set::String dirs;
-  for (auto const& d : dao.stars) dirs.insert(d.real());
+  for (auto const& d : dao.stars) dirs.insert(mkn::kul::fsys::real(d));
 
   auto const lib_file = (out_dir / (mode == Mode::STAT ? staticLib(out_name)
                                                        : libName(env.compilationInfo, out_name)))

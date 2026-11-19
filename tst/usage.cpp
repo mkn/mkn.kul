@@ -104,8 +104,8 @@ class Test {
     KOUT(NON) << mkn::kul::Dir::SEP();
     KOUT(NON) << mkn::kul::env::SEP();
     KOUT(NON) << mkn::kul::env::CWD();
-    KOUT(NON) << mkn::kul::user::home().path();
-    KLOG(INF) << mkn::kul::user::home("maiken").path();
+    KOUT(NON) << mkn::kul::user::home().string();
+    KLOG(INF) << mkn::kul::user::home("maiken").string();
 
     mkn::kul::File fo("TEST_WRITE_OUT");
     mkn::kul::File fe("TEST_WRITE_ERR");

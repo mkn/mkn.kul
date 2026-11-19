@@ -157,13 +157,14 @@ class String : public Item {
 
 class File : public Item {
  public:
+  // T constructed from the path, as File(path), then validated
   template <class T>
-  static T CREATE(std::string const& f) KTHROW(Exception) {
+  static T CREATE(std::filesystem::path const& f) KTHROW(Exception) {
     T file(f);
     try {
       Item::VALIDATE(file.root(), file.validator().children());
     } catch (mkn::kul::yaml::Exception const& e) {
-      KEXCEPTION("YAML error encountered in file: " + f);
+      KEXCEPTION("YAML error encountered in file: " + f.string());
     }
     return file;
   }
