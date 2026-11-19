@@ -7,7 +7,7 @@
 
 std::string_view constexpr RUN =
     R"(
-mkn -p base -M test/instrument/non_constructing_vector.cpp -Og 0 build -b . run -a -fPIC -x clang -m "clang.llvm-mca{link{bin: llvm-mca-19, out: non_vec.txt}}"
+mkn -M tst/instrument/non_constructing_vector.cpp -Og 0 build -b . run -a -fPIC -x clang -m "llvm.mca{link{bin: llvm-mca-19}}"
 )";
 
 template <typename T>
