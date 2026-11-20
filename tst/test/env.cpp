@@ -124,12 +124,16 @@ TEST(EnvWhere, FindsFilesInPath) {
   std::ofstream(dir / "mkn_kul_tool.exe") << "";
   {
     mkn::kul::env::PushEnv path("PATH", dir.string().c_str());
-    auto const exe = fs::canonical(dir / "mkn_kul_tool.exe");
-    EXPECT_EQ(fs::path(mkn::kul::env::WHERE("mkn_kul_tool.exe")), exe);
+    // the same file, not the same text: Windows may give a short (8.3) name or PATHEXT's case
+    auto const found = [&](char const* c) {
+      auto const w = mkn::kul::env::WHERE(c);
+      return !w.empty() && fs::equivalent(w, dir / "mkn_kul_tool.exe");
+    };
+    EXPECT_TRUE(found("mkn_kul_tool.exe"));
     EXPECT_TRUE(mkn::kul::env::WHERE("mkn_kul_missing").empty());
     EXPECT_TRUE(mkn::kul::env::WHERE("mkn_kul_dir").empty());  // a directory is not a command
 #if MKN_KUL_IS_WIN
-    EXPECT_EQ(fs::path(mkn::kul::env::WHERE("mkn_kul_tool")), exe);  // PATHEXT: .EXE
+    EXPECT_TRUE(found("mkn_kul_tool"));  // PATHEXT: .EXE
 #else
     EXPECT_TRUE(mkn::kul::env::WHERE("mkn_kul_tool").empty());  // names are exact
 #endif
