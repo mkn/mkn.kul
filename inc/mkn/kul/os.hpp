@@ -41,6 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "mkn/kul/os/win/os.top.hpp"  // IWYU pragma: export
 #else
 #include "mkn/kul/os/nixish/os.top.hpp"  // IWYU pragma: export
+#include "mkn/kul/os/nixish/exit.hpp"    // IWYU pragma: export
 #endif
 
 #include <algorithm>
