@@ -562,11 +562,20 @@ class PushDir {
 
 namespace env {
 
+// the first file named c in a PATH directory, its real path, else empty; on Windows a name
+//  without an extension is also looked for with each of PATHEXT's, as cmd does: curl.exe for curl
 inline std::string WHERE(char const* c) {
+  std::vector<std::string> names{c};
+#if MKN_KUL_IS_WIN
+  if (std::filesystem::path(c).extension().empty())
+    for (auto const& e : mkn::kul::String::SPLIT(env::GET("PATHEXT", ".COM;.EXE;.BAT;.CMD"), ";"))
+      if (!e.empty()) names.emplace_back(c + e);
+#endif
   for (auto const& s : mkn::kul::String::SPLIT(env::GET("PATH"), mkn::kul::env::SEP())) {
     if (std::error_code ec; !std::filesystem::is_directory(s, ec)) continue;
-    for (auto const& f : fsys::files(s))
-      if (f.filename() == c) return fsys::real(f);
+    for (auto const& n : names)
+      if (auto const f = std::filesystem::path(s) / n; std::filesystem::is_regular_file(f))
+        return fsys::real(f);
   }
   return "";
 }

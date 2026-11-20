@@ -3,6 +3,10 @@
 #include "test_common.hpp"
 
 #include "mkn/kul/env.hpp"
+#include "mkn/kul/os.hpp"
+
+#include <filesystem>
+#include <fstream>
 
 TEST(PushEnvOperations, SetsThenRestoresPreviouslyUnset) {
   mkn::kul::env::SET("MKN_KUL_TEST_ENV_A", nullptr);
@@ -76,7 +80,8 @@ TEST(PushEnvOperations, FromVectorOfNamesUnsetsEach) {
   mkn::kul::env::SET("MKN_KUL_TEST_ENV_H", "h");
   mkn::kul::env::SET("MKN_KUL_TEST_ENV_I", "i");
   {
-    mkn::kul::env::PushEnv push(std::vector<std::string>{"MKN_KUL_TEST_ENV_H", "MKN_KUL_TEST_ENV_I"});
+    mkn::kul::env::PushEnv push(
+        std::vector<std::string>{"MKN_KUL_TEST_ENV_H", "MKN_KUL_TEST_ENV_I"});
     EXPECT_FALSE(mkn::kul::env::EXISTS("MKN_KUL_TEST_ENV_H"));
     EXPECT_FALSE(mkn::kul::env::EXISTS("MKN_KUL_TEST_ENV_I"));
   }
@@ -108,4 +113,30 @@ TEST(Env, get_optional) {
   EXPECT_FALSE(mkn::kul::env::get("MKN_KUL_TEST_UNSET"));
   EXPECT_EQ(mkn::kul::env::get("MKN_KUL_TEST_UNSET", "def"), "def");
   EXPECT_EQ(mkn::kul::env::get_as<int>("MKN_KUL_TEST_UNSET", 3), 3);
+}
+
+// WHERE: a file in a PATH directory by name; on Windows also with PATHEXT's extensions, as cmd
+TEST(EnvWhere, FindsFilesInPath) {
+  namespace fs = std::filesystem;
+  auto const dir = fs::temp_directory_path() / "mkn.kul.env.where";
+  fs::remove_all(dir);
+  fs::create_directories(dir / "mkn_kul_dir");
+  std::ofstream(dir / "mkn_kul_tool.exe") << "";
+  {
+    mkn::kul::env::PushEnv path("PATH", dir.string().c_str());
+    // the same file, not the same text: Windows may give a short (8.3) name or PATHEXT's case
+    auto const found = [&](char const* c) {
+      auto const w = mkn::kul::env::WHERE(c);
+      return !w.empty() && fs::equivalent(w, dir / "mkn_kul_tool.exe");
+    };
+    EXPECT_TRUE(found("mkn_kul_tool.exe"));
+    EXPECT_TRUE(mkn::kul::env::WHERE("mkn_kul_missing").empty());
+    EXPECT_TRUE(mkn::kul::env::WHERE("mkn_kul_dir").empty());  // a directory is not a command
+#if MKN_KUL_IS_WIN
+    EXPECT_TRUE(found("mkn_kul_tool"));  // PATHEXT: .EXE
+#else
+    EXPECT_TRUE(mkn::kul::env::WHERE("mkn_kul_tool").empty());  // names are exact
+#endif
+  }
+  fs::remove_all(dir);
 }
