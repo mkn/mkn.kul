@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "mkn/kul/lang/cpp/compiler/def.hpp"
 #include "mkn/kul/os/any/proc/def.hpp"
 #include "mkn/kul/os/nixish/env.hpp"
-#include "mkn/kul/os/nixish/exit.hpp"
+#include "mkn/kul/os/nixish/exec.hpp"
 
 #if MKN_KUL_IS_NIX
 #include "mkn/kul/os/nix/proc.os.hpp"  // IWYU pragma: export

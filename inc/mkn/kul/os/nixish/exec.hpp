@@ -31,10 +31,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // IWYU pragma: private, include "mkn/kul/os.hpp"
 // IWYU pragma: friend ".*mkn/kul/os/(nix|nixish|bsd)/.*"
 
-#ifndef MKN_KUL_OS_NIXISH_EXIT_HPP_
-#define MKN_KUL_OS_NIXISH_EXIT_HPP_
+#ifndef MKN_KUL_OS_NIXISH_EXEC_HPP_
+#define MKN_KUL_OS_NIXISH_EXEC_HPP_
 
 #include <sys/wait.h>
+
+#include <cstdlib>
+#include <string>
 
 namespace mkn::kul::os {
 
@@ -45,6 +48,13 @@ inline int exit_code(int const status) {
   return WEXITSTATUS(status);
 }
 
+// cmd run by the shell, its output dropped with q
+inline int exec(std::string const& cmd, bool q = false) {
+  int const r = std::system((q ? cmd + " > /dev/null" : cmd).c_str());
+  if (r < 0) return r;
+  return exit_code(r);
+}
+
 }  // namespace mkn::kul::os
 
-#endif /* MKN_KUL_OS_NIXISH_EXIT_HPP_ */
+#endif /* MKN_KUL_OS_NIXISH_EXEC_HPP_ */
