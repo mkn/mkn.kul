@@ -3,14 +3,14 @@
 #include "mkn/kul/proc.hpp"
 #include "mkn/kul/scm.hpp"
 
-#include <unistd.h>
-
 #include <filesystem>
 #include <fstream>
 #include <string>
 #include <vector>
 
 #if !defined(_WIN32)  // file:// clones and bash
+#include <unistd.h>  // getpid
+
 namespace {
 
 namespace fs = std::filesystem;
