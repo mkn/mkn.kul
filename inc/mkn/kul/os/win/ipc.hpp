@@ -43,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "mkn/kul/proc.hpp"
 
 #include <conio.h>
-#include <stdio.h>
+#include <cstdio>
 #include <tchar.h>
 #include <windows.h>
 #include <memory>

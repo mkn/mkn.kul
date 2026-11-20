@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define MKN_KUL_OS_NIX_CPU_HPP_
 
 #include <unistd.h>
-#include <stdint.h>
+#include <cstdint>
 #include <thread>
 
 namespace mkn {

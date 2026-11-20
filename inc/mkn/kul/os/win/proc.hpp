@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <Windows.h>
 #include <psapi.h>
-#include <stdio.h>
+#include <cstdio>
 #include <strsafe.h>
 #include <tchar.h>
 #include <algorithm>
