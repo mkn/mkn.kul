@@ -14,7 +14,7 @@ concurrency:
 
 env:
   CURL_GET: curl -fL --retry 3 --retry-delay 2
-  PATH_GET: https://github.com/mkn/mkn/releases/download/latest
+  PATH_GET: https://github.com/mkn/mkn/releases/latest/download
 
 jobs:
   clang-format:
