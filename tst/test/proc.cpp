@@ -5,6 +5,8 @@
 #include "mkn/kul/proc.hpp"
 #include "tst/run_main.hpp"
 
+#include <csignal>
+
 TEST(Process_Test, LaunchProcess) {
   mkn::kul::Process p("bash");
   p << "-c"
@@ -39,6 +41,17 @@ TEST(Process_Test, CaptureProcess) {
 }
 
 #if !defined(_WIN32)
+// a child killed by a signal fails as 128 + the signal, e.g. a crash or dyld refusing to load it
+TEST(Process_Test, SignalIsFailure) {
+  mkn::kul::Process p("bash");
+  mkn::kul::ProcessCapture pc(p);  // forked and waited for here, not through system()'s shell
+  p << "-c" << "'kill -ABRT $$'";
+  mkn::kul::tst::run_main([&] {
+    EXPECT_THROW(p.start(), mkn::kul::proc::ExitException);
+    EXPECT_EQ(p.exitCode(), 128 + SIGABRT);
+  });
+}
+
 // output is passed on with the length read, a NUL byte does not end it
 TEST(Process_Test, CaptureKeepsNulBytes) {
   mkn::kul::Process p("head");

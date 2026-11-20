@@ -310,7 +310,7 @@ void Process::tearDown() {
 
 void Process::waitExit() KTHROW(mkn::kul::proc::ExitException) {
   tearDown();
-  exitCode(WEXITSTATUS(cStat));
+  exitCode(mkn::kul::os::exit_code(cStat));
   finish();
   setFinished();
 }
