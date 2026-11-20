@@ -56,11 +56,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define MKN_KUL_PROC_DUP_RETRY 3
 #endif  // MKN_KUL_PROC_DUP_RETRY
 
-#include <assert.h>
-#include <errno.h>
+#include <cassert>
+#include <cerrno>
 #include <fcntl.h>
 #include <signal.h>
-#include <stdint.h>
+#include <cstdint>
 #include <sys/select.h>
 #include <sys/types.h>
 #include <sys/wait.h>

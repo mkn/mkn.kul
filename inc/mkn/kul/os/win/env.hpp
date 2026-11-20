@@ -37,7 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <direct.h>
 #include <io.h>
 #include <process.h>
-#include <stdio.h>
+#include <cstdio>
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <sys/types.h>

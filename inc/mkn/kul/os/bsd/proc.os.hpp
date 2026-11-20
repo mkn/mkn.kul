@@ -34,11 +34,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef MKN_KUL_OS_BSD_PROC_OS_HPP_
 #define MKN_KUL_OS_BSD_PROC_OS_HPP_
 
-#include <assert.h>
+#include <cassert>
 #include <fcntl.h>
-#include <signal.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include <csignal>
+#include <cstdio>
+#include <cstdlib>
 #include <sys/wait.h>
 #include <unistd.h>
 #include <stdexcept>

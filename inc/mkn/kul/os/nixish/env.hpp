@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef MKN_KUL_OS_NIXISH_ENV_HPP_
 #define MKN_KUL_OS_NIXISH_ENV_HPP_
 
-#include <stdio.h>
+#include <cstdio>
 #include <stdlib.h>
 #include <unistd.h>
 #include <limits.h>
