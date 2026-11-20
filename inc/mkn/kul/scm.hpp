@@ -148,21 +148,40 @@ class Git : public SCM {
     }
     return p.toString();
   }
+  // a branch checkout is moved to the remote's branch: fast-forwarded, or reset when the branch was
+  //  rebuilt (a rolling one, e.g. latest) and the clone has nothing of its own, no local commits or
+  //  changes, else an error and nothing touched; a tag or commit checkout is pinned, never moved
   void up(std::string const& d, std::string const& r, std::string const& v) const
       KTHROW(Exception) override {
-    if (std::error_code ec; !std::filesystem::is_directory(d, ec))
+    if (std::error_code ec; !std::filesystem::is_directory(d, ec)) {
       co(d, r, v);
-    else {
+      return;
+    }
+    auto const git = [&](std::vector<std::string> const& args, bool const must = true) {
       mkn::kul::Process p("git", d);
-      p.arg("pull");
-      if (!r.empty()) p.arg(r);
-      if (!r.empty() && !v.empty()) p.arg(v);
+      mkn::kul::ProcessCapture pc(p);
+      for (auto const& a : args) p.arg(a);
       try {
         p.start();
       } catch (mkn::kul::proc::ExitException const& e) {
-        KEXCEPT(Exception, "SCM ERROR - Check remote dependency location / version");
+        if (must) KEXCEPT(Exception, "SCM ERROR - git " + args[0] + " in " + d + ": " + pc.errs());
+        return std::string{"\n"};  // never a commit
       }
-    }
+      auto out = pc.outs();
+      while (!out.empty() && (out.back() == '\n' || out.back() == '\r')) out.pop_back();
+      return out;
+    };
+    auto const b = git({"symbolic-ref", "-q", "--short", "HEAD"}, false);
+    if (b == "\n") return;  // detached: a tag or a commit
+    auto const tracking = "refs/remotes/origin/" + b;
+    auto const before = git({"rev-parse", "-q", "--verify", tracking}, false);
+    git({"fetch", r.empty() ? "origin" : r, "+refs/heads/" + b + ":" + tracking});
+    if (git({"merge", "--ff-only", tracking}, false) != "\n") return;
+    if (!git({"status", "--porcelain", "--untracked-files=no"}).empty())
+      KEXCEPT(Exception, "SCM ERROR - " + d + " has local changes, " + b + " was not updated");
+    if (git({"rev-parse", "HEAD"}) != before)
+      KEXCEPT(Exception, "SCM ERROR - " + d + " has local commits, " + b + " was not updated");
+    git({"reset", "--hard", tracking});
   }
   std::string origin(std::string const& d) const override {
     mkn::kul::Process p("git", d);
