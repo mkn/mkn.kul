@@ -50,6 +50,7 @@ inline int exit_code(int const status) {
 
 // cmd run by the shell, its output dropped with q
 inline int exec(std::string const& cmd, bool q = false) {
+  // NOLINTNEXTLINE(bugprone-command-processor,cert-env33-c): cmd is a command line for the shell
   int const r = std::system((q ? cmd + " > /dev/null" : cmd).c_str());
   if (r < 0) return r;
   return exit_code(r);
