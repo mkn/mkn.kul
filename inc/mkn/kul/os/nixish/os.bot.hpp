@@ -46,26 +46,6 @@ std::string mkn::kul::fsys::detail::esc(std::string s) {
 
 namespace mkn {
 namespace kul {
-namespace os {
-
-// a wait status as an exit code: a process killed by a signal is 128 + the signal, as shells
-//  report it, never 0
-inline int exit_code(int const status) {
-  if (WIFSIGNALED(status)) return 128 + WTERMSIG(status);
-  return WEXITSTATUS(status);
-}
-
-inline int exec(std::string const& cmd, bool q = false) {
-  int r = 0;
-  if (q)
-    r = system(std::string(cmd + " > /dev/null").c_str());
-  else
-    r = system(cmd.c_str());
-  if (r < 0) return r;
-  return exit_code(r);
-}
-}  // namespace os
-
 namespace user {
 
 // $HOME
