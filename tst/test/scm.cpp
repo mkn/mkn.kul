@@ -9,7 +9,7 @@
 #include <vector>
 
 #if !defined(_WIN32)  // file:// clones and bash
-#include <unistd.h>  // getpid
+#include <unistd.h>   // getpid
 
 namespace {
 
