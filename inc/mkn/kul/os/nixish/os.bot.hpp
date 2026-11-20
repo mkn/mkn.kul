@@ -46,19 +46,6 @@ std::string mkn::kul::fsys::detail::esc(std::string s) {
 
 namespace mkn {
 namespace kul {
-namespace os {
-
-inline int exec(std::string const& cmd, bool q = false) {
-  int r = 0;
-  if (q)
-    r = system(std::string(cmd + " > /dev/null").c_str());
-  else
-    r = system(cmd.c_str());
-  if (r < 0) return r;
-  return WEXITSTATUS(r);
-}
-}  // namespace os
-
 namespace user {
 
 // $HOME

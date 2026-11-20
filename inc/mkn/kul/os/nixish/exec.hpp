@@ -1,0 +1,61 @@
+/**
+Copyright (c) 2026, Philip Deegan.
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+    * Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above
+copyright notice, this list of conditions and the following disclaimer
+in the documentation and/or other materials provided with the
+distribution.
+    * Neither the name of Philip Deegan nor the names of its
+contributors may be used to endorse or promote products derived from
+this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+// IWYU pragma: private, include "mkn/kul/os.hpp"
+// IWYU pragma: friend ".*mkn/kul/os/(nix|nixish|bsd)/.*"
+
+#ifndef MKN_KUL_OS_NIXISH_EXEC_HPP_
+#define MKN_KUL_OS_NIXISH_EXEC_HPP_
+
+#include <sys/wait.h>
+
+#include <cstdlib>
+#include <string>
+
+namespace mkn::kul::os {
+
+// a wait status as an exit code: a process killed by a signal is 128 + the signal, as shells
+//  report it, never 0
+inline int exit_code(int const status) {
+  if (WIFSIGNALED(status)) return 128 + WTERMSIG(status);
+  return WEXITSTATUS(status);
+}
+
+// cmd run by the shell, its output dropped with q
+inline int exec(std::string const& cmd, bool q = false) {
+  // NOLINTNEXTLINE(bugprone-command-processor,cert-env33-c): cmd is a command line for the shell
+  int const r = std::system((q ? cmd + " > /dev/null" : cmd).c_str());
+  if (r < 0) return r;
+  return exit_code(r);
+}
+
+}  // namespace mkn::kul::os
+
+#endif /* MKN_KUL_OS_NIXISH_EXEC_HPP_ */

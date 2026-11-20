@@ -42,6 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "mkn/kul/lang/cpp/compiler/def.hpp"
 #include "mkn/kul/os/any/proc/def.hpp"
 #include "mkn/kul/os/nixish/env.hpp"
+#include "mkn/kul/os/nixish/exec.hpp"
 
 #if MKN_KUL_IS_NIX
 #include "mkn/kul/os/nix/proc.os.hpp"  // IWYU pragma: export
@@ -60,7 +61,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fcntl.h>
 #include <signal.h>
 #include <stdint.h>
-#include <stdlib.h>
 #include <sys/select.h>
 #include <sys/types.h>
 #include <sys/wait.h>
@@ -310,7 +310,7 @@ void Process::tearDown() {
 
 void Process::waitExit() KTHROW(mkn::kul::proc::ExitException) {
   tearDown();
-  exitCode(WEXITSTATUS(cStat));
+  exitCode(mkn::kul::os::exit_code(cStat));
   finish();
   setFinished();
 }
