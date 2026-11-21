@@ -1,0 +1,56 @@
+name: release
+
+# A PR merged into latest publishes mkn.yaml's version. Dependency versions left as `latest`
+#  (property <dep>.version: latest, e.g. mkn.kul.version) are pinned to that dependency's newest
+#  release tag (github.com/mkn/<dep>) in a commit on top of the merge commit; the tag goes on that
+#  commit, the latest branch keeps `latest`. A pre-release version (e.g. 0.1.0-beta.1) publishes a
+#  GitHub pre-release, never marked latest. Nothing is built here, build.yml tests the PR.
+
+on:
+  pull_request:
+    branches: [ latest ]
+    types: [ closed ]
+
+jobs:
+  publish:
+    if: github.event.pull_request.merged
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+    - uses: actions/checkout@v6
+      with:
+        ref: ${{ github.event.pull_request.merge_commit_sha }}
+    - id: version
+      run: |
+        set -euo pipefail
+        version=$(yq '.version' mkn.yaml)
+        if [ -z "$version" ] || [ "$version" = null ] || [ "$version" = master ]; then
+          echo "mkn.yaml version must be a release on latest, not '$version'"; exit 1
+        fi
+        if git ls-remote --exit-code --tags origin "refs/tags/$version" > /dev/null; then
+          echo "tag $version exists, bump mkn.yaml version"; exit 1
+        fi
+        for key in $(yq '.property // {} | to_entries | .[] | select(.key == "*.version" and .value == "latest") | .key' mkn.yaml); do
+          dep=${key%.version}
+          pin=$(git ls-remote --tags --refs --sort=-v:refname "https://github.com/mkn/$dep" \
+            | sed -n 's#.*refs/tags/\([0-9]*\.[0-9]*\.[0-9]*\)$#\1#p' | head -1)
+          if [ -z "$pin" ]; then echo "no release tag found for $dep"; exit 1; fi
+          echo "$key: $pin"
+          # sed changes only that line, yq -i would reformat the file
+          sed -i "s/^\( *${key//./\\.}: *\)latest\b/\1$pin/" mkn.yaml
+          [ "$(KEY="$key" yq '.property[strenv(KEY)]' mkn.yaml)" = "$pin" ]
+        done
+        git config user.name "github-actions[bot]"
+        git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        git commit -qam "$version: dependency versions pinned" || true
+        git tag -a "$version" -m "$version"
+        git push origin "refs/tags/$version"
+        echo "version=$version" >> "$GITHUB_OUTPUT"
+        case "$version" in *-*) echo "prerelease=true";; *) echo "prerelease=false";; esac >> "$GITHUB_OUTPUT"
+    - uses: softprops/action-gh-release@v2
+      with:
+        tag_name: ${{ steps.version.outputs.version }}
+        name: ${{ steps.version.outputs.version }}
+        prerelease: ${{ steps.version.outputs.prerelease }}
+        make_latest: ${{ steps.version.outputs.prerelease == 'false' }}
