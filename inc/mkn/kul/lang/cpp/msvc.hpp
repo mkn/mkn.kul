@@ -62,7 +62,7 @@ class WINCompiler : public CCompiler {
                          {6, "-O2"},
                          {7, "-O2"},
                          {8, "-O2"},
-                         {9, "-Ox -GA -Gw -Zc:inline -EHsc"}});
+                         {9, "-Ox -Gw -Zc:inline -EHsc"}});
     m_debug_c.insert({{0, "-DNDEBUG"},
                       {1, ""},
                       {2, ""},
