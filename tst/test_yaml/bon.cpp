@@ -57,6 +57,18 @@ TEST(BonYaml, fromYaml) {  // a module's YAML config as maiken hands it on
   EXPECT_EQ(mkn::kul::bon::to_yaml(b)["compile"]["paths"].as<std::string>(), "inc");
 }
 
+TEST(BonYaml, fromYamlEdges) {
+  using mkn::kul::bon::from_yaml;
+  YAML::Node const y = YAML::Load("{a: b}");
+  EXPECT_EQ(from_yaml(y["missing"]).size(), 0u);  // undefined: an empty map, no throw
+  EXPECT_THROW(from_yaml(YAML::Load("? [a, b]\n: first\n? [c, d]\n: second\n")),
+               mkn::kul::bon::Exception);  // non scalar keys would collide
+  EXPECT_THROW(from_yaml(YAML::Load("&self [*self]")), mkn::kul::bon::Exception);  // cycle
+  auto const rep = from_yaml(YAML::Load("{x: &a {k: v}, y: *a}"));  // a repeated alias is fine
+  EXPECT_EQ(rep["x"]["k"].str(), "v");
+  EXPECT_EQ(rep["y"]["k"].str(), "v");
+}
+
 TEST(BonYaml, malformed) { EXPECT_THROW(mkn::kul::bon::from("{a: b"), mkn::kul::bon::Exception); }
 
 int main(int argc, char* argv[]) {
