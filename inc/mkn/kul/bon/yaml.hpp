@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "mkn/kul/bon.hpp"
 #include "yaml-cpp/yaml.h"
+#include "mkn/kul/except.hpp"
 
 #include <string>
 #include <utility>
@@ -56,19 +57,41 @@ inline YAML::Node to_yaml(Node const& node) {
 // parse s to a YAML::Node
 inline YAML::Node from(std::string const& s) { return to_yaml(parse(s)); }
 
-// a YAML::Node as a bon::Node: scalars as strings, null / undefined as an empty map
-inline Node from_yaml(YAML::Node const& node) {
+namespace detail {
+
+// active: the sequences and maps being converted on this path, an alias back to one is a cycle
+inline Node from_yaml(YAML::Node const& node, std::vector<YAML::Node>& active) {
+  if (!node.IsDefined()) return Node{};  // e.g. a missing key's lookup: an empty map
   if (node.IsScalar()) return Node{node.Scalar()};
+  if (!node.IsSequence() && !node.IsMap()) return Node{};  // null: an empty map
+  for (auto const& a : active)
+    if (node.is(a)) KEXCEPT(Exception, "bon: cyclic YAML alias");
+  active.push_back(node);
+  Node out;
   if (node.IsSequence()) {
     Node::List list;
     list.reserve(node.size());
-    for (auto const& n : node) list.emplace_back(from_yaml(n));
-    return Node{std::move(list)};
+    for (auto const& n : node) list.emplace_back(from_yaml(n, active));
+    out = Node{std::move(list)};
+  } else {
+    Node::Map map;
+    for (auto const& kv : node) {
+      if (!kv.first.IsScalar()) KEXCEPT(Exception, "bon: a YAML map key that is not a scalar");
+      map.push_back({kv.first.Scalar(), from_yaml(kv.second, active)});
+    }
+    out = Node{std::move(map)};
   }
-  Node::Map map;
-  if (node.IsMap())
-    for (auto const& kv : node) map.push_back({kv.first.Scalar(), from_yaml(kv.second)});
-  return Node{std::move(map)};
+  active.pop_back();  // a throw leaves active with its caller, which discards it
+  return out;
+}
+
+}  // namespace detail
+
+// a YAML::Node as a bon::Node: scalars as strings, null / undefined as an empty map; throws a
+//  bon::Exception for a cyclic alias or a non scalar map key
+inline Node from_yaml(YAML::Node const& node) {
+  std::vector<YAML::Node> active;
+  return detail::from_yaml(node, active);
 }
 
 }  // namespace mkn::kul::bon
