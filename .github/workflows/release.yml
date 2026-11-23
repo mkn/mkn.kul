@@ -2,7 +2,8 @@ name: release
 
 # A PR merged into latest publishes mkn.yaml's version. Dependency versions left as `latest`
 #  (property <dep>.version: latest, e.g. mkn.kul.version) are pinned to that dependency's newest
-#  release tag (github.com/mkn/<dep>) in a commit on top of the merge commit; the tag goes on that
+#  release tag (github.com/mkn/<dep>; modules, github.com/mkn-mod/<dep>, keep their latest branch) in
+#  a commit on top of the merge commit; the tag goes on that
 #  commit, the latest branch keeps `latest`. A pre-release version (e.g. 0.1.0-beta.1) publishes a
 #  GitHub pre-release, never marked latest. Nothing is built here, build.yml tests the PR.
 
@@ -33,8 +34,12 @@ jobs:
         fi
         for key in $(yq '.property // {} | to_entries | .[] | select(.key == "*.version" and .value == "latest") | .key' mkn.yaml); do
           dep=${key%.version}
-          pin=$(git ls-remote --tags --refs --sort=-v:refname "https://github.com/mkn/$dep" \
-            | sed -n 's#.*refs/tags/\([0-9]*\.[0-9]*\.[0-9]*\)$#\1#p' | head -1)
+          # modules (github.com/mkn-mod) have no releases: their latest branch, left as is
+          if git ls-remote "https://github.com/mkn-mod/$dep" > /dev/null 2>&1; then
+            echo "$key: a module, stays latest"; continue
+          fi
+          tags=$(git ls-remote --tags --refs --sort=-v:refname "https://github.com/mkn/$dep") || tags=
+          pin=$(sed -n 's#.*refs/tags/\([0-9]*\.[0-9]*\.[0-9]*\)$#\1#p' <<< "$tags" | head -1)
           if [ -z "$pin" ]; then echo "no release tag found for $dep"; exit 1; fi
           echo "$key: $pin"
           # sed changes only that line, yq -i would reformat the file
