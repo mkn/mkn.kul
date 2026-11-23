@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <string>
 #include <utility>
+#include <variant>
 #include <vector>
 
 namespace mkn::kul::bon {

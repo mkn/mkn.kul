@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define MKN_KUL_BON_HPP_
 
 #include "mkn/kul/except.hpp"
+#include "mkn/kul/lang/cpp/compiler/def.hpp"
 
 #include <cstddef>
 #include <string>
@@ -77,7 +78,7 @@ struct Node {
   bool contains(std::string const& key) const;
   Node const& operator[](std::string const& key) const;  // throws if there is no key
   Node const& operator[](std::size_t const i) const;
-  Node const* find(std::string const& key) const;  // null if not a map or no key: optional keys
+  MKN_KUL_FN_SIG_RET Node const* find(std::string const& key) const;  // null if not a map or no key
 
  private:
   template <typename T>
