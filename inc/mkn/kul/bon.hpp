@@ -34,7 +34,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "mkn/kul/except.hpp"
 #include "mkn/kul/lang/cpp/compiler/def.hpp"
 
+#include <algorithm>
 #include <cstddef>
+#include <initializer_list>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -116,6 +118,20 @@ inline Node const* Node::find(std::string const& key) const {
   for (auto const& [k, node] : map())
     if (k == key) return &node;
   return nullptr;
+}
+
+// a module's configuration: a map whose keys are among allowed, each value a string; an empty
+//  node (no configuration) passes. Throws a bon::Exception naming the offending key
+inline void validate(Node const& node, std::initializer_list<std::string_view> const allowed) {
+  if (node.is_map()) {
+    for (auto const& [key, value] : node.map()) {
+      if (std::find(allowed.begin(), allowed.end(), key) == allowed.end())
+        KEXCEPT(Exception, "bon: unexpected key: ", key);
+      if (!value.is_string()) KEXCEPT(Exception, "bon: not a string: ", key);
+    }
+    return;
+  }
+  KEXCEPT(Exception, "bon: not a map");
 }
 
 namespace detail {

@@ -155,6 +155,15 @@ TEST(Bon, nodeAccess) {
   EXPECT_EQ(n["a"].find("b"), nullptr);  // not a map
 }
 
+TEST(Bon, validate) {  // a module's allowed configuration keys
+  using mkn::kul::bon::validate;
+  EXPECT_NO_THROW(validate(bon("{paths: inc, style: file}"), {"paths", "style", "types"}));
+  EXPECT_NO_THROW(validate(mkn::kul::bon::Node{}, {"paths"}));  // no configuration
+  EXPECT_THROW(validate(bon("{path: inc}"), {"paths"}), mkn::kul::bon::Exception);
+  EXPECT_THROW(validate(bon("{paths: {a, b}}"), {"paths"}), mkn::kul::bon::Exception);
+  EXPECT_THROW(validate(bon("{a: {x}}")["a"], {"paths"}), mkn::kul::bon::Exception);  // a string
+}
+
 TEST(Bon, iteration) {  // a module reading its config
   auto const n = bon("{a: b, l: {x, y}}");
   std::string keys, items;
