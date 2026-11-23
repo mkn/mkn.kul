@@ -41,6 +41,22 @@ TEST(BonYaml, modArgs) {  // as maiken uses it: name{phase{k: v}}
   EXPECT_EQ(node["compile"]["system_last"].as<std::string>(), "true");
 }
 
+TEST(BonYaml, fromYaml) {  // a module's YAML config as maiken hands it on
+  auto const y = YAML::Load("compile: {paths: inc, n: 2}\nlist: [a, b]\nnone:\n");
+  auto const b = mkn::kul::bon::from_yaml(y);
+  ASSERT_TRUE(b.is_map());
+  EXPECT_EQ(b["compile"]["paths"].str(), "inc");
+  EXPECT_EQ(b["compile"]["n"].str(), "2");
+  ASSERT_TRUE(b["list"].is_list());
+  EXPECT_EQ(b["list"][1].str(), "b");
+  EXPECT_TRUE(b["none"].is_map());  // null: an empty map
+  EXPECT_EQ(b["none"].size(), 0u);
+  EXPECT_EQ(b.find("missing"), nullptr);
+  EXPECT_EQ(mkn::kul::bon::from_yaml(YAML::Node{}).size(), 0u);
+  // and back
+  EXPECT_EQ(mkn::kul::bon::to_yaml(b)["compile"]["paths"].as<std::string>(), "inc");
+}
+
 TEST(BonYaml, malformed) { EXPECT_THROW(mkn::kul::bon::from("{a: b"), mkn::kul::bon::Exception); }
 
 int main(int argc, char* argv[]) {

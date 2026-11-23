@@ -149,4 +149,26 @@ TEST(Bon, nodeAccess) {
   EXPECT_THROW(n["a"].list(), mkn::kul::bon::Exception);
   EXPECT_THROW(n["l"].str(), mkn::kul::bon::Exception);
   EXPECT_THROW(n.str(), mkn::kul::bon::Exception);
+  ASSERT_NE(n.find("a"), nullptr);  // optional keys
+  EXPECT_EQ(n.find("a")->str(), "b");
+  EXPECT_EQ(n.find("q"), nullptr);
+  EXPECT_EQ(n["a"].find("b"), nullptr);  // not a map
+}
+
+TEST(Bon, validate) {  // a module's allowed configuration keys
+  using mkn::kul::bon::validate;
+  EXPECT_NO_THROW(validate(bon("{paths: inc, style: file}"), {"paths", "style", "types"}));
+  EXPECT_NO_THROW(validate(mkn::kul::bon::Node{}, {"paths"}));  // no configuration
+  EXPECT_THROW(validate(bon("{path: inc}"), {"paths"}), mkn::kul::bon::Exception);
+  EXPECT_THROW(validate(bon("{paths: {a, b}}"), {"paths"}), mkn::kul::bon::Exception);
+  EXPECT_THROW(validate(bon("{a: {x}}")["a"], {"paths"}), mkn::kul::bon::Exception);  // a string
+}
+
+TEST(Bon, iteration) {  // a module reading its config
+  auto const n = bon("{a: b, l: {x, y}}");
+  std::string keys, items;
+  for (auto const& [key, node] : n.map()) keys += key;
+  for (auto const& item : n["l"].list()) items += item.str();
+  EXPECT_EQ(keys, "al");
+  EXPECT_EQ(items, "xy");
 }

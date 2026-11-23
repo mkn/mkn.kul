@@ -32,8 +32,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define MKN_KUL_BON_HPP_
 
 #include "mkn/kul/except.hpp"
+#include "mkn/kul/lang/cpp/compiler/def.hpp"
 
+#include <algorithm>
 #include <cstddef>
+#include <initializer_list>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -75,8 +78,9 @@ struct Node {
 
   std::size_t size() const;  // entries of a map or list, 1 for a string
   bool contains(std::string const& key) const;
-  Node const& operator[](std::string const& key) const;
+  Node const& operator[](std::string const& key) const;  // throws if there is no key
   Node const& operator[](std::size_t const i) const;
+  MKN_KUL_FN_SIG_RET Node const* find(std::string const& key) const;  // null if not a map or no key
 
  private:
   template <typename T>
@@ -84,8 +88,6 @@ struct Node {
     if (auto const* v = std::get_if<T>(&value)) return *v;
     KEXCEPT(Exception, "bon: not a ", type);
   }
-
-  Node const* find(std::string const& key) const;
 };
 
 struct Node::Entry {
@@ -112,9 +114,24 @@ inline Node const& Node::operator[](std::size_t const i) const {
 }
 
 inline Node const* Node::find(std::string const& key) const {
+  if (!is_map()) return nullptr;
   for (auto const& [k, node] : map())
     if (k == key) return &node;
   return nullptr;
+}
+
+// a module's configuration: a map whose keys are among allowed, each value a string; an empty
+//  node (no configuration) passes. Throws a bon::Exception naming the offending key
+inline void validate(Node const& node, std::initializer_list<std::string_view> const allowed) {
+  if (node.is_map()) {
+    for (auto const& [key, value] : node.map()) {
+      if (std::find(allowed.begin(), allowed.end(), key) == allowed.end())
+        KEXCEPT(Exception, "bon: unexpected key: ", key);
+      if (!value.is_string()) KEXCEPT(Exception, "bon: not a string: ", key);
+    }
+    return;
+  }
+  KEXCEPT(Exception, "bon: not a map");
 }
 
 namespace detail {
