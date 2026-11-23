@@ -5,6 +5,8 @@ version: master  # on the latest branch a release, e.g. 0.2.0: merged there it i
 property:
   # dependency versions, only here: master on master, latest on the latest branch, releases pinned in tags
   parse.yaml.version: master
+  clang.tidy.version: master
+  cpp.iwyu.version: master
 
 parent: include
 
@@ -42,7 +44,7 @@ profile:
 
 - name: format
   mod: |
-    clang.format{init{style: file, types: hpp cpp ipp, paths: .}}
+    clang.format#master{init{style: file, types: hpp cpp ipp, paths: .}}
 
 # include-what-you-use report for inc/, needs iwyu on PATH, see res/iwyu.imp
 - name: iwyu
@@ -50,6 +52,7 @@ profile:
   dep: parse.yaml#${parse.yaml.version}[headers]
   mod:
   - name: cpp.iwyu
+    version: ${cpp.iwyu.version}
     compile:
       paths: inc
       # os/win os/bsd: other platforms, the rest are fragments of a parent header
@@ -63,6 +66,7 @@ profile:
   dep: parse.yaml#${parse.yaml.version}[headers]
   mod:
   - name: cpp.iwyu
+    version: ${cpp.iwyu.version}
     compile:
       paths: inc
       # os/win os/bsd: other platforms, the rest are fragments of a parent header
@@ -81,6 +85,6 @@ profile:
   dep: parse.yaml#${parse.yaml.version}
   mod:
   - name: clang.tidy
-    version: master
+    version: ${clang.tidy.version}
     init:
       args: -std=c++20
