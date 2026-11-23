@@ -149,4 +149,17 @@ TEST(Bon, nodeAccess) {
   EXPECT_THROW(n["a"].list(), mkn::kul::bon::Exception);
   EXPECT_THROW(n["l"].str(), mkn::kul::bon::Exception);
   EXPECT_THROW(n.str(), mkn::kul::bon::Exception);
+  ASSERT_NE(n.find("a"), nullptr);  // optional keys
+  EXPECT_EQ(n.find("a")->str(), "b");
+  EXPECT_EQ(n.find("q"), nullptr);
+  EXPECT_EQ(n["a"].find("b"), nullptr);  // not a map
+}
+
+TEST(Bon, iteration) {  // a module reading its config
+  auto const n = bon("{a: b, l: {x, y}}");
+  std::string keys, items;
+  for (auto const& [key, node] : n.map()) keys += key;
+  for (auto const& item : n["l"].list()) items += item.str();
+  EXPECT_EQ(keys, "al");
+  EXPECT_EQ(items, "xy");
 }

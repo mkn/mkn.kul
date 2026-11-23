@@ -75,8 +75,9 @@ struct Node {
 
   std::size_t size() const;  // entries of a map or list, 1 for a string
   bool contains(std::string const& key) const;
-  Node const& operator[](std::string const& key) const;
+  Node const& operator[](std::string const& key) const;  // throws if there is no key
   Node const& operator[](std::size_t const i) const;
+  Node const* find(std::string const& key) const;  // null if not a map or no key: optional keys
 
  private:
   template <typename T>
@@ -84,8 +85,6 @@ struct Node {
     if (auto const* v = std::get_if<T>(&value)) return *v;
     KEXCEPT(Exception, "bon: not a ", type);
   }
-
-  Node const* find(std::string const& key) const;
 };
 
 struct Node::Entry {
@@ -112,6 +111,7 @@ inline Node const& Node::operator[](std::size_t const i) const {
 }
 
 inline Node const* Node::find(std::string const& key) const {
+  if (!is_map()) return nullptr;
   for (auto const& [k, node] : map())
     if (k == key) return &node;
   return nullptr;
