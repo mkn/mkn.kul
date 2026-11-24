@@ -255,9 +255,15 @@ class GccCompiler : public CCompiler {
     if (!dryRun && mkn::kul::os::exec(cmd) != 0) KEXCEPT(Exception, "Failed to pre-compile header");
   }
 
+  // inc as for a shell (fsys::esc: spaces escaped as "\\ " but on Windows): a directory is -I,
+  //  anything else a file to -include
   std::string includeArg(std::string const& inc) const override {
+    std::string path = inc;
+#if !MKN_KUL_IS_WIN
+    mkn::kul::String::REPLACE_ALL(path, "\\ ", " ");
+#endif
     std::error_code ec;
-    return std::filesystem::is_directory(inc, ec) ? ("-I" + inc) : ("-include " + inc);
+    return std::filesystem::is_directory(path, ec) ? ("-I" + inc) : ("-include " + inc);
   }
 
   CCompiler_Type type() const override { return CCompiler_Type::GCC; }

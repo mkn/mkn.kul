@@ -147,3 +147,15 @@ TEST(CLI_Test, ArgDefaultLimitIsOnce) {
   EXPECT_THROW(process_default({"-a", "x", "-a", "y"}), Exception);  // would drop x
   EXPECT_THROW(process_default({"-dd"}), Exception);
 }
+
+// settings inc/path lines are split this way: outside quotes a backslash escapes the next
+//  character (a space kept), inside quotes backslashes and spaces are kept, as Windows paths need
+TEST(CLI_Test, BackslashOutsideQuotesEscapes) {
+  EXPECT_EQ(mkn::kul::cli::asArgs(R"(C:/Program\ Files/x C:\x)"),
+            (std::vector<std::string>{"C:/Program Files/x", "C:x"}));
+}
+
+TEST(CLI_Test, QuotesKeepBackslashesAndSpaces) {
+  EXPECT_EQ(mkn::kul::cli::asArgs(R"("C:\Program Files\x" 'y z')"),
+            (std::vector<std::string>{R"(C:\Program Files\x)", "y z"}));
+}
