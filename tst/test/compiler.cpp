@@ -292,10 +292,12 @@ TEST(CompilerTests, ContextCompileCommandWithoutDefaultsToFull) {
 TEST(CompilerTests, GccIncludeArgOfDirectoryWithSpace) {
   auto const base = std::filesystem::temp_directory_path() / "mkn_kul_test with space";
   std::filesystem::create_directories(base / "inc");
-  mkn::kul::os::PushDir const pushd(base.string());
-  auto const arg = GccCompiler{}.includeArg(mkn::kul::Dir("inc").escm());
-  EXPECT_EQ(arg.rfind("-I", 0), 0u) << arg;
-  auto const spaced = GccCompiler{}.includeArg(mkn::kul::Dir(base.string()).esc());
-  EXPECT_EQ(spaced.rfind("-I", 0), 0u) << spaced;
+  {  // left before removing it: Windows does not remove a working directory
+    mkn::kul::os::PushDir const pushd(base.string());
+    auto const arg = GccCompiler{}.includeArg(mkn::kul::Dir("inc").escm());
+    EXPECT_EQ(arg.rfind("-I", 0), 0u) << arg;
+    auto const spaced = GccCompiler{}.includeArg(mkn::kul::Dir(base.string()).esc());
+    EXPECT_EQ(spaced.rfind("-I", 0), 0u) << spaced;
+  }
   std::filesystem::remove_all(base);
 }
