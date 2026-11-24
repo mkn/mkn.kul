@@ -33,7 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // checks without a test framework: one Tester declared (MKN_KUL_TEST_DECLARE), then checks
 //  anywhere in that file (MKN_KUL_TEST_CHECK). Each check records where it was made; at exit the
-//  Tester reports the failures, and with any the process exits 1
+//  Tester reports the failures, and with any the process exits 1. While it lives, a failure
+//  (mkn::kul::fail, e.g. from a library) is its last check: reported with the others, exit 1
 //
 //   MKN_KUL_TEST_DECLARE();
 //   int main() {
@@ -41,6 +42,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //     if (!MKN_KUL_TEST_CHECK(ptr != nullptr, "no ptr")) return 0;  // reported at exit
 //   }
 
+#include "mkn/kul/fail.hpp"
+
+#include <atomic>
 #include <cstdio>
 #include <cstdlib>
 #include <mutex>
@@ -60,12 +64,17 @@ struct Tester {
 
   // exit_on_fail: a failure at destruction exits the process with 1, for a static Tester whose
   //  destruction is the end of the program
-  explicit Tester(bool const exit = true) : exit_on_fail{exit} {}
+  explicit Tester(bool const exit = true)
+      : exit_on_fail{exit},
+        previous{active().exchange(this)},
+        previous_handler{set_fail_handler(on_fail)} {}
 
   Tester(Tester const&) = delete;
   Tester& operator=(Tester const&) = delete;
 
   ~Tester() {
+    set_fail_handler(previous_handler);
+    active().store(previous);
     report();
     // destroyed during exit (a static): std::exit again would be undefined, _Exit ends here
     if (exit_on_fail && failed()) {
@@ -116,8 +125,28 @@ struct Tester {
   bool const exit_on_fail;
 
  private:
+  // the latest Tester alive, the one failures are reported to
+  static std::atomic<Tester*>& active() {
+    static std::atomic<Tester*> tester{nullptr};
+    return tester;
+  }
+
+  static void on_fail(Failure const& f) {
+    if (auto* const tester = active().load()) {
+      tester->check(false, f.what, f.where);
+      tester->report();
+      std::fflush(nullptr);
+      std::_Exit(1);
+    }
+    print(f);
+    std::fflush(nullptr);
+    std::abort();
+  }
+
   mutable std::mutex mutex;
   std::vector<Check> checks;
+  Tester* const previous;
+  FailHandler const previous_handler;
 };
 
 }  // namespace mkn::kul

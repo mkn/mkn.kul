@@ -4,6 +4,7 @@
 #include "mkn/kul/test.hpp"
 
 #include <memory>
+#include <stdexcept>
 #include <string>
 
 TEST(Tester, RecordsChecks) {
@@ -30,4 +31,23 @@ TEST(Tester, ExitsOneOnFailure) {
         tester.check(false, "fails");
       },
       ::testing::ExitedWithCode(1), "1 checks, 0 passed, 1 failed");
+}
+
+TEST(Fail, DefaultHandlerAborts) { EXPECT_DEATH(mkn::kul::fail("boom"), "FAILED: .*boom"); }
+
+TEST(Fail, ReportedByTheLiveTester) {
+  EXPECT_EXIT(
+      {
+        mkn::kul::Tester tester{false};
+        tester.check(true, "before");
+        mkn::kul::fail("boom");
+      },
+      ::testing::ExitedWithCode(1), "2 checks, 1 passed, 1 failed");
+}
+
+TEST(Fail, HandlerCanThrow) {
+  auto const previous = mkn::kul::set_fail_handler(
+      [](mkn::kul::Failure const& f) { throw std::runtime_error(f.what); });
+  EXPECT_THROW(mkn::kul::fail("boom"), std::runtime_error);
+  mkn::kul::set_fail_handler(previous);
 }
