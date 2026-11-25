@@ -1,0 +1,5 @@
+# the default branch is latest (releases); development pull requests go to master
+reviews:
+  auto_review:
+    base_branches:
+      - master
