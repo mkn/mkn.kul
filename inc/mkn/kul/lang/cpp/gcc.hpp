@@ -31,6 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef MKN_KUL_LANG_CPP_GCC_HPP
 #define MKN_KUL_LANG_CPP_GCC_HPP
 
+#include "mkn/kul/cli.hpp"
 #include "mkn/kul/lang/compiler.hpp"
 #include "mkn/kul/string.hpp"
 #include "mkn/kul/defs.hpp"
@@ -99,7 +100,7 @@ class CCompiler : public Compiler {
     for (auto const& f : mkn::kul::fsys::files(dir)) {
       auto const name = f.filename().string();
       if (name.size() > ext.size() && name.ends_with(ext))
-        objs.emplace_back(mkn::kul::fsys::escm(f));
+        objs.emplace_back(mkn::kul::fsys::mini(f));
     }
     std::sort(objs.begin(), objs.end());
     return objs;
@@ -231,8 +232,7 @@ class GccCompiler : public CCompiler {
   static std::string linkArg(std::string const& lib) {
     if (!isLibPath(lib)) return "-l" + lib;
     std::error_code ec;  // its directory is not made yet on dry runs
-    return std::filesystem::is_directory(outDir(lib), ec) ? mkn::kul::fsys::escm(lib)
-                                                          : mkn::kul::fsys::esc(lib);
+    return std::filesystem::is_directory(outDir(lib), ec) ? mkn::kul::fsys::mini(lib) : lib;
   }
 
   ProcessCapture compileSource(CompileDAO& dao) const KTHROW(mkn::kul::Exception) override;
@@ -247,24 +247,24 @@ class GccCompiler : public CCompiler {
     if (in.rfind(".") == std::string::npos) KEXCEPT(Exception, "Unknown header type");
 
     std::string h = in.substr(in.rfind(".") + 1);
-    std::string cmd = executableFor(h) + (isCSource(h) ? " -x c-header " : " -x c++-header ");
-    cmd += in + " ";
-    for (std::string const& s : args) cmd += s + " ";
-    for (std::string const& s : incs) cmd += "-I" + s + " ";
-
-    cmd += " -o " + out;
-    if (!dryRun && mkn::kul::os::exec(cmd) != 0) KEXCEPT(Exception, "Failed to pre-compile header");
+    mkn::kul::Process p(mkn::kul::cli::asArgs(executableFor(h)));  // CC / CXX may carry flags
+    p.arg("-x").arg(isCSource(h) ? "c-header" : "c++-header").arg(in);
+    for (std::string const& s : args) p.arg(s);
+    for (std::string const& s : incs) p.arg("-I" + s);
+    p.arg("-o").arg(out);
+    if (dryRun) return;
+    try {
+      p.start();
+    } catch (mkn::kul::Exception const&) {
+      KEXCEPT(Exception, "Failed to pre-compile header");
+    }
   }
 
-  // inc as for a shell (fsys::esc: spaces escaped as "\\ " but on Windows): a directory is -I,
-  //  anything else a file to -include
-  std::string includeArg(std::string const& inc) const override {
-    std::string path = inc;
-#if !MKN_KUL_IS_WIN
-    mkn::kul::String::REPLACE_ALL(path, "\\ ", " ");
-#endif
+  // a directory is -I, anything else a file to -include
+  std::vector<std::string> includeArgs(std::string const& inc) const override {
     std::error_code ec;
-    return std::filesystem::is_directory(path, ec) ? ("-I" + inc) : ("-include " + inc);
+    if (std::filesystem::is_directory(inc, ec)) return {"-I" + inc};
+    return {"-include", inc};
   }
 
   CCompiler_Type type() const override { return CCompiler_Type::GCC; }
@@ -299,10 +299,9 @@ class GccCompiler : public CCompiler {
       auto rel =
           fs::path(rpath).lexically_relative(fs::path(mkn::kul::fsys::real(outDir(out)))).string();
       if (rel == ".") rel.clear();
-      p << linkerOption("-rpath," + mkn::kul::fsys::esc(rpath))
-        << linkerOption("-rpath,@loader_path/" + rel);
+      p << linkerOption("-rpath," + rpath) << linkerOption("-rpath,@loader_path/" + rel);
 #else
-      p << linkerOption("-rpath=" + mkn::kul::fsys::esc(rpath));
+      p << linkerOption("-rpath=" + rpath);
 #endif
     }
   }

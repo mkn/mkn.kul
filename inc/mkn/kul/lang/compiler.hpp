@@ -156,7 +156,8 @@ class Compiler {
 
   virtual ProcessCapture compileSource(CompileDAO& dao) const KTHROW(mkn::kul::Exception) = 0;
 
-  virtual std::string includeArg(std::string const& inc) const = 0;
+  // the arguments taking inc (a directory, or a file to include), each one argument as it is
+  virtual std::vector<std::string> includeArgs(std::string const& inc) const = 0;
 
   virtual ProcessCapture buildExecutable(LinkDAO& dao) const KTHROW(mkn::kul::Exception) = 0;
 
