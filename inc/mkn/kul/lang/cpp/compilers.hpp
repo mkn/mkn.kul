@@ -242,24 +242,28 @@ inline ProcessCapture GccCompiler::compileSource(CompileDAO& dao) const
   return pc;
 }
 
-// clang-scan-deps beside the compiler, its version suffix kept (clang++-22: clang-scan-deps-22);
-//  MKN_CLANG_SCAN_DEPS overrides
+// clang-scan-deps beside the compiler, its version suffix kept (clang++-22: clang-scan-deps-22,
+//  x86_64-linux-gnu-clang++-22 too: scanners have no target prefix); CXX as for compiles, its
+//  flags not part of the name; MKN_CLANG_SCAN_DEPS overrides
+inline std::string ClangCompiler::scanDeps(std::string const& compiler) {
+  if (auto scanner = mkn::kul::env::get("MKN_CLANG_SCAN_DEPS", ""); !scanner.empty())
+    return scanner;
+  std::filesystem::path const bin = Compilers::INSTANCE().identify(CXX(compiler)).binary;
+  std::string name = bin.filename().string();
+  for (auto const* const c : {"clang++", "clang"})
+    if (auto const at = name.find(c); at != std::string::npos) {
+      name = "clang-scan-deps" + name.substr(at + std::string(c).size());
+      break;
+    }
+  return (bin.parent_path() / name).string();
+}
+
 inline ProcessCapture ClangCompiler::scanModules(std::string const& compiler, std::string const& db,
                                                  std::size_t const threads) const
     KTHROW(mkn::kul::Exception) {
-  std::string scanner = mkn::kul::env::get("MKN_CLANG_SCAN_DEPS", "");
-  if (scanner.empty()) {
-    std::filesystem::path const bin = CXX(Compilers::INSTANCE().identify(compiler).binary);
-    std::string name = bin.filename().string();
-    for (auto const* const c : {"clang++", "clang"})
-      if (name.rfind(c, 0) == 0) {
-        name = "clang-scan-deps" + name.substr(std::string(c).size());
-        break;
-      }
-    scanner = (bin.parent_path() / name).string();
-  }
-  mkn::kul::Process p(std::array<std::string, 6>{scanner, "-format=p1689", "-compilation-database",
-                                                 db, "-j", std::to_string(threads ? threads : 1)});
+  mkn::kul::Process p(std::array<std::string, 6>{scanDeps(compiler), "-format=p1689",
+                                                 "-compilation-database", db, "-j",
+                                                 std::to_string(threads ? threads : 1)});
   ProcessCapture pc;
   pc.setProcess(p);
   pc.cmd(p.toString());

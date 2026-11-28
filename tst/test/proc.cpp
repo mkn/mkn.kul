@@ -134,3 +134,10 @@ TEST(Process_Test, ListedArgvToStringIsShellQuoted) {
   EXPECT_EQ(pc.outs(), "plain|a b|it's|-DX=\"y\"|");
 }
 #endif  // !defined(_WIN32)
+
+#if !defined(_WIN32)
+TEST(Process_Test, ListedArgvNotWaitedFor) {
+  mkn::kul::Process p(std::array{"true"}, /*wfe=*/false);
+  EXPECT_NO_THROW(p.start());  // no exit code to check yet
+}
+#endif  // !defined(_WIN32)

@@ -336,6 +336,8 @@ class ClangCompiler : public GccCompiler {
   }
   ProcessCapture scanModules(std::string const& compiler, std::string const& db,
                              std::size_t threads) const KTHROW(mkn::kul::Exception) override;
+  // the scanner scanModules runs for a build's compiler string
+  static std::string scanDeps(std::string const& compiler);
 
   // On Windows, clang targets the MSVC ABI: its driver resolves "-lfoo" by
   // searching for "foo.lib" (COFF/MSVC convention), not "libfoo.a" (GNU

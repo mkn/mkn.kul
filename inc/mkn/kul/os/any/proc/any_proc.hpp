@@ -142,13 +142,13 @@ class AProcess {
     if (this->o)
       this->o(_s);
     else
-      printf("%s", _s.c_str());
+      std::fwrite(_s.data(), 1, _s.size(), stdout);  // its bytes, NULs too
   }
   virtual void err(std::string const& _s) {
     if (this->e)
       this->e(_s);
     else
-      fprintf(stderr, "%s", _s.c_str());
+      std::fwrite(_s.data(), 1, _s.size(), stderr);
   }
   void error(int16_t const& line, std::string const& _s) KTHROW(mkn::kul::Exception) {
     tearDown();
@@ -226,9 +226,10 @@ class ProcessCapture {
 inline void AProcess::start() KTHROW(mkn::kul::Exception) {
   if (this->s) KEXCEPT(mkn::kul::proc::Exception, "Process is already started");
   this->s = true;
-  if (this->o || this->e || listed)  // the shell's system() would split a listed argv again
+  if (this->o || this->e || listed) {  // the shell's system() would split a listed argv again
     this->run();
-  else
+    if (!this->waitForExit()) return;  // no exit code until the child is waited for
+  } else
     pec = proc::Call(toString(), evs, d).run();
   if (pec != 0)
     mkn::kul::LogMan::INSTANCE().err()
