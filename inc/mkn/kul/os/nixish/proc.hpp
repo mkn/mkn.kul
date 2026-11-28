@@ -88,6 +88,11 @@ class Process : public mkn::kul::AProcess {
   Process(std::string const& cmd, bool const& _wfe = true) : mkn::kul::AProcess(cmd, _wfe) {}
   Process(std::string const& cmd, std::filesystem::path const& path, bool const& _wfe = true)
       : mkn::kul::AProcess(cmd, path.string(), _wfe) {}
+  template <ProcessArgv R>
+  Process(R const& argv, bool const& _wfe = true) : mkn::kul::AProcess(argv, "", _wfe) {}
+  template <ProcessArgv R>
+  Process(R const& argv, std::filesystem::path const& path, bool const& _wfe = true)
+      : mkn::kul::AProcess(argv, path.string(), _wfe) {}
   template <std::same_as<mkn::kul::Dir> D>
   MKN_KUL_DEPRECATED("use std::filesystem::path")
   Process(std::string const& cmd, D const& d, bool const& _wfe = true)
@@ -156,6 +161,12 @@ class Process : public mkn::kul::AProcess {
 };
 
 int Process::child() {
+  if (isListed()) {  // as given: no $( ) expansion, no splitting
+    std::vector<char*> argV;
+    for (auto const& a : args()) argV.push_back(const_cast<char*>(a.c_str()));
+    argV.push_back(NULL);
+    return execvp(argV[0], &argV[0]);
+  }
   std::string _s(toString());
   expand(_s);
   std::vector<std::string> cli{mkn::kul::cli::asArgs(_s)};

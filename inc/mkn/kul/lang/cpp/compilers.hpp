@@ -37,6 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "mkn/kul/lang/cpp/nvcc.hpp"
 #include "mkn/kul/cli.hpp"
 #include "mkn/kul/defs.hpp"
+#include "mkn/kul/env.hpp"
 #include "mkn/kul/except.hpp"
 #include "mkn/kul/lang/compiler.hpp"
 #include "mkn/kul/map.hpp"
@@ -44,6 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "mkn/kul/proc.hpp"
 #include "mkn/kul/string.hpp"
 
+#include <array>
 #include <cstddef>
 #include <cctype>
 #include <filesystem>
@@ -53,6 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <unordered_map>
 #include <utility>
 #include <vector>
+#include <initializer_list>
 
 namespace mkn::kul::lang::cpp {
 
@@ -236,6 +239,35 @@ inline ProcessCapture GccCompiler::compileSource(CompileDAO& dao) const
     pc.exception(std::current_exception());
   }
   pc.file(out);
+  return pc;
+}
+
+// clang-scan-deps beside the compiler, its version suffix kept (clang++-22: clang-scan-deps-22);
+//  MKN_CLANG_SCAN_DEPS overrides
+inline ProcessCapture ClangCompiler::scanModules(std::string const& compiler, std::string const& db,
+                                                 std::size_t const threads) const
+    KTHROW(mkn::kul::Exception) {
+  std::string scanner = mkn::kul::env::get("MKN_CLANG_SCAN_DEPS", "");
+  if (scanner.empty()) {
+    std::filesystem::path const bin = CXX(Compilers::INSTANCE().identify(compiler).binary);
+    std::string name = bin.filename().string();
+    for (auto const* const c : {"clang++", "clang"})
+      if (name.rfind(c, 0) == 0) {
+        name = "clang-scan-deps" + name.substr(std::string(c).size());
+        break;
+      }
+    scanner = (bin.parent_path() / name).string();
+  }
+  mkn::kul::Process p(std::array<std::string, 6>{scanner, "-format=p1689", "-compilation-database",
+                                                 db, "-j", std::to_string(threads ? threads : 1)});
+  ProcessCapture pc;
+  pc.setProcess(p);
+  pc.cmd(p.toString());
+  try {
+    p.start();
+  } catch (std::exception const&) {
+    pc.exception(std::current_exception());
+  }
   return pc;
 }
 

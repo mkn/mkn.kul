@@ -98,6 +98,11 @@ class Process : public mkn::kul::AProcess {
   Process(std::string const& cmd, bool const& wfe = true) : mkn::kul::AProcess(cmd, wfe) {}
   Process(std::string const& cmd, std::filesystem::path const& path, bool const& wfe = true)
       : mkn::kul::AProcess(cmd, path.string(), wfe) {}
+  template <ProcessArgv R>
+  Process(R const& argv, bool const& wfe = true) : mkn::kul::AProcess(argv, "", wfe) {}
+  template <ProcessArgv R>
+  Process(R const& argv, std::filesystem::path const& path, bool const& wfe = true)
+      : mkn::kul::AProcess(argv, path.string(), wfe) {}
   template <std::same_as<mkn::kul::Dir> D>
   MKN_KUL_DEPRECATED("use std::filesystem::path")
   Process(std::string const& cmd, D const& d, bool const& wfe = true)
@@ -121,6 +126,32 @@ class Process : public mkn::kul::AProcess {
     CloseHandle(g_hChildStd_ERR_Rd);
   }
 
+  // a listed argv as one command line, quoted as the C runtime (CommandLineToArgvW) splits it:
+  //  backslashes are literal unless they precede a quote
+  std::string commandLine() const {
+    std::string line;
+    for (auto const& a : args()) {
+      if (!line.empty()) line += ' ';
+      if (!a.empty() && a.find_first_of(" \t\n\v\"") == std::string::npos) {
+        line += a;
+        continue;
+      }
+      line += '"';
+      std::size_t slashes = 0;
+      for (char const c : a) {
+        if (c == '\\') {
+          ++slashes;
+          continue;
+        }
+        line.append(c == '"' ? slashes * 2 + 1 : slashes, '\\');
+        slashes = 0;
+        line += c;
+      }
+      line.append(slashes * 2, '\\');
+      line += '"';
+    }
+    return line;
+  }
   virtual void expand(std::string& s) const {
     std::string r = s;
     auto lb = s.find("$(");
@@ -233,9 +264,9 @@ class Process : public mkn::kul::AProcess {
     preStart();
 
     char const* dir = directory().empty() ? 0 : directory().c_str();
-    std::string cmd(toString());
+    std::string cmd(isListed() ? commandLine() : toString());
 
-    expand(cmd);
+    if (!isListed()) expand(cmd);
     LPSTR szCmdline = _strdup(cmd.c_str());
 
     // the child's own environment block when vars() are set, this process's is not changed

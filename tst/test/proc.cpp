@@ -5,7 +5,10 @@
 #include "mkn/kul/proc.hpp"
 #include "tst/run_main.hpp"
 
+#include <array>
 #include <csignal>
+#include <string>
+#include <vector>
 
 TEST(Process_Test, LaunchProcess) {
   mkn::kul::Process p("bash");
@@ -98,3 +101,36 @@ TEST(Process_Test, CaptureStderrBeforeStdout) {
   ASSERT_FALSE(errs.empty());
   EXPECT_EQ(0u, errs.front().find("e1")) << errs.front();
 }
+
+#if !defined(_WIN32)
+// a container argv: each element one argument, quotes and spaces kept (no shell, no split)
+TEST(Process_Test, ListedArgvRunsAsGiven) {
+  std::array<std::string, 3> const argv{"printf", "%s|", "-DX=\"a b\""};
+  mkn::kul::Process p(argv);
+  mkn::kul::ProcessCapture pc(p);
+  p.start();
+  EXPECT_EQ(pc.outs(), "-DX=\"a b\"|");
+}
+
+TEST(Process_Test, ListedArgvFromAVectorWithoutCapture) {
+  std::vector<std::string> argv{"sh", "-c", "exit 0"};
+  mkn::kul::Process p(argv);
+  EXPECT_NO_THROW(p.start());  // not through system(): it would split "exit 0" again
+  EXPECT_EQ(p.exitCode(), 0);
+}
+
+// toString of a listed argv: a shell reads the same argv back
+TEST(Process_Test, ListedArgvToStringIsShellQuoted) {
+  mkn::kul::Process p(std::array{"echo", "plain", "a b", "it's", "-DX=\"y\""});
+  EXPECT_EQ(p.toString(), "echo plain 'a b' 'it'\\''s' '-DX=\"y\"'");
+
+  std::string back;
+  mkn::kul::Process sh(std::array<std::string, 3>{"sh", "-c", "printf '%s|' " + [&] {
+                                                    auto const s = p.toString();
+                                                    return s.substr(s.find(' ') + 1);
+                                                  }()});
+  mkn::kul::ProcessCapture pc(sh);
+  sh.start();
+  EXPECT_EQ(pc.outs(), "plain|a b|it's|-DX=\"y\"|");
+}
+#endif  // !defined(_WIN32)

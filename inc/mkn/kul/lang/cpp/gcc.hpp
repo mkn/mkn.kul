@@ -50,6 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <unordered_map>
 #include <utility>
 #include <vector>
+#include <cstddef>
 
 namespace mkn::kul::lang::cpp {
 
@@ -320,6 +321,21 @@ class ClangCompiler : public GccCompiler {
     m_optimise_l_bin[9] = m_optimise_l_lib[9] = {{"lto", CLANG_LTO}};
   }
   CCompiler_Type type() const override { return CCompiler_Type::CLANG; }
+
+  bool namedModules() const override { return true; }
+  std::string moduleFile(std::string const& logical) const override {
+    std::string f = logical;  // clang's name for a partition's prebuilt module
+    std::replace(f.begin(), f.end(), ':', '-');
+    return f + ".pcm";
+  }
+  std::vector<std::string> moduleOutputArgs(std::string const& bmi) const override {
+    return {"-fmodule-output=" + bmi};
+  }
+  std::vector<std::string> prebuiltModulesArgs(std::string const& dir) const override {
+    return {"-fprebuilt-module-path=" + dir};
+  }
+  ProcessCapture scanModules(std::string const& compiler, std::string const& db,
+                             std::size_t threads) const KTHROW(mkn::kul::Exception) override;
 
   // On Windows, clang targets the MSVC ABI: its driver resolves "-lfoo" by
   // searching for "foo.lib" (COFF/MSVC convention), not "libfoo.a" (GNU

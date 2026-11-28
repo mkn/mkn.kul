@@ -37,6 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "mkn/kul/proc.hpp"
 
 #include <algorithm>
+#include <cstddef>
 #include <cstdint>
 #include <filesystem>
 #include <initializer_list>
@@ -160,6 +161,25 @@ class Compiler {
   virtual ProcessCapture buildExecutable(LinkDAO& dao) const KTHROW(mkn::kul::Exception) = 0;
 
   virtual ProcessCapture buildLibrary(LinkDAO& dao) const KTHROW(mkn::kul::Exception) = 0;
+
+  // C++20 named modules: a compiler without them (the default) gives no arguments and no scan;
+  //  a build provides each module from one unit, compiled with moduleOutputArgs, before the units
+  //  importing it, which find it through prebuiltModulesArgs
+  virtual bool namedModules() const { return false; }
+  // the built module interface's file name of a module (e.g. "a:b", a partition)
+  virtual std::string moduleFile(std::string const& logical) const { return logical; }
+  // a unit providing a module: its built module interface written to bmi too
+  virtual std::vector<std::string> moduleOutputArgs(std::string const& /*bmi*/) const { return {}; }
+  // the built module interfaces in dir, for units importing them
+  virtual std::vector<std::string> prebuiltModulesArgs(std::string const& /*dir*/) const {
+    return {};
+  }
+  // P1689 JSON (outs()) of what each unit of the compilation database db provides and requires;
+  //  compiler: the build's compiler string, for the scanner of the same toolchain
+  virtual ProcessCapture scanModules(std::string const& /*compiler*/, std::string const& /*db*/,
+                                     std::size_t /*threads*/) const KTHROW(mkn::kul::Exception) {
+    KEXCEPTION("compiler without C++20 named modules");
+  }
 
   virtual void preCompileHeader(std::vector<std::string> const& incs,
                                 std::vector<std::string> const& args, std::string const& in,
