@@ -210,6 +210,16 @@ class Compilers {
 
 // Out-of-line: resolves the linker/compiler binary via Compilers::INSTANCE(),
 // which needs GccCompiler complete, so these can't be defined in gcc.hpp.
+// a command's start as its argv: launchers (ccache ...), the binary (CC / CXX / LD may carry flags,
+//  split as written) and the compiler string's trailing words
+inline std::vector<std::string> commandStart(CompilerIdentityDAO const& id,
+                                             std::string const& bin) {
+  std::vector<std::string> argv = id.prefix;
+  for (auto& w : mkn::kul::cli::asArgs(bin)) argv.push_back(std::move(w));
+  argv.insert(argv.end(), id.trailing.begin(), id.trailing.end());
+  return argv;
+}
+
 inline ProcessCapture GccCompiler::compileSource(CompileDAO& dao) const
     KTHROW(mkn::kul::Exception) {
   auto const env = dao.ctx.state().compileEnv;
@@ -225,10 +235,7 @@ inline ProcessCapture GccCompiler::compileSource(CompileDAO& dao) const
     std::string const bin =
         mkn::kul::String::NO_CASE_CMP(fileType, "c") ? CC(id.binary) : CXX(id.binary);
 
-    mkn::kul::Process p(id.prefix.empty() ? bin : id.prefix[0]);
-    for (size_t i = 1; i < id.prefix.size(); i++) p.arg(id.prefix[i]);
-    if (!id.prefix.empty()) p.arg(bin);
-    for (std::string const& t : id.trailing) p.arg(t);
+    mkn::kul::Process p(commandStart(id, bin));
     if (env.compilationInfo.visibility_hidden) p.arg(hiddenVisibility());  // args may override
     for (std::string const& s : args) p.arg(s);
     p.arg("-o").arg(out).arg("-c").arg(in);
@@ -294,10 +301,7 @@ inline ProcessCapture GccCompiler::buildExecutable(LinkDAO& dao) const KTHROW(mk
   try {
     auto const id = Compilers::INSTANCE().identify(linker);
     std::string const bin = LD(id.binary);
-    mkn::kul::Process p(id.prefix.empty() ? bin : id.prefix[0]);
-    for (size_t i = 1; i < id.prefix.size(); i++) p.arg(id.prefix[i]);
-    if (!id.prefix.empty()) p.arg(bin);
-    for (std::string const& t : id.trailing) p.arg(t);
+    mkn::kul::Process p(commandStart(id, bin));
     for (std::string const& path : libPaths) p.arg("-L" + path);
     if (mode == Mode::STAT) p.arg("-static");
     if (env.compilationInfo.rpathing && (mode == Mode::SHAR || mode == Mode::NONE)) {
@@ -306,7 +310,7 @@ inline ProcessCapture GccCompiler::buildExecutable(LinkDAO& dao) const KTHROW(mk
     p.arg("-o").arg(exe);
     for (std::string const& d : dirs)
       for (auto const& o : objectFiles(env.compilationInfo, d)) p.arg(o);
-    for (std::string const& o : objects) p << mkn::kul::fsys::escm(o);
+    for (std::string const& o : objects) p.arg(o);
     for (std::string const& lib : libs) p.arg(linkArg(lib));
     for (std::string const& s : mkn::kul::cli::asArgs(linkerEnd)) p << s;
 
@@ -338,16 +342,13 @@ inline ProcessCapture GccCompiler::buildLibrary(LinkDAO& dao) const KTHROW(mkn::
                                                        : libName(env.compilationInfo, out_name)))
                             .string();
   mkOutDir(lib_file);
-  std::string const lib = mkn::kul::fsys::esc(lib_file);
+  std::string const& lib = lib_file;
 
   ProcessCapture pc;
   try {
     auto const id = Compilers::INSTANCE().identify(linker);
     std::string const bin = (mode == Mode::SHAR) ? LD(id.binary) : id.binary;
-    mkn::kul::Process p(id.prefix.empty() ? bin : id.prefix[0]);
-    for (size_t i = 1; i < id.prefix.size(); i++) p.arg(id.prefix[i]);
-    if (!id.prefix.empty()) p.arg(bin);
-    for (std::string const& t : id.trailing) p.arg(t);
+    mkn::kul::Process p(commandStart(id, bin));
     if (mode == Mode::SHAR) p.arg("-shared").arg("-o");
     p.arg(lib);
 #if !defined(__APPLE__)
@@ -356,7 +357,7 @@ inline ProcessCapture GccCompiler::buildLibrary(LinkDAO& dao) const KTHROW(mkn::
 #endif
     for (std::string const& d : dirs)
       for (auto const& o : objectFiles(env.compilationInfo, d)) p.arg(o);
-    for (std::string const& o : objects) p << mkn::kul::fsys::escm(o);
+    for (std::string const& o : objects) p.arg(o);
 
     if (mode == Mode::SHAR) {
       for (std::string const& path : libPaths) p.arg("-L" + path);

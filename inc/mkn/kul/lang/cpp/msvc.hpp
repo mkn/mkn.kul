@@ -40,7 +40,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "mkn/kul/os.hpp"
 #include "mkn/kul/proc.hpp"
 
-#include <cstddef>
 #include <exception>
 #include <filesystem>
 #include <string>
@@ -111,16 +110,10 @@ class WINCompiler : public CCompiler {
     std::string const fileType = in.substr(in.rfind(".") + 1);
     std::string cmd = mkn::kul::String::NO_CASE_CMP(fileType, "c") ? CC(compiler) : CXX(compiler);
 
-    std::vector<std::string> bits;
-    if (cmd == compiler && compiler.find(" ") != std::string::npos) {
-      bits = mkn::kul::cli::asArgs(compiler);
-      cmd = bits[0];
-    }
-    mkn::kul::Process p(cmd);
-    for (size_t i = 1; i < bits.size(); i++) p.arg(bits[i]);
+    mkn::kul::Process p(mkn::kul::cli::asArgs(cmd));  // the compiler string, or CC / CXX
     p.arg("-nologo");
     for (std::string const& s : args) p.arg(s);
-    p.arg("-c").arg("-Fo\"" + out + "\"").arg("\"" + in + "\"");
+    p.arg("-c").arg("-Fo" + out).arg(in);
     ProcessCapture pc(p);
 
     try {
@@ -145,19 +138,12 @@ class WINCompiler : public CCompiler {
     std::string exe = out + ".exe";
     mkOutDir(exe);
 
-    std::string cmd = LD(linker);
-    std::vector<std::string> bits;
-    if (cmd == linker && linker.find(" ") != std::string::npos) {
-      bits = mkn::kul::cli::asArgs(linker);
-      cmd = bits[0];
-    }
-    mkn::kul::Process p(cmd);
-    for (unsigned int i = 1; i < bits.size(); i++) p.arg(bits[i]);
-    p.arg("-OUT:\"" + mkn::kul::fsys::escm(exe) + "\"").arg("-nologo");
-    for (std::string const& path : libPaths) p.arg("-LIBPATH:\"" + path + "\"");
+    mkn::kul::Process p(mkn::kul::cli::asArgs(LD(linker)));
+    p.arg("-OUT:" + mkn::kul::fsys::mini(exe)).arg("-nologo");
+    for (std::string const& path : libPaths) p.arg("-LIBPATH:" + path);
     for (std::string const& d : dirs)
       for (auto const& o : objectFiles(env.compilationInfo, d)) p.arg(o);
-    for (std::string const& o : objects) p << mkn::kul::fsys::escm(o);
+    for (std::string const& o : objects) p.arg(o);
     for (std::string const& lib : libs) p.arg(staticLib(lib));
     for (std::string const& s : mkn::kul::cli::asArgs(linkerEnd)) p.arg(s);
 
@@ -188,30 +174,22 @@ class WINCompiler : public CCompiler {
     if (mode == Mode::SHAR) lib = (out_dir / libName(env.compilationInfo, out_name)).string();
     std::string const imp = (out_dir / staticLib(out_name)).string();
 
-    std::string cmd = linker;
-    if (mode == Mode::SHAR) cmd = LD(linker);
-    std::vector<std::string> bits;
-    if (cmd == linker && linker.find(" ") != std::string::npos) {
-      bits = mkn::kul::cli::asArgs(linker);
-      cmd = bits[0];
-    }
-    mkn::kul::Process p(cmd);
+    mkn::kul::Process p(mkn::kul::cli::asArgs(mode == Mode::SHAR ? LD(linker) : linker));
 
     mkOutDir(lib);
     mkOutDir(imp);
 
-    for (unsigned int i = 1; i < bits.size(); i++) p.arg(bits[i]);
     p.arg("-nologo");
     if (mode == Mode::STAT) p.arg("-LTCG");
-    p.arg("-OUT:\"" + mkn::kul::fsys::escm(lib) + "\"");
+    p.arg("-OUT:" + mkn::kul::fsys::mini(lib));
     if (mode == Mode::SHAR) {
-      p.arg("-IMPLIB:\"" + mkn::kul::fsys::escm(imp) + "\"").arg("-DLL");
-      for (std::string const& path : libPaths) p.arg("-LIBPATH:\"" + path + "\"");
+      p.arg("-IMPLIB:" + mkn::kul::fsys::mini(imp)).arg("-DLL");
+      for (std::string const& path : libPaths) p.arg("-LIBPATH:" + path);
       for (std::string const& lib : libs) p.arg(staticLib(lib));
     }
     for (std::string const& d : dirs)
       for (auto const& o : objectFiles(env.compilationInfo, d)) p.arg(o);
-    for (std::string const& o : objects) p << mkn::kul::fsys::escm(o);
+    for (std::string const& o : objects) p.arg(o);
     for (std::string const& s : mkn::kul::cli::asArgs(linkerEnd)) p.arg(s);
 
     ProcessCapture pc(p);
@@ -231,7 +209,9 @@ class WINCompiler : public CCompiler {
     KEXCEPTION("Method is not implemented");
   }
 
-  std::string includeArg(std::string const& inc) const override { return "-I\"" + inc + "\""; }
+  std::vector<std::string> includeArgs(std::string const& inc) const override {
+    return {"-I" + inc};
+  }
 
   CCompiler_Type type() const override { return CCompiler_Type::WIN; }
 

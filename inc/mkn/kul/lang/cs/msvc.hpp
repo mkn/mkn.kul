@@ -62,8 +62,8 @@ class WINCompiler : public Compiler {
     KEXCEPTION("Method compileSource is not implemented in C Sharp");
   }
 
-  std::string includeArg(std::string const&) const override {
-    KEXCEPTION("Method includeArg is not implemented in C Sharp");
+  std::vector<std::string> includeArgs(std::string const&) const override {
+    KEXCEPTION("Method includeArgs is not implemented in C Sharp");
   }
 
   ProcessCapture buildExecutable(LinkDAO& dao) const KTHROW(mkn::kul::Exception) override {

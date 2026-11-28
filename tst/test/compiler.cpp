@@ -318,16 +318,18 @@ TEST(CompilerTests, ContextCompileCommandWithoutDefaultsToFull) {
   EXPECT_EQ("cc -flto a.cpp", c.compileCommandFor("a.cpp", {"lto"}));
 }
 
-// a directory whose name has a space, as maiken passes it (Dir::escm): -I, not -include
-TEST(CompilerTests, GccIncludeArgOfDirectoryWithSpace) {
+// a directory, its name with a space too: one -I argument as it is; a file: -include and the file
+TEST(CompilerTests, GccIncludeArgs) {
   auto const base = std::filesystem::temp_directory_path() / "mkn_kul_test with space";
   std::filesystem::create_directories(base / "inc");
+  mkn::kul::io::Writer((base / "pre.hpp").string()) << "";
   {  // left before removing it: Windows does not remove a working directory
     mkn::kul::os::PushDir const pushd(base.string());
-    auto const arg = GccCompiler{}.includeArg(mkn::kul::Dir("inc").escm());
-    EXPECT_EQ(arg.rfind("-I", 0), 0u) << arg;
-    auto const spaced = GccCompiler{}.includeArg(mkn::kul::Dir(base.string()).esc());
-    EXPECT_EQ(spaced.rfind("-I", 0), 0u) << spaced;
+    EXPECT_EQ(GccCompiler{}.includeArgs("inc"), std::vector<std::string>{"-Iinc"});
+    EXPECT_EQ(GccCompiler{}.includeArgs(base.string()),
+              std::vector<std::string>{"-I" + base.string()});
+    EXPECT_EQ(GccCompiler{}.includeArgs("pre.hpp"),
+              (std::vector<std::string>{"-include", "pre.hpp"}));
   }
   std::filesystem::remove_all(base);
 }
