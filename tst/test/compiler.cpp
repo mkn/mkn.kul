@@ -104,6 +104,9 @@ TEST(CompilerTests, ClangScanDepsBesideTheCompiler) {
   EXPECT_EQ("clang-scan-deps", ClangCompiler::scanDeps("clang++ -std=c++20"));
   EXPECT_EQ("clang-scan-deps-22", ClangCompiler::scanDeps("ccache clang++-22 -fPIC"));
   EXPECT_EQ("/opt/llvm/bin/clang-scan-deps-22", ClangCompiler::scanDeps("/opt/llvm/bin/clang-22"));
+#if defined(_WIN32)  // a backslash separates only there
+  EXPECT_EQ("C:\\llvm\\clang-scan-deps-22", ClangCompiler::scanDeps("C:\\llvm\\clang++-22"));
+#endif
   EXPECT_EQ("clang-scan-deps-18", ClangCompiler::scanDeps("x86_64-linux-gnu-clang++-18"));
   mkn::kul::env::SET("CXX", "clang++-19 -O2");
   EXPECT_EQ("clang-scan-deps-19", ClangCompiler::scanDeps("clang++"));

@@ -126,32 +126,6 @@ class Process : public mkn::kul::AProcess {
     CloseHandle(g_hChildStd_ERR_Rd);
   }
 
-  // a listed argv as one command line, quoted as the C runtime (CommandLineToArgvW) splits it:
-  //  backslashes are literal unless they precede a quote
-  std::string commandLine() const {
-    std::string line;
-    for (auto const& a : args()) {
-      if (!line.empty()) line += ' ';
-      if (!a.empty() && a.find_first_of(" \t\n\v\"") == std::string::npos) {
-        line += a;
-        continue;
-      }
-      line += '"';
-      std::size_t slashes = 0;
-      for (char const c : a) {
-        if (c == '\\') {
-          ++slashes;
-          continue;
-        }
-        line.append(c == '"' ? slashes * 2 + 1 : slashes, '\\');
-        slashes = 0;
-        line += c;
-      }
-      line.append(slashes * 2, '\\');
-      line += '"';
-    }
-    return line;
-  }
   virtual void expand(std::string& s) const {
     std::string r = s;
     auto lb = s.find("$(");
@@ -264,7 +238,7 @@ class Process : public mkn::kul::AProcess {
     preStart();
 
     char const* dir = directory().empty() ? 0 : directory().c_str();
-    std::string cmd(isListed() ? commandLine() : toString());
+    std::string cmd(isListed() ? proc::command_line(args()) : toString());
 
     if (!isListed()) expand(cmd);
     LPSTR szCmdline = _strdup(cmd.c_str());

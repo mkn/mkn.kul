@@ -10,6 +10,12 @@
 #include <string>
 #include <vector>
 
+#if defined(_WIN32)
+#include <windows.h>
+#include <shellapi.h>  // CommandLineToArgvW
+#pragma comment(lib, "shell32.lib")
+#endif  // defined(_WIN32)
+
 TEST(Process_Test, LaunchProcess) {
   mkn::kul::Process p("bash");
   p << "-c"
@@ -141,3 +147,42 @@ TEST(Process_Test, ListedArgvNotWaitedFor) {
   EXPECT_NO_THROW(p.start());  // no exit code to check yet
 }
 #endif  // !defined(_WIN32)
+
+// argv as a Windows command line: the C runtime's splitting rules, on every OS
+TEST(Process_Test, WindowsCommandLineQuoting) {
+  using mkn::kul::proc::command_line;
+  EXPECT_EQ(command_line({"cl", "plain"}), "cl plain");
+  EXPECT_EQ(command_line({"a b"}), "\"a b\"");
+  EXPECT_EQ(command_line({""}), "\"\"");
+  EXPECT_EQ(command_line({"ab\"c"}), "\"ab\\\"c\"");
+  EXPECT_EQ(command_line({"a\\\\b"}), "a\\\\b");          // no quote after them: literal
+  EXPECT_EQ(command_line({"a\\\"b"}), "\"a\\\\\\\"b\"");  // a\"b: 2n+1 before the quote
+  EXPECT_EQ(command_line({"C:\\a dir\\"}),
+            "\"C:\\a dir\\\\\"");  // doubled before the closing quote
+  EXPECT_EQ(command_line({"-DX=\"a b\""}), "\"-DX=\\\"a b\\\"\"");
+}
+
+#if defined(_WIN32)
+// the same argvs read back by Windows' own splitter
+TEST(Process_Test, WindowsCommandLineRoundTrips) {
+  std::vector<std::string> const argv{"prog",   "plain",  "a b",         "",           "ab\"c",
+                                      "a\\\\b", "a\\\"b", "C:\\a dir\\", "-DX=\"a b\""};
+  auto const line = mkn::kul::proc::command_line(argv);
+  std::wstring const wide(line.begin(), line.end());  // ASCII
+  int n = 0;
+  LPWSTR* const back = CommandLineToArgvW(wide.c_str(), &n);
+  ASSERT_NE(back, nullptr);
+  ASSERT_EQ(static_cast<std::size_t>(n), argv.size()) << line;
+  for (int i = 0; i < n; ++i) {
+    std::wstring const w(back[i]);
+    EXPECT_EQ(std::string(w.begin(), w.end()), argv[static_cast<std::size_t>(i)]) << line;
+  }
+  LocalFree(back);
+}
+
+TEST(Process_Test, ListedArgvRunsOnWindows) {
+  mkn::kul::Process p(std::array{"cmd", "/c", "exit 0"});
+  EXPECT_NO_THROW(p.start());
+  EXPECT_EQ(p.exitCode(), 0);
+}
+#endif  // defined(_WIN32)

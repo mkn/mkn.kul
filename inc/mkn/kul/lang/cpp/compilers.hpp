@@ -248,14 +248,15 @@ inline ProcessCapture GccCompiler::compileSource(CompileDAO& dao) const
 inline std::string ClangCompiler::scanDeps(std::string const& compiler) {
   if (auto scanner = mkn::kul::env::get("MKN_CLANG_SCAN_DEPS", ""); !scanner.empty())
     return scanner;
-  std::filesystem::path const bin = Compilers::INSTANCE().identify(CXX(compiler)).binary;
-  std::string name = bin.filename().string();
+  std::string const bin = Compilers::INSTANCE().identify(CXX(compiler)).binary;
+  auto const file = std::filesystem::path(bin).filename().string();
+  std::string name = file;
   for (auto const* const c : {"clang++", "clang"})
     if (auto const at = name.find(c); at != std::string::npos) {
       name = "clang-scan-deps" + name.substr(at + std::string(c).size());
       break;
     }
-  return (bin.parent_path() / name).string();
+  return bin.substr(0, bin.size() - file.size()) + name;  // the directory as written
 }
 
 inline ProcessCapture ClangCompiler::scanModules(std::string const& compiler, std::string const& db,

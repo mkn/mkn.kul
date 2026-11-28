@@ -90,6 +90,37 @@ class Call {
 
 }  // namespace mkn::kul::proc
 
+namespace mkn::kul::proc {
+
+// argv as one Windows command line, quoted as the C runtime (CommandLineToArgvW) splits it back:
+//  backslashes are literal unless they precede a quote
+inline std::string command_line(std::vector<std::string> const& argv) {
+  std::string line;
+  for (auto const& a : argv) {
+    if (!line.empty()) line += ' ';
+    if (!a.empty() && a.find_first_of(" \t\n\v\"") == std::string::npos) {
+      line += a;
+      continue;
+    }
+    line += '"';
+    std::size_t slashes = 0;
+    for (char const c : a) {
+      if (c == '\\') {
+        ++slashes;
+        continue;
+      }
+      line.append(c == '"' ? slashes * 2 + 1 : slashes, '\\');
+      slashes = 0;
+      line += c;
+    }
+    line.append(slashes * 2, '\\');
+    line += '"';
+  }
+  return line;
+}
+
+}  // namespace mkn::kul::proc
+
 namespace mkn::kul {
 
 // a process's argv as a container (std::array when its size is known at the call, else e.g. a
