@@ -3,6 +3,7 @@
 #include "test_common.hpp"
 
 #include "mkn/kul/cli.hpp"
+#include "mkn/kul/env.hpp"
 #include "mkn/kul/lang/cpp/compilers.hpp"
 #include "mkn/kul/lang/cpp/gcc.hpp"
 #include "mkn/kul/lang/cpp/nvcc.hpp"
@@ -16,6 +17,7 @@
 #include <cstdint>
 #include <exception>
 #include <filesystem>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -86,6 +88,34 @@ TEST(CompilerTests, ModeToStringIsModeFromsInverse) {
 TEST(CompilerTests, ClangResolvesToClangFamily) {
   EXPECT_EQ("clang", Compilers::INSTANCE().base("clang"));
   EXPECT_EQ("clang++", Compilers::INSTANCE().base("clang++"));
+}
+
+// the scanner of a compiler string: version suffix kept, target prefix and flags dropped
+TEST(CompilerTests, ClangScanDepsBesideTheCompiler) {
+  using mkn::kul::lang::cpp::ClangCompiler;
+  auto const keep = [](char const* const v) {
+    return mkn::kul::env::EXISTS(v) ? std::optional<std::string>{mkn::kul::env::GET(v)}
+                                    : std::nullopt;
+  };
+  auto const cxx = keep("CXX"), scan = keep("MKN_CLANG_SCAN_DEPS");
+  mkn::kul::env::SET("CXX", nullptr);
+  mkn::kul::env::SET("MKN_CLANG_SCAN_DEPS", nullptr);
+
+  EXPECT_EQ("clang-scan-deps", ClangCompiler::scanDeps("clang++ -std=c++20"));
+  EXPECT_EQ("clang-scan-deps-22", ClangCompiler::scanDeps("ccache clang++-22 -fPIC"));
+  EXPECT_EQ("/opt/llvm/bin/clang-scan-deps-22", ClangCompiler::scanDeps("/opt/llvm/bin/clang-22"));
+#if defined(_WIN32)  // a backslash separates only there; compiler strings are split as a shell
+                     //  does, so a settings file writes it doubled (or /)
+  EXPECT_EQ(R"(C:\llvm\clang-scan-deps-22)", ClangCompiler::scanDeps(R"(C:\\llvm\\clang++-22)"));
+#endif
+  EXPECT_EQ("clang-scan-deps-18", ClangCompiler::scanDeps("x86_64-linux-gnu-clang++-18"));
+  mkn::kul::env::SET("CXX", "clang++-19 -O2");
+  EXPECT_EQ("clang-scan-deps-19", ClangCompiler::scanDeps("clang++"));
+  mkn::kul::env::SET("MKN_CLANG_SCAN_DEPS", "/my/scanner");
+  EXPECT_EQ("/my/scanner", ClangCompiler::scanDeps("clang++"));
+
+  mkn::kul::env::SET("CXX", cxx ? cxx->c_str() : nullptr);
+  mkn::kul::env::SET("MKN_CLANG_SCAN_DEPS", scan ? scan->c_str() : nullptr);
 }
 
 // clang on Windows targets the MSVC ABI: its driver resolves "-lfoo" by

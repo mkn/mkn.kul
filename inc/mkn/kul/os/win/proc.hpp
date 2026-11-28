@@ -98,6 +98,11 @@ class Process : public mkn::kul::AProcess {
   Process(std::string const& cmd, bool const& wfe = true) : mkn::kul::AProcess(cmd, wfe) {}
   Process(std::string const& cmd, std::filesystem::path const& path, bool const& wfe = true)
       : mkn::kul::AProcess(cmd, path.string(), wfe) {}
+  template <ProcessArgv R>
+  Process(R const& argv, bool const& wfe = true) : mkn::kul::AProcess(argv, "", wfe) {}
+  template <ProcessArgv R>
+  Process(R const& argv, std::filesystem::path const& path, bool const& wfe = true)
+      : mkn::kul::AProcess(argv, path.string(), wfe) {}
   template <std::same_as<mkn::kul::Dir> D>
   MKN_KUL_DEPRECATED("use std::filesystem::path")
   Process(std::string const& cmd, D const& d, bool const& wfe = true)
@@ -233,9 +238,9 @@ class Process : public mkn::kul::AProcess {
     preStart();
 
     char const* dir = directory().empty() ? 0 : directory().c_str();
-    std::string cmd(toString());
+    std::string cmd(isListed() ? proc::command_line(args()) : toString());
 
-    expand(cmd);
+    if (!isListed()) expand(cmd);
     LPSTR szCmdline = _strdup(cmd.c_str());
 
     // the child's own environment block when vars() are set, this process's is not changed

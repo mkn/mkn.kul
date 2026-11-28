@@ -43,9 +43,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "mkn/kul/os/any/proc/def.hpp"  // IWYU pragma: export
 #include "mkn/kul/defs.hpp"
 
+#include <concepts>
 #include <cstdint>
 #include <cstdio>
+#include <ranges>
 #include <string>
+#include <string_view>
 #include <functional>
 #include <sstream>
 #include <unordered_map>
@@ -87,7 +90,46 @@ class Call {
 
 }  // namespace mkn::kul::proc
 
+namespace mkn::kul::proc {
+
+// argv as one Windows command line, quoted as the C runtime (CommandLineToArgvW) splits it back:
+//  backslashes are literal unless they precede a quote
+inline std::string command_line(std::vector<std::string> const& argv) {
+  std::string line;
+  for (auto const& a : argv) {
+    if (!line.empty()) line += ' ';
+    if (!a.empty() && a.find_first_of(" \t\n\v\"") == std::string::npos) {
+      line += a;
+      continue;
+    }
+    line += '"';
+    std::size_t slashes = 0;
+    for (char const c : a) {
+      if (c == '\\') {
+        ++slashes;
+        continue;
+      }
+      line.append(c == '"' ? slashes * 2 + 1 : slashes, '\\');
+      slashes = 0;
+      line += c;
+    }
+    line.append(slashes * 2, '\\');
+    line += '"';
+  }
+  return line;
+}
+
+}  // namespace mkn::kul::proc
+
 namespace mkn::kul {
+
+// a process's argv as a container (std::array when its size is known at the call, else e.g. a
+//  std::vector): each element one argument as it is, unlike a command string, split as a shell
+//  would
+template <typename R>
+concept ProcessArgv =
+    std::ranges::input_range<R const> && !std::convertible_to<R const&, std::string_view> &&
+    std::constructible_from<std::string, std::ranges::range_reference_t<R const>>;
 
 class AProcess {
  private:
@@ -98,6 +140,7 @@ class AProcess {
   std::function<void(std::string const&)> e, o;
   std::vector<std::string> argv;
   mkn::kul::hash::map::S2S evs;
+  bool const listed = false;  // argv given as a container: run as it is, never split again
   friend std::ostream& operator<<(std::ostream&, AProcess const&);
 
  protected:
@@ -105,6 +148,13 @@ class AProcess {
   AProcess(std::string const& cmd, std::string const& _d, bool const& _wfe) : wfe(_wfe), d(_d) {
     argv.push_back(cmd);
   }
+  template <ProcessArgv R>
+  AProcess(R const& _argv, std::string const& _d, bool const& _wfe)
+      : wfe(_wfe), d(_d), listed(true) {
+    for (auto const& a : _argv) argv.emplace_back(a);
+    if (argv.empty()) KEXCEPTION("Process: an empty argv");
+  }
+  bool isListed() const { return listed; }
   virtual ~AProcess() {}
 
   std::string const& directory() const { return d; }
@@ -123,13 +173,13 @@ class AProcess {
     if (this->o)
       this->o(_s);
     else
-      printf("%s", _s.c_str());
+      std::fwrite(_s.data(), 1, _s.size(), stdout);  // its bytes, NULs too
   }
   virtual void err(std::string const& _s) {
     if (this->e)
       this->e(_s);
     else
-      fprintf(stderr, "%s", _s.c_str());
+      std::fwrite(_s.data(), 1, _s.size(), stderr);
   }
   void error(int16_t const& line, std::string const& _s) KTHROW(mkn::kul::Exception) {
     tearDown();
@@ -207,9 +257,10 @@ class ProcessCapture {
 inline void AProcess::start() KTHROW(mkn::kul::Exception) {
   if (this->s) KEXCEPT(mkn::kul::proc::Exception, "Process is already started");
   this->s = true;
-  if (this->o || this->e)
+  if (this->o || this->e || listed) {  // the shell's system() would split a listed argv again
     this->run();
-  else
+    if (!this->waitForExit()) return;  // no exit code until the child is waited for
+  } else
     pec = proc::Call(toString(), evs, d).run();
   if (pec != 0)
     mkn::kul::LogMan::INSTANCE().err()
@@ -220,9 +271,21 @@ inline void AProcess::start() KTHROW(mkn::kul::Exception) {
                                     "Process exit code: " + std::to_string(pec));
 }
 
+// a listed argv quoted as a POSIX shell reads it back, e.g. for a compilation database
 inline std::string AProcess::toString() const {
   std::string _s;
-  for (std::string const& a : args()) _s += a + " ";
+  for (std::string const& a : args()) {
+    bool const plain = !listed || (!a.empty() && a.find_first_of(" \t\n'\"\\$`*?[]{}()<>|&;#~!") ==
+                                                     std::string::npos);
+    if (plain)
+      _s += a;
+    else {
+      _s += '\'';
+      for (char const c : a) _s += c == '\'' ? std::string("'\\''") : std::string(1, c);
+      _s += '\'';
+    }
+    _s += " ";
+  }
   _s.pop_back();
   return _s;
 }

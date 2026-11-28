@@ -37,6 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "mkn/kul/lang/cpp/nvcc.hpp"
 #include "mkn/kul/cli.hpp"
 #include "mkn/kul/defs.hpp"
+#include "mkn/kul/env.hpp"
 #include "mkn/kul/except.hpp"
 #include "mkn/kul/lang/compiler.hpp"
 #include "mkn/kul/map.hpp"
@@ -44,6 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "mkn/kul/proc.hpp"
 #include "mkn/kul/string.hpp"
 
+#include <array>
 #include <cstddef>
 #include <cctype>
 #include <filesystem>
@@ -53,6 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <unordered_map>
 #include <utility>
 #include <vector>
+#include <initializer_list>
 
 namespace mkn::kul::lang::cpp {
 
@@ -236,6 +239,40 @@ inline ProcessCapture GccCompiler::compileSource(CompileDAO& dao) const
     pc.exception(std::current_exception());
   }
   pc.file(out);
+  return pc;
+}
+
+// clang-scan-deps beside the compiler, its version suffix kept (clang++-22: clang-scan-deps-22,
+//  x86_64-linux-gnu-clang++-22 too: scanners have no target prefix); CXX as for compiles, its
+//  flags not part of the name; MKN_CLANG_SCAN_DEPS overrides
+inline std::string ClangCompiler::scanDeps(std::string const& compiler) {
+  if (auto scanner = mkn::kul::env::get("MKN_CLANG_SCAN_DEPS", ""); !scanner.empty())
+    return scanner;
+  std::string const bin = Compilers::INSTANCE().identify(CXX(compiler)).binary;
+  auto const file = std::filesystem::path(bin).filename().string();
+  std::string name = file;
+  for (auto const* const c : {"clang++", "clang"})
+    if (auto const at = name.find(c); at != std::string::npos) {
+      name = "clang-scan-deps" + name.substr(at + std::string(c).size());
+      break;
+    }
+  return bin.substr(0, bin.size() - file.size()) + name;  // the directory as written
+}
+
+inline ProcessCapture ClangCompiler::scanModules(std::string const& compiler, std::string const& db,
+                                                 std::size_t const threads) const
+    KTHROW(mkn::kul::Exception) {
+  mkn::kul::Process p(std::array<std::string, 6>{scanDeps(compiler), "-format=p1689",
+                                                 "-compilation-database", db, "-j",
+                                                 std::to_string(threads ? threads : 1)});
+  ProcessCapture pc;
+  pc.setProcess(p);
+  pc.cmd(p.toString());
+  try {
+    p.start();
+  } catch (std::exception const&) {
+    pc.exception(std::current_exception());
+  }
   return pc;
 }
 
